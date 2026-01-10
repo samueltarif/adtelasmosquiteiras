@@ -37,12 +37,7 @@ const problems = [
             {{ problem.icon }}
           </div>
           <h3 class="text-xl md:text-[22px] mb-4 text-text-primary font-semibold">{{ problem.title }}</h3>
-          <p class="text-sm md:text-base text-text-secondary mb-5">{{ problem.description }}</p>
-          <CtaButton 
-            text="Saber Mais"
-            variant="primary"
-            size="small"
-          />
+          <p class="text-sm md:text-base text-text-secondary">{{ problem.description }}</p>
         </div>
       </div>
     </div>
