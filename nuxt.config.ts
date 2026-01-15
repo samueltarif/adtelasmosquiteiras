@@ -5,6 +5,10 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/tailwind.css'],
   
+  devServer: {
+    port: 3001
+  },
+  
   // Security Headers
   nitro: {
     routeRules: {

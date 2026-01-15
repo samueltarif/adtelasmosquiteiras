@@ -3,19 +3,22 @@
 
 const problems = [
   {
-    icon: '🦟',
+    icon: '/images/mosquitoo.png',
     title: 'Mosquitos e Insetos',
-    description: 'Barreira completa contra dengue, zika e outras doenças transmitidas por insetos.'
+    description: 'Barreira completa contra dengue, zika e outras doenças transmitidas por insetos.',
+    isImage: true
   },
   {
-    icon: '👶',
+    icon: '/images/menino_janela.png',
     title: 'Segurança de Crianças',
-    description: 'Proteção contra quedas. Material resistente testado e aprovado para usar com confiança.'
+    description: 'Proteção contra quedas. Material resistente testado e aprovado para usar com confiança.',
+    isImage: true
   },
   {
-    icon: '🐱',
+    icon: '/images/pets_pro.png',
     title: 'Pets Seguros',
-    description: 'Seus gatos e cães livres para aproveitar a varanda sem risco de fugas ou quedas.'
+    description: 'Seus gatos e cães livres para aproveitar a varanda sem risco de fugas ou quedas.',
+    isImage: true
   }
 ]
 </script>
@@ -33,8 +36,11 @@ const problems = [
           :key="index"
           class="bg-surface p-6 md:p-10 rounded-xl border-2 border-border text-center transition-all duration-300 cursor-pointer hover:border-primary hover:shadow-lg hover:-translate-y-2"
         >
-          <div class="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-[40px]">
-            {{ problem.icon }}
+          <div v-if="problem.isImage" class="w-20 h-20 mx-auto mb-5 flex items-center justify-center">
+            <img :src="problem.icon" :alt="problem.title" class="w-20 h-20 object-contain" />
+          </div>
+          <div v-else class="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center text-[40px]">
+            <span>{{ problem.icon }}</span>
           </div>
           <h3 class="text-xl md:text-[22px] mb-4 text-text-primary font-semibold">{{ problem.title }}</h3>
           <p class="text-sm md:text-base text-text-secondary">{{ problem.description }}</p>
