@@ -19,7 +19,7 @@
         </div>
         <div class="w-full h-[300px] md:h-[400px] bg-white/10 rounded-xl overflow-hidden shadow-lg">
           <img 
-            src="https://user-gen-media-assets.s3.amazonaws.com/seedream_images/0f3599b6-0c4b-4e3a-884f-6b8ddb80552c.png" 
+            src="/images/familia.png" 
             alt="Família protegida em varanda com rede de segurança instalada"
             class="w-full h-full object-cover"
           />

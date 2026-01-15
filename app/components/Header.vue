@@ -12,6 +12,7 @@ const menuItems = [
   { label: 'Serviços', id: 'problems' },
   { label: 'Vantagens', id: 'value' },
   { label: 'Cases', id: 'cases' },
+  { label: 'Avaliações', id: 'reviews' },
   { label: 'Soluções', id: 'solutions' },
   { label: 'FAQ', id: 'faq' },
   { label: 'Contato', id: 'contact' }

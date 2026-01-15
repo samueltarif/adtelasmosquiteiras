@@ -4,6 +4,7 @@
     <ProblemsSection />
     <ValueProposition />
     <CaseStudies />
+    <ReviewsCarousel />
     <SegmentedSolutions />
     <FaqSection />
     <CtaSection />

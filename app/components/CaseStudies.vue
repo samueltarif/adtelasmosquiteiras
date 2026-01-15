@@ -1,7 +1,7 @@
 <script setup>
 const cases = [
   {
-    image: 'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/a4d700a4-5c47-45d7-a515-945f158c5b69.png',
+    image: '/images/gato.png',
     alt: 'Gato seguro em janela com rede de proteção',
     label: 'Pets Seguros',
     meta: 'Marina & Gato Whiskers',
@@ -23,7 +23,7 @@ const cases = [
     result: '✅ Instalado em 4 horas | Teste de Carga: 500kg'
   },
   {
-    image: 'https://user-gen-media-assets.s3.amazonaws.com/seedream_images/135c8d1a-4b3f-47ac-98fd-595ca5c15249.png',
+    image: '/images/bebe.png',
     alt: 'Varanda antes e depois com instalação de rede de proteção',
     label: 'Transformação Completa',
     meta: 'Fernanda',
