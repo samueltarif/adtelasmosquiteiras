@@ -105,10 +105,12 @@ const secondaryButtonClasses = computed(() => {
     </button>
   </div>
 
-  <!-- WhatsApp Modal -->
-  <WhatsappModal 
-    :is-open="isOpen" 
-    @close="closeModal" 
-    @submit="handleWhatsappSubmit" 
-  />
+  <!-- WhatsApp Modal com Teleport para renderizar no body -->
+  <Teleport to="body">
+    <WhatsappModal 
+      :is-open="isOpen" 
+      @close="closeModal" 
+      @submit="handleWhatsappSubmit" 
+    />
+  </Teleport>
 </template>

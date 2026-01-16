@@ -1,3 +1,8 @@
+<script setup>
+// Ativar animações de scroll
+useScrollAnimation()
+</script>
+
 <template>
   <div>
     <HeroSection />

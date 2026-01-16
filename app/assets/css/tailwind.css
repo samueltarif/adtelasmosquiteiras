@@ -5,3 +5,128 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Animações customizadas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out;
+}
+
+/* Animações de scroll para seções */
+.animate-out {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.animate-in {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Variações de animação por seção */
+[data-section="problems"].animate-in {
+  animation: slide-in-left 0.8s ease-out forwards;
+}
+
+[data-section="value"].animate-in {
+  animation: slide-in-right 0.8s ease-out forwards;
+}
+
+[data-section="cases"].animate-in,
+[data-section="reviews"].animate-in,
+[data-section="solutions"].animate-in {
+  animation: scale-in 0.8s ease-out forwards;
+}
+
+[data-section="faq"].animate-in,
+[data-section="contact"].animate-in {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Animação para cards dentro das seções */
+.animate-in .animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Delays para efeito cascata */
+.animate-in > *:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.animate-in > *:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.animate-in > *:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.animate-in > *:nth-child(4) {
+  animation-delay: 0.4s;
+}

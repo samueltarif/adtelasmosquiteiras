@@ -73,10 +73,10 @@ const handleOverlayClick = (event) => {
     v-if="isOpen"
     @click="handleOverlayClick"
     class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 backdrop-blur-sm"
-    style="z-index: 99999;"
+    style="z-index: 999999 !important;"
   >
     <!-- Modal Content -->
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative" style="z-index: 100000;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto relative">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-200">
         <div class="flex items-center gap-3">
