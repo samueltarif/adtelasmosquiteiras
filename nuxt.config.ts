@@ -19,7 +19,7 @@ export default defineNuxtConfig({
           'X-XSS-Protection': '1; mode=block',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://user-gen-media-assets.s3.amazonaws.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.whatsapp.com; frame-ancestors 'none';"
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://user-gen-media-assets.s3.amazonaws.com https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.whatsapp.com https://vitals.vercel-insights.com; frame-ancestors 'none';"
         }
       }
     }

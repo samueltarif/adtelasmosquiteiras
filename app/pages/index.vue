@@ -6,6 +6,7 @@ useScrollAnimation()
 <template>
   <div>
     <HeroSection />
+    <ServicesSection />
     <ProblemsSection />
     <ValueProposition />
     <CaseStudies />

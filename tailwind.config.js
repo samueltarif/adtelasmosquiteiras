@@ -46,6 +46,10 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(30px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' }
         }
+      },
+      height: {
+        '46': '11.5rem', // 184px
+        '60': '15rem'    // 240px
       }
     }
   },

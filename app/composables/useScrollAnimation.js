@@ -1,8 +1,14 @@
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 export const useScrollAnimation = () => {
+  const observer = ref(null)
+
   const observeElements = () => {
-    const observer = new IntersectionObserver(
+    if (typeof window === 'undefined' || !window.IntersectionObserver) {
+      return null
+    }
+
+    const intersectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -21,17 +27,27 @@ export const useScrollAnimation = () => {
     const sections = document.querySelectorAll('[data-section]')
     sections.forEach((section) => {
       section.classList.add('animate-out')
-      observer.observe(section)
+      intersectionObserver.observe(section)
     })
 
-    return observer
+    observer.value = intersectionObserver
+    return intersectionObserver
   }
 
   onMounted(() => {
-    // Pequeno delay para garantir que o DOM está pronto
-    setTimeout(() => {
-      observeElements()
-    }, 100)
+    if (typeof window !== 'undefined') {
+      // Pequeno delay para garantir que o DOM está pronto
+      setTimeout(() => {
+        observeElements()
+      }, 100)
+    }
+  })
+
+  onUnmounted(() => {
+    if (observer.value) {
+      observer.value.disconnect()
+      observer.value = null
+    }
   })
 
   return {

@@ -2,7 +2,7 @@
   <footer class="bg-text-primary text-white py-10 text-center">
     <div class="max-w-[1200px] mx-auto px-5">
       <p class="font-bold">AD Telas e Redes © 2026 — Proteção Profissional em São Paulo</p>
-      <p class="text-xs mt-2.5 opacity-80">Endereço: São Paulo - SP | CNPJ: 40.297.694/0001-9</p>
+      <p class="text-xs mt-2.5 opacity-80">Endereço: São Paulo - SP | CNPJ: 40.297.694/0001-95</p>
       <p class="text-xs opacity-80">Atendimento: (11) 98358-6611 | vendas.adtelaseredes@gmail.com</p>
       
       <!-- Redes Sociais -->

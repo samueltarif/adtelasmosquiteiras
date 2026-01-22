@@ -4,5 +4,6 @@
     <slot />
     <Footer />
     <FloatingButtons />
+    <StickyFormModal />
   </div>
 </template>
