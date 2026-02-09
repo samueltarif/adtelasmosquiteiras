@@ -66,7 +66,7 @@
             
             <!-- Sub-headline -->
             <p class="text-lg font-semibold mb-6 text-center opacity-95">
-              Garantia 5 Anos | Orçamento Grátis
+              Garantia 2 Anos | Orçamento Grátis
             </p>
 
             <!-- CAMADA 2 (2-4s) - CTAs Principais com CSS Puro -->
@@ -85,7 +85,7 @@
           <!-- Desktop Version -->
           <div class="hidden md:block">
             <h1 class="text-[28px] md:text-[48px] font-extrabold leading-tight mb-5 flex flex-wrap items-center gap-3">
-              <span>Telas Mosquiteiras Sob Medida em São Paulo – Garantia 5 Anos. Orçamento grátis agora</span>
+              <span>Telas Mosquiteiras Sob Medida em São Paulo – Garantia 2 Anos. Orçamento grátis agora</span>
               <svg class="w-6 h-6 md:w-8 md:h-8 text-white animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
               </svg>
