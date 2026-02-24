@@ -55,7 +55,7 @@
 
         <!-- 2. HEADLINE DIRETA (1-2s) -->
         <h1 class="text-[28px] leading-[1.15] font-extrabold mb-3 text-center">
-          Telas Mosquiteiras<br>em São Paulo
+          Telas Mosqueteiras<br>em São Paulo
         </h1>
         
         <!-- 3. BENEFÍCIO CHAVE -->
@@ -65,7 +65,7 @@
 
         <!-- 4. CTA PRINCIPAL - WHATSAPP (2-3s) -->
         <a 
-          href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras."
+          href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosqueteiras."
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-3 w-full h-14 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold text-base shadow-lg active:scale-[0.98] transition-all mb-3"
@@ -125,7 +125,7 @@
           <!-- Coluna de Conteúdo (2/3) -->
           <div class="lg:col-span-2">
             <h1 class="text-[28px] md:text-[48px] font-extrabold leading-tight mb-5 flex flex-wrap items-center gap-3">
-              <span>Telas Mosquiteiras Sob Medida em São Paulo – Garantia 2 Anos. Orçamento grátis agora</span>
+              <span>Telas Mosqueteiras Sob Medida em São Paulo – Garantia 2 Anos. Orçamento grátis agora</span>
               <svg class="w-6 h-6 md:w-8 md:h-8 text-white animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
               </svg>

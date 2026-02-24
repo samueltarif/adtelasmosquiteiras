@@ -15,8 +15,8 @@ useHead({
     <MobileHeroOptimized
       logo-src="/images/logo ad.png"
       whatsapp-number="5511983586611"
-      whatsapp-message="Olá! Vi seu site e gostaria de um orçamento para telas mosquiteiras."
-      headline="Telas Mosquiteiras em São Paulo"
+      whatsapp-message="Olá! Vi seu site e gostaria de um orçamento para telas mosqueteiras."
+      headline="Telas Mosqueteiras em São Paulo"
       subheadline="Instalação em 48h • Garantia 2 Anos • +500 Clientes Satisfeitos"
       :rating="5.0"
       :review-count="487"

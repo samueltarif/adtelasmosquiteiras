@@ -12,7 +12,7 @@
 const config = {
   // WhatsApp
   whatsappNumber: '5511983586611', // ⚠️ ALTERAR: Número sem + e sem espaços
-  whatsappMessage: 'Olá! Vi seu anúncio e gostaria de um orçamento para telas mosquiteiras.', // ⚠️ ALTERAR: Mensagem pré-preenchida
+  whatsappMessage: 'Olá! Vi seu anúncio e gostaria de um orçamento para telas mosqueteiras.', // ⚠️ ALTERAR: Mensagem pré-preenchida
   
   // Telefone
   phoneNumber: '+5511983586611', // ⚠️ ALTERAR: Número com + para tel:
@@ -20,7 +20,7 @@ const config = {
   
   // Textos
   logo: '/images/logo ad.png', // ⚠️ ALTERAR: Caminho da logo
-  headline: 'Telas Mosquiteiras em São Paulo', // ⚠️ ALTERAR: Título principal
+  headline: 'Telas Mosqueteiras em São Paulo', // ⚠️ ALTERAR: Título principal
   subheadline: 'Instalação em 48h • Garantia 2 Anos • +500 Clientes', // ⚠️ ALTERAR: Subtítulo
   
   // Prova Social

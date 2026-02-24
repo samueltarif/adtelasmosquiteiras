@@ -8,7 +8,7 @@
     
     <!-- WhatsApp Floating -->
     <a
-      href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras."
+      href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosqueteiras."
       target="_blank"
       rel="noopener noreferrer"
       title="WhatsApp: Solicitar Orçamento"
