@@ -1,4 +1,10 @@
 <script setup>
+// Cores da marca AD Telas Mosquiteiras:
+// Azul escuro: #22345F (títulos)
+// Laranja: #F49A1A (destaques, linha decorativa, indicadores)
+// Azul claro: #E5EDF8 (bordas)
+// Cinza escuro: #4B5563 (texto secundário)
+
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // Array com as avaliações
@@ -68,13 +74,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section data-section="reviews" class="py-10 md:py-20 bg-background">
+  <section data-section="reviews" class="py-10 md:py-20 bg-white">
     <div class="max-w-[1200px] mx-auto px-5">
-      <h2 class="text-2xl md:text-4xl text-center mb-5 text-text-primary font-bold">
+      <h2 class="text-2xl md:text-4xl text-center mb-5 text-[#22345F] font-bold">
         Avaliações dos Nossos Clientes
       </h2>
-      <div class="h-[3px] w-[60px] bg-gradient-to-r from-primary to-primary-light mx-auto mb-8"></div>
-      <p class="text-base md:text-lg text-center text-text-secondary mb-12">
+      <div class="h-[3px] w-[60px] bg-[#F49A1A] mx-auto mb-8"></div>
+      <p class="text-base md:text-lg text-center text-[#4B5563] mb-12">
         Veja o que nossos clientes falam sobre nossos serviços
       </p>
 
@@ -115,8 +121,8 @@ onUnmounted(() => {
             :class="[
               'w-3 h-3 rounded-full transition-all duration-300',
               currentIndex === index 
-                ? 'bg-primary scale-110' 
-                : 'bg-gray-300 hover:bg-gray-400'
+                ? 'bg-[#F49A1A] scale-110' 
+                : 'bg-gray-300 hover:bg-[#F49A1A]/50'
             ]"
           ></button>
         </div>
@@ -124,18 +130,18 @@ onUnmounted(() => {
         <!-- Setas de navegação -->
         <button
           @click="goToSlide((currentIndex - 1 + reviews.length) % reviews.length)"
-          class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-[#E5EDF8]"
         >
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-[#22345F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         </button>
         
         <button
           @click="nextSlide"
-          class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
+          class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-[#E5EDF8]"
         >
-          <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-[#22345F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </button>
@@ -147,7 +153,7 @@ onUnmounted(() => {
           href="https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary-light text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group"
+          class="inline-flex items-center gap-3 bg-[#F49A1A] text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-[#d88715] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-2 border-[#F49A1A]"
         >
           <!-- Google Icon -->
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">

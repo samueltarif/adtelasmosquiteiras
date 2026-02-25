@@ -1,4 +1,10 @@
 <script setup>
+// Cores da marca AD Telas Mosquiteiras:
+// Azul escuro: #22345F (títulos)
+// Laranja: #F49A1A (destaques, linha decorativa)
+// Azul claro: #E5EDF8 (bordas)
+// Cinza escuro: #4B5563 (texto secundário)
+
 const { toggleFaq, isOpen } = useFaq()
 
 const faqs = [
@@ -34,10 +40,10 @@ const faqs = [
 </script>
 
 <template>
-  <section data-section="faq" class="py-10 md:py-20 bg-surface border-t border-border">
+  <section data-section="faq" class="py-10 md:py-20 bg-gray-50 border-t border-[#E5EDF8]">
     <div class="max-w-[1200px] mx-auto px-5">
-      <h2 class="text-2xl md:text-4xl text-center mb-5 text-text-primary font-bold">Dúvidas Frequentes</h2>
-      <div class="h-[3px] w-[60px] bg-gradient-to-r from-primary to-primary-light mx-auto mb-10"></div>
+      <h2 class="text-2xl md:text-4xl text-center mb-5 text-[#22345F] font-bold">Dúvidas Frequentes</h2>
+      <div class="h-[3px] w-[60px] bg-[#F49A1A] mx-auto mb-10"></div>
 
       <div class="max-w-[800px] mx-auto">
         <div 
@@ -45,19 +51,19 @@ const faqs = [
           :key="index"
           @click="toggleFaq(index)"
           :class="[
-            'bg-surface p-5 md:p-6 mb-4 rounded-xl border border-border cursor-pointer transition-all duration-300 hover:border-primary hover:shadow-md hover:-translate-y-1',
-            isOpen(index) ? 'border-primary shadow-lg scale-[1.02]' : ''
+            'bg-white p-5 md:p-6 mb-4 rounded-xl border-2 border-[#E5EDF8] cursor-pointer transition-all duration-300 hover:border-[#F49A1A] hover:shadow-md hover:-translate-y-1',
+            isOpen(index) ? 'border-[#F49A1A] shadow-lg scale-[1.02]' : ''
           ]"
           :style="{ animationDelay: `${index * 0.1}s` }"
           class="animate-fade-in-up"
         >
           <div class="flex justify-between items-center">
-            <h4 class="text-base md:text-lg text-text-primary font-semibold pr-4 transition-colors duration-300">
+            <h4 class="text-base md:text-lg text-[#22345F] font-semibold pr-4 transition-colors duration-300">
               {{ faq.question }}
             </h4>
             <span 
               :class="[
-                'text-primary text-2xl font-bold transition-all duration-500 ease-in-out',
+                'text-[#F49A1A] text-2xl font-bold transition-all duration-500 ease-in-out',
                 isOpen(index) ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
               ]"
             >
@@ -74,7 +80,7 @@ const faqs = [
           >
             <div 
               v-show="isOpen(index)"
-              class="mt-5 pt-5 border-t border-border text-text-secondary leading-relaxed text-sm md:text-base overflow-hidden"
+              class="mt-5 pt-5 border-t border-[#E5EDF8] text-[#4B5563] leading-relaxed text-sm md:text-base overflow-hidden"
             >
               {{ faq.answer }}
             </div>

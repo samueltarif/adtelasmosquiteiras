@@ -1,5 +1,9 @@
 <script setup>
-// Removido o useWhatsappModal pois agora é gerenciado pelo CtaButton
+// Cores da marca AD Telas Mosquiteiras:
+// Azul escuro: #22345F (títulos e textos principais)
+// Laranja: #F49A1A (destaques, selos URGENTE, botões)
+// Azul claro: #E5EDF8 (bordas)
+// Cinza escuro: #4B5563 (texto comum)
 
 const problems = [
   {
@@ -41,36 +45,52 @@ const scrollToSection = (sectionId) => {
 </script>
 
 <template>
-  <section data-section="problems" class="py-10 md:py-20 bg-background">
+  <section data-section="problems" class="py-10 md:py-20 bg-gray-50">
     <div class="max-w-[1200px] mx-auto px-5">
-      <h2 class="text-2xl md:text-4xl text-center mb-5 text-text-primary font-bold">Você Está CANSADO Desses Problemas?</h2>
-      <div class="h-[3px] w-[60px] bg-gradient-to-r from-red-500 to-red-600 mx-auto mb-8"></div>
-      <p class="text-base md:text-lg text-center text-text-secondary mb-12">Milhares de famílias em São Paulo sofrem com isso TODOS OS DIAS</p>
+      <!-- Título principal - Azul escuro #22345F -->
+      <h2 class="text-2xl md:text-4xl text-center mb-5 text-[#22345F] font-bold">
+        Você Está CANSADO Desses Problemas?
+      </h2>
+      
+      <!-- Linha decorativa - Laranja #F49A1A -->
+      <div class="h-[3px] w-[60px] bg-[#F49A1A] mx-auto mb-8"></div>
+      
+      <!-- Subtítulo - Cinza escuro #4B5563 -->
+      <p class="text-base md:text-lg text-center text-[#4B5563] mb-12">
+        Milhares de famílias em São Paulo sofrem com isso TODOS OS DIAS
+      </p>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10 mb-12">
         <div 
           v-for="(problem, index) in problems" 
           :key="index"
-          class="bg-surface p-6 md:p-10 rounded-xl border-2 border-red-100 text-center transition-all duration-300 cursor-pointer hover:border-red-300 hover:shadow-xl hover:-translate-y-3 relative overflow-hidden"
+          class="bg-white p-6 md:p-10 rounded-xl border-2 border-[#E5EDF8] text-center transition-all duration-300 cursor-pointer hover:border-[#22345F]/30 hover:shadow-xl hover:-translate-y-3 relative overflow-hidden"
         >
-          <!-- Badge de Urgência -->
-          <div class="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+          <!-- Badge de Urgência - Laranja #F49A1A -->
+          <div class="absolute top-4 right-4 bg-[#F49A1A] text-white text-xs font-bold px-3 py-1.5 rounded-full animate-pulse shadow-lg">
             URGENTE
           </div>
 
           <div v-if="problem.isImage" class="w-20 h-20 mx-auto mb-5 flex items-center justify-center">
             <img :src="problem.icon" :alt="problem.title" class="w-20 h-20 object-contain filter drop-shadow-lg" />
           </div>
-          <div v-else class="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-[40px]">
+          <div v-else class="w-20 h-20 mx-auto mb-5 bg-gradient-to-br from-[#22345F] to-[#1a2847] rounded-full flex items-center justify-center text-[40px]">
             <span>{{ problem.icon }}</span>
           </div>
           
-          <h3 class="text-xl md:text-[22px] mb-4 text-red-700 font-bold leading-tight">{{ problem.title }}</h3>
-          <p class="text-sm md:text-base text-text-secondary mb-4 leading-relaxed">{{ problem.description }}</p>
+          <!-- Título do card - Azul escuro #22345F -->
+          <h3 class="text-xl md:text-[22px] mb-4 text-[#22345F] font-bold leading-tight">
+            {{ problem.title }}
+          </h3>
           
-          <!-- Call to Action Emocional -->
-          <div class="bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-            <p class="text-red-600 font-semibold text-sm">{{ problem.urgency }}</p>
+          <!-- Descrição - Cinza escuro #4B5563 -->
+          <p class="text-sm md:text-base text-[#4B5563] mb-4 leading-relaxed">
+            {{ problem.description }}
+          </p>
+          
+          <!-- Call to Action Emocional - Fundo laranja claro com borda laranja -->
+          <div class="bg-[#FFF7ED] border-2 border-[#F49A1A]/30 rounded-lg p-3 mt-4">
+            <p class="text-[#F49A1A] font-semibold text-sm">{{ problem.urgency }}</p>
           </div>
         </div>
       </div>
