@@ -64,7 +64,7 @@ onUnmounted(() => {
 <template>
   <!-- Header Desktop -->
   <header 
-    class="hidden md:block fixed top-0 left-0 right-0 border-b border-gray-200 z-50 shadow-sm transition-all duration-300"
+    class="hidden md:block fixed top-0 left-0 right-0 border-b border-gray-200 z-40 shadow-sm transition-all duration-300"
     :class="isScrolled ? 'bg-white/70 backdrop-blur-md' : 'bg-white'"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,7 +123,7 @@ onUnmounted(() => {
 
   <!-- Header Mobile Sticky Compacto -->
   <header 
-    class="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 z-50 shadow-sm h-16 transition-all duration-300"
+    class="md:hidden fixed top-0 left-0 right-0 border-b border-gray-200 z-40 shadow-sm h-16 transition-all duration-300"
     :class="isScrolled ? 'bg-white/70 backdrop-blur-md' : 'bg-white'"
   >
     <div class="flex justify-between items-center h-full px-4">
