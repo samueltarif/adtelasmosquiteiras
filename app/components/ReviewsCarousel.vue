@@ -150,7 +150,7 @@ onUnmounted(() => {
       <!-- Botão Veja Mais Avaliações -->
       <div class="text-center mt-8">
         <a
-          href="https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,"
+          href="https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6&zx=1768571227913&no_sw_cr=1#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-3 bg-[#F49A1A] text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-[#d88715] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group border-2 border-[#F49A1A]"

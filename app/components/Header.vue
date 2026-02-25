@@ -28,6 +28,13 @@ const toggleMobileMenu = () => {
 const scrollToSection = (sectionId) => {
   isMobileMenuOpen.value = false // Fechar menu mobile
   
+  // Se não estiver na home, navegar para home primeiro
+  const route = useRoute()
+  if (route.path !== '/') {
+    navigateTo('/')
+    return
+  }
+  
   if (sectionId === 'hero') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else {
@@ -43,6 +50,12 @@ const scrollToSection = (sectionId) => {
       })
     }
   }
+}
+
+// Função para voltar à home (logo)
+const goToHome = () => {
+  isMobileMenuOpen.value = false
+  navigateTo('/')
 }
 
 // Detectar scroll para aplicar transparência
@@ -70,13 +83,16 @@ onUnmounted(() => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-28">
         <!-- Logo com 150px width, auto height, 10px padding -->
-        <div class="flex items-center p-2.5">
+        <button 
+          @click="goToHome"
+          class="flex items-center p-2.5 cursor-pointer hover:opacity-80 transition-opacity"
+        >
           <img 
             src="/images/logo ad.png" 
             alt="AD Telas e Redes" 
             class="w-[150px] h-auto"
           />
-        </div>
+        </button>
 
         <!-- Menu de Navegação - Esconde em telas < 768px -->
         <nav class="hidden md:flex items-center space-x-8">
@@ -128,13 +144,16 @@ onUnmounted(() => {
   >
     <div class="flex justify-between items-center h-full px-4">
       <!-- Logo Mobile -->
-      <div class="flex items-center">
+      <button 
+        @click="goToHome"
+        class="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+      >
         <img 
           src="/images/logo ad.png" 
           alt="AD Telas" 
           class="h-12 w-auto"
         />
-      </div>
+      </button>
 
       <!-- Telefone WhatsApp Compacto com Animação -->
       <a 

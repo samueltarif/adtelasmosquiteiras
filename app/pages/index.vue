@@ -6,7 +6,10 @@ useScrollAnimation()
 <template>
   <div>
     <HeroSection />
-    <ServicesSection />
+    
+    <!-- Cards de Serviços Clicáveis -->
+    <ServicesCards />
+    
     <ProblemsSection />
     <ValueProposition />
     <CaseStudies />
@@ -14,5 +17,8 @@ useScrollAnimation()
     <SegmentedSolutions />
     <FaqSection />
     <CtaSection />
+    
+    <!-- Chat de Ajuda Rápida -->
+    <QuickHelpChat />
   </div>
 </template>
