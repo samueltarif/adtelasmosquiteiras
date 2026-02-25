@@ -241,8 +241,8 @@ export const useServicoData = () => {
    */
   const getWhatsAppMessage = (servico, origem = 'card') => {
     let message = `Olá! Vim pelo site e gostaria de um orçamento para:\n\n`
-    message += `📋 Serviço: ${servico.titulo}\n`
-    message += `📍 Origem: ${origem}\n\n`
+    message += `Serviço: ${servico.titulo}\n`
+    message += `Origem: ${origem}\n\n`
     message += `Pode me passar mais informações?`
     
     return encodeURIComponent(message)

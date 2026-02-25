@@ -16,7 +16,8 @@ const cases = [
     title: 'Gato Livre e Protegido',
     problem: 'Gato querendo sair pela janela, risco de queda no 10º andar.',
     solution: 'Rede de proteção em 3 janelas com acabamento premium.',
-    result: '✅ Instalado em 3 horas | Garantia 2 anos'
+    result: 'Instalado em 3 horas | Garantia 2 anos',
+    resultIcon: 'lucide:check-circle'
   },
   {
     image: '/images/protecaoinfantil.jpeg',
@@ -27,7 +28,8 @@ const cases = [
     title: 'Crianças Brincando com Segurança',
     problem: 'A criança (6 anos) com risco de queda na varanda.',
     solution: 'Rede de segurança completa com acabamento discreto.',
-    result: '✅ Instalado em 4 horas | Teste de Carga: 500kg'
+    result: 'Instalado em 4 horas | Teste de Carga: 500kg',
+    resultIcon: 'lucide:check-circle'
   },
   {
     image: '/images/bebe.png',
@@ -38,7 +40,8 @@ const cases = [
     title: 'Varanda Renovada e Protegida',
     problem: 'Varanda ociosa por falta de segurança contra mosquitos.',
     solution: 'Mosquiteiras + rede de segurança. Agora é área de convivência!',
-    result: '✅ Espaço protegido, seguro e pronto para uso diário'
+    result: 'Espaço protegido, seguro e pronto para uso diário',
+    resultIcon: 'lucide:check-circle'
   }
 ]
 </script>
@@ -69,8 +72,9 @@ const cases = [
             <h4 class="text-lg font-semibold mb-3 text-[#22345F]">{{ caseItem.title }}</h4>
             <p class="text-sm text-[#4B5563] mb-2"><strong class="text-[#22345F]">Problema:</strong> {{ caseItem.problem }}</p>
             <p class="text-sm text-[#4B5563] mb-4"><strong class="text-[#22345F]">Solução:</strong> {{ caseItem.solution }}</p>
-            <div class="bg-[#25D366]/10 text-[#25D366] px-4 py-2.5 rounded-md text-[13px] font-semibold border border-[#25D366]/30">
-              {{ caseItem.result }}
+            <div class="bg-[#25D366]/10 text-[#25D366] px-4 py-2.5 rounded-md text-[13px] font-semibold border border-[#25D366]/30 flex items-center gap-2">
+              <Icon :name="caseItem.resultIcon" class="w-4 h-4 flex-shrink-0" />
+              <span>{{ caseItem.result }}</span>
             </div>
           </div>
         </div>

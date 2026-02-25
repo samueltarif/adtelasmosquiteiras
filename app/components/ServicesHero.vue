@@ -53,8 +53,9 @@ const trackClick = (familiaSlug) => {
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             
             <!-- Icon Badge -->
-            <div class="absolute top-4 left-4 w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-4xl shadow-lg">
-              {{ familia.icon }}
+            <div class="absolute top-4 left-4 w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+              <Icon v-if="familia.iconName" :name="familia.iconName" class="w-10 h-10 text-[#22345F]" />
+              <span v-else class="text-4xl">{{ familia.icon }}</span>
             </div>
           </div>
 
@@ -76,13 +77,11 @@ const trackClick = (familiaSlug) => {
               </span>
             </div>
             
-            <!-- Botão -->
-            <button class="w-full px-6 py-4 bg-[#25D366] text-white rounded-xl font-bold text-base hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg group-hover:shadow-xl">
+            <!-- Botão visual (não interativo, o card inteiro é clicável) -->
+            <div class="w-full px-6 py-4 bg-[#25D366] text-white rounded-xl font-bold text-base group-hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg group-hover:shadow-xl">
               <span>Ver Todos os Serviços</span>
-              <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-              </svg>
-            </button>
+              <Icon name="lucide:arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </div>
           </div>
         </NuxtLink>
         

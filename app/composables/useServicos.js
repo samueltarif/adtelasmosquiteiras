@@ -23,6 +23,7 @@ export const useServicos = () => {
       nome: 'Redes de Proteção',
       slug: 'redes',
       icon: '🛡️',
+      iconName: 'lucide:shield',
       descricao: 'Proteção certificada contra quedas para crianças, pets e adultos',
       cor: '#22345F',
       imagem: '/images/familia.png',
@@ -33,6 +34,7 @@ export const useServicos = () => {
           slug: 'residencial',
           titulo: 'Residencial',
           emoji: '🏠',
+          iconName: 'lucide:home',
           descricao: 'Janelas, portas, sacadas e varandas',
           
           servicos: {
@@ -68,7 +70,8 @@ export const useServicos = () => {
               titulo: 'Redes para Varandas',
               descricaoCurta: 'Proteção total para varandas',
               destaque: 'Instalação 48h',
-              imagem: '/images/familia.png',
+              imagem: '/images/bebe.png',
+              imagemEspecificacoes: '/images/Redes_para_Varandas_especificações.jpg',
               keywords: ['varanda', 'sacada', 'área externa']
             },
             apartamentos: {
@@ -76,7 +79,8 @@ export const useServicos = () => {
               titulo: 'Redes para Apartamentos',
               descricaoCurta: 'Solução completa para seu apartamento',
               destaque: 'Pacote completo',
-              imagem: '/images/familia.png',
+              imagem: '/images/Redes_para_Apartamentos.png',
+              imagemEspecificacoes: '/images/Redes_para_Apartamentos_especificações.jpg',
               keywords: ['apartamento', 'condomínio', 'prédio']
             },
             escadas: {
@@ -84,7 +88,8 @@ export const useServicos = () => {
               titulo: 'Redes para Escadas',
               descricaoCurta: 'Segurança em escadas e mezaninos',
               destaque: 'Sob medida',
-              imagem: '/images/familia.png',
+              imagem: '/images/Redes_para_Escadas.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Escadas_especificações.png',
               keywords: ['escada', 'mezanino', 'degrau']
             },
             basculantes: {
@@ -92,7 +97,8 @@ export const useServicos = () => {
               titulo: 'Redes para Basculantes',
               descricaoCurta: 'Proteção para janelas basculantes',
               destaque: 'Fácil abertura',
-              imagem: '/images/familia.png',
+              imagem: '/images/Redes_para_Basculantes.png',
+              imagemEspecificacoes: '/images/Redes_para_Basculantes_especificações.jpg',
               keywords: ['basculante', 'janela basculante']
             }
           }
@@ -103,6 +109,7 @@ export const useServicos = () => {
           slug: 'pets',
           titulo: 'Pets & Crianças',
           emoji: '🐶',
+          iconName: 'lucide:dog',
           descricao: 'Segurança para quem você ama',
           
           servicos: {
@@ -160,6 +167,7 @@ export const useServicos = () => {
           slug: 'comercial',
           titulo: 'Comercial',
           emoji: '🏢',
+          iconName: 'lucide:building',
           descricao: 'Portões, muros e áreas externas',
           
           servicos: {
@@ -168,7 +176,8 @@ export const useServicos = () => {
               titulo: 'Redes para Portões',
               descricaoCurta: 'Proteção para portões e entradas',
               destaque: 'Alta durabilidade',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Redes_para_Portões.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Portões_especificações.jpg',
               keywords: ['portão', 'entrada', 'garagem']
             },
             muros: {
@@ -176,7 +185,8 @@ export const useServicos = () => {
               titulo: 'Redes para Muros',
               descricaoCurta: 'Segurança adicional em muros',
               destaque: 'Anti-invasão',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Redes_para_Muros.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Muros_especificações.png',
               keywords: ['muro', 'cerca', 'perímetro']
             },
             telhados: {
@@ -184,7 +194,8 @@ export const useServicos = () => {
               titulo: 'Redes para Telhados',
               descricaoCurta: 'Proteção contra pombos e pássaros',
               destaque: 'Anti-pombos',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Redes_para_Telhados.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Telhados_especificações.jpg',
               keywords: ['telhado', 'pombo', 'pássaro']
             },
             piscinas: {
@@ -192,7 +203,8 @@ export const useServicos = () => {
               titulo: 'Redes para Piscinas',
               descricaoCurta: 'Segurança em áreas de piscina',
               destaque: 'Resistente à água',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Redes_para_Piscinas.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Piscinas_especificações.jpg',
               keywords: ['piscina', 'área de lazer']
             },
             coberturas: {
@@ -200,7 +212,8 @@ export const useServicos = () => {
               titulo: 'Redes para Coberturas',
               descricaoCurta: 'Proteção para áreas cobertas',
               destaque: 'Sob medida',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Redes_para_Coberturas.jpg',
+              imagemEspecificacoes: '/images/Redes_para_Coberturas_especificações.jpg',
               keywords: ['cobertura', 'toldo']
             }
           }
@@ -216,6 +229,7 @@ export const useServicos = () => {
       nome: 'Telas Mosquiteiras',
       slug: 'telas',
       icon: '🦟',
+      iconName: 'lucide:bug',
       descricao: 'Proteção contra mosquitos transmissores de dengue, zika e chikungunya',
       cor: '#F49A1A',
       imagem: '/images/TELA_MOSQUITEIRA.png',
@@ -226,6 +240,7 @@ export const useServicos = () => {
           slug: 'residencial',
           titulo: 'Residencial',
           emoji: '🏠',
+          iconName: 'lucide:home',
           descricao: 'Janelas, portas e varandas',
           
           servicos: {
@@ -242,7 +257,8 @@ export const useServicos = () => {
               titulo: 'Telas para Portas',
               descricaoCurta: 'Ventilação sem mosquitos',
               destaque: 'Fácil abertura',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas_para_Portas.jpeg',
+              imagemEspecificacoes: '/images/Telas_para_Portas_especificações.jpeg',
               keywords: ['tela porta', 'mosquiteira porta']
             },
             varandas: {
@@ -250,7 +266,8 @@ export const useServicos = () => {
               titulo: 'Telas para Varandas',
               descricaoCurta: 'Aproveite a varanda sem insetos',
               destaque: 'Área completa',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas_para_Varandas.jpg',
+              imagemEspecificacoes: '/images/Telas_para_Varandas_especificações.jpg',
               keywords: ['tela varanda', 'mosquiteira varanda']
             },
             sacadas: {
@@ -258,7 +275,8 @@ export const useServicos = () => {
               titulo: 'Telas para Sacadas',
               descricaoCurta: 'Proteção total contra mosquitos',
               destaque: 'Instalação rápida',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/telas_para_Sacadas.jpg',
+              imagemEspecificacoes: '/images/telas_para_Sacadas_especificações.jpg',
               keywords: ['tela sacada', 'mosquiteira sacada']
             },
             apartamentos: {
@@ -266,7 +284,8 @@ export const useServicos = () => {
               titulo: 'Telas para Apartamentos',
               descricaoCurta: 'Solução completa anti-mosquito',
               destaque: 'Pacote completo',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas_para_Apartamento.jpg',
+              imagemEspecificacoes: '/images/Telas_para_Apartamento_especificações.jpg',
               keywords: ['tela apartamento', 'mosquiteira']
             },
             banheiro: {
@@ -274,7 +293,8 @@ export const useServicos = () => {
               titulo: 'Telas para Banheiro',
               descricaoCurta: 'Proteção em áreas úmidas',
               destaque: 'Anti-mofo',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas_para_Banheiro.jpg',
+              imagemEspecificacoes: '/images/Telas_para_Banheiro_especificações.jpg',
               keywords: ['tela banheiro', 'mosquiteira banheiro']
             }
           }
@@ -285,6 +305,7 @@ export const useServicos = () => {
           slug: 'especiais',
           titulo: 'Modelos Especiais',
           emoji: '🔧',
+          iconName: 'lucide:wrench',
           descricao: 'Sistemas diferenciados de abertura',
           
           servicos: {
@@ -293,7 +314,8 @@ export const useServicos = () => {
               titulo: 'Telas de Correr',
               descricaoCurta: 'Sistema deslizante prático',
               destaque: 'Fácil uso',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas_de_Correr.jpg',
+              imagemEspecificacoes: '/images/Telas_de_Correr_especificações.jpg',
               keywords: ['tela correr', 'deslizante']
             },
             pivotante: {
@@ -301,7 +323,7 @@ export const useServicos = () => {
               titulo: 'Telas Pivotantes',
               descricaoCurta: 'Abertura giratória',
               destaque: 'Moderna',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas Pivotantes.webp',
               keywords: ['tela pivotante', 'giratória']
             },
             removivel: {
@@ -309,7 +331,8 @@ export const useServicos = () => {
               titulo: 'Telas Removíveis',
               descricaoCurta: 'Fácil de remover e limpar',
               destaque: 'Prática',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas Removíveis.webp',
+              imagemEspecificacoes: '/images/Telas Removíveis especificações.jpg',
               keywords: ['tela removível', 'destacável']
             },
             basculante: {
@@ -317,7 +340,8 @@ export const useServicos = () => {
               titulo: 'Telas para Basculantes',
               descricaoCurta: 'Específica para janelas basculantes',
               destaque: 'Sob medida',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas para Basculante.jpg',
+              imagemEspecificacoes: '/images/Telas para Basculante especificações.webp',
               keywords: ['tela basculante', 'janela basculante']
             },
             aluminio: {
@@ -325,7 +349,8 @@ export const useServicos = () => {
               titulo: 'Telas com Alumínio',
               descricaoCurta: 'Estrutura em alumínio reforçado',
               destaque: 'Durável',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas com Alumínio.jpg',
+              imagemEspecificacoes: '/images/Telas com Alumínio especificações.jpg',
               keywords: ['tela alumínio', 'estrutura alumínio']
             },
             acoinox: {
@@ -333,7 +358,8 @@ export const useServicos = () => {
               titulo: 'Telas com Aço Inox',
               descricaoCurta: 'Máxima resistência e durabilidade',
               destaque: 'Premium',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/Telas com Aço Inox.jpg',
+              imagemEspecificacoes: '/images/Telas com Aço Inox especificações.png',
               keywords: ['tela aço inox', 'inox']
             }
           }
@@ -345,6 +371,7 @@ export const useServicos = () => {
           slug: 'pet',
           titulo: 'Pet Screen',
           emoji: '🐾',
+          iconName: 'lucide:paw-print',
           descricao: 'Telas reforçadas para pets',
           
           servicos: {
@@ -353,7 +380,8 @@ export const useServicos = () => {
               titulo: 'Telas Pet Screen',
               descricaoCurta: 'Resistente a arranhões de pets',
               destaque: 'Anti-arranhão',
-              imagem: '/images/pets_pro.png',
+              imagem: '/images/Telas Pet Screen.webp',
+              imagemEspecificacoes: '/images/Telas Pet Screen especificações.jpg',
               keywords: ['tela pet', 'pet screen', 'gato', 'cachorro']
             },
             pernilongos: {
@@ -361,7 +389,8 @@ export const useServicos = () => {
               titulo: 'Telas Anti-Pernilongos',
               descricaoCurta: 'Malha extra fina contra pernilongos',
               destaque: 'Malha micro',
-              imagem: '/images/mosquitoo.png',
+              imagem: '/images/Telas Anti-Pernilongos.jpg',
+              imagemEspecificacoes: '/images/Telas Anti-Pernilongos especificações.webp',
               keywords: ['pernilongo', 'mosquito', 'inseto']
             }
           }
@@ -372,6 +401,7 @@ export const useServicos = () => {
           slug: 'comercial',
           titulo: 'Fachadas Grandes',
           emoji: '🏢',
+          iconName: 'lucide:building-2',
           descricao: 'Soluções para grandes áreas',
           
           servicos: {
@@ -380,7 +410,8 @@ export const useServicos = () => {
               titulo: 'Telas para Fachadas',
               descricaoCurta: 'Proteção para grandes fachadas',
               destaque: 'Grande porte',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Telas para Fachadas.webp',
+              imagemEspecificacoes: '/images/Telas para Fachadas especificações.png',
               keywords: ['fachada', 'prédio', 'comercial']
             },
             coberturas: {
@@ -388,7 +419,8 @@ export const useServicos = () => {
               titulo: 'Telas para Coberturas',
               descricaoCurta: 'Proteção em áreas cobertas',
               destaque: 'Sob medida',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Telas para Coberturas.jpg',
+              imagemEspecificacoes: '/images/Telas para Coberturas especificações.jpg',
               keywords: ['cobertura', 'toldo', 'área coberta']
             },
             restaurantes: {
@@ -396,7 +428,8 @@ export const useServicos = () => {
               titulo: 'Telas para Restaurantes',
               descricaoCurta: 'Ambiente livre de insetos',
               destaque: 'Comercial',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Telas para Restaurantes.jpg',
+              imagemEspecificacoes: '/images/Telas para Restaurantes especificações.jpeg',
               keywords: ['restaurante', 'bar', 'comercial']
             },
             industrias: {
@@ -404,7 +437,8 @@ export const useServicos = () => {
               titulo: 'Telas para Indústrias',
               descricaoCurta: 'Proteção industrial',
               destaque: 'Alta resistência',
-              imagem: '/images/tela_proteção_servico.png',
+              imagem: '/images/Telas para Indústrias.webp',
+              imagemEspecificacoes: '/images/Telas para Indústrias especificações.webp',
               keywords: ['indústria', 'fábrica', 'galpão']
             }
           }
@@ -490,7 +524,7 @@ export const useServicos = () => {
     const servico = getServicoBySlug(familiaSlug, categoriaSlug, servicoSlug)
     if (!servico) return `https://wa.me/${WHATSAPP_NUMBER}`
     
-    const msg = `Olá! Gostaria de um orçamento para:\n\n📋 ${servico.titulo}\n📂 ${servico.familiaNome} > ${servico.categoriaTitulo}\n\nPode me ajudar?`
+    const msg = `Olá! Gostaria de um orçamento para:\n\nServiço: ${servico.titulo}\nCategoria: ${servico.familiaNome} > ${servico.categoriaTitulo}\n\nPode me ajudar?`
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`
   }
   

@@ -1,6 +1,13 @@
 <script setup>
 // Ativar animações de scroll
 useScrollAnimation()
+
+// Estado do modal de formulário
+const showFormModal = ref(false)
+
+const openFormModal = () => {
+  showFormModal.value = true
+}
 </script>
 
 <template>
@@ -18,7 +25,16 @@ useScrollAnimation()
     <FaqSection />
     <CtaSection />
     
-    <!-- Chat de Ajuda Rápida -->
+    <!-- Mobile Unified CTA -->
+    <MobileUnifiedCTA
+      servico-atual="Redes de Proteção ou Telas Mosquiteiras"
+      @open-form="openFormModal"
+    />
+    
+    <!-- Quick Help Chat -->
     <QuickHelpChat />
+    
+    <!-- Modal de Formulário -->
+    <StickyFormModal v-model="showFormModal" />
   </div>
 </template>

@@ -341,7 +341,7 @@ const handleBackdropClick = (e) => {
                     class="flex flex-col items-center gap-2 p-4 bg-white border-2 border-[#E5EDF8] rounded-2xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step1_pets"
                   >
-                    <span class="text-3xl">🐱</span>
+                    <Icon name="lucide:cat" class="w-8 h-8 text-[#22345F] group-hover:text-[#F49A1A]" />
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Pets</span>
                   </button>
                   
@@ -350,7 +350,7 @@ const handleBackdropClick = (e) => {
                     class="flex flex-col items-center gap-2 p-4 bg-white border-2 border-[#E5EDF8] rounded-2xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step1_mosquitos"
                   >
-                    <span class="text-3xl">🦟</span>
+                    <Icon name="lucide:bug" class="w-8 h-8 text-[#22345F] group-hover:text-[#F49A1A]" />
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Contra mosquitos</span>
                   </button>
                   
@@ -469,7 +469,7 @@ const handleBackdropClick = (e) => {
                     class="w-full flex items-center gap-3 p-4 bg-white border-2 border-[#E5EDF8] rounded-xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step3_apartamento"
                   >
-                    <span class="text-2xl">🏢</span>
+                    <Icon name="lucide:building" class="w-6 h-6 text-[#22345F] group-hover:text-[#F49A1A]" />
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Apartamento</span>
                   </button>
                   
@@ -478,7 +478,7 @@ const handleBackdropClick = (e) => {
                     class="w-full flex items-center gap-3 p-4 bg-white border-2 border-[#E5EDF8] rounded-xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step3_casa"
                   >
-                    <span class="text-2xl">🏠</span>
+                    <Icon name="lucide:home" class="w-6 h-6 text-[#22345F] group-hover:text-[#F49A1A]" />
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Casa</span>
                   </button>
                   
@@ -487,7 +487,7 @@ const handleBackdropClick = (e) => {
                     class="w-full flex items-center gap-3 p-4 bg-white border-2 border-[#E5EDF8] rounded-xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step3_outros"
                   >
-                    <span class="text-2xl">🏗️</span>
+                    <Icon name="lucide:warehouse" class="w-6 h-6 text-[#22345F] group-hover:text-[#F49A1A]" />
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Outros</span>
                   </button>
                 </div>

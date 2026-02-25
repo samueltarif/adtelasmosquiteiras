@@ -6,12 +6,12 @@
 // Cinza escuro: #4B5563 (texto secundário)
 
 const values = [
-  { icon: '✅', title: 'Garantia Completa', description: '2 anos de garantia contra defeitos de material e instalação. Obs: Danos decorrentes de mau uso não estão cobertos' },
-  { icon: '⚡', title: 'Instalação Rápida', description: 'Agendamento em até 48h e instalação em poucas horas.' },
-  { icon: '💰', title: 'Parcelamento Fácil', description: 'Parcelamos no cartão de crédito. Sem juros para compras acima de R$1000.' },
-  { icon: '🎯', title: 'Atendimento SP', description: 'Cobertura total em São Paulo. Técnicos treinados e experientes.' },
-  { icon: '📏', title: 'Customizado', description: 'Medidas sob demanda para qualquer tamanho de janela ou varanda.' },
-  { icon: '🏆', title: 'Material Premium', description: 'Telas resistentes com durabilidade comprovada de 5+ anos.' }
+  { icon: 'lucide:shield-check', title: 'Garantia Completa', description: '2 anos de garantia contra defeitos de material e instalação. Obs: Danos decorrentes de mau uso não estão cobertos' },
+  { icon: 'lucide:zap', title: 'Instalação Rápida', description: 'Agendamento em até 48h e instalação em poucas horas.' },
+  { icon: 'lucide:credit-card', title: 'Parcelamento Fácil', description: 'Parcelamos no cartão de crédito. Sem juros para compras acima de R$1000.' },
+  { icon: 'lucide:map-pin', title: 'Atendimento SP', description: 'Cobertura total em São Paulo. Técnicos treinados e experientes.' },
+  { icon: 'lucide:ruler', title: 'Customizado', description: 'Medidas sob demanda para qualquer tamanho de janela ou varanda.' },
+  { icon: 'lucide:award', title: 'Material Premium', description: 'Telas resistentes com durabilidade comprovada de 5+ anos.' }
 ]
 </script>
 
@@ -27,7 +27,10 @@ const values = [
           :key="index"
           class="p-6 md:p-8 bg-white border-2 border-[#E5EDF8] rounded-xl text-center hover:border-[#F49A1A] hover:shadow-lg transition-all duration-300"
         >
-          <h4 class="text-[#22345F] text-base md:text-lg font-semibold mb-2.5">{{ value.icon }} {{ value.title }}</h4>
+          <div class="flex flex-col items-center gap-3 mb-3">
+            <Icon :name="value.icon" class="w-10 h-10 text-[#F49A1A]" />
+            <h4 class="text-[#22345F] text-base md:text-lg font-semibold">{{ value.title }}</h4>
+          </div>
           <p class="text-sm text-[#4B5563]">{{ value.description }}</p>
         </div>
       </div>

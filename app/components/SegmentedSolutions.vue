@@ -13,11 +13,11 @@ const segmentContent = {
     bgClass: 'from-purple-500/5 to-purple-400/5',
     title: 'Proteção Completa Para Crianças',
     items: [
-      { icon: '✅', bold: 'Material testado:', text: 'Resistência comprovada a 500kg' },
-      { icon: '✅', bold: 'Sem pontos de risco:', text: 'Toda costura reforçada e segura' },
-      { icon: '✅', bold: 'Fácil limpeza:', text: 'Protege a criança e permite ventilação' },
-      { icon: '✅', bold: 'Instalação por profissional:', text: 'Técnico certificado em sua casa' },
-      { icon: '✅', bold: 'Avaliação gratuita:', text: 'Visitamos e analisamos todos os pontos de risco' }
+      { icon: 'lucide:check-circle', bold: 'Material testado:', text: 'Resistência comprovada a 500kg' },
+      { icon: 'lucide:check-circle', bold: 'Sem pontos de risco:', text: 'Toda costura reforçada e segura' },
+      { icon: 'lucide:check-circle', bold: 'Fácil limpeza:', text: 'Protege a criança e permite ventilação' },
+      { icon: 'lucide:check-circle', bold: 'Instalação por profissional:', text: 'Técnico certificado em sua casa' },
+      { icon: 'lucide:check-circle', bold: 'Avaliação gratuita:', text: 'Visitamos e analisamos todos os pontos de risco' }
     ],
     buttonText: 'Quero Orçamento Agora'
   },
@@ -25,11 +25,11 @@ const segmentContent = {
     bgClass: 'from-red-500/5 to-red-600/5',
     title: 'Proteção Total Para Seus Pets',
     items: [
-      { icon: '🐱', bold: 'Malha resistente a garras:', text: 'Suporta arranhões de gatos' },
-      { icon: '🐕', bold: 'Para cães:', text: 'Rede forte para saltos e movimentos rápidos' },
-      { icon: '💨', bold: 'Circulação de ar:', text: 'Ambiente fresco e confortável' },
-      { icon: '🌱', bold: 'Livre de tóxicos:', text: 'Material 100% seguro para animais' },
-      { icon: '🔧', bold: 'Instalação discreta:', text: 'Não interfere na visão do imóvel' }
+      { icon: 'lucide:cat', bold: 'Malha resistente a garras:', text: 'Suporta arranhões de gatos' },
+      { icon: 'lucide:dog', bold: 'Para cães:', text: 'Rede forte para saltos e movimentos rápidos' },
+      { icon: 'lucide:wind', bold: 'Circulação de ar:', text: 'Ambiente fresco e confortável' },
+      { icon: 'lucide:leaf', bold: 'Livre de tóxicos:', text: 'Material 100% seguro para animais' },
+      { icon: 'lucide:wrench', bold: 'Instalação discreta:', text: 'Não interfere na visão do imóvel' }
     ],
     buttonText: 'Solicitar Orçamento'
   },
@@ -37,11 +37,11 @@ const segmentContent = {
     bgClass: 'from-blue-500/5 to-blue-600/5',
     title: 'Segurança Extra Para Andares Altos',
     items: [
-      { icon: '🏢', bold: 'Acesso condomínio:', text: 'Todos os documentos preparados' },
-      { icon: '📋', bold: 'Aprovação com síndico:', text: 'Consultoria sobre regulamentação' },
-      { icon: '⚡', bold: 'Instalação especializada:', text: 'Experiência em edifícios altos' },
-      { icon: '🛡️', bold: 'Reforço de segurança:', text: 'Fixação garantida contra vento' },
-      { icon: '📞', bold: 'Suporte pós-venda:', text: 'Reparos por defeito de instalação ou material são gratuitos; danos por mau uso são cobrados.' }
+      { icon: 'lucide:building', bold: 'Acesso condomínio:', text: 'Todos os documentos preparados' },
+      { icon: 'lucide:clipboard-check', bold: 'Aprovação com síndico:', text: 'Consultoria sobre regulamentação' },
+      { icon: 'lucide:zap', bold: 'Instalação especializada:', text: 'Experiência em edifícios altos' },
+      { icon: 'lucide:shield', bold: 'Reforço de segurança:', text: 'Fixação garantida contra vento' },
+      { icon: 'lucide:phone', bold: 'Suporte pós-venda:', text: 'Reparos por defeito de instalação ou material são gratuitos; danos por mau uso são cobrados.' }
     ],
     buttonText: 'Começar Agora'
   }
@@ -78,8 +78,9 @@ const segmentContent = {
       >
         <h3 class="text-xl md:text-2xl font-bold mb-5 text-text-primary">{{ content.title }}</h3>
         <ul class="list-none mt-5">
-          <li v-for="(item, index) in content.items" :key="index" class="mb-4 text-sm md:text-base text-text-primary">
-            {{ item.icon }} <strong>{{ item.bold }}</strong> {{ item.text }}
+          <li v-for="(item, index) in content.items" :key="index" class="mb-4 text-sm md:text-base text-text-primary flex items-start gap-2">
+            <Icon :name="item.icon" class="w-5 h-5 text-[#F49A1A] flex-shrink-0 mt-0.5" />
+            <span><strong>{{ item.bold }}</strong> {{ item.text }}</span>
           </li>
         </ul>
         <CtaButton 

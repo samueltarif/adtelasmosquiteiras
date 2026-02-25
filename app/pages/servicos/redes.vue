@@ -3,6 +3,10 @@ import { useServicos } from '~/composables/useServicos'
 
 const { getFamiliaBySlug } = useServicos()
 const familia = getFamiliaBySlug('redes')
+const route = useRoute()
+
+// Estado do modal de formulário
+const showFormModal = ref(false)
 
 // SEO
 useHead({
@@ -35,7 +39,7 @@ const categorias = Object.values(familia.categorias).map(cat => ({
   <div class="min-h-screen bg-white">
     
     <!-- Breadcrumb -->
-    <BreadcrumbServico :items="breadcrumbItems" />
+    <Breadcrumb :path="route.path" />
     
     <!-- Hero -->
     <section class="py-16 md:py-20 bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white">
@@ -74,7 +78,11 @@ const categorias = Object.values(familia.categorias).map(cat => ({
             :to="categoria.url"
             class="group bg-gradient-to-br from-[#E5EDF8] to-white p-8 rounded-3xl border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
           >
-            <div class="text-5xl mb-4">{{ categoria.emoji }}</div>
+            <!-- Icon -->
+            <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-4">
+              <Icon v-if="categoria.iconName" :name="categoria.iconName" class="w-10 h-10 text-[#22345F]" />
+              <span v-else class="text-3xl">{{ categoria.emoji }}</span>
+            </div>
             <h3 class="text-2xl font-bold text-[#22345F] mb-3 group-hover:text-[#F49A1A] transition-colors">
               {{ categoria.titulo }}
             </h3>
@@ -114,6 +122,15 @@ const categorias = Object.values(familia.categorias).map(cat => ({
         </a>
       </div>
     </section>
+
+    <!-- Mobile Unified CTA -->
+    <MobileUnifiedCTA
+      servico-atual="Redes de Proteção"
+      @open-form="showFormModal = true"
+    />
+    
+    <!-- Modal de Formulário -->
+    <StickyFormModal v-model="showFormModal" />
 
   </div>
 </template>

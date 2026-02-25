@@ -20,17 +20,6 @@ if (!servico) {
 }
 
 // ============================================
-// BREADCRUMB
-// ============================================
-const breadcrumbItems = [
-  { label: 'Início', to: '/' },
-  { label: 'Serviços', to: '/servicos' },
-  { label: servico.familiaNome, to: `/servicos/${servico.familia}` },
-  { label: servico.categoriaTitulo, to: `/servicos/${servico.familia}/${servico.categoria}` },
-  { label: servico.titulo }
-]
-
-// ============================================
 // SEO & META TAGS
 // ============================================
 useHead({
@@ -87,6 +76,16 @@ onMounted(() => {
     servico: servico.slug
   })
 })
+
+// Estado do modal de formulário
+const showFormModal = ref(false)
+
+const openFormModal = () => {
+  console.log('🟢 [SERVICO] openFormModal() chamado')
+  console.log('🟢 [SERVICO] showFormModal antes:', showFormModal.value)
+  showFormModal.value = true
+  console.log('🟢 [SERVICO] showFormModal depois:', showFormModal.value)
+}
 </script>
 
 <template>
@@ -95,7 +94,7 @@ onMounted(() => {
     <!-- ============================================ -->
     <!-- BREADCRUMB -->
     <!-- ============================================ -->
-    <BreadcrumbServico :items="breadcrumbItems" />
+    <Breadcrumb />
     
     <!-- ============================================ -->
     <!-- 1. HERO ESPECÍFICO DO SERVIÇO -->
@@ -525,6 +524,16 @@ onMounted(() => {
         </NuxtLink>
       </div>
     </section>
+
+    <!-- Mobile Unified CTA -->
+    <MobileUnifiedCTA
+      :servico-atual="servico.titulo"
+      :msg-padrao="`Olá! Gostaria de um orçamento para ${servico.titulo}.`"
+      @open-form="openFormModal"
+    />
+
+    <!-- Modal de Formulário -->
+    <StickyFormModal v-model="showFormModal" />
     
   </div>
 </template>
