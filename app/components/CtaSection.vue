@@ -18,7 +18,7 @@
           
           <!-- Botão CTA com ícones -->
           <div class="flex items-center justify-center gap-3 mb-6">
-            <img src="/favicon.ico" alt="AD Telas" class="w-8 h-8 animate-bounce" />
+            <img src="/images/logo ad.png" alt="AD Telas" class="w-12 h-12 animate-bounce" />
             <a
               href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosqueteiras."
               target="_blank"
@@ -30,7 +30,7 @@
               </svg>
               CLIQUE AQUI
             </a>
-            <img src="/favicon.ico" alt="AD Telas" class="w-8 h-8 animate-bounce" />
+            <img src="/images/logo ad.png" alt="AD Telas" class="w-12 h-12 animate-bounce" />
           </div>
           
           <!-- Urgência visual -->
