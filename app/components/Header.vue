@@ -9,14 +9,14 @@ const isScrolled = ref(false)
 
 // Itens do menu de navegação
 const menuItems = [
-  { label: 'Início', id: 'hero' },
-  { label: 'Serviços', id: 'problems' },
-  { label: 'Vantagens', id: 'value' },
-  { label: 'Cases', id: 'cases' },
-  { label: 'Avaliações', id: 'reviews' },
-  { label: 'Soluções', id: 'solutions' },
-  { label: 'FAQ', id: 'faq' },
-  { label: 'Contato', id: 'contact' }
+  { label: 'Início', id: 'hero', type: 'scroll' },
+  { label: 'Serviços', id: 'problems', type: 'scroll' },
+  { label: 'Vantagens', id: 'value', type: 'scroll' },
+  { label: 'Cases', id: 'cases', type: 'scroll' },
+  { label: 'Avaliações', id: 'reviews', type: 'scroll' },
+  { label: 'Soluções', id: 'solutions', type: 'scroll' },
+  { label: 'FAQ', id: 'faq', type: 'scroll' },
+  { label: 'Contato', id: '/contato', type: 'link' }
 ]
 
 // Função para alternar menu mobile
@@ -24,9 +24,15 @@ const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
-// Função para scroll suave para seções
-const scrollToSection = (sectionId) => {
+// Função para scroll suave para seções ou navegação
+const scrollToSection = (item) => {
   isMobileMenuOpen.value = false // Fechar menu mobile
+  
+  // Se for um link direto (type: 'link'), navegar
+  if (item.type === 'link') {
+    navigateTo(item.id)
+    return
+  }
   
   // Se não estiver na home, navegar para home primeiro
   const route = useRoute()
@@ -35,6 +41,8 @@ const scrollToSection = (sectionId) => {
     return
   }
   
+  // Scroll para seção
+  const sectionId = item.id
   if (sectionId === 'hero') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else {
@@ -99,7 +107,7 @@ onUnmounted(() => {
           <button
             v-for="item in menuItems"
             :key="item.id"
-            @click="scrollToSection(item.id)"
+            @click="scrollToSection(item)"
             class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
           >
             {{ item.label }}
@@ -128,7 +136,7 @@ onUnmounted(() => {
         <button
           v-for="item in menuItems"
           :key="item.id"
-          @click="scrollToSection(item.id)"
+          @click="scrollToSection(item)"
           class="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200"
         >
           {{ item.label }}
@@ -194,7 +202,7 @@ onUnmounted(() => {
         <button
           v-for="item in menuItems"
           :key="item.id"
-          @click="scrollToSection(item.id)"
+          @click="scrollToSection(item)"
           class="block w-full text-left py-2 text-sm font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 border-b border-gray-100 last:border-b-0"
         >
           {{ item.label }}
