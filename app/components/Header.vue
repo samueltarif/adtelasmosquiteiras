@@ -16,6 +16,7 @@ const menuItems = [
   { label: 'Avaliações', id: 'reviews', type: 'scroll' },
   { label: 'Soluções', id: 'solutions', type: 'scroll' },
   { label: 'FAQ', id: 'faq', type: 'scroll' },
+  { label: 'Orçamento', id: '/orcamento', type: 'link', highlight: true },
   { label: 'Contato', id: '/contato', type: 'link' }
 ]
 
@@ -108,7 +109,12 @@ onUnmounted(() => {
             v-for="item in menuItems"
             :key="item.id"
             @click="scrollToSection(item)"
-            class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+            :class="[
+              'px-3 py-2 text-sm font-medium transition-colors duration-200',
+              item.highlight 
+                ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-lg font-bold' 
+                : 'text-gray-700 hover:text-blue-600'
+            ]"
           >
             {{ item.label }}
           </button>
@@ -137,7 +143,12 @@ onUnmounted(() => {
           v-for="item in menuItems"
           :key="item.id"
           @click="scrollToSection(item)"
-          class="text-gray-700 hover:text-blue-600 hover:bg-gray-50 block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200"
+          :class="[
+            'block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200',
+            item.highlight
+              ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-lg font-bold'
+              : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+          ]"
         >
           {{ item.label }}
         </button>
@@ -203,7 +214,12 @@ onUnmounted(() => {
           v-for="item in menuItems"
           :key="item.id"
           @click="scrollToSection(item)"
-          class="block w-full text-left py-2 text-sm font-bold text-gray-800 hover:text-blue-600 transition-colors duration-200 border-b border-gray-100 last:border-b-0"
+          :class="[
+            'block w-full text-left py-2 text-sm font-bold transition-colors duration-200 border-b border-gray-100 last:border-b-0',
+            item.highlight
+              ? 'text-[#F49A1A] hover:text-[#e08910]'
+              : 'text-gray-800 hover:text-blue-600'
+          ]"
         >
           {{ item.label }}
         </button>

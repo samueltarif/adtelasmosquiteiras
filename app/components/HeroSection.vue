@@ -91,16 +91,24 @@
           <span>Orçamento Grátis no WhatsApp</span>
         </a>
 
-        <!-- 5. CTA SECUNDÁRIO - Outline Laranja -->
-        <a 
-          href="tel:+5511983586611"
-          class="flex items-center justify-center gap-2.5 w-full h-12 bg-white text-[#F49A1A] rounded-2xl font-medium text-sm border-2 border-[#F49A1A] active:scale-[0.98] active:bg-[#F49A1A]/5 transition-all mb-6"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-          </svg>
-          <span>Ligar: (11) 98358-6611</span>
-        </a>
+        <!-- 5. CTA SECUNDÁRIO - Grid com 2 botões -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+          <NuxtLink 
+            to="/orcamento"
+            class="flex items-center justify-center gap-1.5 h-12 bg-white text-[#F49A1A] rounded-2xl font-medium text-sm border-2 border-[#F49A1A] active:scale-[0.98] active:bg-[#F49A1A]/5 transition-all"
+          >
+            <Icon name="lucide:file-text" class="w-4 h-4" />
+            <span>Formulário</span>
+          </NuxtLink>
+          
+          <a 
+            href="tel:+5511983586611"
+            class="flex items-center justify-center gap-1.5 h-12 bg-white text-[#22345F] rounded-2xl font-medium text-sm border-2 border-[#22345F]/20 active:scale-[0.98] active:bg-gray-50 transition-all"
+          >
+            <Icon name="lucide:phone" class="w-4 h-4" />
+            <span>Ligar</span>
+          </a>
+        </div>
 
         <!-- 6. TRUST BADGES - Minimal com ícones laranja -->
         <div class="flex items-center justify-center gap-6 text-xs text-gray-600 mb-6">
@@ -214,13 +222,19 @@
                 <span>Orçamento Grátis</span>
               </a>
 
-              <a 
-                href="tel:+5511983586611"
+              <NuxtLink 
+                to="/orcamento"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-[#F49A1A] rounded-2xl font-medium text-base border-2 border-[#F49A1A] hover:bg-[#F49A1A]/5 transition-all"
               >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                </svg>
+                <Icon name="lucide:file-text" class="w-5 h-5" />
+                <span>Preencher Formulário</span>
+              </NuxtLink>
+
+              <a 
+                href="tel:+5511983586611"
+                class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-[#22345F] rounded-2xl font-medium text-base border-2 border-[#22345F]/20 hover:bg-gray-50 transition-all"
+              >
+                <Icon name="lucide:phone" class="w-5 h-5" />
                 <span>Ligar Agora</span>
               </a>
             </div>
