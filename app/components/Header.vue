@@ -11,6 +11,7 @@ const isScrolled = ref(false)
 const menuItems = [
   { label: 'Início', id: 'hero', type: 'scroll' },
   { label: 'Serviços', id: 'problems', type: 'scroll' },
+  { label: 'Bairros', id: '/bairros/vila-sonia', type: 'link' },
   { label: 'Vantagens', id: 'value', type: 'scroll' },
   { label: 'Cases', id: 'cases', type: 'scroll' },
   { label: 'Avaliações', id: 'reviews', type: 'scroll' },
