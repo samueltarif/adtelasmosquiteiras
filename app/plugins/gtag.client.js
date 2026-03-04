@@ -1,6 +1,5 @@
 export default defineNuxtPlugin(() => {
-  // Substitua G-XXXXXXXXXX pelo seu ID do Google Analytics
-  const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'
+  const GA_MEASUREMENT_ID = 'G-S0038L1Q6R'
   
   // Carregar script do Google Analytics
   const script = document.createElement('script')

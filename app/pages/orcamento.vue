@@ -58,7 +58,23 @@ const submitForm = async () => {
     
     // Redirecionar para WhatsApp após 2 segundos
     setTimeout(() => {
-      const mensagem = `Olá! Acabei de preencher o formulário de orçamento.\n\nNome: ${formData.value.nome}\nServiço: ${formData.value.servico}\nBairro: ${formData.value.bairro}\n\nPode me ajudar?`
+      let mensagem = `Olá! Acabei de preencher o formulário de orçamento.\n\n`
+      mensagem += `📝 Nome: ${formData.value.nome}\n`
+      mensagem += `📞 Telefone: ${formData.value.telefone}\n`
+      
+      if (formData.value.email) {
+        mensagem += `📧 E-mail: ${formData.value.email}\n`
+      }
+      
+      mensagem += `📍 Bairro: ${formData.value.bairro}\n`
+      mensagem += `🔧 Serviço: ${formData.value.servico}\n`
+      
+      if (formData.value.mensagem) {
+        mensagem += `\n💬 Mensagem:\n${formData.value.mensagem}\n`
+      }
+      
+      mensagem += `\nPode me ajudar?`
+      
       window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(mensagem)}`, '_blank')
     }, 2000)
     

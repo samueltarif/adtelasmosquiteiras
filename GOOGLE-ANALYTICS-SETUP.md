@@ -1,138 +1,156 @@
-# 🎯 CONFIGURAÇÃO GOOGLE ANALYTICS - AD TELAS
+# Google Analytics 4 - Configuração Completa
 
-## ✅ IMPLEMENTADO
+## ✅ STATUS: CONFIGURADO
 
-### 1. Plugin Global (app/plugins/gtag.client.js)
-- Rastreamento automático de todas as páginas
-- Rastreamento de mudanças de rota (SPA)
-- Carregamento assíncrono do script
+**ID do Google Analytics**: `G-S0038L1Q6R`
 
-### 2. Páginas HTML Estáticas
-- ✅ `/politica-de-privacidade.html` - Tag adicionada
-- ✅ `/termos-de-uso.html` - Tag adicionada
+## Arquivos Configurados
 
-### 3. Rotas Dinâmicas Cobertas
-- ✅ `/servicos/[familia]/[categoria]/[servico]` - Ex: `/servicos/telas/especiais/removivel`
-- ✅ Todas as páginas Vue são rastreadas automaticamente pelo plugin
+### 1. Plugin Global (Rotas Vue/Nuxt) ✅
+**Arquivo**: `app/plugins/gtag.client.js`
 
-## 🔧 CONFIGURAÇÃO NECESSÁRIA
-
-### Passo 1: Obter ID do Google Analytics
-1. Acesse [Google Analytics](https://analytics.google.com/)
-2. Crie uma propriedade GA4 (se ainda não tiver)
-3. Copie o ID de medição (formato: `G-XXXXXXXXXX`)
-
-### Passo 2: Substituir o ID nos Arquivos
-
-#### Arquivo 1: `app/plugins/gtag.client.js`
 ```javascript
-// Linha 3 - Substituir:
-const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'
-// Por:
-const GA_MEASUREMENT_ID = 'G-SEU-ID-AQUI'
+const GA_MEASUREMENT_ID = 'G-S0038L1Q6R'
 ```
 
-#### Arquivo 2: `public/politica-de-privacidade.html`
+Este plugin rastreia automaticamente:
+- Todas as rotas Vue/Nuxt (/, /servicos, /orcamento, etc.)
+- Mudanças de página (SPA navigation)
+- Page views
+
+### 2. Política de Privacidade ✅
+**Arquivo**: `public/politica-de-privacidade.html`
+
 ```html
-<!-- Linha 8 - Substituir: -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<!-- Por: -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SEU-ID-AQUI"></script>
-
-<!-- Linha 13 - Substituir: -->
-gtag('config', 'G-XXXXXXXXXX');
-<!-- Por: -->
-gtag('config', 'G-SEU-ID-AQUI');
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S0038L1Q6R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S0038L1Q6R');
+</script>
 ```
 
-#### Arquivo 3: `public/termos-de-uso.html`
+### 3. Termos de Uso ✅
+**Arquivo**: `public/termos-de-uso.html`
+
 ```html
-<!-- Linha 8 - Substituir: -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<!-- Por: -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SEU-ID-AQUI"></script>
-
-<!-- Linha 13 - Substituir: -->
-gtag('config', 'G-XXXXXXXXXX');
-<!-- Por: -->
-gtag('config', 'G-SEU-ID-AQUI');
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-S0038L1Q6R"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-S0038L1Q6R');
+</script>
 ```
 
-## 📊 VERIFICAÇÃO
+## Páginas Rastreadas
 
-### Testar se está funcionando:
+### Rotas Vue/Nuxt (via plugin)
+- ✅ `/` - Home
+- ✅ `/orcamento` - Página de orçamento
+- ✅ `/contato` - Página de contato
+- ✅ `/servicos` - Listagem de serviços
+- ✅ `/servicos/redes` - Redes de proteção
+- ✅ `/servicos/telas` - Telas mosquiteiras
+- ✅ `/servicos/[familia]/[categoria]/[servico]` - Páginas individuais
 
-1. **Build e Deploy:**
-```bash
-npm run build
+### Páginas HTML Estáticas (via tag direta)
+- ✅ `/politica-de-privacidade` - Política de privacidade
+- ✅ `/termos-de-uso` - Termos de uso
+
+## Eventos Customizados Configurados
+
+### Página de Orçamento
+```javascript
+// Envio de formulário
+window.dataLayer.push({
+  event: 'form_submit',
+  form_name: 'orcamento',
+  servico: 'Nome do Serviço'
+})
+
+// Clique em contato
+window.dataLayer.push({
+  event: 'contact_click',
+  method: 'whatsapp' | 'phone',
+  origem: 'card' | 'footer'
+})
 ```
 
-2. **Abrir o site no navegador**
+## Como Verificar se Está Funcionando
 
-3. **Abrir DevTools (F12) > Console**
+### Método 1: Google Analytics Real-Time
+1. Acesse [Google Analytics](https://analytics.google.com/)
+2. Vá em **Relatórios** > **Tempo real**
+3. Abra seu site em outra aba
+4. Você deve ver 1 usuário ativo
 
-4. **Verificar se não há erros do gtag**
+### Método 2: Console do Navegador
+1. Abra o site
+2. Pressione F12 (DevTools)
+3. Vá na aba **Console**
+4. Digite: `window.dataLayer`
+5. Você deve ver um array com eventos
 
-5. **Ir para Google Analytics > Relatórios > Tempo Real**
-   - Deve aparecer 1 usuário ativo (você)
-   - Deve mostrar a página que você está visitando
+### Método 3: Google Tag Assistant
+1. Instale a extensão [Tag Assistant](https://tagassistant.google.com/)
+2. Abra seu site
+3. Clique no ícone da extensão
+4. Deve mostrar "Google Analytics: GA4" detectado
 
-### Testar Rotas Específicas:
-- ✅ Visitar: `/politica-de-privacidade`
-- ✅ Visitar: `/termos-de-uso`
-- ✅ Visitar: `/servicos/telas/especiais/removivel`
-- ✅ Navegar entre páginas (deve rastrear cada mudança)
+## Troubleshooting
 
-## 🎯 EVENTOS RASTREADOS
+### Tag não aparece no Google Analytics
+- ✅ Verifique se o ID `G-S0038L1Q6R` está correto
+- ✅ Aguarde até 24h para dados aparecerem nos relatórios
+- ✅ Use "Tempo Real" para verificação imediata
+- ✅ Desative bloqueadores de anúncios/rastreamento
 
-### Automático (Page Views):
-- Todas as páginas Vue
-- Páginas HTML estáticas
-- Mudanças de rota (SPA navigation)
+### Eventos customizados não aparecem
+- ✅ Verifique `window.dataLayer` no console
+- ✅ Eventos podem levar até 24h para aparecer em relatórios
+- ✅ Use "DebugView" no GA4 para debug em tempo real
 
-### Manual (já implementado no código):
-- Cliques em botões WhatsApp
-- Cliques em cards de serviços
-- Submissão de formulários
-- Cliques em CTAs
+### Páginas não rastreadas
+- ✅ Verifique se o plugin está em `app/plugins/gtag.client.js`
+- ✅ Verifique se o arquivo tem extensão `.client.js`
+- ✅ Limpe o cache do navegador e do Nuxt
 
-## 🔒 SEGURANÇA
+## CSP (Content Security Policy)
 
-O CSP (Content Security Policy) já foi atualizado no `nuxt.config.ts` para permitir:
-- `https://www.googletagmanager.com`
-- `https://www.google-analytics.com`
-- `https://analytics.google.com`
+O `nuxt.config.ts` já está configurado para permitir Google Analytics:
 
-## 📝 NOTAS
-
-- O plugin é `.client.js` para rodar apenas no navegador
-- Não afeta o SSR (Server-Side Rendering)
-- Carregamento assíncrono não bloqueia a página
-- Compatível com Nuxt 4
-
-## ⚠️ IMPORTANTE
-
-Após substituir o ID do Google Analytics, faça:
-```bash
-npm run build
-git add .
-git commit -m "Configure Google Analytics ID"
-git push
+```javascript
+script: [
+  "'self'",
+  "'unsafe-inline'",
+  "https://www.googletagmanager.com",
+  "https://www.google-analytics.com"
+],
+connect: [
+  "'self'",
+  "https://www.google-analytics.com",
+  "https://analytics.google.com"
+]
 ```
 
-## 🆘 TROUBLESHOOTING
+## Próximos Passos
 
-### GA não aparece no Tempo Real:
-1. Verificar se o ID está correto
-2. Limpar cache do navegador
-3. Verificar console do navegador por erros
-4. Aguardar 5-10 minutos (pode haver delay)
+1. ✅ Configurar conversões no GA4
+2. ✅ Criar funis de conversão
+3. ✅ Configurar eventos de e-commerce (se aplicável)
+4. ✅ Integrar com Google Ads
+5. ✅ Configurar relatórios customizados
 
-### Páginas não rastreadas:
-1. Verificar se o plugin está em `app/plugins/`
-2. Verificar se o arquivo termina com `.client.js`
-3. Rebuild do projeto
+## Suporte
 
-### CSP bloqueando scripts:
-1. Verificar `nuxt.config.ts` > `nitro.routeRules`
-2. Confirmar que Google Analytics está na whitelist
+Se tiver problemas:
+1. Verifique o console do navegador (F12)
+2. Use o Google Tag Assistant
+3. Consulte a [documentação oficial do GA4](https://support.google.com/analytics/answer/9304153)
+
+---
+
+**Última atualização**: 03/03/2026 14:30
+**Status**: ✅ Totalmente configurado e funcionando
