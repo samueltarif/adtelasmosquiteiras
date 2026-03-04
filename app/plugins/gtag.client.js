@@ -7,21 +7,27 @@ export default defineNuxtPlugin(() => {
   script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`
   document.head.appendChild(script)
   
-  // Inicializar gtag
+  // Inicializar gtag e tornar global
   window.dataLayer = window.dataLayer || []
-  function gtag() {
+  window.gtag = function() {
     window.dataLayer.push(arguments)
   }
-  gtag('js', new Date())
-  gtag('config', GA_MEASUREMENT_ID, {
-    page_path: window.location.pathname
+  
+  window.gtag('js', new Date())
+  window.gtag('config', GA_MEASUREMENT_ID, {
+    page_path: window.location.pathname,
+    send_page_view: true
   })
   
-  // Rastrear mudanças de rota
+  // Rastrear mudanças de rota (SPA navigation)
   const router = useRouter()
   router.afterEach((to) => {
-    gtag('config', GA_MEASUREMENT_ID, {
-      page_path: to.fullPath
+    window.gtag('config', GA_MEASUREMENT_ID, {
+      page_path: to.fullPath,
+      page_title: document.title
     })
   })
+  
+  // Log para debug
+  console.log('✅ Google Analytics carregado:', GA_MEASUREMENT_ID)
 })
