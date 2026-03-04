@@ -5,6 +5,17 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxt/icon'],
   css: ['~/assets/css/tailwind.css'],
   
+  // Runtime Config - Variáveis de ambiente
+  runtimeConfig: {
+    // Privado (apenas servidor)
+    gaApiSecret: process.env.GA_API_SECRET,
+    
+    // Público (cliente e servidor)
+    public: {
+      gaMeasurementId: process.env.GA_MEASUREMENT_ID || 'G-S0038L1Q6R'
+    }
+  },
+  
   devServer: {
     port: 3001
   },
