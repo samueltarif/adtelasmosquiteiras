@@ -30,7 +30,7 @@ export default defineNuxtConfig({
           'X-XSS-Protection': '1; mode=block',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.whatsapp.com https://www.google-analytics.com https://analytics.google.com; frame-ancestors 'none';"
+          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.whatsapp.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://www.google.com https://region1.google-analytics.com https://region1.analytics.google.com https://stats.g.doubleclick.net; frame-src https://www.googletagmanager.com; frame-ancestors 'none';"
         }
       }
     }
