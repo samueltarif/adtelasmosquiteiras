@@ -21,13 +21,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     document.head.appendChild(script);
 
     // Configurar transport_url para forçar todas as requisições através do Worker
-    // Usando /collect como endpoint específico para coleta de dados
+    // O fps.goog gerencia automaticamente os endpoints (/collect, /j/collect, etc)
     gtag('config', 'GTM-KZTR2DHT', {
-      'transport_url': 'https://www.adtelasmosquiteiras.com.br/metrics/collect',
+      'transport_url': 'https://www.adtelasmosquiteiras.com.br/metrics',
       'first_party_collection': true
     });
 
     console.log('✅ GTM carregado via /metrics/ (Cloudflare Worker)');
-    console.log('✅ Transport URL configurada: https://www.adtelasmosquiteiras.com.br/metrics/collect');
+    console.log('✅ Transport URL configurada: https://www.adtelasmosquiteiras.com.br/metrics');
   }
 })
