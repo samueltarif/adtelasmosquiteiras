@@ -23,13 +23,6 @@ export default defineNuxtConfig({
   // Security Headers
   nitro: {
     routeRules: {
-      // Proxy para GTM
-      '/metrics/gtm.js': {
-        proxy: 'https://www.googletagmanager.com/gtm.js'
-      },
-      '/metrics/**': {
-        proxy: 'https://www.googletagmanager.com/**'
-      },
       '/**': {
         headers: {
           'X-Content-Type-Options': 'nosniff',
