@@ -21,8 +21,7 @@ const formData = ref({
   mensagem: ''
 })
 
-const isSubmitting = ref(false)
-const submitSuccess = ref(false)
+const { isSubmitting, submitSuccess, countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
 const submitError = ref(false)
 
 // Opções de serviços
@@ -54,29 +53,9 @@ const submitForm = async () => {
       })
     }
     
-    submitSuccess.value = true
-    
-    // Redirecionar para WhatsApp após 2 segundos
-    setTimeout(() => {
-      let mensagem = `Olá! Acabei de preencher o formulário de orçamento.\n\n`
-      mensagem += `📝 Nome: ${formData.value.nome}\n`
-      mensagem += `📞 Telefone: ${formData.value.telefone}\n`
-      
-      if (formData.value.email) {
-        mensagem += `📧 E-mail: ${formData.value.email}\n`
-      }
-      
-      mensagem += `📍 Bairro: ${formData.value.bairro}\n`
-      mensagem += `🔧 Serviço: ${formData.value.servico}\n`
-      
-      if (formData.value.mensagem) {
-        mensagem += `\n💬 Mensagem:\n${formData.value.mensagem}\n`
-      }
-      
-      mensagem += `\nPode me ajudar?`
-      
-      window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(mensagem)}`, '_blank')
-    }, 2000)
+    // Montar URL do WhatsApp com os dados do formulário
+    const url = buildWhatsappUrl(formData.value)
+    startRedirect(url)
     
   } catch (error) {
     submitError.value = true
@@ -278,11 +257,12 @@ const callPhone = () => {
               </div>
 
               <!-- Mensagem de Sucesso -->
-              <div v-if="submitSuccess" class="bg-[#25D366]/10 border-2 border-[#25D366] rounded-xl p-6 mb-6 text-center">
-                <Icon name="lucide:check-circle" class="w-12 h-12 text-[#25D366] mx-auto mb-3" />
-                <div class="font-bold text-[#22345F] mb-2">Formulário Enviado!</div>
-                <div class="text-sm text-[#4B5563]">Redirecionando para WhatsApp...</div>
-              </div>
+              <FormSuccess
+                v-if="submitSuccess"
+                :nome="formData.nome"
+                :whatsapp-url="whatsappRedirectUrl"
+                :countdown="countdown"
+              />
 
               <!-- Mensagem de Erro -->
               <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-center">

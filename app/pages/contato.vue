@@ -29,6 +29,7 @@ const formData = ref({
 
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
+const { countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
 
 // Enviar para WhatsApp
 const sendToWhatsApp = async () => {
@@ -36,47 +37,11 @@ const sendToWhatsApp = async () => {
     alert('Por favor, preencha pelo menos nome e telefone.')
     return
   }
-
   isSubmitting.value = true
-  
-  try {
-    await new Promise(resolve => setTimeout(resolve, 800))
-    
-    let message = `Olá! Vim pelo formulário de contato do site.\n\n`
-    message += `Nome: ${formData.value.nome}\n`
-    message += `Telefone: ${formData.value.telefone}\n`
-    
-    if (formData.value.email) {
-      message += `Email: ${formData.value.email}\n`
-    }
-    
-    if (formData.value.cidade) {
-      message += `Cidade: ${formData.value.cidade}\n`
-    }
-    
-    if (formData.value.mensagem) {
-      message += `\nMensagem:\n${formData.value.mensagem}`
-    }
-    
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
-    
-    if (typeof window !== 'undefined') {
-      window.open(whatsappUrl, '_blank')
-    }
-    
-    isSubmitted.value = true
-    
-    setTimeout(() => {
-      formData.value = { nome: '', telefone: '', email: '', cidade: '', mensagem: '' }
-      isSubmitted.value = false
-    }, 3000)
-    
-  } catch (error) {
-    console.error('Erro:', error)
-    alert('Erro ao enviar. Tente novamente.')
-  } finally {
-    isSubmitting.value = false
-  }
+  await new Promise(resolve => setTimeout(resolve, 800))
+  isSubmitting.value = false
+  isSubmitted.value = true
+  startRedirect(buildWhatsappUrl(formData.value))
 }
 
 // Links diretos
@@ -212,7 +177,9 @@ const emailLink = `mailto:${EMAIL}`
                 Preencha o formulário e entraremos em contato rapidamente
               </p>
 
-              <form @submit.prevent="sendToWhatsApp" class="space-y-4">
+              <FormSuccess v-if="isSubmitted" :nome="formData.nome" :whatsapp-url="whatsappRedirectUrl" :countdown="countdown" />
+
+              <form v-else @submit.prevent="sendToWhatsApp" class="space-y-4">
                 <!-- Nome -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">
