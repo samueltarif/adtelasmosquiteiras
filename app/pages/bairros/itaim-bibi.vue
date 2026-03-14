@@ -29,6 +29,7 @@ const submitForm = async () => {
 }
 
 const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`, '_blank')
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`
 </script>
 
 <template>
@@ -56,7 +57,7 @@ const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encod
               <div class="flex items-start gap-3"><Icon name="lucide:shield-check" class="w-6 h-6 text-[#25D366] flex-shrink-0 mt-1" /><div><h3 class="font-bold text-[#22345F]">Garantia de 2 Anos</h3><p class="text-sm text-gray-600">Cobertura total contra defeitos</p></div></div>
               <div class="flex items-start gap-3"><Icon name="lucide:wrench" class="w-6 h-6 text-[#F49A1A] flex-shrink-0 mt-1" /><div><h3 class="font-bold text-[#22345F]">Profissionais Qualificados</h3><p class="text-sm text-gray-600">Equipe treinada e experiente</p></div></div>
             </div>
-            <button @click="openWhatsApp" class="w-full md:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2"><Icon name="lucide:message-circle" class="w-5 h-5" />WhatsApp Direto</button>
+            <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="w-full md:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2"><Icon name="lucide:message-circle" class="w-5 h-5" />WhatsApp Direto</a>
           </div>
           <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8">
             <h3 class="text-2xl font-bold text-[#22345F] mb-2 text-center">Solicite seu Orçamento</h3>

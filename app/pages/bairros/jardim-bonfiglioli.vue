@@ -56,6 +56,7 @@ const openWhatsApp = () => {
   const msg = `Olá! Gostaria de um orçamento para ${bairro}.`
   window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`, '_blank')
 }
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`
 </script>
 
 <template>
@@ -125,13 +126,15 @@ const openWhatsApp = () => {
               </div>
             </div>
 
-            <button
-              @click="openWhatsApp"
+            <a
+              :href="whatsappUrl"
+              target="_blank"
+              rel="noopener noreferrer"
               class="w-full md:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2"
             >
               <Icon name="lucide:message-circle" class="w-5 h-5" />
               WhatsApp Direto
-            </button>
+            </a>
           </div>
 
           <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8">
