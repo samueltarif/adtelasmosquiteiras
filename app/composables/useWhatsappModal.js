@@ -13,9 +13,9 @@ export function useWhatsappModal() {
   }
 
   const generateWhatsappUrl = (formData) => {
-    const message = `Olá, meu nome é ${formData.nome}%0A%0AEu vim pelo site.%0A%0AMoro em ${formData.bairro} - ${formData.cidade}.%0A%0ATenho interesse no serviço de ${formData.tipoServico}.%0A%0AAguardo retorno, Por favor!`
+    const message = `Olá, meu nome é ${formData.nome}\n\nEu vim pelo site.\n\nMoro em ${formData.bairro} - ${formData.cidade}.\n\nTenho interesse no serviço de ${formData.tipoServico}.\n\nAguardo retorno, Por favor!`
     
-    return `https://wa.me/${whatsappNumber.replace('+', '')}?text=${message}`
+    return `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
   }
 
   return {
