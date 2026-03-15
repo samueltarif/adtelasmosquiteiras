@@ -20,7 +20,19 @@ export function useFormSubmit() {
     return `https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`
   }
 
+  // Função de conversão Google Ads
+  const reportConversion = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-473885322/lNTDCOim14gcEIrV--EB'
+      })
+    }
+  }
+
   const redirectToThankYou = (fields) => {
+    // Disparar conversão Google Ads
+    reportConversion()
+    
     const url = buildWhatsappUrl(fields)
     router.push({
       path: '/obrigado',
