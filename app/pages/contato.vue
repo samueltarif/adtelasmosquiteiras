@@ -29,7 +29,7 @@ const formData = ref({
 
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
-const { countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
+const { redirectToThankYou } = useFormSubmit()
 
 // Enviar para WhatsApp
 const sendToWhatsApp = async () => {
@@ -41,7 +41,7 @@ const sendToWhatsApp = async () => {
   await new Promise(resolve => setTimeout(resolve, 800))
   isSubmitting.value = false
   isSubmitted.value = true
-  startRedirect(buildWhatsappUrl(formData.value))
+  redirectToThankYou(formData.value)
 }
 
 // Links diretos
@@ -177,9 +177,7 @@ const emailLink = `mailto:${EMAIL}`
                 Preencha o formulário e entraremos em contato rapidamente
               </p>
 
-              <FormSuccess v-if="isSubmitted" :nome="formData.nome" :whatsapp-url="whatsappRedirectUrl" :countdown="countdown" />
-
-              <form v-else @submit.prevent="sendToWhatsApp" class="space-y-4">
+              <form @submit.prevent="sendToWhatsApp" class="space-y-4">
                 <!-- Nome -->
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">

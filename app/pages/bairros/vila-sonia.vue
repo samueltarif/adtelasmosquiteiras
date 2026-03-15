@@ -19,7 +19,7 @@ const formData = ref({
   mensagem: ''
 })
 
-const { isSubmitting, submitSuccess, countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
+const { isSubmitting, redirectToThankYou } = useFormSubmit()
 
 const servicosOptions = [
   'Telas Mosquiteiras',
@@ -34,7 +34,7 @@ const submitForm = async () => {
   isSubmitting.value = true
   await new Promise(resolve => setTimeout(resolve, 800))
   isSubmitting.value = false
-  startRedirect(buildWhatsappUrl(formData.value))
+  redirectToThankYou(formData.value)
 }
 
 const openWhatsApp = () => {
@@ -135,11 +135,7 @@ const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá
               Preencha e receba no WhatsApp
             </p>
 
-            <div v-if="submitSuccess">
-              <FormSuccess :nome="formData.nome" :whatsapp-url="whatsappRedirectUrl" :countdown="countdown" />
-            </div>
-
-            <form v-else @submit.prevent="submitForm" class="space-y-4">
+            <form @submit.prevent="submitForm" class="space-y-4">
               <div>
                 <input
                   v-model="formData.nome"

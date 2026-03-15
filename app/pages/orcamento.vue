@@ -21,7 +21,7 @@ const formData = ref({
   mensagem: ''
 })
 
-const { isSubmitting, submitSuccess, countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
+const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const submitError = ref(false)
 
 // Opções de serviços
@@ -53,9 +53,8 @@ const submitForm = async () => {
       })
     }
     
-    // Montar URL do WhatsApp com os dados do formulário
-    const url = buildWhatsappUrl(formData.value)
-    startRedirect(url)
+    // Redirecionar para página de obrigado com URL do WhatsApp
+    redirectToThankYou(formData.value)
     
   } catch (error) {
     submitError.value = true
@@ -256,14 +255,7 @@ const callPhone = () => {
                 </p>
               </div>
 
-              <!-- Mensagem de Sucesso -->
-              <FormSuccess
-                v-if="submitSuccess"
-                :nome="formData.nome"
-                :whatsapp-url="whatsappRedirectUrl"
-                :countdown="countdown"
-              />
-
+              <!-- Formulário -->
               <!-- Mensagem de Erro -->
               <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-center">
                 <Icon name="lucide:alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2" />
@@ -271,7 +263,7 @@ const callPhone = () => {
               </div>
 
               <!-- Formulário -->
-              <form v-if="!submitSuccess" @submit.prevent="submitForm" class="space-y-4">
+              <form @submit.prevent="submitForm" class="space-y-4">
                 
                 <!-- Nome -->
                 <div>

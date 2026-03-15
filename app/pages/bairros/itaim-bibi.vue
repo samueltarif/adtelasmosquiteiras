@@ -10,14 +10,14 @@ useHead({
 })
 
 const formData = ref({ nome: '', telefone: '', email: '', bairro: bairro, servico: '', mensagem: '' })
-const { isSubmitting, submitSuccess, countdown, whatsappRedirectUrl, startRedirect, buildWhatsappUrl } = useFormSubmit()
+const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const servicosOptions = ['Telas Mosquiteiras', 'Redes de Proteção', 'Telas Pet Screen', 'Redes para Crianças', 'Redes para Pets', 'Outro serviço']
 
 const submitForm = async () => {
   isSubmitting.value = true
   await new Promise(resolve => setTimeout(resolve, 800))
   isSubmitting.value = false
-  startRedirect(buildWhatsappUrl(formData.value))
+  redirectToThankYou(formData.value)
 }
 
 const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`, '_blank')
@@ -55,7 +55,7 @@ const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá
             <h3 class="text-2xl font-bold text-[#22345F] mb-2 text-center">Solicite seu Orçamento</h3>
             <p class="text-gray-600 text-sm text-center mb-6">Preencha e receba no WhatsApp</p>
             <div v-if="submitSuccess"><FormSuccess :nome="formData.nome" :whatsapp-url="whatsappRedirectUrl" :countdown="countdown" /></div>
-            <form v-else @submit.prevent="submitForm" class="space-y-4">
+            <form @submit.prevent="submitForm" class="space-y-4">
               <input v-model="formData.nome" type="text" required placeholder="Seu nome *" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" />
               <input v-model="formData.telefone" type="tel" required placeholder="WhatsApp / Telefone *" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" />
               <input v-model="formData.email" type="email" placeholder="E-mail (opcional)" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" />
