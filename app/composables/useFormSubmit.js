@@ -20,11 +20,11 @@ export function useFormSubmit() {
     return `https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`
   }
 
-  // Função de conversão Google Ads - Orçamento
+  // Função de conversão Google Ads - Contato
   const reportConversion = () => {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'conversion', {
-        'send_to': 'AW-473885322/AXOFCLv42IgcEIrV--EB'
+        'send_to': 'AW-17981093809/4GwPCPWSjoccELHvhv5C'
       })
     }
   }
