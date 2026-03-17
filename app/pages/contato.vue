@@ -38,10 +38,13 @@ const sendToWhatsApp = async () => {
     return
   }
   isSubmitting.value = true
-  await new Promise(resolve => setTimeout(resolve, 800))
-  isSubmitting.value = false
-  isSubmitted.value = true
-  redirectToThankYou(formData.value)
+  try {
+    await redirectToThankYou(formData.value)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 // Links diretos
