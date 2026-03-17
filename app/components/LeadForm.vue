@@ -47,7 +47,7 @@ const goToStep1 = () => {
   currentStep.value = 1
 }
 
-// Enviar para WhatsApp (pode ser do passo 1 ou 2)
+// Enviar formulário (envia email e redireciona para página de obrigado)
 const sendToWhatsApp = async () => {
   if (!canContinue.value) {
     alert('Por favor, preencha todos os campos obrigatórios.')
@@ -57,10 +57,27 @@ const sendToWhatsApp = async () => {
   isSubmitting.value = true
   
   try {
-    // Simular processamento
-    await new Promise(resolve => setTimeout(resolve, 800))
+    // Enviar para API (email)
+    const response = await $fetch('/api/send-lead', {
+      method: 'POST',
+      body: {
+        nome: formData.value.nome,
+        cidade: formData.value.cidade,
+        bairro: formData.value.bairro || '',
+        servico: formData.value.servico || 'Não especificado'
+      }
+    })
+
+    if (response.success) {
+      // Redirecionar para página de obrigado com nome do serviço
+      const servicoParam = formData.value.servico || 'nossos serviços'
+      await navigateTo(`/obrigado?servico=${encodeURIComponent(servicoParam)}`)
+    }
     
-    // Criar mensagem para WhatsApp
+  } catch (error) {
+    console.error('Erro ao enviar:', error)
+    
+    // Fallback: abrir WhatsApp se o email falhar
     let message = `Olá! Meu nome é ${formData.value.nome}, moro em ${formData.value.cidade}`
     
     if (formData.value.bairro) {
@@ -77,23 +94,11 @@ const sendToWhatsApp = async () => {
     
     const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(message)}`
     
-    // Abrir WhatsApp
     if (typeof window !== 'undefined') {
       window.open(whatsappUrl, '_blank')
     }
     
-    isSubmitted.value = true
-    
-    // Reset após 3 segundos
-    setTimeout(() => {
-      formData.value = { nome: '', cidade: '', bairro: '', servico: '' }
-      currentStep.value = 1
-      isSubmitted.value = false
-    }, 3000)
-    
-  } catch (error) {
-    console.error('Erro:', error)
-    alert('Erro ao enviar. Tente novamente.')
+    alert('Não foi possível enviar o email, mas você pode continuar pelo WhatsApp.')
   } finally {
     isSubmitting.value = false
   }

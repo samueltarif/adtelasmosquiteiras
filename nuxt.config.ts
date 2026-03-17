@@ -9,6 +9,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Privado (apenas servidor)
     gaApiSecret: process.env.GA_API_SECRET,
+    gmailEmail: process.env.GMAIL_EMAIL,
+    gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
     
     // Público (cliente e servidor)
     public: {
