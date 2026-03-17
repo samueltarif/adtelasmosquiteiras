@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
 
-  const { nome, cidade, bairro, servico } = body
+  const { nome, cidade, bairro, servico, telefone, email, mensagem } = body
 
   if (!nome || !cidade) {
     throw createError({
@@ -29,7 +29,10 @@ export default defineEventHandler(async (event) => {
           <p><strong>Nome:</strong> ${nome}</p>
           <p><strong>Cidade:</strong> ${cidade}</p>
           ${bairro ? `<p><strong>Bairro/Região:</strong> ${bairro}</p>` : ''}
+          ${telefone ? `<p><strong>Telefone/WhatsApp:</strong> ${telefone}</p>` : ''}
+          ${email ? `<p><strong>E-mail:</strong> ${email}</p>` : ''}
           ${servico ? `<p><strong>Serviço de Interesse:</strong> ${servico}</p>` : '<p><strong>Serviço de Interesse:</strong> Não especificado</p>'}
+          ${mensagem ? `<p><strong>Mensagem:</strong><br>${mensagem}</p>` : ''}
         </div>
         <p style="color: #666; font-size: 12px; margin-top: 20px;">
           Solicitação recebida em ${new Date().toLocaleString('pt-BR')}

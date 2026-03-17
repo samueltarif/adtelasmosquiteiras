@@ -1,24 +1,9 @@
 /**
  * Composable reutilizável para submit de formulários
- * Redireciona para /obrigado com a URL do WhatsApp como query param
+ * Envia email via API e redireciona para /obrigado
  */
 export function useFormSubmit() {
   const isSubmitting = ref(false)
-  const router = useRouter()
-
-  const buildWhatsappUrl = (fields) => {
-    let msg = `Olá! Vim pelo site e gostaria de um orçamento.\n\n`
-    if (fields.nome)        msg += `📝 Nome: ${fields.nome}\n`
-    if (fields.telefone)    msg += `📞 Telefone: ${fields.telefone}\n`
-    if (fields.email)       msg += `📧 E-mail: ${fields.email}\n`
-    if (fields.bairro)      msg += `📍 Bairro: ${fields.bairro}\n`
-    if (fields.cidade)      msg += `🏙️ Cidade: ${fields.cidade}\n`
-    if (fields.servico)     msg += `🔧 Serviço: ${fields.servico}\n`
-    if (fields.tipoServico) msg += `🔧 Serviço: ${fields.tipoServico}\n`
-    if (fields.mensagem)    msg += `\n💬 Mensagem:\n${fields.mensagem}\n`
-    msg += `\nPode me ajudar?`
-    return `https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`
-  }
 
   // Função de conversão Google Ads - Contato
   const reportConversion = () => {
@@ -29,16 +14,34 @@ export function useFormSubmit() {
     }
   }
 
-  const redirectToThankYou = (fields) => {
+  const redirectToThankYou = async (fields) => {
     // Disparar conversão Google Ads
     reportConversion()
-    
-    const url = buildWhatsappUrl(fields)
-    router.push({
+
+    try {
+      // Enviar email via API
+      await $fetch('/api/send-lead', {
+        method: 'POST',
+        body: {
+          nome: fields.nome || '',
+          cidade: fields.cidade || fields.bairro || 'São Paulo',
+          bairro: fields.bairro || '',
+          servico: fields.servico || fields.tipoServico || 'Não especificado',
+          telefone: fields.telefone || '',
+          email: fields.email || '',
+          mensagem: fields.mensagem || ''
+        }
+      })
+    } catch (e) {
+      console.error('Erro ao enviar email:', e)
+    }
+
+    // Redirecionar para /obrigado apenas com o nome do serviço
+    await navigateTo({
       path: '/obrigado',
-      query: { url, nome: fields.nome || '' }
+      query: { servico: fields.servico || fields.tipoServico || 'nossos serviços' }
     })
   }
 
-  return { isSubmitting, buildWhatsappUrl, redirectToThankYou }
+  return { isSubmitting, redirectToThankYou }
 }
