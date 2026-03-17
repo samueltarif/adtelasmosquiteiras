@@ -45,7 +45,7 @@ useHead({
           
           <!-- WhatsApp -->
           <a
-            href="https://wa.me/5511983586611?text=Olá! Acabei de enviar uma solicitação pelo site e gostaria de mais informações."
+            href="https://wa.me/5511983586611"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#1fb854] transition-all"
