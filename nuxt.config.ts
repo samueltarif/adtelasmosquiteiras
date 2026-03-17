@@ -12,6 +12,8 @@ export default defineNuxtConfig({
     gmailEmail: process.env.GMAIL_EMAIL,
     gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
     resendApiKey: process.env.RESEND_API_KEY,
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     
     // Público (cliente e servidor)
     public: {
