@@ -64,22 +64,24 @@ onUnmounted(() => { clearInterval(timer) })
     
     <!-- Hero com carrossel -->
     <section class="relative overflow-hidden">
-      <div class="relative w-full h-72 md:h-96">
-        <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
-          <img
-            v-for="(img, i) in carouselImages"
-            v-show="currentIndex === i"
-            :key="img.src"
-            :src="img.src"
-            :alt="img.alt"
-            class="absolute inset-0 w-full h-full object-cover"
-          />
-        </transition-group>
-        <div class="absolute inset-0 bg-gradient-to-b from-[#22345F]/70 via-[#22345F]/60 to-[#22345F]/80"></div>
-        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
+      <div class="relative w-full h-72 md:h-96 overflow-hidden">
+        <div class="relative w-full h-full">
+          <transition-group name="fade-carousel" tag="div" class="absolute inset-0">
+            <img
+              v-for="(img, i) in carouselImages"
+              v-show="currentIndex === i"
+              :key="img.src"
+              :src="img.src"
+              :alt="img.alt"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+          </transition-group>
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-[#22345F]/70 via-[#22345F]/60 to-[#22345F]/80 pointer-events-none"></div>
+        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white pointer-events-none">
           <h1 class="text-3xl md:text-5xl font-bold">{{ familia.nome }}</h1>
         </div>
-        <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
           <button
             v-for="(img, i) in carouselImages"
             :key="i"
