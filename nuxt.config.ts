@@ -23,6 +23,7 @@ export default defineNuxtConfig({
   // Security Headers
   nitro: {
     routeRules: {
+      '/': { redirect: '/home' },
       '/**': {
         headers: {
           'X-Content-Type-Options': 'nosniff',
