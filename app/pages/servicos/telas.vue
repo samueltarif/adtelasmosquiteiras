@@ -66,13 +66,7 @@ onUnmounted(() => { clearInterval(timer) })
 
         <!-- Conteúdo sobre o carrossel -->
         <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
-          <div class="text-5xl md:text-7xl mb-4">{{ familia.icon }}</div>
-          <h1 class="text-3xl md:text-5xl font-bold mb-3">{{ familia.nome }}</h1>
-          <p class="text-base md:text-xl text-white/90 mb-6 max-w-2xl">{{ familia.descricao }}</p>
-          <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-6 py-3 rounded-full text-base font-bold shadow-lg">
-            <Icon name="lucide:check-circle" class="w-5 h-5" />
-            18 Serviços Disponíveis
-          </div>
+          <h1 class="text-3xl md:text-5xl font-bold">{{ familia.nome }}</h1>
         </div>
 
         <!-- Dots -->
