@@ -2,12 +2,12 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const carouselImages = [
-  { src: '/images/MosquiteiraAreaExterna.png', alt: 'Mosquiteira área externa' },
-  { src: '/images/mosquiteiraJanela.png', alt: 'Mosquiteira para janela' },
-  { src: '/images/mosquiteira_paraPorta.png', alt: 'Mosquiteira para porta' },
+  { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira área externa' },
+  { src: '/images/mosquiteira_janela.png', alt: 'Mosquiteira para janela' },
+  { src: '/images/mosquiteira_para_porta.png', alt: 'Mosquiteira para porta' },
   { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
   { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
-  { src: '/images/TELA_MOSQUITEIRA.png', alt: 'Tela mosquiteira' },
+  { src: '/images/tela_mosquiteira.png', alt: 'Tela mosquiteira' },
 ]
 
 const currentIndex = ref(0)
