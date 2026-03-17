@@ -1,14 +1,13 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useServicos } from '~/composables/useServicos'
 
 const { getFamiliaBySlug } = useServicos()
 const familia = getFamiliaBySlug('redes')
 const route = useRoute()
 
-// Estado do modal de formulário
 const showFormModal = ref(false)
 
-// SEO
 useHead({
   title: `${familia.nome} | Todos os Serviços | AD Telas`,
   meta: [
@@ -16,14 +15,12 @@ useHead({
   ]
 })
 
-// Breadcrumb
 const breadcrumbItems = [
   { label: 'Início', to: '/' },
   { label: 'Serviços', to: '/servicos' },
   { label: familia.nome }
 ]
 
-// Categorias
 const categorias = Object.values(familia.categorias).map(cat => ({
   slug: cat.slug,
   titulo: cat.titulo,
@@ -33,6 +30,30 @@ const categorias = Object.values(familia.categorias).map(cat => ({
   url: `/servicos/redes/${cat.slug}`
 }))
 
+// Carrossel
+const carouselImages = [
+  { src: '/images/redes_para_sacadas.jpg', alt: 'Redes para sacadas' },
+  { src: '/images/redes_para_janelas.png', alt: 'Redes para janelas' },
+  { src: '/images/redes_para_criancas.png', alt: 'Redes para crianças' },
+  { src: '/images/redes_para_cachorros.png', alt: 'Redes para cachorros' },
+  { src: '/images/redes_para_apartamentos.png', alt: 'Redes para apartamentos' },
+  { src: '/images/redes_para_coberturas.jpg', alt: 'Redes para coberturas' },
+  { src: '/images/redes_para_escadas.jpg', alt: 'Redes para escadas' },
+  { src: '/images/redes_para_piscinas.jpg', alt: 'Redes para piscinas' },
+  { src: '/images/redes_para_muros.jpg', alt: 'Redes para muros' },
+  { src: '/images/redes_para_telhados.jpg', alt: 'Redes para telhados' },
+  { src: '/images/redes_para_portas.png', alt: 'Redes para portas' },
+  { src: '/images/redes_para_portoes.jpg', alt: 'Redes para portões' },
+  { src: '/images/redes_para_animais.png', alt: 'Redes para animais' },
+  { src: '/images/redes_para_idosos.png', alt: 'Redes para idosos' },
+  { src: '/images/redes_para_basculantes.png', alt: 'Redes para basculantes' },
+]
+const currentIndex = ref(0)
+let timer = null
+function next() { currentIndex.value = (currentIndex.value + 1) % carouselImages.length }
+function goTo(i) { currentIndex.value = i }
+onMounted(() => { timer = setInterval(next, 3500) })
+onUnmounted(() => { clearInterval(timer) })
 </script>
 
 <template>
@@ -41,18 +62,31 @@ const categorias = Object.values(familia.categorias).map(cat => ({
     <!-- Breadcrumb -->
     <Breadcrumb :path="route.path" />
     
-    <!-- Hero -->
-    <section class="py-16 md:py-20 bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white">
-      <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        <div class="text-center">
-          <div class="text-6xl md:text-8xl mb-6">{{ familia.icon }}</div>
-          <h1 class="text-4xl md:text-6xl font-bold mb-6">{{ familia.nome }}</h1>
-          <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">{{ familia.descricao }}</p>
-          
-          <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-6 py-3 rounded-full text-lg font-bold">
-            <Icon name="lucide:check-circle" class="w-5 h-5" />
-            17 Serviços Disponíveis
-          </div>
+    <!-- Hero com carrossel -->
+    <section class="relative overflow-hidden">
+      <div class="relative w-full h-72 md:h-96">
+        <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
+          <img
+            v-for="(img, i) in carouselImages"
+            v-show="currentIndex === i"
+            :key="img.src"
+            :src="img.src"
+            :alt="img.alt"
+            class="absolute inset-0 w-full h-full object-cover"
+          />
+        </transition-group>
+        <div class="absolute inset-0 bg-gradient-to-b from-[#22345F]/70 via-[#22345F]/60 to-[#22345F]/80"></div>
+        <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
+          <h1 class="text-3xl md:text-5xl font-bold">{{ familia.nome }}</h1>
+        </div>
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          <button
+            v-for="(img, i) in carouselImages"
+            :key="i"
+            @click="goTo(i)"
+            class="w-2.5 h-2.5 rounded-full transition-all"
+            :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
+          />
         </div>
       </div>
     </section>
@@ -134,3 +168,16 @@ const categorias = Object.values(familia.categorias).map(cat => ({
 
   </div>
 </template>
+
+<style scoped>
+.fade-carousel-enter-active,
+.fade-carousel-leave-active {
+  transition: opacity 0.7s ease;
+  position: absolute;
+  inset: 0;
+}
+.fade-carousel-enter-from,
+.fade-carousel-leave-to { opacity: 0; }
+.fade-carousel-enter-to,
+.fade-carousel-leave-from { opacity: 1; }
+</style>
