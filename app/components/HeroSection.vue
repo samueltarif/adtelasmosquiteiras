@@ -109,19 +109,19 @@ onUnmounted(() => { clearInterval(timer) })
         <!-- CTAs secundários -->
         <div class="grid grid-cols-2 gap-3">
           <NuxtLink
-            to="/orcamento"
+            to="/servicos/telas"
             class="flex items-center justify-center gap-1.5 h-12 bg-white text-[#F49A1A] rounded-2xl font-medium text-sm border-2 border-[#F49A1A] active:scale-[0.98] transition-all"
           >
-            <Icon name="lucide:file-text" class="w-4 h-4" />
-            Formulário
+            <Icon name="lucide:grid" class="w-4 h-4" />
+            Telas Mosquiteiras
           </NuxtLink>
-          <a
-            href="tel:+5511983586611"
+          <NuxtLink
+            to="/servicos/redes"
             class="flex items-center justify-center gap-1.5 h-12 bg-white text-[#22345F] rounded-2xl font-medium text-sm border-2 border-[#22345F]/20 active:scale-[0.98] transition-all"
           >
-            <Icon name="lucide:phone" class="w-4 h-4" />
-            Ligar
-          </a>
+            <Icon name="lucide:shield" class="w-4 h-4" />
+            Redes de Proteção
+          </NuxtLink>
         </div>
 
       </div>
@@ -184,19 +184,19 @@ onUnmounted(() => { clearInterval(timer) })
                 Orçamento Grátis
               </a>
               <NuxtLink
-                to="/orcamento"
+                to="/servicos/telas"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-[#F49A1A] rounded-2xl font-medium text-base border-2 border-[#F49A1A] hover:bg-[#F49A1A]/5 transition-all"
               >
-                <Icon name="lucide:file-text" class="w-5 h-5" />
-                Preencher Formulário
+                <Icon name="lucide:grid" class="w-5 h-5" />
+                Telas Mosquiteiras
               </NuxtLink>
-              <a
-                href="tel:+5511983586611"
+              <NuxtLink
+                to="/servicos/redes"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-[#22345F] rounded-2xl font-medium text-base border-2 border-[#22345F]/20 hover:bg-gray-50 transition-all"
               >
-                <Icon name="lucide:phone" class="w-5 h-5" />
-                Ligar Agora
-              </a>
+                <Icon name="lucide:shield" class="w-5 h-5" />
+                Redes de Proteção
+              </NuxtLink>
             </div>
           </div>
 
