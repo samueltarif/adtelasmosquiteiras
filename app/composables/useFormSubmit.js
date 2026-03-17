@@ -36,11 +36,8 @@ export function useFormSubmit() {
       console.error('Erro ao enviar email:', e)
     }
 
-    // Redirecionar para /obrigado apenas com o nome do serviço
-    await navigateTo({
-      path: '/obrigado',
-      query: { servico: fields.servico || fields.tipoServico || 'nossos serviços' }
-    })
+    // Redirecionar para /obrigado sem query params
+    await navigateTo('/obrigado')
   }
 
   return { isSubmitting, redirectToThankYou }

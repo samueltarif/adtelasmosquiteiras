@@ -69,9 +69,7 @@ const sendToWhatsApp = async () => {
     })
 
     if (response.success) {
-      // Redirecionar para página de obrigado com nome do serviço
-      const servicoParam = formData.value.servico || 'nossos serviços'
-      await navigateTo(`/obrigado?servico=${encodeURIComponent(servicoParam)}`)
+      await navigateTo('/obrigado')
     }
     
   } catch (error) {

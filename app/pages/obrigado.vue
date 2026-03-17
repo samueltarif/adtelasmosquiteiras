@@ -1,7 +1,4 @@
 <script setup>
-const route = useRoute()
-const servico = route.query.servico || 'nossos serviços'
-
 useHead({
   title: 'Obrigado! | AD Telas e Redes',
   meta: [
@@ -30,7 +27,7 @@ useHead({
         </h1>
         
         <p class="text-lg text-gray-600 mb-2">
-          Recebemos suas informações sobre <strong class="text-[#F49A1A]">{{ servico }}</strong>.
+          Recebemos suas informações e em breve nossa equipe entrará em contato.
         </p>
         
         <p class="text-base text-gray-500 mb-8">
