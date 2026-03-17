@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -13,14 +13,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Log para debug no Vercel
+  console.log('[send-lead] Recebido:', { nome, cidade, servico })
+  console.log('[send-lead] RESEND_API_KEY configurada:', !!config.resendApiKey)
+
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: config.gmailEmail,
-        pass: config.gmailAppPassword
-      }
-    })
+    const resend = new Resend(config.resendApiKey)
 
     const htmlEmail = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -43,19 +41,23 @@ export default defineEventHandler(async (event) => {
       </div>
     `
 
-    await transporter.sendMail({
-      from: `"AD Telas - Site" <${config.gmailEmail}>`,
-      to: config.gmailEmail,
-      subject: `Nova Solicitação: ${servico} - ${nome}`,
+    const { data, error } = await resend.emails.send({
+      from: 'AD Telas - Site <onboarding@resend.dev>',
+      to: ['vendas.adtelaseredes@gmail.com'],
+      subject: `Nova Solicitação: ${servico || 'Orçamento'} - ${nome}`,
       html: htmlEmail
     })
 
+    if (error) {
+      console.error('[send-lead] Erro Resend:', error)
+      throw createError({ statusCode: 500, message: 'Erro ao enviar email' })
+    }
+
+    console.log('[send-lead] Email enviado com sucesso:', data?.id)
     return { success: true, message: 'Email enviado com sucesso' }
+
   } catch (error) {
-    console.error('Erro ao enviar email:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erro ao enviar email'
-    })
+    console.error('[send-lead] Erro:', error)
+    throw createError({ statusCode: 500, message: 'Erro ao enviar email' })
   }
 })
