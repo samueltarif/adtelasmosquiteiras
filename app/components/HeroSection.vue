@@ -1,9 +1,33 @@
 <script setup>
-// iOS-inspired clean design with brand colors
-// Paleta: Alta conversão focada em CTA
-// Azul escuro: #22345F (da logo)
-// Laranja: #F49A1A (da logo)
-// Verde WhatsApp: #25D366
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const carouselImages = [
+  { src: '/images/MosquiteiraAreaExterna.png', alt: 'Mosquiteira área externa' },
+  { src: '/images/mosquiteiraJanela.png', alt: 'Mosquiteira para janela' },
+  { src: '/images/mosquiteira_paraPorta.png', alt: 'Mosquiteira para porta' },
+  { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
+  { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
+  { src: '/images/TELA_MOSQUITEIRA.png', alt: 'Tela mosquiteira' },
+]
+
+const currentIndex = ref(0)
+let timer = null
+
+function next() {
+  currentIndex.value = (currentIndex.value + 1) % carouselImages.length
+}
+
+function goTo(i) {
+  currentIndex.value = i
+}
+
+onMounted(() => {
+  timer = setInterval(next, 3500)
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 </script>
 
 <template>
@@ -127,13 +151,28 @@
           </div>
         </div>
 
-        <!-- 7. IMAGEM - Clean Card com borda -->
-        <div class="w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-2 border-gray-100">
-          <img 
-            src="/images/familia.png" 
-            alt="Família protegida"
-            class="w-full h-full object-cover"
-          />
+        <!-- 7. IMAGEM - Carrossel -->
+        <div class="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-2 border-gray-100">
+          <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
+            <img
+              v-for="(img, i) in carouselImages"
+              v-show="currentIndex === i"
+              :key="img.src"
+              :src="img.src"
+              :alt="img.alt"
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+          </transition-group>
+          <!-- Dots -->
+          <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+            <button
+              v-for="(img, i) in carouselImages"
+              :key="i"
+              @click="goTo(i)"
+              class="w-2 h-2 rounded-full transition-all"
+              :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/50'"
+            />
+          </div>
         </div>
 
       </div>
@@ -244,28 +283,45 @@
           <div class="relative">
             <!-- Imagem com Card de Prova Social -->
             <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100">
-              <img 
-                src="/images/familia.png" 
-                alt="Família protegida"
-                class="w-full h-[500px] object-cover"
-              />
-              
-              <!-- Card de Prova Social Flutuante -->
-              <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl border-2 border-[#F49A1A]/10">
-                <div class="flex items-center gap-4">
-                  <img 
-                    src="/images/giovana_naomi.png" 
-                    alt="Cliente"
-                    class="w-14 h-14 rounded-full object-cover border-2 border-[#F49A1A]/20 shadow-md"
+              <!-- Carrossel Desktop -->
+              <div class="relative w-full h-[500px]">
+                <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
+                  <img
+                    v-for="(img, i) in carouselImages"
+                    v-show="currentIndex === i"
+                    :key="img.src"
+                    :src="img.src"
+                    :alt="img.alt"
+                    class="absolute inset-0 w-full h-full object-cover"
                   />
-                  <div class="flex-1">
-                    <div class="flex items-center gap-1 mb-1">
-                      <svg v-for="i in 5" :key="i" class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
+                </transition-group>
+                <!-- Dots Desktop -->
+                <div class="absolute bottom-24 left-0 right-0 flex justify-center gap-2">
+                  <button
+                    v-for="(img, i) in carouselImages"
+                    :key="i"
+                    @click="goTo(i)"
+                    class="w-2.5 h-2.5 rounded-full transition-all"
+                    :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/50'"
+                  />
+                </div>
+                <!-- Card de Prova Social Flutuante -->
+                <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-2xl p-5 shadow-xl border-2 border-[#F49A1A]/10">
+                  <div class="flex items-center gap-4">
+                    <img 
+                      src="/images/giovana_naomi.png" 
+                      alt="Cliente"
+                      class="w-14 h-14 rounded-full object-cover border-2 border-[#F49A1A]/20 shadow-md"
+                    />
+                    <div class="flex-1">
+                      <div class="flex items-center gap-1 mb-1">
+                        <svg v-for="i in 5" :key="i" class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      </div>
+                      <p class="text-gray-700 text-sm font-medium mb-1">"Instalação perfeita, super pontuais"</p>
+                      <p class="text-gray-500 text-xs">Giovana Naomi • Cliente verificada</p>
                     </div>
-                    <p class="text-gray-700 text-sm font-medium mb-1">"Instalação perfeita, super pontuais"</p>
-                    <p class="text-gray-500 text-xs">Giovana Naomi • Cliente verificada</p>
                   </div>
                 </div>
               </div>
@@ -276,3 +332,20 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+.fade-carousel-enter-active,
+.fade-carousel-leave-active {
+  transition: opacity 0.7s ease;
+  position: absolute;
+  inset: 0;
+}
+.fade-carousel-enter-from,
+.fade-carousel-leave-to {
+  opacity: 0;
+}
+.fade-carousel-enter-to,
+.fade-carousel-leave-from {
+  opacity: 1;
+}
+</style>
