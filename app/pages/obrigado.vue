@@ -68,7 +68,7 @@ useHead({
 
       <!-- Informação adicional -->
       <p class="text-center text-sm text-gray-500 mt-6">
-        Tempo médio de resposta: até 2 horas úteis
+        Tempo médio de resposta: em alguns minutos
       </p>
 
     </div>

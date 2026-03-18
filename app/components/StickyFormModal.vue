@@ -131,7 +131,7 @@ onUnmounted(() => {
           <div class="flex justify-between items-center mb-6">
             <div>
               <h3 class="text-xl font-bold text-gray-800">Orçamento Grátis</h3>
-              <p class="text-sm text-gray-600">Resposta em até 2 horas</p>
+              <p class="text-sm text-gray-600">Resposta em alguns minutos</p>
             </div>
             <button
               @click="closeModal"

@@ -1,4 +1,61 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+// Carrosseis do hero
+const heroCarousels = [
+  {
+    label: 'Telas Mosquiteiras',
+    link: '/servicos/telas',
+    images: [
+      '/images/tela_mosquiteira.png',
+      '/images/mosquiteira_janela.png',
+      '/images/mosquiteira_area_externa.png',
+      '/images/mosquiteira_para_porta.png',
+      '/images/mosquiteira_removivel.png',
+    ]
+  },
+  {
+    label: 'Redes de Proteção',
+    link: '/servicos/redes',
+    images: [
+      '/images/redes_para_sacadas.jpg',
+      '/images/redes_para_janelas.png',
+      '/images/redes_para_criancas.png',
+      '/images/redes_para_apartamentos.png',
+      '/images/redes_para_coberturas.jpg',
+    ]
+  },
+  {
+    label: 'Diversos',
+    link: '/servicos/telas',
+    images: [
+      '/images/telas_para_sacadas.jpg',
+      '/images/telas_para_varandas.jpg',
+      '/images/telas_pet_screen.webp',
+      '/images/telas_para_apartamento.jpg',
+      '/images/telas_removiveis.webp',
+    ]
+  }
+]
+
+const carouselIndexes = ref([0, 0, 0])
+let carouselTimers = []
+
+onMounted(() => {
+  heroCarousels.forEach((_, i) => {
+    const offset = i * 1200
+    carouselTimers.push(setTimeout(() => {
+      carouselTimers.push(setInterval(() => {
+        carouselIndexes.value[i] = (carouselIndexes.value[i] + 1) % heroCarousels[i].images.length
+      }, 3500))
+    }, offset))
+  })
+})
+
+onUnmounted(() => {
+  carouselTimers.forEach(t => clearTimeout(t) || clearInterval(t))
+})
+
 // SEO
 useHead({
   title: 'Solicitar Orçamento Grátis | AD Telas e Redes SP',
@@ -97,32 +154,41 @@ const callPhone = () => {
         <div class="text-center max-w-3xl mx-auto">
           <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-4 py-2 rounded-full text-sm font-bold mb-6">
             <Icon name="lucide:check-circle" class="w-4 h-4" />
-            Resposta em até 2 horas
+            Resposta em alguns minutos
           </div>
           
-          <h1 class="text-3xl md:text-5xl font-bold mb-4">
+          <h1 class="text-3xl md:text-5xl font-bold mb-8">
             Solicite seu Orçamento Grátis
           </h1>
-          
-          <p class="text-lg md:text-xl text-white/90 mb-8">
-            Escolha a forma de contato que preferir. Estamos prontos para atendê-lo!
-          </p>
-          
-          <!-- Stats -->
-          <div class="flex flex-wrap justify-center gap-6 md:gap-8">
-            <div class="text-center">
-              <div class="text-3xl md:text-4xl font-bold text-[#25D366]">48h</div>
-              <div class="text-sm text-white/80">Instalação</div>
-            </div>
-            <div class="text-center">
-              <div class="text-3xl md:text-4xl font-bold text-[#25D366]">2 anos</div>
-              <div class="text-sm text-white/80">Garantia</div>
-            </div>
-            <div class="text-center">
-              <div class="text-3xl md:text-4xl font-bold text-[#25D366]">500+</div>
-              <div class="text-sm text-white/80">Clientes</div>
-            </div>
+
+          <!-- 3 carrosseis lado a lado -->
+          <div class="grid grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <NuxtLink
+              v-for="(carousel, i) in heroCarousels"
+              :key="i"
+              :to="carousel.link"
+              class="card-glow relative rounded-xl overflow-hidden aspect-[3/4] md:aspect-[4/4] shadow-lg cursor-pointer group"
+            >
+              <transition-group name="fade">
+                <img
+                  v-for="(img, idx) in carousel.images"
+                  v-show="carouselIndexes[i] === idx"
+                  :key="img"
+                  :src="img"
+                  :alt="carousel.label"
+                  class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </transition-group>
+              <!-- Label -->
+              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                <p class="text-white text-xs font-bold text-center">{{ carousel.label }}</p>
+              </div>
+              <!-- Hover overlay -->
+              <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60"></div>
+            </NuxtLink>
           </div>
+          
+
         </div>
       </div>
     </section>
@@ -132,7 +198,69 @@ const callPhone = () => {
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
           
-          <!-- Coluna Esquerda: Meios de Contato -->
+          <!-- Coluna Esquerda: Formulário -->
+          <div>
+            <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-24">
+              
+              <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold mb-2 inline-block relative titulo-destaque">
+                  Preencha o Formulário
+                </h3>
+                <p class="text-[#4B5563] text-sm">
+                  Retornamos em alguns minutos
+                </p>
+              </div>
+
+              <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-center">
+                <Icon name="lucide:alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2" />
+                <div class="text-sm text-red-600">Erro ao enviar. Tente novamente ou use WhatsApp.</div>
+              </div>
+
+              <form @submit.prevent="submitForm" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Nome Completo *</label>
+                  <input v-model="formData.nome" type="text" required placeholder="Seu nome" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">WhatsApp / Telefone *</label>
+                  <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">E-mail (opcional)</label>
+                  <input v-model="formData.email" type="email" placeholder="seu@email.com" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Bairro / Região *</label>
+                  <input v-model="formData.bairro" type="text" required placeholder="Ex: Vila Mariana" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Serviço de Interesse *</label>
+                  <select v-model="formData.servico" required class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors">
+                    <option value="">Selecione um serviço</option>
+                    <option v-for="servico in servicosOptions" :key="servico" :value="servico">{{ servico }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Mensagem (opcional)</label>
+                  <textarea v-model="formData.mensagem" rows="3" placeholder="Conte-nos mais sobre sua necessidade..." class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-none"></textarea>
+                </div>
+                <button type="submit" :disabled="isSubmitting" class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
+                  <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação' }}</span>
+                </button>
+                <p class="text-xs text-[#4B5563] text-center">
+                  Ao enviar, você concorda com nossa 
+                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline">Política de Privacidade</NuxtLink>
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <!-- Coluna Direita: Meios de Contato -->
           <div class="space-y-6">
             
             <!-- Título -->
@@ -242,141 +370,6 @@ const callPhone = () => {
 
           </div>
 
-          <!-- Coluna Direita: Formulário -->
-          <div>
-            <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-24">
-              
-              <div class="text-center mb-6">
-                <h3 class="text-2xl font-bold text-[#22345F] mb-2">
-                  Ou Preencha o Formulário
-                </h3>
-                <p class="text-[#4B5563] text-sm">
-                  Retornamos em até 2 horas úteis
-                </p>
-              </div>
-
-              <!-- Formulário -->
-              <!-- Mensagem de Erro -->
-              <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-center">
-                <Icon name="lucide:alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2" />
-                <div class="text-sm text-red-600">Erro ao enviar. Tente novamente ou use WhatsApp.</div>
-              </div>
-
-              <!-- Formulário -->
-              <form @submit.prevent="submitForm" class="space-y-4">
-                
-                <!-- Nome -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    Nome Completo *
-                  </label>
-                  <input
-                    v-model="formData.nome"
-                    type="text"
-                    required
-                    placeholder="Seu nome"
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <!-- Telefone -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    WhatsApp / Telefone *
-                  </label>
-                  <input
-                    v-model="formData.telefone"
-                    type="tel"
-                    required
-                    placeholder="(11) 98765-4321"
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <!-- Email -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    E-mail (opcional)
-                  </label>
-                  <input
-                    v-model="formData.email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <!-- Bairro -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    Bairro / Região *
-                  </label>
-                  <input
-                    v-model="formData.bairro"
-                    type="text"
-                    required
-                    placeholder="Ex: Vila Mariana"
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors"
-                  />
-                </div>
-
-                <!-- Serviço -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    Serviço de Interesse *
-                  </label>
-                  <select
-                    v-model="formData.servico"
-                    required
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors"
-                  >
-                    <option value="">Selecione um serviço</option>
-                    <option v-for="servico in servicosOptions" :key="servico" :value="servico">
-                      {{ servico }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Mensagem -->
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">
-                    Mensagem (opcional)
-                  </label>
-                  <textarea
-                    v-model="formData.mensagem"
-                    rows="3"
-                    placeholder="Conte-nos mais sobre sua necessidade..."
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-none"
-                  ></textarea>
-                </div>
-
-                <!-- Botão Submit -->
-                <button
-                  type="submit"
-                  :disabled="isSubmitting"
-                  class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
-                  <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação' }}</span>
-                </button>
-
-                <!-- Aviso LGPD -->
-                <p class="text-xs text-[#4B5563] text-center">
-                  Ao enviar, você concorda com nossa 
-                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline">
-                    Política de Privacidade
-                  </NuxtLink>
-                </p>
-
-              </form>
-
-            </div>
-          </div>
-
         </div>
       </div>
     </section>
@@ -407,3 +400,46 @@ const callPhone = () => {
 
   </div>
 </template>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.8s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.titulo-destaque {
+  background: linear-gradient(135deg, #22345F, #F49A1A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.titulo-destaque::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #F49A1A, #22345F);
+  border-radius: 2px;
+}
+
+/* Animated border cards */
+.card-glow {
+  padding: 3px;
+  background: linear-gradient(90deg, #F49A1A, #25D366, #F49A1A);
+  background-size: 200% 200%;
+  animation: border-spin 2.5s linear infinite;
+}
+.card-glow > * {
+  border-radius: 10px;
+}
+
+@keyframes border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+</style>

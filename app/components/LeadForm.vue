@@ -122,7 +122,7 @@ const sendToWhatsApp = async () => {
         'text-gray-600',
         variant === 'desktop' ? 'text-sm' : 'text-xs'
       ]">
-        Resposta em até 2 horas
+        Resposta em alguns minutos
       </p>
       
       <!-- Indicador de Passos -->
