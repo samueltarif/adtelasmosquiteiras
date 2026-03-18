@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, computed } from 'vue'
 
 // ============================================
@@ -392,7 +392,7 @@ const handleBackdropClick = (e) => {
                           Proteção certificada com garantia de 2 anos. Suporta até 500kg.
                         </span>
                         <span v-else-if="selectedNeed === 'Contra mosquitos'">
-                          Transparência 85%, eficaz contra dengue e aedes. Instalação em 48h.
+                          Transparência 85%, eficaz contra dengue e aedes. Instalação em 24h.
                         </span>
                         <span v-else>
                           Solução completa: rede de proteção + tela mosquiteira. Máxima segurança.
@@ -421,7 +421,7 @@ const handleBackdropClick = (e) => {
                     <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span>Instalação em 48h</span>
+                    <span>Instalação em 24h</span>
                     <span class="text-gray-300">•</span>
                     <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>

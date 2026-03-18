@@ -35,7 +35,7 @@ export const useServicoData = () => {
         },
         {
           icone: 'clock',
-          titulo: 'Instalação em 48h',
+          titulo: 'Instalação em 24h',
           descricao: 'Agendamento rápido, instalação profissional'
         },
         {
@@ -57,12 +57,12 @@ export const useServicoData = () => {
         { label: 'Garantia', valor: '2 anos' },
         { label: 'Malha', valor: '3x3cm ou 5x5cm' },
         { label: 'Cores', valor: 'Branca, preta, verde' },
-        { label: 'Instalação', valor: '48h após medição' }
+        { label: 'Instalação', valor: '24h após medição' }
       ],
       
       // Comparação com concorrentes
       comparacao: {
-        nos: ['Garantia 2 anos', 'Instalação 48h', 'Material premium', 'Suporte 500kg', 'Certificado INMETRO'],
+        nos: ['Garantia 2 anos', 'Instalação 24h', 'Material premium', 'Suporte 500kg', 'Certificado INMETRO'],
         concorrentes: ['Garantia 6 meses', 'Instalação 7-15 dias', 'Material padrão', 'Suporte 300kg', 'Sem certificação']
       },
       
@@ -96,7 +96,7 @@ export const useServicoData = () => {
         },
         {
           pergunta: 'Quanto tempo demora a instalação?',
-          resposta: 'Após a medição, instalamos em até 48h. O processo de instalação leva de 2 a 4 horas dependendo do tamanho.'
+          resposta: 'Após a medição, Instalamos em até 24h. O processo de instalação leva de 2 a 4 horas dependendo do tamanho.'
         },
         {
           pergunta: 'Posso escolher a cor da rede?',
@@ -112,8 +112,8 @@ export const useServicoData = () => {
       keywords: ['rede de proteção', 'proteção janela', 'segurança criança', 'proteção pet', 'rede sacada'],
       
       // Meta tags
-      metaTitle: 'Rede de Proteção em São Paulo | Instalação 48h | AD Telas',
-      metaDescription: 'Rede de proteção para janelas e sacadas. Resiste até 500kg. Instalação em 48h. Garantia 2 anos. Proteja sua família e pets. Orçamento grátis!'
+      metaTitle: 'Rede de Proteção em São Paulo | Instalação 24h | AD Telas',
+      metaDescription: 'Rede de proteção para janelas e sacadas. Resiste até 500kg. Instalação em 24h. Garantia 2 anos. Proteja sua família e pets. Orçamento grátis!'
     },
     
     {
@@ -158,12 +158,12 @@ export const useServicoData = () => {
         { label: 'Garantia', valor: '2 anos' },
         { label: 'Malha', valor: '1x1mm (micro)' },
         { label: 'Cores', valor: 'Cinza escuro (invisível)' },
-        { label: 'Instalação', valor: '48h após medição' }
+        { label: 'Instalação', valor: '24h após medição' }
       ],
       
       // Comparação com concorrentes
       comparacao: {
-        nos: ['Transparência 85%', 'Instalação 48h', 'Malha micro 1mm', 'Não oxida', 'Garantia 2 anos'],
+        nos: ['Transparência 85%', 'Instalação 24h', 'Malha micro 1mm', 'Não oxida', 'Garantia 2 anos'],
         concorrentes: ['Transparência 60%', 'Instalação 7-15 dias', 'Malha 2mm', 'Oxida com tempo', 'Garantia 6 meses']
       },
       
@@ -214,7 +214,7 @@ export const useServicoData = () => {
       
       // Meta tags
       metaTitle: 'Tela Mosquiteira Invisível em São Paulo | Anti-Dengue | AD Telas',
-      metaDescription: 'Tela mosquiteira com 85% transparência. Proteção contra dengue, zika e mosquitos. Instalação 48h. Garantia 2 anos. Orçamento grátis!'
+      metaDescription: 'Tela mosquiteira com 85% transparência. Proteção contra dengue, zika e mosquitos. Instalação 24h. Garantia 2 anos. Orçamento grátis!'
     }
   ]
   

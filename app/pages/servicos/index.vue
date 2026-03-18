@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { useServicos } from '~/composables/useServicos'
 
 const { getTotalServicos } = useServicos()
@@ -8,7 +8,7 @@ const totalServicos = getTotalServicos()
 useHead({
   title: 'Nossos Serviços | Redes de Proteção e Telas Mosquiteiras | AD Telas',
   meta: [
-    { name: 'description', content: `${totalServicos} serviços de redes de proteção e telas mosquiteiras em São Paulo. Instalação em 48h. Garantia 2 anos. Orçamento grátis!` },
+    { name: 'description', content: `${totalServicos} serviços de redes de proteção e telas mosquiteiras em São Paulo. Instalação em 24h. Garantia 2 anos. Orçamento grátis!` },
     { name: 'keywords', content: 'redes de proteção, telas mosquiteiras, janelas, sacadas, pets, crianças, são paulo' },
     { property: 'og:title', content: 'Nossos Serviços | AD Telas e Redes' },
     { property: 'og:description', content: `${totalServicos} serviços disponíveis. Proteção para sua família e seu lar.` }

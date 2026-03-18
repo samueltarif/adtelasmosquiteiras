@@ -4,7 +4,7 @@ const bairro = 'Jardim Bonfiglioli'
 useHead({
   title: `Telas e Redes de Proteção em ${bairro} SP | Orçamento Grátis`,
   meta: [
-    { name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 48h.` }
+    { name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 24h.` }
   ]
 })
 
@@ -58,7 +58,7 @@ const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá
         <div class="flex flex-wrap justify-center gap-4 text-sm">
           <div class="flex items-center gap-2">
             <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
-            <span>Instalação 48h</span>
+            <span>Instalação 24h</span>
           </div>
           <div class="flex items-center gap-2">
             <Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" />

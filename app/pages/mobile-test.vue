@@ -17,7 +17,7 @@ useHead({
       whatsapp-number="5511983586611"
       whatsapp-message="Olá! Vi seu site e gostaria de um orçamento para telas mosqueteiras."
       headline="Telas Mosqueteiras em São Paulo"
-      subheadline="Instalação em 48h • Garantia 2 Anos • +500 Clientes Satisfeitos"
+      subheadline="Instalação em 24h • Garantia 2 Anos • +500 Clientes Satisfeitos"
       :rating="5.0"
       :review-count="487"
       primary-cta-text="Orçamento Grátis no WhatsApp"
@@ -41,7 +41,7 @@ useHead({
           </div>
           <div>
             <h3 class="font-bold text-gray-900 mb-1">Instalação Rápida</h3>
-            <p class="text-sm text-gray-600">Instalamos em até 48h após a medição</p>
+            <p class="text-sm text-gray-600">Instalamos em até 24h após a medição</p>
           </div>
         </div>
 

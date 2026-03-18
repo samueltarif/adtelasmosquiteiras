@@ -7,7 +7,7 @@
 
 const values = [
   { icon: 'lucide:shield-check', title: 'Garantia Completa', description: '2 anos de garantia contra defeitos de material e instalação. Obs: Danos decorrentes de mau uso não estão cobertos' },
-  { icon: 'lucide:zap', title: 'Instalação Rápida', description: 'Agendamento em até 48h e instalação em poucas horas.' },
+  { icon: 'lucide:zap', title: 'Instalação Rápida', description: 'Agendamento em até 24h e instalação em poucas horas.' },
   { icon: 'lucide:credit-card', title: 'Parcelamento Fácil', description: 'Parcelamos no cartão de crédito. Sem juros para compras acima de R$1000.' },
   { icon: 'lucide:map-pin', title: 'Atendimento SP', description: 'Cobertura total em São Paulo. Técnicos treinados e experientes.' },
   { icon: 'lucide:ruler', title: 'Customizado', description: 'Medidas sob demanda para qualquer tamanho de janela ou varanda.' },

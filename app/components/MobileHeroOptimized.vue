@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 // Props para customização
 const props = defineProps({
   logoSrc: {
@@ -19,7 +19,7 @@ const props = defineProps({
   },
   subheadline: {
     type: String,
-    default: 'Instalação em 48h • Garantia 2 Anos • +500 Clientes Satisfeitos'
+    default: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes Satisfeitos'
   },
   rating: {
     type: Number,

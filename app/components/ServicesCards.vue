@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { useServicos } from '~/composables/useServicos'
 
 // ============================================
@@ -18,7 +18,7 @@ const servicosCards = [
     destaque: 'Mais Procurado',
     beneficios: [
       { titulo: 'Resiste até 500kg' },
-      { titulo: 'Instalação em 48h' },
+      { titulo: 'Instalação em 24h' },
       { titulo: 'Garantia 2 anos' }
     ],
     url: '/servicos/redes'
@@ -33,7 +33,7 @@ const servicosCards = [
     beneficios: [
       { titulo: 'Visão 100% clara' },
       { titulo: 'Eficaz contra aedes' },
-      { titulo: 'Instalação 48h' }
+      { titulo: 'Instalação 24h' }
     ],
     url: '/servicos/telas'
   }

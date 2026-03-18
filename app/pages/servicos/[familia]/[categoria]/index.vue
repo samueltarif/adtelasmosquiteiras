@@ -19,7 +19,7 @@ const servicosArray = Object.values(categoria.servicos)
 useHead({
   title: `${categoria.titulo} | ${familia.nome} | AD Telas`,
   meta: [
-    { name: 'description', content: `${categoria.descricao}. ${servicosArray.length} serviços de ${familia.nome.toLowerCase()} disponíveis. Instalação em 48h.` },
+    { name: 'description', content: `${categoria.descricao}. ${servicosArray.length} serviços de ${familia.nome.toLowerCase()} disponíveis. Instalação em 24h.` },
     { name: 'keywords', content: `${categoria.titulo.toLowerCase()}, ${familia.nome.toLowerCase()}, são paulo` },
     { property: 'og:title', content: `${categoria.titulo} | ${familia.nome}` },
     { property: 'og:description', content: categoria.descricao }

@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 /**
  * ============================================
  * MOBILE LANDING PAGE - ALTA CONVERSÃO
@@ -21,7 +21,7 @@ const config = {
   // Textos
   logo: '/images/logo ad.png', // ⚠️ ALTERAR: Caminho da logo
   headline: 'Telas Mosqueteiras em São Paulo', // ⚠️ ALTERAR: Título principal
-  subheadline: 'Instalação em 48h • Garantia 2 Anos • +500 Clientes', // ⚠️ ALTERAR: Subtítulo
+  subheadline: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes', // ⚠️ ALTERAR: Subtítulo
   
   // Prova Social
   rating: 5.0, // ⚠️ ALTERAR: Nota de avaliação

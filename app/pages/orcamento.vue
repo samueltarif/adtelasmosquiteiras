@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // Carrosseis do hero
@@ -60,7 +60,7 @@ onUnmounted(() => {
 useHead({
   title: 'Solicitar Orçamento Grátis | AD Telas e Redes SP',
   meta: [
-    { name: 'description', content: 'Solicite seu orçamento grátis de telas mosquiteiras e redes de proteção. Atendimento rápido via WhatsApp, telefone ou formulário. Instalação em 48h.' },
+    { name: 'description', content: 'Solicite seu orçamento grátis de telas mosquiteiras e redes de proteção. Atendimento rápido via WhatsApp, telefone ou formulário. Instalação em 24h.' },
     { name: 'keywords', content: 'orçamento telas, orçamento redes proteção, orçamento grátis, solicitar orçamento sp' },
     { property: 'og:title', content: 'Orçamento Grátis - AD Telas e Redes' },
     { property: 'og:description', content: 'Receba seu orçamento em minutos. WhatsApp, telefone ou formulário online.' }
@@ -149,25 +149,25 @@ const callPhone = () => {
     <Breadcrumb />
     
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-12 md:py-16">
+    <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-6 md:py-8">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        <div class="text-center max-w-3xl mx-auto">
-          <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-4 py-2 rounded-full text-sm font-bold mb-6">
-            <Icon name="lucide:check-circle" class="w-4 h-4" />
-            Resposta em alguns minutos
-          </div>
+        <!-- Mobile: título em cima, cards embaixo | Desktop: título à esquerda, cards à direita -->
+        <div class="flex flex-col md:flex-row md:items-center md:gap-8">
           
-          <h1 class="text-3xl md:text-5xl font-bold mb-8">
-            Solicite seu Orçamento Grátis
-          </h1>
+          <!-- Título -->
+          <div class="text-center md:text-left md:flex-shrink-0 mb-4 md:mb-0">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+              Orçamento<br class="hidden md:block"/> Grátis
+            </h1>
+          </div>
 
           <!-- 3 carrosseis lado a lado -->
-          <div class="grid grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div class="grid grid-cols-3 gap-3 flex-1">
             <NuxtLink
               v-for="(carousel, i) in heroCarousels"
               :key="i"
               :to="carousel.link"
-              class="card-glow relative rounded-xl overflow-hidden aspect-[3/4] md:aspect-[4/4] shadow-lg cursor-pointer group"
+              class="card-glow relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-48 md:h-56"
             >
               <transition-group name="fade">
                 <img
@@ -185,16 +185,24 @@ const callPhone = () => {
               </div>
               <!-- Hover overlay -->
               <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60"></div>
+              <!-- Mãozinha com ripple -->
+              <div class="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center pointer-events-none">
+                <div class="relative cursor-hand-wrap">
+                  <span class="ripple-ring ripple-1"></span>
+                  <span class="ripple-ring ripple-2"></span>
+                  <span class="ripple-ring ripple-3"></span>
+                  <span class="cursor-hand-svg">👆</span>
+                </div>
+              </div>
             </NuxtLink>
           </div>
-          
 
-        </div>
+        </div><!-- fim flex row -->
       </div>
     </section>
 
     <!-- Main Content -->
-    <section class="py-12 md:py-16">
+    <section class="py-6 md:py-8">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
           
@@ -226,10 +234,6 @@ const callPhone = () => {
                   <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">E-mail (opcional)</label>
-                  <input v-model="formData.email" type="email" placeholder="seu@email.com" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
-                </div>
-                <div>
                   <label class="block text-sm font-semibold text-[#22345F] mb-2">Bairro / Região *</label>
                   <input v-model="formData.bairro" type="text" required placeholder="Ex: Vila Mariana" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
@@ -239,10 +243,6 @@ const callPhone = () => {
                     <option value="">Selecione um serviço</option>
                     <option v-for="servico in servicosOptions" :key="servico" :value="servico">{{ servico }}</option>
                   </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Mensagem (opcional)</label>
-                  <textarea v-model="formData.mensagem" rows="3" placeholder="Conte-nos mais sobre sua necessidade..." class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-none"></textarea>
                 </div>
                 <button type="submit" :disabled="isSubmitting" class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                   <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
@@ -441,5 +441,46 @@ const callPhone = () => {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+@keyframes click-hint {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%       { transform: translateY(-6px) rotate(-8deg); }
+  60%       { transform: translateY(-2px) rotate(4deg); }
+}
+.cursor-hand-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cursor-hand-svg {
+  font-size: 2rem;
+  animation: click-hint 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  position: relative;
+  z-index: 10;
+}
+
+/* Ripple sai da ponta do dedo indicador (topo do SVG) */
+.ripple-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  width: 12px;
+  height: 12px;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  animation: ripple-expand 1.4s ease-out infinite;
+  pointer-events: none;
+}
+.ripple-2 { animation-delay: 0.35s; }
+.ripple-3 { animation-delay: 0.7s; }
+
+@keyframes ripple-expand {
+  0%   { transform: translateX(-50%) scale(0); opacity: 1; }
+  70%  { transform: translateX(-50%) scale(4); opacity: 0; }
+  100% { transform: translateX(-50%) scale(4); opacity: 0; }
 }
 </style>

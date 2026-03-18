@@ -4,7 +4,7 @@ const bairro = 'Itaim Bibi'
 useHead({
   title: `Telas e Redes de Proteção em ${bairro} SP | Orçamento Grátis`,
   meta: [
-    { name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 48h. Atendemos ${bairro} e região.` },
+    { name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 24h. Atendemos ${bairro} e região.` },
     { name: 'keywords', content: `telas ${bairro}, redes proteção ${bairro}, telas mosquiteiras ${bairro}` }
   ]
 })
@@ -32,7 +32,7 @@ const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá
         <h1 class="text-3xl md:text-5xl font-bold mb-4">Telas e Redes em {{ bairro }}</h1>
         <p class="text-lg md:text-xl text-white/90 mb-6">Instalação profissional com garantia de 2 anos</p>
         <div class="flex flex-wrap justify-center gap-4 text-sm">
-          <div class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" /><span>Instalação 48h</span></div>
+          <div class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" /><span>Instalação 24h</span></div>
           <div class="flex items-center gap-2"><Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" /><span>Garantia 2 Anos</span></div>
           <div class="flex items-center gap-2"><Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A]" /><span>5.0 (487 avaliações)</span></div>
         </div>

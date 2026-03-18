@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 useHead({
   title: 'Bairros Atendidos em São Paulo | AD Telas e Redes',
   meta: [
@@ -20,7 +20,7 @@ const bairros = [
   {
     nome: 'Itaim Bibi',
     slug: 'itaim-bibi',
-    descricao: 'Orçamento grátis e instalação em até 48h'
+    descricao: 'Orçamento grátis e instalação em até 24h'
   },
   {
     nome: 'Jardim Bonfiglioli',
@@ -75,7 +75,7 @@ const bairros = [
           </div>
           <div class="flex items-center gap-2">
             <Icon name="lucide:clock" class="w-5 h-5 text-[#25D366]" />
-            <span>Instalação 48h</span>
+            <span>Instalação 24h</span>
           </div>
           <div class="flex items-center gap-2">
             <Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" />

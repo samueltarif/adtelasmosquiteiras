@@ -69,7 +69,7 @@ export const useServicos = () => {
               slug: 'varandas',
               titulo: 'Redes para Varandas',
               descricaoCurta: 'Proteção total para varandas',
-              destaque: 'Instalação 48h',
+              destaque: 'Instalação 24h',
               imagem: '/images/bebe.png',
               imagemEspecificacoes: '/images/redes_para_varandas_especificacoes.jpg',
               keywords: ['varanda', 'sacada', 'área externa']
@@ -454,22 +454,22 @@ export const useServicos = () => {
   const servicoTemplateBase = {
     beneficios: [
       { icone: 'shield', titulo: 'Resiste Chuva e Sol', descricao: 'Material UV resistente' },
-      { icone: 'clock', titulo: 'Instalação em 48h', descricao: 'Agendamento rápido' },
+      { icone: 'clock', titulo: 'Instalação em 24h', descricao: 'Agendamento rápido' },
       { icone: 'check', titulo: 'Fácil de Limpar', descricao: 'Manutenção simples' },
       { icone: 'award', titulo: 'Encaixe Perfeito', descricao: 'Medição precisa' }
     ],
     especificacoes: [
       { label: 'Material', valor: 'Polietileno alta resistência' },
-      { label: 'Resistência', valor: 'Até 500kg' },
+      { label: 'Fácil Limpeza', valor: 'Passa pano úmido' },
       { label: 'Garantia', valor: '2 anos' },
-      { label: 'Instalação', valor: '48h após medição' }
+      { label: 'Instalação', valor: '24h após medição' }
     ],
     comparacao: {
-      nos: ['Garantia 2 anos', 'Instalação 48h', 'Material premium', 'Certificado INMETRO'],
+      nos: ['Garantia 2 anos', 'Instalação 24h', 'Material premium', 'Certificado INMETRO'],
       concorrentes: ['Garantia 6 meses', 'Instalação 7-15 dias', 'Material padrão', 'Sem certificação']
     },
     faq: [
-      { pergunta: 'Quanto tempo demora a instalação?', resposta: 'Após medição, instalamos em até 48h.' },
+      { pergunta: 'Quanto tempo demora a instalação?', resposta: 'Após medição, Instalamos em até 24h.' },
       { pergunta: 'Tem garantia?', resposta: 'Sim! 2 anos de garantia contra defeitos.' },
       { pergunta: 'Fazem orçamento grátis?', resposta: 'Sim! Orçamento 100% gratuito sem compromisso.' }
     ]
@@ -506,7 +506,7 @@ export const useServicos = () => {
       categoriaTitulo: categoria.titulo,
       categoriaEmoji: categoria.emoji,
       metaTitle: `${servico.titulo} em São Paulo | ${familia.nome} | AD Telas`,
-      metaDescription: `${servico.titulo}: ${servico.descricaoCurta}. Instalação 48h. Garantia 2 anos. Orçamento grátis!`
+      metaDescription: `${servico.titulo}: ${servico.descricaoCurta}. Instalação 24h. Garantia 2 anos. Orçamento grátis!`
     }
   }
   
