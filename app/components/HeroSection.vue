@@ -97,28 +97,30 @@ onUnmounted(() => { clearInterval(timer) })
         <div class="grid grid-cols-2 gap-2 mb-2">
           <NuxtLink
             to="/servicos/telas"
-            class="flex items-center justify-center gap-1.5 py-1.5 bg-[#22345F] text-white rounded-lg font-medium text-xs active:scale-[0.97] transition-all"
+            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
           >
-            <Icon name="lucide:grid" class="w-3 h-3" />
+            <Icon name="lucide:grid" class="w-5 h-5" />
             <span>Telas Mosquiteiras</span>
           </NuxtLink>
           <NuxtLink
             to="/servicos/redes"
-            class="flex items-center justify-center gap-1.5 py-1.5 bg-[#22345F] text-white rounded-lg font-medium text-xs active:scale-[0.97] transition-all"
+            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
           >
-            <Icon name="lucide:shield" class="w-3 h-3" />
+            <Icon name="lucide:shield" class="w-5 h-5" />
             <span>Redes de Proteção</span>
           </NuxtLink>
         </div>
 
-        <!-- CTA Orçamento abaixo -->
-        <NuxtLink
-          to="/orcamento"
-          class="flex items-center justify-center gap-1.5 w-full py-1.5 bg-[#F49A1A] text-white rounded-lg font-medium text-xs active:scale-[0.97] transition-all"
-        >
-          <Icon name="lucide:file-text" class="w-3 h-3 shrink-0" />
-          Solicitar Orçamento Grátis
-        </NuxtLink>
+        <!-- CTA Orçamento menor e centralizado -->
+        <div class="flex justify-center">
+          <NuxtLink
+            to="/orcamento"
+            class="inline-flex items-center gap-1.5 px-5 py-1.5 bg-[#F49A1A] text-white rounded-lg font-medium text-xs active:scale-[0.97] transition-all"
+          >
+            <Icon name="lucide:file-text" class="w-3 h-3 shrink-0" />
+            Solicitar Orçamento Grátis
+          </NuxtLink>
+        </div>
 
       </div>
     </div>
