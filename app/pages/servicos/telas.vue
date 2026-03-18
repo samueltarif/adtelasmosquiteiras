@@ -24,21 +24,48 @@ const categorias = Object.values(familia.categorias).map(cat => ({
   url: `/servicos/telas/${cat.slug}`
 }))
 
-// Carrossel
-const carouselImages = [
-  { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira área externa' },
-  { src: '/images/mosquiteira_janela.png', alt: 'Mosquiteira para janela' },
-  { src: '/images/mosquiteira_para_porta.png', alt: 'Mosquiteira para porta' },
-  { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
-  { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
-  { src: '/images/tela_mosquiteira.png', alt: 'Tela mosquiteira' },
+// 3 carrosseis independentes com imagens mescladas
+const blocks = [
+  {
+    images: [
+      { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira área externa' },
+      { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
+    ],
+    index: ref(0)
+  },
+  {
+    images: [
+      { src: '/images/mosquiteira_janela.png', alt: 'Mosquiteira para janela' },
+      { src: '/images/tela_mosquiteira.png', alt: 'Tela mosquiteira' },
+    ],
+    index: ref(0)
+  },
+  {
+    images: [
+      { src: '/images/mosquiteira_para_porta.png', alt: 'Mosquiteira para porta' },
+      { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
+    ],
+    index: ref(0)
+  }
 ]
+
+// Carrossel mobile (único)
+const carouselImages = blocks.flatMap(b => b.images)
 const currentIndex = ref(0)
-let timer = null
+let timers = []
 function next() { currentIndex.value = (currentIndex.value + 1) % carouselImages.length }
-function goTo(i) { currentIndex.value = i }
-onMounted(() => { timer = setInterval(next, 3500) })
-onUnmounted(() => { clearInterval(timer) })
+
+onMounted(() => {
+  timers.push(setInterval(next, 3500))
+  blocks.forEach((block, i) => {
+    setTimeout(() => {
+      timers.push(setInterval(() => {
+        block.index.value = (block.index.value + 1) % block.images.length
+      }, 3500))
+    }, i * 1200)
+  })
+})
+onUnmounted(() => { timers.forEach(t => clearInterval(t)) })
 </script>
 
 <template>
@@ -48,7 +75,8 @@ onUnmounted(() => { clearInterval(timer) })
     <Breadcrumb />
     
     <!-- Hero com carrossel -->
-    <section class="w-full h-72 md:h-96 relative overflow-hidden">
+    <!-- Mobile: carrossel único -->
+    <section class="md:hidden w-full h-72 relative overflow-hidden">
       <img
         v-for="(img, i) in carouselImages"
         :key="img.src"
@@ -59,16 +87,32 @@ onUnmounted(() => { clearInterval(timer) })
       />
       <div class="absolute inset-0 bg-gradient-to-b from-[#22345F]/70 via-[#22345F]/60 to-[#22345F]/80"></div>
       <div class="absolute inset-0 flex items-center justify-center px-4 text-center text-white">
-        <h1 class="text-3xl md:text-5xl font-bold">{{ familia.nome }}</h1>
+        <h1 class="text-3xl font-bold">{{ familia.nome }}</h1>
       </div>
-      <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-        <button
-          v-for="(img, i) in carouselImages"
-          :key="i"
-          @click="goTo(i)"
-          class="w-2.5 h-2.5 rounded-full transition-all"
-          :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
-        />
+    </section>
+
+    <!-- Desktop: 3 blocos lado a lado -->
+    <section class="hidden md:block w-full relative overflow-hidden" style="height: 420px;">
+      <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <h1 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">{{ familia.nome }}</h1>
+      </div>
+      <div class="flex h-full">
+        <div
+          v-for="(block, bi) in blocks"
+          :key="bi"
+          class="relative flex-1 overflow-hidden"
+          :class="bi === 1 ? 'border-x-2 border-white/20' : ''"
+        >
+          <img
+            v-for="(img, i) in block.images"
+            :key="img.src"
+            :src="img.src"
+            :alt="img.alt"
+            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+            :class="block.index.value === i ? 'opacity-100' : 'opacity-0'"
+          />
+          <div class="absolute inset-0 bg-[#22345F]/60"></div>
+        </div>
       </div>
     </section>
 

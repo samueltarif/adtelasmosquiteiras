@@ -30,30 +30,59 @@ const categorias = Object.values(familia.categorias).map(cat => ({
   url: `/servicos/redes/${cat.slug}`
 }))
 
-// Carrossel
-const carouselImages = [
-  { src: '/images/redes_para_sacadas.jpg', alt: 'Redes para sacadas' },
-  { src: '/images/redes_para_janelas.png', alt: 'Redes para janelas' },
-  { src: '/images/redes_para_criancas.png', alt: 'Redes para crianças' },
-  { src: '/images/redes_para_cachorros.png', alt: 'Redes para cachorros' },
-  { src: '/images/redes_para_apartamentos.png', alt: 'Redes para apartamentos' },
-  { src: '/images/redes_para_coberturas.jpg', alt: 'Redes para coberturas' },
-  { src: '/images/redes_para_escadas.jpg', alt: 'Redes para escadas' },
-  { src: '/images/redes_para_piscinas.jpg', alt: 'Redes para piscinas' },
-  { src: '/images/redes_para_muros.jpg', alt: 'Redes para muros' },
-  { src: '/images/redes_para_telhados.jpg', alt: 'Redes para telhados' },
-  { src: '/images/redes_para_portas.png', alt: 'Redes para portas' },
-  { src: '/images/redes_para_portoes.jpg', alt: 'Redes para portões' },
-  { src: '/images/redes_para_animais.png', alt: 'Redes para animais' },
-  { src: '/images/redes_para_idosos.png', alt: 'Redes para idosos' },
-  { src: '/images/redes_para_basculantes.png', alt: 'Redes para basculantes' },
+// 3 carrosseis independentes com imagens mescladas
+const blocks = [
+  {
+    images: [
+      { src: '/images/redes_para_sacadas.jpg', alt: 'Redes para sacadas' },
+      { src: '/images/redes_para_criancas.png', alt: 'Redes para crianças' },
+      { src: '/images/redes_para_piscinas.jpg', alt: 'Redes para piscinas' },
+      { src: '/images/redes_para_telhados.jpg', alt: 'Redes para telhados' },
+      { src: '/images/redes_para_basculantes.png', alt: 'Redes para basculantes' },
+    ],
+    index: ref(0)
+  },
+  {
+    images: [
+      { src: '/images/redes_para_janelas.png', alt: 'Redes para janelas' },
+      { src: '/images/redes_para_apartamentos.png', alt: 'Redes para apartamentos' },
+      { src: '/images/redes_para_muros.jpg', alt: 'Redes para muros' },
+      { src: '/images/redes_para_animais.png', alt: 'Redes para animais' },
+      { src: '/images/redes_para_portas.png', alt: 'Redes para portas' },
+    ],
+    index: ref(0)
+  },
+  {
+    images: [
+      { src: '/images/redes_para_cachorros.png', alt: 'Redes para cachorros' },
+      { src: '/images/redes_para_coberturas.jpg', alt: 'Redes para coberturas' },
+      { src: '/images/redes_para_escadas.jpg', alt: 'Redes para escadas' },
+      { src: '/images/redes_para_idosos.png', alt: 'Redes para idosos' },
+      { src: '/images/redes_para_portoes.jpg', alt: 'Redes para portões' },
+    ],
+    index: ref(0)
+  }
 ]
+
+// Carrossel mobile (único)
+const carouselImages = blocks.flatMap(b => b.images)
 const currentIndex = ref(0)
-let timer = null
+let timers = []
 function next() { currentIndex.value = (currentIndex.value + 1) % carouselImages.length }
-function goTo(i) { currentIndex.value = i }
-onMounted(() => { timer = setInterval(next, 3500) })
-onUnmounted(() => { clearInterval(timer) })
+
+onMounted(() => {
+  // mobile timer
+  timers.push(setInterval(next, 3500))
+  // desktop: cada bloco com offset de tempo diferente
+  blocks.forEach((block, i) => {
+    setTimeout(() => {
+      timers.push(setInterval(() => {
+        block.index.value = (block.index.value + 1) % block.images.length
+      }, 3500))
+    }, i * 1200)
+  })
+})
+onUnmounted(() => { timers.forEach(t => clearInterval(t)) })
 </script>
 
 <template>
@@ -63,8 +92,8 @@ onUnmounted(() => { clearInterval(timer) })
     <Breadcrumb :path="route.path" />
     
     <!-- Hero com carrossel -->
-    <section class="w-full h-72 md:h-96 relative overflow-hidden">
-      <!-- Imagens empilhadas com opacity controlada por CSS -->
+    <!-- Mobile: carrossel único -->
+    <section class="md:hidden w-full h-72 relative overflow-hidden">
       <img
         v-for="(img, i) in carouselImages"
         :key="img.src"
@@ -73,21 +102,36 @@ onUnmounted(() => { clearInterval(timer) })
         class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
         :class="currentIndex === i ? 'opacity-100' : 'opacity-0'"
       />
-      <!-- Overlay -->
       <div class="absolute inset-0 bg-gradient-to-b from-[#22345F]/70 via-[#22345F]/60 to-[#22345F]/80"></div>
-      <!-- Título -->
       <div class="absolute inset-0 flex items-center justify-center px-4 text-center text-white">
-        <h1 class="text-3xl md:text-5xl font-bold">{{ familia.nome }}</h1>
+        <h1 class="text-3xl font-bold">{{ familia.nome }}</h1>
       </div>
-      <!-- Dots -->
-      <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-        <button
-          v-for="(img, i) in carouselImages"
-          :key="i"
-          @click="goTo(i)"
-          class="w-2.5 h-2.5 rounded-full transition-all"
-          :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
-        />
+    </section>
+
+    <!-- Desktop: 3 blocos lado a lado -->
+    <section class="hidden md:block w-full relative overflow-hidden" style="height: 420px;">
+      <!-- Overlay e título centralizados -->
+      <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <h1 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">{{ familia.nome }}</h1>
+      </div>
+      <!-- 3 blocos -->
+      <div class="flex h-full">
+        <div
+          v-for="(block, bi) in blocks"
+          :key="bi"
+          class="relative flex-1 overflow-hidden"
+          :class="bi === 1 ? 'border-x-2 border-white/20' : ''"
+        >
+          <img
+            v-for="(img, i) in block.images"
+            :key="img.src"
+            :src="img.src"
+            :alt="img.alt"
+            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+            :class="block.index.value === i ? 'opacity-100' : 'opacity-0'"
+          />
+          <div class="absolute inset-0 bg-[#22345F]/60"></div>
+        </div>
       </div>
     </section>
 
