@@ -43,8 +43,8 @@ export const useServicos = () => {
               titulo: 'Redes para Janelas',
               descricaoCurta: 'Proteção invisível para todas as janelas',
               destaque: 'Mais vendido',
-              imagem: '/images/Redes_para_Janelas.png',
-              imagemEspecificacoes: '/images/Redes_para_Janelas_especificações.png',
+              imagem: '/images/redes_para_janelas.png',
+              imagemEspecificacoes: '/images/redes_para_janelas.png',
               keywords: ['janela', 'apartamento', 'casa', 'proteção janela']
             },
             portas: {
@@ -52,8 +52,8 @@ export const useServicos = () => {
               titulo: 'Redes para Portas',
               descricaoCurta: 'Segurança sem bloquear a ventilação',
               destaque: 'Ventilação total',
-              imagem: '/images/Redes_para_Portas.png',
-              imagemEspecificacoes: '/images/Redes_para_Portas_especificações.jpeg',
+              imagem: '/images/redes_para_portas.png',
+              imagemEspecificacoes: '/images/redes_para_portas.png',
               keywords: ['porta', 'porta balcão', 'entrada']
             },
             sacadas: {
@@ -61,8 +61,8 @@ export const useServicos = () => {
               titulo: 'Redes para Sacadas',
               descricaoCurta: 'Aproveite sua sacada com segurança',
               destaque: 'Resiste 500kg',
-              imagem: '/images/Redes_para_Sacadas.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Sacadas_especificações.jpg',
+              imagem: '/images/redes_para_sacadas.jpg',
+              imagemEspecificacoes: '/images/redes_para_sacadas.jpg',
               keywords: ['sacada', 'varanda', 'terraço']
             },
             varandas: {
@@ -71,7 +71,7 @@ export const useServicos = () => {
               descricaoCurta: 'Proteção total para varandas',
               destaque: 'Instalação 48h',
               imagem: '/images/bebe.png',
-              imagemEspecificacoes: '/images/Redes_para_Varandas_especificações.jpg',
+              imagemEspecificacoes: '/images/redes_para_varandas_especificacoes.jpg',
               keywords: ['varanda', 'sacada', 'área externa']
             },
             apartamentos: {
@@ -79,8 +79,8 @@ export const useServicos = () => {
               titulo: 'Redes para Apartamentos',
               descricaoCurta: 'Solução completa para seu apartamento',
               destaque: 'Pacote completo',
-              imagem: '/images/Redes_para_Apartamentos.png',
-              imagemEspecificacoes: '/images/Redes_para_Apartamentos_especificações.jpg',
+              imagem: '/images/redes_para_apartamentos.png',
+              imagemEspecificacoes: '/images/redes_para_apartamentos.png',
               keywords: ['apartamento', 'condomínio', 'prédio']
             },
             escadas: {
@@ -88,8 +88,8 @@ export const useServicos = () => {
               titulo: 'Redes para Escadas',
               descricaoCurta: 'Segurança em escadas e mezaninos',
               destaque: 'Sob medida',
-              imagem: '/images/Redes_para_Escadas.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Escadas_especificações.png',
+              imagem: '/images/redes_para_escadas.jpg',
+              imagemEspecificacoes: '/images/redes_para_escadas.jpg',
               keywords: ['escada', 'mezanino', 'degrau']
             },
             basculantes: {
@@ -97,8 +97,8 @@ export const useServicos = () => {
               titulo: 'Redes para Basculantes',
               descricaoCurta: 'Proteção para janelas basculantes',
               destaque: 'Fácil abertura',
-              imagem: '/images/Redes_para_Basculantes.png',
-              imagemEspecificacoes: '/images/Redes_para_Basculantes_especificações.jpg',
+              imagem: '/images/redes_para_basculantes.png',
+              imagemEspecificacoes: '/images/redes_para_basculantes.png',
               keywords: ['basculante', 'janela basculante']
             }
           }
@@ -118,8 +118,8 @@ export const useServicos = () => {
               titulo: 'Redes para Crianças',
               descricaoCurta: 'Máxima segurança para os pequenos',
               destaque: 'Certificado INMETRO',
-              imagem: '/images/Redes_para_Crianças.png',
-              imagemEspecificacoes: '/images/Redes_para_Crianças_especificações.png',
+              imagem: '/images/redes_para_criancas.png',
+              imagemEspecificacoes: '/images/redes_para_criancas.png',
               keywords: ['criança', 'bebê', 'infantil']
             },
             gatos: {
@@ -128,7 +128,7 @@ export const useServicos = () => {
               descricaoCurta: 'Impeça fugas e quedas de gatos',
               destaque: 'Malha reforçada',
               imagem: '/images/gato.png',
-              imagemEspecificacoes: '/images/Redes_para_Gatos_especificaçoes.png',
+              imagemEspecificacoes: '/images/redes_para_gatos_especificacoes.png',
               keywords: ['gato', 'felino', 'pet']
             },
             cachorros: {
@@ -136,8 +136,8 @@ export const useServicos = () => {
               titulo: 'Redes para Cachorros',
               descricaoCurta: 'Proteção para cães de todos os portes',
               destaque: 'Extra resistente',
-              imagem: '/images/Redes_para_Cachorros.png',
-              imagemEspecificacoes: '/images/Redes_para_Cachorros_especificações.png',
+              imagem: '/images/redes_para_cachorros.png',
+              imagemEspecificacoes: '/images/redes_para_cachorros.png',
               keywords: ['cachorro', 'cão', 'pet']
             },
             animais: {
@@ -145,8 +145,8 @@ export const useServicos = () => {
               titulo: 'Redes para Animais',
               descricaoCurta: 'Proteção para todos os tipos de pets',
               destaque: 'Versátil',
-              imagem: '/images/Redes_para_Animais.png',
-              imagemEspecificacoes: '/images/Redes_para_Animais_especificações.png',
+              imagem: '/images/redes_para_animais.png',
+              imagemEspecificacoes: '/images/redes_para_animais_especificacoes.png',
               keywords: ['animal', 'pet', 'bicho']
             },
             idosos: {
@@ -154,8 +154,8 @@ export const useServicos = () => {
               titulo: 'Redes para Idosos',
               descricaoCurta: 'Segurança para a terceira idade',
               destaque: 'Cuidado especial',
-              imagem: '/images/Redes_para_Idosos.png',
-              imagemEspecificacoes: '/images/Redes_para_Idosos_especificações.png',
+              imagem: '/images/redes_para_idosos.png',
+              imagemEspecificacoes: '/images/redes_para_idosos_especificacoes.png',
               keywords: ['idoso', 'terceira idade', 'segurança']
             }
           }
@@ -176,8 +176,8 @@ export const useServicos = () => {
               titulo: 'Redes para Portões',
               descricaoCurta: 'Proteção para portões e entradas',
               destaque: 'Alta durabilidade',
-              imagem: '/images/Redes_para_Portões.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Portões_especificações.jpg',
+              imagem: '/images/redes_para_portoes.jpg',
+              imagemEspecificacoes: '/images/redes_para_portoes.jpg',
               keywords: ['portão', 'entrada', 'garagem']
             },
             muros: {
@@ -185,8 +185,8 @@ export const useServicos = () => {
               titulo: 'Redes para Muros',
               descricaoCurta: 'Segurança adicional em muros',
               destaque: 'Anti-invasão',
-              imagem: '/images/Redes_para_Muros.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Muros_especificações.png',
+              imagem: '/images/redes_para_muros.jpg',
+              imagemEspecificacoes: '/images/redes_para_muros_especificacoes.png',
               keywords: ['muro', 'cerca', 'perímetro']
             },
             telhados: {
@@ -194,8 +194,8 @@ export const useServicos = () => {
               titulo: 'Redes para Telhados',
               descricaoCurta: 'Proteção contra pombos e pássaros',
               destaque: 'Anti-pombos',
-              imagem: '/images/Redes_para_Telhados.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Telhados_especificações.jpg',
+              imagem: '/images/redes_para_telhados.jpg',
+              imagemEspecificacoes: '/images/redes_para_telhados_especificacoes.jpg',
               keywords: ['telhado', 'pombo', 'pássaro']
             },
             piscinas: {
@@ -203,8 +203,8 @@ export const useServicos = () => {
               titulo: 'Redes para Piscinas',
               descricaoCurta: 'Segurança em áreas de piscina',
               destaque: 'Resistente à água',
-              imagem: '/images/Redes_para_Piscinas.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Piscinas_especificações.jpg',
+              imagem: '/images/redes_para_piscinas.jpg',
+              imagemEspecificacoes: '/images/redes_para_piscinas_especificacoes.jpg',
               keywords: ['piscina', 'área de lazer']
             },
             coberturas: {
@@ -212,8 +212,8 @@ export const useServicos = () => {
               titulo: 'Redes para Coberturas',
               descricaoCurta: 'Proteção para áreas cobertas',
               destaque: 'Sob medida',
-              imagem: '/images/Redes_para_Coberturas.jpg',
-              imagemEspecificacoes: '/images/Redes_para_Coberturas_especificações.jpg',
+              imagem: '/images/redes_para_coberturas.jpg',
+              imagemEspecificacoes: '/images/redes_para_coberturas_especificacoes.jpg',
               keywords: ['cobertura', 'toldo']
             }
           }
@@ -232,7 +232,7 @@ export const useServicos = () => {
       iconName: 'lucide:bug',
       descricao: 'Proteção contra mosquitos transmissores de dengue, zika e chikungunya',
       cor: '#F49A1A',
-      imagem: '/images/TELA_MOSQUITEIRA.png',
+      imagem: '/images/tela_mosquiteira.png',
       
       categorias: {
         // Categoria 1: Residencial (6 serviços)
@@ -249,7 +249,7 @@ export const useServicos = () => {
               titulo: 'Telas para Janelas',
               descricaoCurta: 'Visão 100% clara, proteção total',
               destaque: '85% transparência',
-              imagem: '/images/TELA_MOSQUITEIRA.png',
+              imagem: '/images/tela_mosquiteira.png',
               keywords: ['tela janela', 'mosquiteira', 'dengue']
             },
             portas: {
@@ -257,8 +257,8 @@ export const useServicos = () => {
               titulo: 'Telas para Portas',
               descricaoCurta: 'Ventilação sem mosquitos',
               destaque: 'Fácil abertura',
-              imagem: '/images/Telas_para_Portas.jpeg',
-              imagemEspecificacoes: '/images/Telas_para_Portas_especificações.jpeg',
+              imagem: '/images/telas_para_portas.jpeg',
+              imagemEspecificacoes: '/images/telas_para_portas_especificacoes.jpeg',
               keywords: ['tela porta', 'mosquiteira porta']
             },
             varandas: {
@@ -266,8 +266,8 @@ export const useServicos = () => {
               titulo: 'Telas para Varandas',
               descricaoCurta: 'Aproveite a varanda sem insetos',
               destaque: 'Área completa',
-              imagem: '/images/Telas_para_Varandas.jpg',
-              imagemEspecificacoes: '/images/Telas_para_Varandas_especificações.jpg',
+              imagem: '/images/telas_para_varandas.jpg',
+              imagemEspecificacoes: '/images/telas_para_varandas_especificacoes.jpg',
               keywords: ['tela varanda', 'mosquiteira varanda']
             },
             sacadas: {
@@ -275,8 +275,8 @@ export const useServicos = () => {
               titulo: 'Telas para Sacadas',
               descricaoCurta: 'Proteção total contra mosquitos',
               destaque: 'Instalação rápida',
-              imagem: '/images/telas_para_Sacadas.jpg',
-              imagemEspecificacoes: '/images/telas_para_Sacadas_especificações.jpg',
+              imagem: '/images/telas_para_sacadas.jpg',
+              imagemEspecificacoes: '/images/telas_para_sacadas_especificacoes.jpg',
               keywords: ['tela sacada', 'mosquiteira sacada']
             },
             apartamentos: {
@@ -284,8 +284,8 @@ export const useServicos = () => {
               titulo: 'Telas para Apartamentos',
               descricaoCurta: 'Solução completa anti-mosquito',
               destaque: 'Pacote completo',
-              imagem: '/images/Telas_para_Apartamento.jpg',
-              imagemEspecificacoes: '/images/Telas_para_Apartamento_especificações.jpg',
+              imagem: '/images/telas_para_apartamento.jpg',
+              imagemEspecificacoes: '/images/telas_para_apartamento_especificacoes.jpg',
               keywords: ['tela apartamento', 'mosquiteira']
             },
             banheiro: {
@@ -293,8 +293,8 @@ export const useServicos = () => {
               titulo: 'Telas para Banheiro',
               descricaoCurta: 'Proteção em áreas úmidas',
               destaque: 'Anti-mofo',
-              imagem: '/images/Telas_para_Banheiro.jpg',
-              imagemEspecificacoes: '/images/Telas_para_Banheiro_especificações.jpg',
+              imagem: '/images/telas_para_banheiro.jpg',
+              imagemEspecificacoes: '/images/telas_para_banheiro_especificacoes.jpg',
               keywords: ['tela banheiro', 'mosquiteira banheiro']
             }
           }
@@ -314,8 +314,8 @@ export const useServicos = () => {
               titulo: 'Telas de Correr',
               descricaoCurta: 'Sistema deslizante prático',
               destaque: 'Fácil uso',
-              imagem: '/images/Telas_de_Correr.jpg',
-              imagemEspecificacoes: '/images/Telas_de_Correr_especificações.jpg',
+              imagem: '/images/telas_de_correr.jpg',
+              imagemEspecificacoes: '/images/telas_de_correr_especificacoes.jpg',
               keywords: ['tela correr', 'deslizante']
             },
             pivotante: {
@@ -323,7 +323,7 @@ export const useServicos = () => {
               titulo: 'Telas Pivotantes',
               descricaoCurta: 'Abertura giratória',
               destaque: 'Moderna',
-              imagem: '/images/Telas Pivotantes.webp',
+              imagem: '/images/telas_pivotantes.webp',
               keywords: ['tela pivotante', 'giratória']
             },
             removivel: {
@@ -331,8 +331,8 @@ export const useServicos = () => {
               titulo: 'Telas Removíveis',
               descricaoCurta: 'Fácil de remover e limpar',
               destaque: 'Prática',
-              imagem: '/images/Telas Removíveis.webp',
-              imagemEspecificacoes: '/images/Telas Removíveis especificações.jpg',
+              imagem: '/images/telas_removiveis.webp',
+              imagemEspecificacoes: '/images/telas_removiveis_especificacoes.jpg',
               keywords: ['tela removível', 'destacável']
             },
             basculante: {
@@ -340,8 +340,8 @@ export const useServicos = () => {
               titulo: 'Telas para Basculantes',
               descricaoCurta: 'Específica para janelas basculantes',
               destaque: 'Sob medida',
-              imagem: '/images/Telas para Basculante.jpg',
-              imagemEspecificacoes: '/images/Telas para Basculante especificações.webp',
+              imagem: '/images/telas_para_basculante.jpg',
+              imagemEspecificacoes: '/images/telas_para_basculante_especificacoes.webp',
               keywords: ['tela basculante', 'janela basculante']
             },
             aluminio: {
@@ -349,8 +349,8 @@ export const useServicos = () => {
               titulo: 'Telas com Alumínio',
               descricaoCurta: 'Estrutura em alumínio reforçado',
               destaque: 'Durável',
-              imagem: '/images/Telas com Alumínio.jpg',
-              imagemEspecificacoes: '/images/Telas com Alumínio especificações.jpg',
+              imagem: '/images/telas_com_aluminio.jpg',
+              imagemEspecificacoes: '/images/telas_com_aluminio_especificacoes.jpg',
               keywords: ['tela alumínio', 'estrutura alumínio']
             },
             acoinox: {
@@ -358,8 +358,8 @@ export const useServicos = () => {
               titulo: 'Telas com Aço Inox',
               descricaoCurta: 'Máxima resistência e durabilidade',
               destaque: 'Premium',
-              imagem: '/images/Telas com Aço Inox.jpg',
-              imagemEspecificacoes: '/images/Telas com Aço Inox especificações.png',
+              imagem: '/images/telas_com_aco_inox.jpg',
+              imagemEspecificacoes: '/images/telas_com_aco_inox_especificacoes.png',
               keywords: ['tela aço inox', 'inox']
             }
           }
@@ -380,8 +380,8 @@ export const useServicos = () => {
               titulo: 'Telas Pet Screen',
               descricaoCurta: 'Resistente a arranhões de pets',
               destaque: 'Anti-arranhão',
-              imagem: '/images/Telas Pet Screen.webp',
-              imagemEspecificacoes: '/images/Telas Pet Screen especificações.jpg',
+              imagem: '/images/telas_pet_screen.webp',
+              imagemEspecificacoes: '/images/telas_pet_screen_especificacoes.jpg',
               keywords: ['tela pet', 'pet screen', 'gato', 'cachorro']
             },
             pernilongos: {
@@ -389,8 +389,8 @@ export const useServicos = () => {
               titulo: 'Telas Anti-Pernilongos',
               descricaoCurta: 'Malha extra fina contra pernilongos',
               destaque: 'Malha micro',
-              imagem: '/images/Telas Anti-Pernilongos.jpg',
-              imagemEspecificacoes: '/images/Telas Anti-Pernilongos especificações.webp',
+              imagem: '/images/telas_anti-pernilongos.jpg',
+              imagemEspecificacoes: '/images/telas_anti-pernilongos_especificacoes.webp',
               keywords: ['pernilongo', 'mosquito', 'inseto']
             }
           }
@@ -410,8 +410,8 @@ export const useServicos = () => {
               titulo: 'Telas para Fachadas',
               descricaoCurta: 'Proteção para grandes fachadas',
               destaque: 'Grande porte',
-              imagem: '/images/Telas para Fachadas.webp',
-              imagemEspecificacoes: '/images/Telas para Fachadas especificações.png',
+              imagem: '/images/telas_para_fachadas.webp',
+              imagemEspecificacoes: '/images/telas_para_fachadas_especificacoes.png',
               keywords: ['fachada', 'prédio', 'comercial']
             },
             coberturas: {
@@ -419,8 +419,8 @@ export const useServicos = () => {
               titulo: 'Telas para Coberturas',
               descricaoCurta: 'Proteção em áreas cobertas',
               destaque: 'Sob medida',
-              imagem: '/images/Telas para Coberturas.jpg',
-              imagemEspecificacoes: '/images/Telas para Coberturas especificações.jpg',
+              imagem: '/images/telas_para_coberturas.jpg',
+              imagemEspecificacoes: '/images/telas_para_coberturas_especificacoes.jpg',
               keywords: ['cobertura', 'toldo', 'área coberta']
             },
             restaurantes: {
@@ -428,8 +428,8 @@ export const useServicos = () => {
               titulo: 'Telas para Restaurantes',
               descricaoCurta: 'Ambiente livre de insetos',
               destaque: 'Comercial',
-              imagem: '/images/Telas para Restaurantes.jpg',
-              imagemEspecificacoes: '/images/Telas para Restaurantes especificações.jpeg',
+              imagem: '/images/telas_para_restaurantes.jpg',
+              imagemEspecificacoes: '/images/telas_para_restaurantes_especificacoes.jpeg',
               keywords: ['restaurante', 'bar', 'comercial']
             },
             industrias: {
@@ -437,8 +437,8 @@ export const useServicos = () => {
               titulo: 'Telas para Indústrias',
               descricaoCurta: 'Proteção industrial',
               destaque: 'Alta resistência',
-              imagem: '/images/Telas para Indústrias.webp',
-              imagemEspecificacoes: '/images/Telas para Indústrias especificações.webp',
+              imagem: '/images/telas_para_industrias.webp',
+              imagemEspecificacoes: '/images/telas_para_industrias_especificacoes.webp',
               keywords: ['indústria', 'fábrica', 'galpão']
             }
           }
