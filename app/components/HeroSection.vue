@@ -115,9 +115,9 @@ onUnmounted(() => { clearInterval(timer) })
         <div class="flex justify-center">
           <NuxtLink
             to="/orcamento"
-            class="inline-flex items-center gap-1.5 px-5 py-1.5 bg-[#F49A1A] text-white rounded-lg font-medium text-xs active:scale-[0.97] transition-all"
+            class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:file-text" class="w-3 h-3 shrink-0" />
+            <Icon name="lucide:file-text" class="w-4 h-4 shrink-0" />
             Solicitar Orçamento Grátis
           </NuxtLink>
         </div>
