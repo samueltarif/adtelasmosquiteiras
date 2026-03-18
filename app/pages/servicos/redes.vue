@@ -233,7 +233,7 @@ onUnmounted(() => { timers.forEach(t => clearInterval(t)) })
           Fale com nossos especialistas e encontre a solução perfeita
         </p>
         <a
-          href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20com%20Redes%20de%20Proteção"
+          href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20com%20Redes%20de%20Proteção.%20Vim%20pelo%20site%3A%20https://www.adtelasmosquiteiras.com.br/home"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"

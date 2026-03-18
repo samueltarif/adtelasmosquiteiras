@@ -20,8 +20,8 @@ const submitForm = async () => {
   redirectToThankYou(formData.value)
 }
 
-const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`, '_blank')
-const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`
+const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`)}`, '_blank')
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`)}`
 </script>
 
 <template>

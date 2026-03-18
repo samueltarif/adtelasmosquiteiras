@@ -63,7 +63,7 @@ const submitForm = async () => {
   }
 }
 
-const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento.')}`
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home')}`
 
 const trackWhatsApp = (origem) => {
   if (typeof window !== 'undefined' && window.dataLayer) {

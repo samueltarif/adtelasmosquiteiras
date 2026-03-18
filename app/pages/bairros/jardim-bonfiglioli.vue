@@ -36,10 +36,10 @@ const submitForm = async () => {
 }
 
 const openWhatsApp = () => {
-  const msg = `Olá! Gostaria de um orçamento para ${bairro}.`
+  const msg = `Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`
   window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`, '_blank')
 }
-const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}.`)}`
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`)}`
 </script>
 
 <template>

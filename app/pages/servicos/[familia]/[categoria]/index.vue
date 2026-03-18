@@ -144,7 +144,7 @@ const openFormModal = () => {
           Fale conosco e encontraremos a solução ideal para você
         </p>
         <a
-          :href="`https://wa.me/5511983586611?text=Olá!%20Estou%20procurando%20serviços%20de%20${categoria.titulo}`"
+          :href="`https://wa.me/5511983586611?text=Olá!%20Estou%20procurando%20serviços%20de%20${categoria.titulo}.%20Vim%20pelo%20site%3A%20adtelas.com.br`"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"

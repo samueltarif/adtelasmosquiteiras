@@ -240,7 +240,7 @@ export const useServicoData = () => {
    * Gera mensagem WhatsApp para serviço específico
    */
   const getWhatsAppMessage = (servico, origem = 'card') => {
-    let message = `Olá! Vim pelo site e gostaria de um orçamento para:\n\n`
+    let message = `Olá! Vim pelo site https://www.adtelasmosquiteiras.com.br/home e gostaria de um orçamento para:\n\n`
     message += `Serviço: ${servico.titulo}\n`
     message += `Origem: ${origem}\n\n`
     message += `Pode me passar mais informações?`

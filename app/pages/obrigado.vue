@@ -42,7 +42,7 @@ useHead({
           
           <!-- WhatsApp -->
           <a
-            href="https://wa.me/5511983586611"
+            href="https://wa.me/5511983586611?text=Olá!%20Acabei%20de%20enviar%20meu%20orçamento%20pelo%20site%20https://www.adtelasmosquiteiras.com.br/home%20e%20gostaria%20de%20confirmar."
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#1fb854] transition-all"
