@@ -177,7 +177,7 @@ const trackEvent = (eventName, params = {}) => {
             </NuxtLink>
             
             <a
-              href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20o%20serviço%20ideal"
+              href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20o%20serviço%20ideal.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br%2Fhome"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg hover:shadow-xl"

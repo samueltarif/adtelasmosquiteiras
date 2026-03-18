@@ -113,7 +113,7 @@ onUnmounted(() => { clearInterval(timer) })
 
         <!-- CTA WhatsApp abaixo -->
         <a
-          href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras."
+          href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2.5 w-full h-13 py-3.5 bg-[#25D366] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#25D366]/25 active:scale-[0.98] transition-all"
@@ -191,7 +191,7 @@ onUnmounted(() => { clearInterval(timer) })
               </div>
               <!-- WhatsApp abaixo -->
               <a
-                href="https://wa.me/5511983586611?text=Olá! Gostaria de um orçamento para telas mosquiteiras."
+                href="https://wa.me/5511983586611?text=Olá! Gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#25D366]/20 hover:bg-[#1fb854] transition-all"

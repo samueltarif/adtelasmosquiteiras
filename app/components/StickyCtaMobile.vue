@@ -25,7 +25,7 @@ onUnmounted(() => {
   >
     <!-- CTA Principal - Orçamento Grátis -->
     <a 
-      href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras."
+      href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
       target="_blank"
       rel="noopener noreferrer"
       class="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#25D366] to-[#20B858] hover:from-[#20B858] hover:to-[#1DA851] text-white font-bold text-sm rounded-full shadow-xl transition-all duration-300 hover:scale-105 animate-pulse border-2 border-white"
