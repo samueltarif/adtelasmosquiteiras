@@ -97,16 +97,16 @@ onUnmounted(() => { clearInterval(timer) })
         <div class="grid grid-cols-2 gap-2 mb-2">
           <NuxtLink
             to="/servicos/telas"
-            class="flex items-center justify-center gap-2 py-3 bg-[#22345F] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
+            class="flex items-center justify-center gap-1.5 py-2 bg-[#22345F] text-white rounded-lg font-medium text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:grid" class="w-4 h-4" />
+            <Icon name="lucide:grid" class="w-3.5 h-3.5" />
             <span>Telas Mosquiteiras</span>
           </NuxtLink>
           <NuxtLink
             to="/servicos/redes"
-            class="flex items-center justify-center gap-2 py-3 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
+            class="flex items-center justify-center gap-1.5 py-2 bg-[#F49A1A] text-white rounded-lg font-medium text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:shield" class="w-4 h-4" />
+            <Icon name="lucide:shield" class="w-3.5 h-3.5" />
             <span>Redes de Proteção</span>
           </NuxtLink>
         </div>
@@ -114,9 +114,9 @@ onUnmounted(() => { clearInterval(timer) })
         <!-- CTA Orçamento abaixo -->
         <NuxtLink
           to="/orcamento"
-          class="flex items-center justify-center gap-2 w-full py-3 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
+          class="flex items-center justify-center gap-1.5 w-full py-2 bg-[#F49A1A] text-white rounded-lg font-medium text-sm active:scale-[0.97] transition-all"
         >
-          <Icon name="lucide:file-text" class="w-4 h-4 shrink-0" />
+          <Icon name="lucide:file-text" class="w-3.5 h-3.5 shrink-0" />
           Solicitar Orçamento Grátis
         </NuxtLink>
 
