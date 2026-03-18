@@ -94,19 +94,19 @@ onUnmounted(() => { clearInterval(timer) })
         </div>
 
         <!-- CTAs: telas e redes em destaque -->
-        <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="grid grid-cols-2 gap-2 mb-2">
           <NuxtLink
             to="/servicos/telas"
-            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
+            class="flex items-center justify-center gap-2 py-3 bg-[#22345F] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:grid" class="w-5 h-5" />
+            <Icon name="lucide:grid" class="w-4 h-4" />
             <span>Telas Mosquiteiras</span>
           </NuxtLink>
           <NuxtLink
             to="/servicos/redes"
-            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#F49A1A] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
+            class="flex items-center justify-center gap-2 py-3 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:shield" class="w-5 h-5" />
+            <Icon name="lucide:shield" class="w-4 h-4" />
             <span>Redes de Proteção</span>
           </NuxtLink>
         </div>
@@ -114,9 +114,9 @@ onUnmounted(() => { clearInterval(timer) })
         <!-- CTA Orçamento abaixo -->
         <NuxtLink
           to="/orcamento"
-          class="flex items-center justify-center gap-2.5 w-full h-13 py-3.5 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#F49A1A]/25 active:scale-[0.98] transition-all"
+          class="flex items-center justify-center gap-2 w-full py-3 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
         >
-          <Icon name="lucide:file-text" class="w-5 h-5 shrink-0" />
+          <Icon name="lucide:file-text" class="w-4 h-4 shrink-0" />
           Solicitar Orçamento Grátis
         </NuxtLink>
 
