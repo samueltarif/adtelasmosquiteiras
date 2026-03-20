@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   variant: {
@@ -21,11 +21,6 @@ const formData = ref({
 
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
-const isClient = ref(false)
-
-onMounted(() => {
-  isClient.value = true
-})
 
 // Validação do passo 1
 const canContinue = computed(() => {
@@ -150,7 +145,7 @@ const sendToWhatsApp = async () => {
     </div>
 
     <!-- Form -->
-    <form v-if="isClient" @submit.prevent="currentStep === 1 ? sendToWhatsApp() : sendToWhatsApp()" class="space-y-4">
+    <form @submit.prevent="currentStep === 1 ? sendToWhatsApp() : sendToWhatsApp()" class="space-y-4">
       
       <!-- ========== PASSO 1: DADOS RÁPIDOS ========== -->
       <div v-show="currentStep === 1" class="space-y-4">
@@ -319,14 +314,6 @@ const sendToWhatsApp = async () => {
       </div>
 
     </form>
-
-    <!-- Loading placeholder -->
-    <div v-else class="space-y-4">
-      <div class="w-full h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-      <div class="w-full h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-      <div class="w-full h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-      <div class="w-full h-12 bg-gray-200 rounded-lg animate-pulse"></div>
-    </div>
 
     <!-- Trust Indicators -->
     <div class="mt-4 pt-4 border-t border-gray-100">

@@ -1,29 +1,43 @@
 <script setup>
-import { useBairroLanding, slugify } from '~/composables/useBairroLanding'
+import { BAIRROS_DATA } from '~/composables/useBairroLanding'
 
 const route = useRoute()
-const slug = route.params.slug
+const rawSlug = route.params.slug
+const slug = Array.isArray(rawSlug) ? rawSlug[0] : (rawSlug ?? '')
 
-const { data: bairro } = useBairroLanding(slug)
+// Páginas estáticas que têm seu próprio .vue — não devem cair aqui
+const STATIC_PAGES = [
+  'por-que-instalar-tela-mosquiteira',
+  'home', 'contato', 'orcamento', 'obrigado',
+]
 
-// 404 se não for um bairro conhecido
-if (!bairro) {
-  throw createError({ statusCode: 404, statusMessage: 'Página não encontrada' })
+const bairro = STATIC_PAGES.includes(slug) ? null : (BAIRROS_DATA[slug] ?? null)
+
+if (STATIC_PAGES.includes(slug)) {
+  await navigateTo(`/${slug}`, { replace: true, redirectCode: 301 })
 }
 
+if (!bairro) {
+  throw createError({ statusCode: 404, message: 'Página não encontrada' })
+}
+
+// Guard para SSR — garante que nada abaixo execute se bairro for null
+const nome = bairro?.nome ?? ''
+const cidade = bairro?.cidade ?? ''
+
 useHead({
-  title: `Tela Mosquiteira e Redes de Proteção em ${bairro.nome} SP | AD Telas`,
+  title: `Tela Mosquiteira e Redes de Proteção em ${nome} SP | AD Telas`,
   meta: [
     {
       name: 'description',
-      content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro.nome}, ${bairro.cidade}. Orçamento grátis, instalação em 24h. Proteja sua família dos insetos e quedas.`
+      content: `Instalação de telas mosquiteiras e redes de proteção em ${nome}, ${cidade}. Orçamento grátis, instalação em 24h. Proteja sua família dos insetos e quedas.`
     },
     {
       name: 'keywords',
-      content: `tela mosquiteira ${bairro.nome}, rede proteção ${bairro.nome}, telas ${bairro.nome} SP, mosquiteiro ${bairro.nome}`
+      content: `tela mosquiteira ${nome}, rede proteção ${nome}, telas ${nome} SP, mosquiteiro ${nome}`
     },
-    { property: 'og:title', content: `Tela Mosquiteira em ${bairro.nome} | AD Telas e Redes` },
-    { property: 'og:description', content: `Instalação profissional de telas e redes em ${bairro.nome}. Orçamento grátis.` },
+    { property: 'og:title', content: `Tela Mosquiteira em ${nome} | AD Telas e Redes` },
+    { property: 'og:description', content: `Instalação profissional de telas e redes em ${nome}. Orçamento grátis.` },
   ],
   script: [
     {
@@ -32,11 +46,11 @@ useHead({
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
         name: 'AD Telas e Redes',
-        description: `Instalação de telas mosquiteiras e redes de proteção em ${bairro.nome}`,
+        description: `Instalação de telas mosquiteiras e redes de proteção em ${nome}`,
         url: `https://www.adtelasmosquiteiras.com.br/${slug}`,
         telephone: '+55-11-98358-6611',
-        areaServed: { '@type': 'Place', name: `${bairro.nome}, ${bairro.cidade}` },
-        address: { '@type': 'PostalAddress', addressLocality: bairro.cidade, addressRegion: 'SP', addressCountry: 'BR' },
+        areaServed: { '@type': 'Place', name: `${nome}, ${cidade}` },
+        address: { '@type': 'PostalAddress', addressLocality: cidade, addressRegion: 'SP', addressCountry: 'BR' },
       })
     }
   ]
@@ -48,7 +62,7 @@ const formData = ref({
   nome: '',
   telefone: '',
   email: '',
-  bairro: bairro.nome,
+  bairro: nome,
   servico: '',
   mensagem: ''
 })
@@ -71,12 +85,51 @@ const submitForm = async () => {
 
 const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro.nome}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/${slug}`)}`
 
+// Artigos fixos com links gov.br
+const artigosFixos = [
+  {
+    titulo: 'Brasil registra mais de 5.000 mortes por dengue em 2024 — recorde histórico',
+    descricao: 'O Painel de Monitoramento das Arboviroses do Ministério da Saúde registrou 5.000+ mortes e 6,5 milhões de casos prováveis em 2024.',
+    url: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/a/aedes-aegypti/monitoramento-das-arboviroses',
+    fonte: 'Ministério da Saúde',
+    data: '2024-08-01',
+  },
+  {
+    titulo: 'Zika vírus: mais de 2.000 bebês nasceram com microcefalia no Brasil',
+    descricao: 'O vírus Zika, transmitido pelo Aedes aegypti, causou mais de 2.000 casos de microcefalia no Brasil desde 2015.',
+    url: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/z/zika-virus',
+    fonte: 'Ministério da Saúde',
+    data: '2024-01-01',
+  },
+  {
+    titulo: 'Chikungunya pode causar artrite crônica por meses ou anos',
+    descricao: 'O Ministério da Saúde alerta que a chikungunya causa dores articulares intensas que podem se tornar crônicas, especialmente em idosos.',
+    url: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/c/chikungunya',
+    fonte: 'Ministério da Saúde',
+    data: '2024-01-01',
+  },
+  {
+    titulo: 'Dengue, Zika e Chikungunya: riscos para gestantes e recém-nascidos',
+    descricao: 'Arboviroses podem causar prematuridade, baixo peso e complicações neurológicas em bebês quando a mãe é infectada durante a gravidez.',
+    url: 'https://bvsms.saude.gov.br/arboviroses-complicacoes-na-gravidez-infeccao-por-zika-virus-infeccao-pelo-virus-da-dengue-infeccao-pelo-virus-chikungunya-recem-nascido',
+    fonte: 'Biblioteca Virtual em Saúde / MS',
+    data: '2024-01-01',
+  },
+]
+
+const { data: noticiasApi } = await useFetch(`/api/noticias/${slug}`, { default: () => [] })
+const noticiasExibidas = computed(() => {
+  const api = noticiasApi.value ?? []
+  const fixos = artigosFixos.filter(f => !api.some((a) => a.url === f.url))
+  return [...api, ...fixos].slice(0, 6)
+})
+
 const faqOpen = ref(null)
 const toggleFaq = (i) => { faqOpen.value = faqOpen.value === i ? null : i }
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div v-if="bairro" class="min-h-screen bg-gray-50">
 
     <!-- Hero -->
     <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-14 md:py-20">
@@ -87,7 +140,7 @@ const toggleFaq = (i) => { faqOpen.value = faqOpen.value === i ? null : i }
         <h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
           Tela Mosquiteira e Redes de Proteção em {{ bairro.nome }}
         </h1>
-        <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+        <p class="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
           Instalação profissional no {{ bairro.descricao }}. Orçamento grátis e instalação em até 48h.
         </p>
         <div class="flex flex-wrap justify-center gap-6 text-sm mb-8">
@@ -283,6 +336,121 @@ const toggleFaq = (i) => { faqOpen.value = faqOpen.value === i ? null : i }
       </div>
     </section>
 
+    <!-- Sintomas e Tratamento -->
+    <section class="py-12 bg-red-50 border-t border-red-100">
+      <div class="container mx-auto px-4 max-w-5xl">
+        <div class="flex items-center gap-3 mb-2">
+          <Icon name="lucide:alert-circle" class="w-6 h-6 text-red-600" />
+          <h2 class="text-2xl font-bold text-[#22345F]">Sintomas e Tratamento — Saiba Reconhecer</h2>
+        </div>
+        <p class="text-gray-600 text-sm mb-6">
+          Informações oficiais do Ministério da Saúde. Se apresentar sintomas, procure atendimento médico imediatamente.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/dengue"
+            target="_blank" rel="noopener noreferrer"
+            class="bg-white border-2 border-red-200 rounded-2xl p-5 hover:border-red-400 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">🦟</span>
+              <h3 class="font-bold text-red-700 text-base">Dengue</h3>
+            </div>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>• Febre alta (acima de 38°C)</li>
+              <li>• Dor de cabeça intensa</li>
+              <li>• Dores no corpo e articulações</li>
+              <li>• Manchas vermelhas na pele</li>
+              <li>• Náuseas e vômitos</li>
+            </ul>
+            <div class="flex items-center gap-1 text-xs text-red-600 font-semibold group-hover:underline">
+              <Icon name="lucide:external-link" class="w-3 h-3" />
+              Ver sintomas completos — gov.br
+            </div>
+          </a>
+          <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/z/zika-virus"
+            target="_blank" rel="noopener noreferrer"
+            class="bg-white border-2 border-purple-200 rounded-2xl p-5 hover:border-purple-400 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">🤰</span>
+              <h3 class="font-bold text-purple-700 text-base">Zika Vírus</h3>
+            </div>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>• Febre baixa</li>
+              <li>• Manchas vermelhas pelo corpo</li>
+              <li>• Coceira intensa</li>
+              <li>• Dor nos olhos e articulações</li>
+              <li>• <span class="text-purple-700 font-semibold">Risco grave para gestantes</span></li>
+            </ul>
+            <div class="flex items-center gap-1 text-xs text-purple-600 font-semibold group-hover:underline">
+              <Icon name="lucide:external-link" class="w-3 h-3" />
+              Ver sintomas completos — gov.br
+            </div>
+          </a>
+          <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/c/chikungunya"
+            target="_blank" rel="noopener noreferrer"
+            class="bg-white border-2 border-orange-200 rounded-2xl p-5 hover:border-orange-400 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl">🦴</span>
+              <h3 class="font-bold text-orange-700 text-base">Chikungunya</h3>
+            </div>
+            <ul class="text-xs text-gray-600 space-y-1 mb-4">
+              <li>• Febre alta de início súbito</li>
+              <li>• Dores articulares intensas</li>
+              <li>• Inchaço nas articulações</li>
+              <li>• Dor pode durar meses ou anos</li>
+              <li>• <span class="text-orange-700 font-semibold">Risco elevado para idosos</span></li>
+            </ul>
+            <div class="flex items-center gap-1 text-xs text-orange-600 font-semibold group-hover:underline">
+              <Icon name="lucide:external-link" class="w-3 h-3" />
+              Ver sintomas completos — gov.br
+            </div>
+          </a>
+        </div>
+        <div class="mt-5 bg-white border border-gray-200 rounded-xl p-4 flex items-start gap-3">
+          <Icon name="lucide:info" class="w-5 h-5 text-[#0891b2] flex-shrink-0 mt-0.5" />
+          <p class="text-xs text-gray-600 leading-relaxed">
+            <span class="font-semibold text-[#22345F]">Fonte oficial:</span> Informações de sintomas e tratamento do
+            <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/a/aedes-aegypti" target="_blank" rel="noopener noreferrer" class="text-[#0891b2] underline">Ministério da Saúde do Brasil</a>.
+            A tela mosquiteira é a medida preventiva mais eficaz dentro de casa — bloqueia fisicamente o Aedes aegypti antes da picada.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notícias -->
+    <section class="py-12 bg-white border-t border-gray-100">
+      <div class="container mx-auto px-4 max-w-5xl">
+        <div class="flex items-center gap-3 mb-2">
+          <Icon name="lucide:newspaper" class="w-6 h-6 text-[#0891b2]" />
+          <h2 class="text-2xl font-bold text-[#22345F]">Notícias sobre Dengue e Mosquitos em São Paulo</h2>
+        </div>
+        <p class="text-gray-500 text-sm mb-6">
+          Dados e reportagens sobre dengue, Zika e chikungunya — e como a tela mosquiteira protege sua família em {{ bairro.nome }}.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <a v-for="(noticia, i) in noticiasExibidas" :key="i"
+            :href="noticia.url" target="_blank" rel="noopener noreferrer nofollow"
+            class="bg-gray-50 border border-gray-200 rounded-xl p-5 hover:border-[#0891b2] hover:shadow-md transition-all group">
+            <div class="flex items-center gap-2 mb-2">
+              <Icon name="lucide:external-link" class="w-4 h-4 text-[#0891b2]" />
+              <span class="text-xs text-[#0891b2] font-medium">{{ noticia.fonte }}</span>
+              <span class="text-xs text-gray-400 ml-auto">{{ noticia.data }}</span>
+            </div>
+            <h3 class="font-semibold text-[#22345F] text-sm leading-snug mb-2 group-hover:text-[#0891b2] transition-colors line-clamp-2">
+              {{ noticia.titulo }}
+            </h3>
+            <p v-if="noticia.descricao" class="text-xs text-gray-500 line-clamp-2">{{ noticia.descricao }}</p>
+          </a>
+        </div>
+        <div class="text-center">
+          <NuxtLink to="/por-que-instalar-tela-mosquiteira"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-[#22345F] text-white rounded-xl font-semibold text-sm hover:bg-[#1a2847] transition-all">
+            <Icon name="lucide:arrow-right" class="w-4 h-4" />
+            Ver todos os casos e notícias
+          </NuxtLink>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section class="py-12 bg-white">
       <div class="container mx-auto px-4 max-w-3xl">
@@ -319,7 +487,7 @@ const toggleFaq = (i) => { faqOpen.value = faqOpen.value === i ? null : i }
         <h2 class="text-2xl md:text-3xl font-bold mb-4">
           Pronto para proteger seu lar em {{ bairro.nome }}?
         </h2>
-        <p class="text-white/80 mb-8">
+        <p class="text-gray-200 mb-8">
           Entre em contato agora e receba um orçamento gratuito. Instalação em até 48 horas.
         </p>
         <a

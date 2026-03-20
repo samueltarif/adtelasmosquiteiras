@@ -1,5 +1,5 @@
 import { defineEventHandler } from 'h3'
-import { CIDADES_BAIRROS } from '../app/data/bairros'
+import { CIDADES_BAIRROS } from '#shared/bairros'
 
 export default defineEventHandler(() => {
   return CIDADES_BAIRROS.map((cidade) => ({

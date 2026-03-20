@@ -111,14 +111,14 @@ onUnmounted(() => { clearInterval(timer) })
           </NuxtLink>
         </div>
 
-        <!-- CTA Orçamento menor e centralizado -->
+        <!-- CTA Notícias -->
         <div class="flex justify-center">
           <NuxtLink
-            to="/orcamento"
+            to="/por-que-instalar-tela-mosquiteira"
             class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:file-text" class="w-4 h-4 shrink-0" />
-            Solicitar Orçamento Grátis
+            <Icon name="lucide:newspaper" class="w-4 h-4 shrink-0" />
+            Por que instalar tela mosquiteira?
           </NuxtLink>
         </div>
 
@@ -187,13 +187,13 @@ onUnmounted(() => { clearInterval(timer) })
                   Redes de Proteção
                 </NuxtLink>
               </div>
-              <!-- Orçamento abaixo -->
+              <!-- Notícias abaixo -->
               <NuxtLink
-                to="/orcamento"
+                to="/por-que-instalar-tela-mosquiteira"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#F49A1A]/20 hover:bg-[#e08a10] transition-all"
               >
-                <Icon name="lucide:file-text" class="w-5 h-5 shrink-0" />
-                Solicitar Orçamento Grátis
+                <Icon name="lucide:newspaper" class="w-5 h-5 shrink-0" />
+                Por que instalar tela mosquiteira?
               </NuxtLink>
             </div>
           </div>

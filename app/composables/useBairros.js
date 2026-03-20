@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { CIDADES_BAIRROS } from '~/data/bairros'
+import { CIDADES_BAIRROS } from '#shared/bairros'
 
 export const CIDADES = CIDADES_BAIRROS.map(({ id, nome }) => ({ id, nome }))
 
