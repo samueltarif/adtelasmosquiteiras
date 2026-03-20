@@ -114,14 +114,20 @@ const tiposTela = [
   { nome: 'Tela Inox', desc: 'Aço inoxidável, máxima resistência', icone: 'lucide:shield' },
 ]
 
-const { isSubmitting, redirectToThankYou } = useFormSubmit()
-const formData = ref({ nome: '', telefone: '', email: '', bairro: bairro.nome, servico: 'Telas Mosquiteiras', mensagem: '' })
-const submitForm = async () => {
-  isSubmitting.value = true
-  await new Promise(r => setTimeout(r, 800))
-  isSubmitting.value = false
-  redirectToThankYou(formData.value)
-}
+const fotos = [
+  { src: '/images/telas_para_sacadas.jpg', alt: 'Tela mosquiteira para sacadas' },
+  { src: '/images/telas_para_varandas.jpg', alt: 'Tela mosquiteira para varandas' },
+  { src: '/images/telas_para_apartamento.jpg', alt: 'Tela mosquiteira para apartamento' },
+  { src: '/images/telas_de_correr.jpg', alt: 'Tela mosquiteira de correr' },
+  { src: '/images/telas_removiveis.webp', alt: 'Tela mosquiteira removível' },
+  { src: '/images/telas_para_portas.jpeg', alt: 'Tela mosquiteira para portas' },
+  { src: '/images/telas_com_aluminio.jpg', alt: 'Tela mosquiteira com alumínio' },
+  { src: '/images/telas_com_aco_inox.jpg', alt: 'Tela mosquiteira com aço inox' },
+  { src: '/images/telas_pet_screen.webp', alt: 'Tela Pet Screen' },
+  { src: '/images/telas_para_banheiro.jpg', alt: 'Tela mosquiteira para banheiro' },
+  { src: '/images/telas_anti-pernilongos.jpg', alt: 'Tela anti-pernilongos' },
+  { src: '/images/telas_para_coberturas.jpg', alt: 'Tela mosquiteira para coberturas' },
+]
 
 const faqOpen = ref<number | null>(null)
 const toggleFaq = (i: number | string) => {
@@ -263,48 +269,49 @@ const toggleFaq = (i: number | string) => {
 
           </div>
 
-          <!-- Formulário -->
+          <!-- CTA WhatsApp -->
           <div>
-            <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-6">
-              <h3 class="text-2xl font-bold text-[#22345F] mb-2 text-center">
+            <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-6 text-center">
+              <Icon name="lucide:message-circle" class="w-14 h-14 text-[#25D366] mx-auto mb-4" />
+              <h3 class="text-2xl font-bold text-[#22345F] mb-2">
                 Orçamento Grátis em {{ bairro.nome }}
               </h3>
-              <p class="text-gray-500 text-sm text-center mb-7">Resposta em minutos pelo WhatsApp</p>
-              <form @submit.prevent="submitForm" class="space-y-4">
-                <input v-model="formData.nome" type="text" required placeholder="Seu nome *"
-                  class="w-full px-4 py-3.5 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none text-sm" />
-                <input v-model="formData.telefone" type="tel" required placeholder="WhatsApp / Telefone *"
-                  class="w-full px-4 py-3.5 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none text-sm" />
-                <input v-model="formData.email" type="email" placeholder="E-mail (opcional)"
-                  class="w-full px-4 py-3.5 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none text-sm" />
-                <select v-model="formData.servico" required
-                  class="w-full px-4 py-3.5 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none text-sm">
-                  <option value="Telas Mosquiteiras">Telas Mosquiteiras</option>
-                  <option value="Tela Removível">Tela Removível</option>
-                  <option value="Tela de Correr">Tela de Correr</option>
-                  <option value="Tela Basculante">Tela Basculante</option>
-                  <option value="Pet Screen">Pet Screen</option>
-                  <option value="Tela com Alumínio">Tela com Alumínio</option>
-                  <option value="Tela Inox">Tela Inox</option>
-                </select>
-                <textarea v-model="formData.mensagem" rows="3" placeholder="Mensagem (opcional)"
-                  class="w-full px-4 py-3.5 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none resize-none text-sm"></textarea>
-                <button type="submit" :disabled="isSubmitting"
-                  class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2">
-                  <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
-                  <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  {{ isSubmitting ? 'Enviando...' : 'Solicitar Orçamento' }}
-                </button>
-              </form>
-              <div class="mt-5 text-center"><span class="text-gray-400 text-xs">ou fale diretamente</span></div>
+              <p class="text-gray-500 text-sm mb-6">Resposta em minutos pelo WhatsApp. Sem compromisso.</p>
               <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer"
-                class="mt-3 w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-semibold transition-all text-sm">
-                <Icon name="lucide:message-circle" class="w-5 h-5" />
-                Falar direto no WhatsApp
+                class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-2xl font-bold text-lg shadow-lg transition-all mb-6">
+                <Icon name="lucide:message-circle" class="w-6 h-6" />
+                Falar no WhatsApp
               </a>
+              <div class="grid grid-cols-2 gap-3 text-left">
+                <div class="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
+                  <Icon name="lucide:clock" class="w-5 h-5 text-[#F49A1A] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p class="text-xs font-bold text-[#22345F]">Instalação em 48h</p>
+                    <p class="text-xs text-gray-500">Após aprovação</p>
+                  </div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
+                  <Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p class="text-xs font-bold text-[#22345F]">Garantia 2 Anos</p>
+                    <p class="text-xs text-gray-500">Cobertura total</p>
+                  </div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
+                  <Icon name="lucide:credit-card" class="w-5 h-5 text-[#0891b2] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p class="text-xs font-bold text-[#22345F]">Parcelamento</p>
+                    <p class="text-xs text-gray-500">Cartão e PIX</p>
+                  </div>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-3 flex items-start gap-2">
+                  <Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p class="text-xs font-bold text-[#22345F]">5.0 ★ 487 avaliações</p>
+                    <p class="text-xs text-gray-500">Google Reviews</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -451,6 +458,25 @@ const toggleFaq = (i: number | string) => {
             <div v-if="faqOpen === i" class="px-5 pb-4 text-gray-600 text-sm leading-relaxed">
               {{ item.r }}
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Galeria de fotos -->
+    <section class="py-14 bg-gray-50 border-t border-gray-100">
+      <div class="container mx-auto px-5 max-w-6xl">
+        <h2 class="text-2xl font-bold text-[#22345F] text-center mb-3">
+          Nossos Produtos
+        </h2>
+        <p class="text-gray-500 text-center text-sm mb-10">
+          Telas mosquiteiras instaladas em {{ bairro.nome }} e região
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div v-for="foto in fotos" :key="foto.src"
+            class="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow aspect-square bg-white">
+            <img :src="foto.src" :alt="foto.alt"
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
           </div>
         </div>
       </div>
