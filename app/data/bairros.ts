@@ -327,7 +327,7 @@ export const CIDADES_BAIRROS: Cidade[] = [
   {
     id: 3550605,
     nome: 'São Roque',
-    bairrors: [
+    bairros: [
       'Bairro da Estação', 'Bairro do Taboão', 'Centro', 'Chácaras Reunidas', 'Jardim Progresso',
       'Jardim Santa Catarina', 'Jardim São João', 'Mailasqui', 'Parque Primavera', 'Parque São Roque',
       'Taboão', 'Vila Boa Vista', 'Vila Caputera', 'Vila Esperança', 'Vila Matilde',
