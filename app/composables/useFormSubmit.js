@@ -7,9 +7,19 @@ export function useFormSubmit() {
 
   // Função de conversão Google Ads - Contato
   const reportConversion = () => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'conversion', {
-        'send_to': 'AW-17981093809/4GwPCPWSjoccELHvhv5C'
+    if (typeof window !== 'undefined') {
+      // gtag direct
+      if (window.gtag) {
+        window.gtag('event', 'conversion', {
+          'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C'
+        })
+      }
+      // dataLayer push for GTM
+      window.dataLayer = window.dataLayer || []
+      window.dataLayer.push({
+        event: 'form_submission',
+        event_category: 'lead',
+        event_label: 'formulario_contato'
       })
     }
   }

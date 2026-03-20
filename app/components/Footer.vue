@@ -5,33 +5,13 @@
       <!-- Bairros Atendidos -->
       <div class="mb-8 pb-8 border-b border-white/20">
         <h3 class="font-bold text-lg mb-4 text-center">Bairros Atendidos em São Paulo</h3>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 text-sm">
-          <NuxtLink to="/bairros/vila-sonia" class="hover:text-[#F49A1A] transition-colors text-center">
-            Vila Sônia
-          </NuxtLink>
-          <NuxtLink to="/bairros/pinheiros" class="hover:text-[#F49A1A] transition-colors text-center">
-            Pinheiros
-          </NuxtLink>
-          <NuxtLink to="/bairros/itaim-bibi" class="hover:text-[#F49A1A] transition-colors text-center">
-            Itaim Bibi
-          </NuxtLink>
-          <NuxtLink to="/bairros/jardim-bonfiglioli" class="hover:text-[#F49A1A] transition-colors text-center">
-            Jardim Bonfiglioli
-          </NuxtLink>
-          <NuxtLink to="/bairros/butanta" class="hover:text-[#F49A1A] transition-colors text-center">
-            Butantã
-          </NuxtLink>
-          <NuxtLink to="/bairros/vila-olimpia" class="hover:text-[#F49A1A] transition-colors text-center">
-            Vila Olímpia
-          </NuxtLink>
-          <NuxtLink to="/bairros/jardim-das-vertentes" class="hover:text-[#F49A1A] transition-colors text-center">
-            Jardim das Vertentes
-          </NuxtLink>
-          <NuxtLink to="/bairros/jardim-monte-kemel" class="hover:text-[#F49A1A] transition-colors text-center">
-            Jardim Monte Kemel
-          </NuxtLink>
-          <NuxtLink to="/bairros/jardim-paulista" class="hover:text-[#F49A1A] transition-colors text-center">
-            Jardim Paulista
+        <div class="text-center">
+          <NuxtLink 
+            to="/bairros" 
+            class="inline-flex items-center gap-2 px-6 py-3 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-semibold transition-colors"
+          >
+            <Icon name="lucide:map-pin" class="w-4 h-4" />
+            Ver todos os bairros atendidos
           </NuxtLink>
         </div>
       </div>

@@ -5,6 +5,32 @@ useHead({
     { name: 'robots', content: 'noindex, nofollow' }
   ]
 })
+
+// Fire conversion on page load — catches direct landings and GTM triggers
+onMounted(() => {
+  // Google Ads conversion
+  if (window.gtag) {
+    window.gtag('event', 'conversion', {
+      'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C'
+    })
+  }
+
+  // GA4 event
+  if (window.gtag) {
+    window.gtag('event', 'generate_lead', {
+      event_category: 'lead',
+      event_label: 'obrigado_page'
+    })
+  }
+
+  // dataLayer push for GTM
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push({
+    event: 'form_submission',
+    event_category: 'lead',
+    event_label: 'obrigado_page'
+  })
+})
 </script>
 
 <template>
