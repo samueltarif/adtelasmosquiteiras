@@ -3263,7 +3263,7 @@ const BAIRROS_DATA = {
   'jardim-tres-marias': {
     nome: 'Jardim Três Marias',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3274,7 +3274,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Três Marias fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Três Marias se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Três Marias?', r: 'Sim! Atendemos Jardim Três Marias e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Três Marias?', r: 'Sim! Atendemos Jardim Três Marias e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3282,7 +3282,7 @@ const BAIRROS_DATA = {
   'jardim-umuarama': {
     nome: 'Jardim Umuarama',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3293,7 +3293,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Umuarama fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Umuarama se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Umuarama?', r: 'Sim! Atendemos Jardim Umuarama e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Umuarama?', r: 'Sim! Atendemos Jardim Umuarama e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3301,7 +3301,7 @@ const BAIRROS_DATA = {
   'jardim-guarau': {
     nome: 'Jardim Guarau',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3312,7 +3312,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Guarau fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Guarau se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Guarau?', r: 'Sim! Atendemos Jardim Guarau e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Guarau?', r: 'Sim! Atendemos Jardim Guarau e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3320,7 +3320,7 @@ const BAIRROS_DATA = {
   'jardim-herculano': {
     nome: 'Jardim Herculano',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3331,7 +3331,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Herculano fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Herculano se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Herculano?', r: 'Sim! Atendemos Jardim Herculano e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Herculano?', r: 'Sim! Atendemos Jardim Herculano e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3339,7 +3339,7 @@ const BAIRROS_DATA = {
   'jardim-selma': {
     nome: 'Jardim Selma',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona leste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3350,7 +3350,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Selma fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Selma se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Selma?', r: 'Sim! Atendemos Jardim Selma e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Selma?', r: 'Sim! Atendemos Jardim Selma e toda a zona leste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3358,7 +3358,7 @@ const BAIRROS_DATA = {
   'jardim-republica': {
     nome: 'Jardim República',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona leste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3369,7 +3369,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim República fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim República se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim República?', r: 'Sim! Atendemos Jardim República e toda a Zona Sul.' },
+      { q: 'Atendem Jardim República?', r: 'Sim! Atendemos Jardim República e toda a zona leste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3435,7 +3435,7 @@ const BAIRROS_DATA = {
   'jardim-maracana': {
     nome: 'Jardim Maracanã',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3446,7 +3446,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Maracanã fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Maracanã se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Maracanã?', r: 'Sim! Atendemos Jardim Maracanã e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Maracanã?', r: 'Sim! Atendemos Jardim Maracanã e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3454,7 +3454,7 @@ const BAIRROS_DATA = {
   'jardim-lourdes': {
     nome: 'Jardim Lourdes',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3465,7 +3465,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Lourdes fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Lourdes se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Lourdes?', r: 'Sim! Atendemos Jardim Lourdes e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Lourdes?', r: 'Sim! Atendemos Jardim Lourdes e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3473,7 +3473,7 @@ const BAIRROS_DATA = {
   'jardim-lidia': {
     nome: 'Jardim Lídia',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3484,7 +3484,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Lídia fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Lídia se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Lídia?', r: 'Sim! Atendemos Jardim Lídia e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Lídia?', r: 'Sim! Atendemos Jardim Lídia e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3492,7 +3492,7 @@ const BAIRROS_DATA = {
   'jardim-itapura': {
     nome: 'Jardim Itapura',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3503,7 +3503,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Itapura fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Itapura se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Itapura?', r: 'Sim! Atendemos Jardim Itapura e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Itapura?', r: 'Sim! Atendemos Jardim Itapura e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3511,7 +3511,7 @@ const BAIRROS_DATA = {
   'jardim-iporanga': {
     nome: 'Jardim Iporanga',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3522,7 +3522,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Iporanga fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Iporanga se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Iporanga?', r: 'Sim! Atendemos Jardim Iporanga e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Iporanga?', r: 'Sim! Atendemos Jardim Iporanga e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3530,7 +3530,7 @@ const BAIRROS_DATA = {
   'jardim-ingai': {
     nome: 'Jardim Ingá',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3541,7 +3541,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Ingá fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Ingá se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Ingá?', r: 'Sim! Atendemos Jardim Ingá e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Ingá?', r: 'Sim! Atendemos Jardim Ingá e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3549,7 +3549,7 @@ const BAIRROS_DATA = {
   'jardim-guedala': {
     nome: 'Jardim Guedala',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial nobre na Zona Sul de São Paulo, com casas e apartamentos de alto padrão',
+    descricao: 'bairro residencial nobre na zona oeste de São Paulo, com casas e apartamentos de alto padrão',
     areasVerdes: ['Parque do Ibirapuera (proximidades)', 'Ruas arborizadas', 'Parque Estadual das Fontes do Ipiranga'],
     caracteristicas: [
       'Bairro nobre com casas e apartamentos de alto padrão',
@@ -3587,7 +3587,7 @@ const BAIRROS_DATA = {
   'jardim-everest': {
     nome: 'Jardim Everest',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3598,7 +3598,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Everest fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Everest se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Everest?', r: 'Sim! Atendemos Jardim Everest e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Everest?', r: 'Sim! Atendemos Jardim Everest e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3606,7 +3606,7 @@ const BAIRROS_DATA = {
   'jardim-esmeralda': {
     nome: 'Jardim Esmeralda',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3617,7 +3617,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Esmeralda fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Esmeralda se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Esmeralda?', r: 'Sim! Atendemos Jardim Esmeralda e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Esmeralda?', r: 'Sim! Atendemos Jardim Esmeralda e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
@@ -3625,7 +3625,7 @@ const BAIRROS_DATA = {
   'jardim-eliane': {
     nome: 'Jardim Eliane',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e boa infraestrutura',
+    descricao: 'bairro residencial na zona leste de São Paulo, com casas de médio padrão e boa infraestrutura',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3636,7 +3636,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Eliane fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Eliane se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Eliane?', r: 'Sim! Atendemos Jardim Eliane e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Eliane?', r: 'Sim! Atendemos Jardim Eliane e toda a zona leste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Fazem orçamento gratuito?', r: 'Sim! O orçamento é sempre gratuito e sem compromisso.' },
     ],
@@ -3644,7 +3644,7 @@ const BAIRROS_DATA = {
   'jardim-dom-jose': {
     nome: 'Jardim Dom José',
     cidade: 'São Paulo',
-    descricao: 'bairro residencial na Zona Sul de São Paulo, com casas de médio padrão e comércio local',
+    descricao: 'bairro residencial na zona oeste de São Paulo, com casas de médio padrão e comércio local',
     areasVerdes: ['Represa Guarapiranga (proximidades)', 'Parque Estadual da Serra do Mar (proximidades)', 'Áreas verdes locais'],
     caracteristicas: [
       'Bairro residencial com casas e sobrados',
@@ -3655,7 +3655,7 @@ const BAIRROS_DATA = {
     beneficiosMosquiteira: 'Jardim Dom José fica próximo à Represa Guarapiranga, criando condições ideais para mosquitos. Telas mosquiteiras são essenciais.',
     beneficiosRede: 'As casas de Jardim Dom José se beneficiam de redes de proteção para crianças e pets. Instalação rápida com garantia de 2 anos.',
     faq: [
-      { q: 'Atendem Jardim Dom José?', r: 'Sim! Atendemos Jardim Dom José e toda a Zona Sul.' },
+      { q: 'Atendem Jardim Dom José?', r: 'Sim! Atendemos Jardim Dom José e toda a zona oeste.' },
       { q: 'Qual o prazo de instalação?', r: 'Após aprovação do orçamento, instalamos em até 48 horas.' },
       { q: 'Qual a garantia dos produtos?', r: 'Todos os nossos produtos têm garantia de 2 anos.' },
     ],
