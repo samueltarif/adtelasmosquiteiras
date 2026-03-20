@@ -1,12 +1,157 @@
 <script setup>
 const bairro = 'Jardim Paulista'
-useHead({ title: `Telas e Redes de Proteção em ${bairro} SP | Orçamento Grátis`, meta: [{ name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 24h.` }] })
-const formData = ref({ nome: '', telefone: '', email: '', bairro: bairro, servico: '', mensagem: '' })
-const isSubmitting = ref(false), submitSuccess = ref(false)
-const servicosOptions = ['Telas Mosquiteiras', 'Redes de Proteção', 'Telas Pet Screen', 'Redes para Crianças', 'Redes para Pets', 'Outro serviço']
-const { redirectToThankYou } = useFormSubmit()
-const submitForm = async () => { isSubmitting.value = true; await new Promise(r => setTimeout(r, 800)); isSubmitting.value = false; redirectToThankYou(formData.value) }
-const openWhatsApp = () => window.open(`https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`)}`, '_blank')
-const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`)}`
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(`Olá! Gostaria de um orçamento para ${bairro}. Vim pelo site: https://www.adtelasmosquiteiras.com.br/bairros/jardim-paulista`)}`
+
+useHead({
+  title: `Telas e Redes de Proteção em ${bairro} SP | Orçamento Grátis`,
+  meta: [
+    { name: 'description', content: `Instalação de telas mosquiteiras e redes de proteção em ${bairro}. Orçamento grátis, instalação rápida em 48h. Atendemos ${bairro} e região.` },
+  ]
+})
+
+const fotos = [
+  { src: '/images/telas_para_sacadas.jpg', alt: 'Tela mosquiteira para sacadas' },
+  { src: '/images/telas_para_varandas.jpg', alt: 'Tela mosquiteira para varandas' },
+  { src: '/images/telas_para_apartamento.jpg', alt: 'Tela mosquiteira para apartamento' },
+  { src: '/images/telas_de_correr.jpg', alt: 'Tela mosquiteira de correr' },
+  { src: '/images/telas_removiveis.webp', alt: 'Tela mosquiteira removível' },
+  { src: '/images/telas_para_portas.jpeg', alt: 'Tela mosquiteira para portas' },
+  { src: '/images/telas_com_aluminio.jpg', alt: 'Tela mosquiteira com alumínio' },
+  { src: '/images/telas_com_aco_inox.jpg', alt: 'Tela mosquiteira com aço inox' },
+  { src: '/images/telas_pet_screen.webp', alt: 'Tela Pet Screen' },
+  { src: '/images/telas_para_banheiro.jpg', alt: 'Tela mosquiteira para banheiro' },
+  { src: '/images/telas_anti-pernilongos.jpg', alt: 'Tela anti-pernilongos' },
+  { src: '/images/telas_para_coberturas.jpg', alt: 'Tela mosquiteira para coberturas' },
+]
 </script>
-<template><div class="min-h-screen bg-gradient-to-b from-gray-50 to-white"><Breadcrumb /><section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-12 md:py-16"><div class="container mx-auto px-4 max-w-4xl text-center"><h1 class="text-3xl md:text-5xl font-bold mb-4">Telas e Redes em {{ bairro }}</h1><p class="text-lg md:text-xl text-white/90 mb-6">Instalação profissional com garantia de 2 anos</p><div class="flex flex-wrap justify-center gap-4 text-sm"><div class="flex items-center gap-2"><Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" /><span>Instalação 24h</span></div><div class="flex items-center gap-2"><Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" /><span>Garantia 2 Anos</span></div><div class="flex items-center gap-2"><Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A]" /><span>5.0 (487 avaliações)</span></div></div></div></section><section class="py-12"><div class="container mx-auto px-4 max-w-6xl"><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div><h2 class="text-2xl font-bold text-[#22345F] mb-4">Atendemos {{ bairro }} e Região</h2><p class="text-gray-600 mb-6">Somos especialistas em instalação de telas mosquiteiras e redes de proteção em {{ bairro }}. Atendimento rápido, orçamento grátis e instalação profissional.</p><div class="space-y-4 mb-8"><div class="flex items-start gap-3"><Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366] flex-shrink-0 mt-1" /><div><h3 class="font-bold text-[#22345F]">Instalação Rápida</h3><p class="text-sm text-gray-600">Instalamos em até 48 horas após aprovação</p></div></div><div class="flex items-start gap-3"><Icon name="lucide:shield-check" class="w-6 h-6 text-[#25D366] flex-shrink-0 mt-1" /><div><h3 class="font-bold text-[#22345F]">Garantia de 2 Anos</h3><p class="text-sm text-gray-600">Cobertura total contra defeitos</p></div></div><div class="flex items-start gap-3"><Icon name="lucide:wrench" class="w-6 h-6 text-[#F49A1A] flex-shrink-0 mt-1" /><div><h3 class="font-bold text-[#22345F]">Profissionais Qualificados</h3><p class="text-sm text-gray-600">Equipe treinada e experiente</p></div></div></div><a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="w-full md:w-auto px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2"><Icon name="lucide:message-circle" class="w-5 h-5" />WhatsApp Direto</a></div><div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8"><h3 class="text-2xl font-bold text-[#22345F] mb-2 text-center">Solicite seu Orçamento</h3><p class="text-gray-600 text-sm text-center mb-6">Preencha e receba no WhatsApp</p><div v-if="submitSuccess"><FormSuccess :nome="formData.nome" :whatsapp-url="whatsappRedirectUrl" :countdown="countdown" /></div><form @submit.prevent="submitForm" class="space-y-4"><input v-model="formData.nome" type="text" required placeholder="Seu nome *" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" /><input v-model="formData.telefone" type="tel" required placeholder="WhatsApp / Telefone *" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" /><input v-model="formData.email" type="email" placeholder="E-mail (opcional)" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none" /><select v-model="formData.servico" required class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none"><option value="">Selecione o serviço *</option><option v-for="s in servicosOptions" :key="s" :value="s">{{ s }}</option></select><textarea v-model="formData.mensagem" rows="3" placeholder="Mensagem (opcional)" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none resize-none"></textarea><button type="submit" :disabled="isSubmitting" class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"><Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" /><svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação' }}</button></form></div></div></div></section></div></template>
+
+<template>
+  <div class="min-h-screen bg-gray-50">
+
+    <Breadcrumb />
+
+    <!-- Hero -->
+    <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-16 md:py-24">
+      <div class="container mx-auto px-5 max-w-4xl text-center">
+        <p class="text-[#F49A1A] font-semibold text-sm uppercase tracking-widest mb-4">
+          AD Telas Mosquiteiras · São Paulo
+        </p>
+        <h1 class="text-3xl md:text-5xl font-bold mb-5 leading-tight">
+          Telas e Redes em {{ bairro }}
+        </h1>
+        <p class="text-lg text-white/80 mb-8 max-w-xl mx-auto leading-relaxed">
+          Instalação profissional de telas mosquiteiras e redes de proteção em {{ bairro }}. Orçamento grátis e instalação em até 48h.
+        </p>
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm mb-10">
+          <div class="flex items-center gap-2">
+            <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
+            <span>Instalação em 48h</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" />
+            <span>Garantia 2 Anos</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A]" />
+            <span>5.0 · 487 avaliações</span>
+          </div>
+        </div>
+        <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-2xl font-bold text-lg shadow-xl transition-all">
+          <Icon name="lucide:message-circle" class="w-6 h-6" />
+          Solicitar Orçamento Grátis
+        </a>
+      </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="py-14 bg-white">
+      <div class="container mx-auto px-5 max-w-5xl">
+        <h2 class="text-2xl font-bold text-[#22345F] text-center mb-10">
+          Por que escolher a AD Telas em {{ bairro }}?
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:clock" class="w-10 h-10 text-[#F49A1A] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Instalação Rápida</h3>
+            <p class="text-sm text-gray-600">Em até 48h após aprovação do orçamento</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:shield-check" class="w-10 h-10 text-[#25D366] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Garantia 2 Anos</h3>
+            <p class="text-sm text-gray-600">Cobertura total contra defeitos de fabricação</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:award" class="w-10 h-10 text-[#0891b2] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Profissionais Qualificados</h3>
+            <p class="text-sm text-gray-600">Equipe treinada e experiente em {{ bairro }}</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:credit-card" class="w-10 h-10 text-[#F49A1A] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Facilidade de Pagamento</h3>
+            <p class="text-sm text-gray-600">Cartão, PIX e parcelamento disponíveis</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:map-pin" class="w-10 h-10 text-[#25D366] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Atendemos {{ bairro }}</h3>
+            <p class="text-sm text-gray-600">Cobertura completa no bairro e região</p>
+          </div>
+          <div class="bg-gray-50 rounded-2xl p-6 text-center">
+            <Icon name="lucide:message-circle" class="w-10 h-10 text-[#0891b2] mx-auto mb-3" />
+            <h3 class="font-bold text-[#22345F] mb-2">Orçamento Grátis</h3>
+            <p class="text-sm text-gray-600">Sem compromisso, resposta em minutos</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA intermediário -->
+    <section class="py-10 bg-[#25D366]">
+      <div class="container mx-auto px-5 max-w-3xl text-center">
+        <p class="text-white font-bold text-xl mb-4">Fale agora e receba seu orçamento em minutos</p>
+        <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#25D366] rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">
+          <Icon name="lucide:message-circle" class="w-6 h-6" />
+          Chamar no WhatsApp
+        </a>
+      </div>
+    </section>
+
+    <!-- Galeria de fotos -->
+    <section class="py-14 bg-gray-50">
+      <div class="container mx-auto px-5 max-w-6xl">
+        <h2 class="text-2xl font-bold text-[#22345F] text-center mb-3">
+          Nossos Produtos
+        </h2>
+        <p class="text-gray-500 text-center text-sm mb-10">
+          Telas mosquiteiras e redes de proteção instaladas em {{ bairro }} e região
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div v-for="foto in fotos" :key="foto.src"
+            class="rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow aspect-square bg-white">
+            <img :src="foto.src" :alt="foto.alt"
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA final -->
+    <section class="py-14 bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white text-center">
+      <div class="container mx-auto px-5 max-w-2xl">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">
+          Proteja sua família em {{ bairro }}
+        </h2>
+        <p class="text-white/80 mb-8 leading-relaxed">
+          Orçamento gratuito e instalação em até 48 horas. Sem compromisso.
+        </p>
+        <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-2xl font-bold text-lg shadow-xl transition-all">
+          <Icon name="lucide:message-circle" class="w-6 h-6" />
+          Falar no WhatsApp
+        </a>
+      </div>
+    </section>
+
+  </div>
+</template>
