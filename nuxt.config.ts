@@ -29,6 +29,16 @@ export default defineNuxtConfig({
   nitro: {
     routeRules: {
       '/': { redirect: '/home' },
+      // Redirects das URLs antigas /bairros/[slug] → /[slug]
+      '/bairros/itaim-bibi': { redirect: '/itaim-bibi' },
+      '/bairros/pinheiros': { redirect: '/pinheiros' },
+      '/bairros/vila-olimpia': { redirect: '/vila-olimpia' },
+      '/bairros/butanta': { redirect: '/butanta' },
+      '/bairros/jardim-paulista': { redirect: '/jardim-paulista' },
+      '/bairros/jardim-bonfiglioli': { redirect: '/jardim-bonfiglioli' },
+      '/bairros/jardim-das-vertentes': { redirect: '/jardim-das-vertentes' },
+      '/bairros/jardim-monte-kemel': { redirect: '/jardim-monte-kemel' },
+      '/bairros/vila-sonia': { redirect: '/vila-sonia' },
       '/**': {
         headers: {
           'X-Content-Type-Options': 'nosniff',

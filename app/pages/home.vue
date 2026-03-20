@@ -23,18 +23,32 @@ useHead({
 
 const showFormModal = ref(false)
 const openFormModal = () => { showFormModal.value = true }
+
+// Scroll para seção quando chegar via hash (ex: /home#faq)
+onMounted(() => {
+  const hash = window.location.hash?.replace('#', '')
+  if (hash) {
+    setTimeout(() => {
+      const el = document.getElementById(hash)
+      if (el) {
+        const headerHeight = 112
+        const top = el.getBoundingClientRect().top + window.scrollY - headerHeight
+        window.scrollTo({ top, behavior: 'smooth' })
+      }
+    }, 300)
+  }
+})
 </script>
 
 <template>
   <div>
-    <HeroSection />
-    <ServicesCards />
-    <ProblemsSection />
-    <ValueProposition />
-    <CaseStudies />
-    <ReviewsCarousel />
-    <SegmentedSolutions />
-    <FaqSection />
+    <div id="hero"><HeroSection /></div>
+    <div id="problems"><ServicesCards /><ProblemsSection /></div>
+    <div id="value"><ValueProposition /></div>
+    <div id="cases"><CaseStudies /></div>
+    <div id="reviews"><ReviewsCarousel /></div>
+    <div id="solutions"><SegmentedSolutions /></div>
+    <div id="faq"><FaqSection /></div>
     <CtaSection />
     <MobileUnifiedCTA
       servico-atual="Redes de Proteção ou Telas Mosquiteiras"

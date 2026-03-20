@@ -28,36 +28,32 @@ const toggleMobileMenu = () => {
 
 // Função para scroll suave para seções ou navegação
 const scrollToSection = (item) => {
-  isMobileMenuOpen.value = false // Fechar menu mobile
-  
+  isMobileMenuOpen.value = false
+
   // Se for um link direto (type: 'link'), navegar
   if (item.type === 'link') {
     navigateTo(item.id)
     return
   }
-  
-  // Se não estiver na home, navegar para home primeiro
+
   const route = useRoute()
-  if (route.path !== '/') {
-    navigateTo('/')
+  const isHome = route.path === '/home' || route.path === '/'
+
+  if (!isHome) {
+    // Navegar para home com hash para scroll após carregamento
+    navigateTo(`/home#${item.id}`)
     return
   }
-  
-  // Scroll para seção
-  const sectionId = item.id
-  if (sectionId === 'hero') {
+
+  // Scroll para seção na home
+  if (item.id === 'hero') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else {
-    const element = document.querySelector(`[data-section="${sectionId}"]`)
+    const element = document.querySelector(`[data-section="${item.id}"]`)
     if (element) {
-      // Calcular offset para compensar o header fixo
-      const headerHeight = 112 // Nova altura do header (h-28 = 112px)
-      const elementPosition = element.offsetTop - headerHeight
-      
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      })
+      const headerHeight = 112
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY - headerHeight
+      window.scrollTo({ top: elementPosition, behavior: 'smooth' })
     }
   }
 }
