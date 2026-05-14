@@ -1,24 +1,16 @@
 <script setup>
 import { useServicoData } from '~/composables/useServicoData'
 
-// ============================================
-// ROUTE & DATA
-// ============================================
 const route = useRoute()
 const { getServicoBySlug, getWhatsAppUrl, GOOGLE_REVIEWS_URL } = useServicoData()
 
-// Buscar serviço pelo slug
 const servico = getServicoBySlug(route.params.slug)
 
-// Se serviço não encontrado, redirecionar para página de serviços
 if (!servico) {
   await navigateTo('/servicos')
   throw createError({ statusCode: 404, message: 'Serviço não encontrado' })
 }
 
-// ============================================
-// SEO & META TAGS
-// ============================================
 useHead({
   title: servico?.metaTitle || 'Serviços | AD Telas',
   meta: [
@@ -31,47 +23,27 @@ useHead({
   ]
 })
 
-// ============================================
-// MÉTODOS
-// ============================================
 const scrollToContact = () => {
-  const element = document.getElementById('contato-final')
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
+  document.getElementById('contato-final')?.scrollIntoView({ behavior: 'smooth' })
 }
 
+const trackEvent = (eventName, params = {}) => {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ event: eventName, ...params })
+  }
+}
 
 const openWhatsApp = (origem = 'hero') => {
   const url = getWhatsAppUrl(servico, origem)
-  
-  // GA4 Event
-  trackEvent('servico_whatsapp_clicked', {
-    slug: servico.slug,
-    origem
-  })
-  
+  trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem })
   window.open(url, '_blank')
 }
-
-// Função para tracking de eventos
-const trackEvent = (eventName, params = {}) => {
-  if (typeof window !== 'undefined' && window.dataLayer) {
-    window.dataLayer.push({
-      event: eventName,
-      ...params
-    })
-  }
-}
-
 </script>
 
 <template>
   <div class="min-h-screen bg-white">
-    
-    <!-- ============================================ -->
-    <!-- 1. HERO ESPECÍFICO DO SERVIÇO -->
-    <!-- ============================================ -->
+
+    <!-- Hero -->
     <section class="relative bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white py-16 md:py-24 overflow-hidden">
       <!-- Background Pattern -->
       <div class="absolute inset-0 opacity-10">
@@ -148,9 +120,7 @@ const trackEvent = (eventName, params = {}) => {
                 class="flex-1 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl"
                 data-gtm="servico-hero-whatsapp"
               >
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.424h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-                </svg>
+                <WhatsappIcon class="w-6 h-6" />
                 Orçamento Grátis para {{ servico.titulo.split(' ')[0] }}
               </button>
               
@@ -194,10 +164,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 2. POR QUE NOSSA [SERVIÇO] -->
-    <!-- ============================================ -->
+    <!-- Por que nossa [serviço] -->
     <section class="py-16 md:py-24 bg-white">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         
@@ -261,10 +228,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 3. VÍDEO/DEMO -->
-    <!-- ============================================ -->
+    <!-- Demo e Especificações -->
     <section class="py-16 md:py-24 bg-gradient-to-b from-white to-[#F9FAFB]">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         
@@ -312,9 +276,7 @@ const trackEvent = (eventName, params = {}) => {
               class="mt-8 w-full px-8 py-4 bg-[#F49A1A] text-white rounded-xl font-bold text-lg hover:bg-[#d88715] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
               data-gtm="servico-specs-whatsapp"
             >
-              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.424h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-              </svg>
+              <WhatsappIcon class="w-6 h-6" />
               Solicitar Orçamento Detalhado
             </button>
           </div>
@@ -323,10 +285,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 4. COMPARAÇÃO: NÓS VS CONCORRENTES -->
-    <!-- ============================================ -->
+    <!-- Comparação -->
     <section class="py-16 md:py-24 bg-white">
       <div class="container mx-auto px-4 md:px-6 max-w-5xl">
         
@@ -379,9 +338,7 @@ const trackEvent = (eventName, params = {}) => {
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
             data-gtm="servico-comparacao-whatsapp"
           >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.424h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-            </svg>
+            <WhatsappIcon class="w-6 h-6" />
             Quero a Melhor Opção!
           </button>
         </div>
@@ -389,10 +346,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 5. CASES ESPECÍFICOS -->
-    <!-- ============================================ -->
+    <!-- Cases de Sucesso -->
     <section class="py-16 md:py-24 bg-gradient-to-b from-[#F9FAFB] to-white">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         
@@ -448,10 +402,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 6. FAQ ESPECÍFICA -->
-    <!-- ============================================ -->
+    <!-- FAQ -->
     <section class="py-16 md:py-24 bg-white">
       <div class="container mx-auto px-4 md:px-6 max-w-4xl">
         
@@ -497,9 +448,7 @@ const trackEvent = (eventName, params = {}) => {
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
             data-gtm="servico-faq-whatsapp"
           >
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.424h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-            </svg>
+            <WhatsappIcon class="w-6 h-6" />
             Fale com um Especialista
           </button>
         </div>
@@ -507,10 +456,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
     </section>
 
-
-    <!-- ============================================ -->
-    <!-- 7. CTA FINAL AGRESSIVO -->
-    <!-- ============================================ -->
+    <!-- CTA Final -->
     <section id="contato-final" class="py-16 md:py-24 bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white relative overflow-hidden">
       <!-- Background Pattern -->
       <div class="absolute inset-0 opacity-10">
@@ -567,9 +513,7 @@ const trackEvent = (eventName, params = {}) => {
             class="inline-flex items-center gap-3 px-10 py-5 bg-[#25D366] text-white rounded-2xl font-bold text-xl hover:bg-[#1fb854] transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105 mb-6"
             data-gtm="servico-cta-final-whatsapp"
           >
-            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.424h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-            </svg>
+            <WhatsappIcon class="w-7 h-7" />
             Solicitar Orçamento GRÁTIS Agora
           </button>
           
@@ -589,21 +533,8 @@ const trackEvent = (eventName, params = {}) => {
               data-gtm="servico-rating-clicked"
             >
               <span class="font-semibold group-hover:underline">Nota 5.0</span>
-              <!-- 5 Estrelinhas -->
               <div class="flex gap-0.5">
-                <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-                <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
+                <svg v-for="s in 5" :key="s" class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
               </div>

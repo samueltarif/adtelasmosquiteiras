@@ -123,8 +123,8 @@ export const useServicoData = () => {
       destaque: 'Visão 100% clara',
       descricaoCurta: 'Transparência total, proteção máxima',
       descricaoCompleta: 'Tela mosquiteira de alta tecnologia com 85% de transparência. Protege contra mosquitos transmissores de dengue, zika e chikungunya sem comprometer a vista ou ventilação.',
-      imagem: '/images/TELA_MOSQUITEIRA.png', // Card principal
-      imagemHero: '/images/TELA_MOSQUITEIRA.png', // Hero da página
+      imagem: '/images/tela_mosquiteira.png', // Card principal
+      imagemHero: '/images/tela_mosquiteira.png', // Hero da página
       imagemDemo: '/images/tela_proteção_servico.png', // Seção demo
       
       // Benefícios principais (4 cards)

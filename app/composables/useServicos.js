@@ -323,7 +323,7 @@ export const useServicos = () => {
               titulo: 'Telas Pivotantes',
               descricaoCurta: 'Abertura giratória',
               destaque: 'Moderna',
-              imagem: '/images/telas_pivotantes.webp',
+              imagem: '/images/telas_de_correr.jpg',
               keywords: ['tela pivotante', 'giratória']
             },
             removivel: {
@@ -331,7 +331,7 @@ export const useServicos = () => {
               titulo: 'Telas Removíveis',
               descricaoCurta: 'Fácil de remover e limpar',
               destaque: 'Prática',
-              imagem: '/images/telas_removiveis.webp',
+              imagem: '/images/mosquiteira_removivel.png',
               imagemEspecificacoes: '/images/telas_removiveis_especificacoes.jpg',
               keywords: ['tela removível', 'destacável']
             },
@@ -341,7 +341,7 @@ export const useServicos = () => {
               descricaoCurta: 'Específica para janelas basculantes',
               destaque: 'Sob medida',
               imagem: '/images/telas_para_basculante.jpg',
-              imagemEspecificacoes: '/images/telas_para_basculante_especificacoes.webp',
+              imagemEspecificacoes: '/images/telas_para_basculante.jpg',
               keywords: ['tela basculante', 'janela basculante']
             },
             aluminio: {
@@ -380,7 +380,7 @@ export const useServicos = () => {
               titulo: 'Telas Pet Screen',
               descricaoCurta: 'Resistente a arranhões de pets',
               destaque: 'Anti-arranhão',
-              imagem: '/images/telas_pet_screen.webp',
+              imagem: '/images/telas_pet_screen_especificacoes.jpg',
               imagemEspecificacoes: '/images/telas_pet_screen_especificacoes.jpg',
               keywords: ['tela pet', 'pet screen', 'gato', 'cachorro']
             },
@@ -390,7 +390,7 @@ export const useServicos = () => {
               descricaoCurta: 'Malha extra fina contra pernilongos',
               destaque: 'Malha micro',
               imagem: '/images/telas_anti-pernilongos.jpg',
-              imagemEspecificacoes: '/images/telas_anti-pernilongos_especificacoes.webp',
+              imagemEspecificacoes: '/images/telas_anti-pernilongos.jpg',
               keywords: ['pernilongo', 'mosquito', 'inseto']
             }
           }
@@ -410,7 +410,7 @@ export const useServicos = () => {
               titulo: 'Telas para Fachadas',
               descricaoCurta: 'Proteção para grandes fachadas',
               destaque: 'Grande porte',
-              imagem: '/images/telas_para_fachadas.webp',
+              imagem: '/images/telas_para_fachadas_especificacoes.png',
               imagemEspecificacoes: '/images/telas_para_fachadas_especificacoes.png',
               keywords: ['fachada', 'prédio', 'comercial']
             },
@@ -437,8 +437,8 @@ export const useServicos = () => {
               titulo: 'Telas para Indústrias',
               descricaoCurta: 'Proteção industrial',
               destaque: 'Alta resistência',
-              imagem: '/images/telas_para_industrias.webp',
-              imagemEspecificacoes: '/images/telas_para_industrias_especificacoes.webp',
+              imagem: '/images/telas_para_coberturas.jpg',
+              imagemEspecificacoes: '/images/telas_para_coberturas_especificacoes.jpg',
               keywords: ['indústria', 'fábrica', 'galpão']
             }
           }
