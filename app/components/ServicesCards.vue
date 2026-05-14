@@ -28,7 +28,7 @@ const servicosCards = [
     titulo: 'Telas Mosquiteiras',
     subtitulo: '18 serviços disponíveis',
     descricaoCurta: 'Proteção contra mosquitos transmissores de dengue, zika e chikungunya',
-    imagem: '/images/TELA_MOSQUITEIRA.png',
+    imagem: '/images/tela_mosquiteira.png',
     destaque: 'Anti-Dengue',
     beneficios: [
       { titulo: 'Visão 100% clara' },
