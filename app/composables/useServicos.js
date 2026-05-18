@@ -246,56 +246,56 @@ export const useServicos = () => {
           servicos: {
             janelas: {
               slug: 'janelas',
-              titulo: 'Telas para Janelas',
+              titulo: 'Telas Mosquiteiras para Janelas',
               descricaoCurta: 'Visão 100% clara, proteção total',
               destaque: '85% transparência',
               imagem: '/images/tela_mosquiteira.png',
-              keywords: ['tela janela', 'mosquiteira', 'dengue']
+              keywords: ['tela mosquiteira janela', 'mosquiteira', 'dengue']
             },
             portas: {
               slug: 'portas',
-              titulo: 'Telas para Portas',
+              titulo: 'Telas Mosquiteiras para Portas',
               descricaoCurta: 'Ventilação sem mosquitos',
               destaque: 'Fácil abertura',
               imagem: '/images/telas_para_portas.jpeg',
               imagemEspecificacoes: '/images/telas_para_portas_especificacoes.jpeg',
-              keywords: ['tela porta', 'mosquiteira porta']
+              keywords: ['tela mosquiteira porta', 'mosquiteira porta']
             },
             varandas: {
               slug: 'varandas',
-              titulo: 'Telas para Varandas',
+              titulo: 'Telas Mosquiteiras para Varandas',
               descricaoCurta: 'Aproveite a varanda sem insetos',
               destaque: 'Área completa',
               imagem: '/images/telas_para_varandas.jpg',
               imagemEspecificacoes: '/images/telas_para_varandas_especificacoes.jpg',
-              keywords: ['tela varanda', 'mosquiteira varanda']
+              keywords: ['tela mosquiteira varanda', 'mosquiteira varanda']
             },
             sacadas: {
               slug: 'sacadas',
-              titulo: 'Telas para Sacadas',
+              titulo: 'Telas Mosquiteiras para Sacadas',
               descricaoCurta: 'Proteção total contra mosquitos',
               destaque: 'Instalação rápida',
               imagem: '/images/telas_para_sacadas.jpg',
               imagemEspecificacoes: '/images/telas_para_sacadas_especificacoes.jpg',
-              keywords: ['tela sacada', 'mosquiteira sacada']
+              keywords: ['tela mosquiteira sacada', 'mosquiteira sacada']
             },
             apartamentos: {
               slug: 'apartamentos',
-              titulo: 'Telas para Apartamentos',
+              titulo: 'Telas Mosquiteiras para Apartamentos',
               descricaoCurta: 'Solução completa anti-mosquito',
               destaque: 'Pacote completo',
               imagem: '/images/telas_para_apartamento.jpg',
               imagemEspecificacoes: '/images/telas_para_apartamento_especificacoes.jpg',
-              keywords: ['tela apartamento', 'mosquiteira']
+              keywords: ['tela mosquiteira apartamento', 'mosquiteira']
             },
             banheiro: {
               slug: 'banheiro',
-              titulo: 'Telas para Banheiro',
+              titulo: 'Telas Mosquiteiras para Banheiro',
               descricaoCurta: 'Proteção em áreas úmidas',
               destaque: 'Anti-mofo',
               imagem: '/images/telas_para_banheiro.jpg',
               imagemEspecificacoes: '/images/telas_para_banheiro_especificacoes.jpg',
-              keywords: ['tela banheiro', 'mosquiteira banheiro']
+              keywords: ['tela mosquiteira banheiro', 'mosquiteira banheiro']
             }
           }
         },
@@ -311,56 +311,56 @@ export const useServicos = () => {
           servicos: {
             correr: {
               slug: 'correr',
-              titulo: 'Telas de Correr',
+              titulo: 'Telas Mosquiteiras de Correr',
               descricaoCurta: 'Sistema deslizante prático',
               destaque: 'Fácil uso',
               imagem: '/images/telas_de_correr.jpg',
               imagemEspecificacoes: '/images/telas_de_correr_especificacoes.jpg',
-              keywords: ['tela correr', 'deslizante']
+              keywords: ['tela mosquiteira correr', 'deslizante']
             },
             pivotante: {
               slug: 'pivotante',
-              titulo: 'Telas Pivotantes',
+              titulo: 'Telas Mosquiteiras Pivotantes',
               descricaoCurta: 'Abertura giratória',
               destaque: 'Moderna',
               imagem: '/images/telas_de_correr.jpg',
-              keywords: ['tela pivotante', 'giratória']
+              keywords: ['tela mosquiteira pivotante', 'giratória']
             },
             removivel: {
               slug: 'removivel',
-              titulo: 'Telas Removíveis',
+              titulo: 'Telas Mosquiteiras Removíveis',
               descricaoCurta: 'Fácil de remover e limpar',
               destaque: 'Prática',
               imagem: '/images/mosquiteira_removivel.png',
               imagemEspecificacoes: '/images/telas_removiveis_especificacoes.jpg',
-              keywords: ['tela removível', 'destacável']
+              keywords: ['tela mosquiteira removível', 'destacável']
             },
             basculante: {
               slug: 'basculante',
-              titulo: 'Telas para Basculantes',
+              titulo: 'Telas Mosquiteiras para Basculantes',
               descricaoCurta: 'Específica para janelas basculantes',
               destaque: 'Sob medida',
               imagem: '/images/telas_para_basculante.jpg',
               imagemEspecificacoes: '/images/telas_para_basculante.jpg',
-              keywords: ['tela basculante', 'janela basculante']
+              keywords: ['tela mosquiteira basculante', 'janela basculante']
             },
             aluminio: {
               slug: 'aluminio',
-              titulo: 'Telas com Alumínio',
+              titulo: 'Telas Mosquiteiras com Alumínio',
               descricaoCurta: 'Estrutura em alumínio reforçado',
               destaque: 'Durável',
               imagem: '/images/telas_com_aluminio.jpg',
               imagemEspecificacoes: '/images/telas_com_aluminio_especificacoes.jpg',
-              keywords: ['tela alumínio', 'estrutura alumínio']
+              keywords: ['tela mosquiteira alumínio', 'estrutura alumínio']
             },
             acoinox: {
               slug: 'acoinox',
-              titulo: 'Telas com Aço Inox',
+              titulo: 'Telas Mosquiteiras com Aço Inox',
               descricaoCurta: 'Máxima resistência e durabilidade',
               destaque: 'Premium',
               imagem: '/images/telas_com_aco_inox.jpg',
               imagemEspecificacoes: '/images/telas_com_aco_inox_especificacoes.png',
-              keywords: ['tela aço inox', 'inox']
+              keywords: ['tela mosquiteira aço inox', 'inox']
             }
           }
         },
@@ -377,16 +377,16 @@ export const useServicos = () => {
           servicos: {
             pets: {
               slug: 'pets',
-              titulo: 'Telas Pet Screen',
+              titulo: 'Telas Mosquiteiras Pet Screen',
               descricaoCurta: 'Resistente a arranhões de pets',
               destaque: 'Anti-arranhão',
               imagem: '/images/telas_pet_screen_especificacoes.jpg',
               imagemEspecificacoes: '/images/telas_pet_screen_especificacoes.jpg',
-              keywords: ['tela pet', 'pet screen', 'gato', 'cachorro']
+              keywords: ['tela mosquiteira pet', 'pet screen', 'gato', 'cachorro']
             },
             pernilongos: {
               slug: 'pernilongos',
-              titulo: 'Telas Anti-Pernilongos',
+              titulo: 'Telas Mosquiteiras Anti-Pernilongos',
               descricaoCurta: 'Malha extra fina contra pernilongos',
               destaque: 'Malha micro',
               imagem: '/images/telas_anti-pernilongos.jpg',
@@ -407,39 +407,39 @@ export const useServicos = () => {
           servicos: {
             fachadas: {
               slug: 'fachadas',
-              titulo: 'Telas para Fachadas',
+              titulo: 'Telas Mosquiteiras para Fachadas',
               descricaoCurta: 'Proteção para grandes fachadas',
               destaque: 'Grande porte',
               imagem: '/images/telas_para_fachadas_especificacoes.png',
               imagemEspecificacoes: '/images/telas_para_fachadas_especificacoes.png',
-              keywords: ['fachada', 'prédio', 'comercial']
+              keywords: ['tela mosquiteira fachada', 'prédio', 'comercial']
             },
             coberturas: {
               slug: 'coberturas',
-              titulo: 'Telas para Coberturas',
+              titulo: 'Telas Mosquiteiras para Coberturas',
               descricaoCurta: 'Proteção em áreas cobertas',
               destaque: 'Sob medida',
               imagem: '/images/telas_para_coberturas.jpg',
               imagemEspecificacoes: '/images/telas_para_coberturas_especificacoes.jpg',
-              keywords: ['cobertura', 'toldo', 'área coberta']
+              keywords: ['tela mosquiteira cobertura', 'toldo', 'área coberta']
             },
             restaurantes: {
               slug: 'restaurantes',
-              titulo: 'Telas para Restaurantes',
+              titulo: 'Telas Mosquiteiras para Restaurantes',
               descricaoCurta: 'Ambiente livre de insetos',
               destaque: 'Comercial',
               imagem: '/images/telas_para_restaurantes.jpg',
               imagemEspecificacoes: '/images/telas_para_restaurantes_especificacoes.jpeg',
-              keywords: ['restaurante', 'bar', 'comercial']
+              keywords: ['tela mosquiteira restaurante', 'bar', 'comercial']
             },
             industrias: {
               slug: 'industrias',
-              titulo: 'Telas para Indústrias',
+              titulo: 'Telas Mosquiteiras para Indústrias',
               descricaoCurta: 'Proteção industrial',
               destaque: 'Alta resistência',
               imagem: '/images/telas_para_coberturas.jpg',
               imagemEspecificacoes: '/images/telas_para_coberturas_especificacoes.jpg',
-              keywords: ['indústria', 'fábrica', 'galpão']
+              keywords: ['tela mosquiteira indústria', 'fábrica', 'galpão']
             }
           }
         }
