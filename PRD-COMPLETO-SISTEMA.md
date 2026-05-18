@@ -1,4 +1,4 @@
-# PRD - Product Requirements Document
+﻿# PRD - Product Requirements Document
 # AD Telas e Redes - Sistema Completo de Landing Page e Catálogo de Serviços
 
 **Versão:** 2.0  
@@ -907,7 +907,7 @@ Pode me ajudar?
 #### Mensagem do Formulário (Passo 1)
 ```
 Olá! Meu nome é [NOME], moro em [CIDADE].
-Gostaria de um orçamento para telas mosqueteiras.
+Gostaria de um orçamento para telas mosquiteiras.
 Pode me ajudar?
 ```
 

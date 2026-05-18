@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 // Cores da marca AD Telas Mosquiteiras:
 // Azul escuro: #22345F (texto do botão)
 // Azul médio: #1D7BA6 (fundo do card - início do gradiente)
@@ -39,7 +39,7 @@
             
             <!-- Botão: fundo branco, texto azul escuro, borda laranja -->
             <a
-              href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosqueteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
+              href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2.5 bg-white text-[#22345F] px-8 py-4 rounded-2xl font-bold text-base md:text-lg hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-2 border-[#F49A1A] w-full sm:w-auto justify-center min-h-[44px]"

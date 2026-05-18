@@ -15,7 +15,7 @@ const props = defineProps({
   },
   headline: {
     type: String,
-    default: 'Telas Mosqueteiras em São Paulo'
+    default: 'Telas mosquiteiras em São Paulo'
   },
   subheadline: {
     type: String,

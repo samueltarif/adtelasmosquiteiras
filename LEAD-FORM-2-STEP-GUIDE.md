@@ -1,4 +1,4 @@
-# Lead Form - 2-Step Funnel Guide
+﻿# Lead Form - 2-Step Funnel Guide
 
 ## Overview
 Optimized lead capture form with 2-step mini funnel designed for maximum mobile conversion.
@@ -35,7 +35,7 @@ Optimized lead capture form with 2-step mini funnel designed for maximum mobile 
 
 ### From Step 1 (minimal):
 ```
-Olá! Meu nome é [Nome], moro em [Cidade]. Gostaria de um orçamento para telas mosqueteiras.
+Olá! Meu nome é [Nome], moro em [Cidade]. Gostaria de um orçamento para telas mosquiteiras.
 ```
 
 ### From Step 2 (with details):
