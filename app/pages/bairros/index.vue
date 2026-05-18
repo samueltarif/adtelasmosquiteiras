@@ -1,14 +1,14 @@
-<script setup lang="ts">
+Ôªø<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useBairros } from '~/composables/useBairros'
 
 useHead({
-  title: 'Bairros Atendidos | AD Telas e Redes de ProteÁ„o SP',
+  title: 'Bairros Atendidos | AD Telas e Redes de Prote√ß√£o SP',
   meta: [
     {
       name: 'description',
       content:
-        'InstalaÁ„o de telas mosquiteiras e redes de proteÁ„o em 19 cidades: S„o Paulo, Guarulhos, Osasco, Sorocaba, Cotia, Barueri e mais. OrÁamento gr·tis e instalaÁ„o r·pida.',
+        'Instala√ß√£o de telas mosquiteiras e redes de prote√ß√£o em 19 cidades: S√£o Paulo, Guarulhos, Osasco, Sorocaba, Cotia, Barueri e mais. Or√ßamento gr√°tis e instala√ß√£o r√°pida.',
     },
   ],
 })
@@ -45,7 +45,7 @@ function collapseAll() {
 }
 
 const whatsappUrl = (bairro: string, cidade: string) => {
-  const msg = `Ol·! Gostaria de um orÁamento para ${bairro} - ${cidade}. Vim pelo site.`
+  const msg = `Ol√°! Gostaria de um or√ßamento para ${bairro} - ${cidade}. Vim pelo site.`
   return `https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`
 }
 
@@ -63,15 +63,15 @@ onMounted(() => {
       <div class="container mx-auto px-4 max-w-5xl text-center">
         <div class="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 text-sm mb-5">
           <Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" />
-          <span>Cobertura na Grande S„o Paulo</span>
+          <span>Cobertura na Grande S√£o Paulo</span>
         </div>
         <h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
           Bairros Atendidos
         </h1>
         <p class="text-lg md:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-          InstalaÁ„o profissional de telas e redes de proteÁ„o em
+          Instala√ß√£o profissional de telas e redes de prote√ß√£o em
           <span class="text-[#F49A1A] font-semibold">{{ CIDADES.length }} cidades</span>
-          da Grande S„o Paulo e regi„o.
+          da Grande S√£o Paulo e regi√£o.
         </p>
 
         <!-- Stats -->
@@ -87,7 +87,7 @@ onMounted(() => {
           </div>
           <div class="flex items-center gap-2">
             <Icon name="lucide:clock" class="w-5 h-5 text-[#25D366]" />
-            <span>InstalaÁ„o em 24h</span>
+            <span>Instala√ß√£o em 24h</span>
           </div>
           <div class="flex items-center gap-2">
             <Icon name="lucide:shield-check" class="w-5 h-5 text-[#25D366]" />
@@ -147,7 +147,7 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- Conte˙do principal -->
+    <!-- Conte√∫do principal -->
     <section class="py-10">
       <div class="container mx-auto px-4 max-w-5xl">
 
@@ -227,13 +227,13 @@ onMounted(() => {
               <!-- CTA por cidade -->
               <div class="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-3">
                 <a
-                  :href="`https://wa.me/5511983586611?text=${encodeURIComponent('Ol·! Gostaria de um orÁamento em ' + cidade.nome + '. Vim pelo site.')}`"
+                  :href="`https://wa.me/5511983586611?text=${encodeURIComponent('Ol√°! Gostaria de um or√ßamento em ' + cidade.nome + '. Vim pelo site.')}`"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl text-sm font-semibold transition-colors"
                 >
                   <Icon name="lucide:message-circle" class="w-4 h-4" />
-                  OrÁamento em {{ cidade.nome }}
+                  Or√ßamento em {{ cidade.nome }}
                 </a>
               </div>
             </div>
@@ -242,9 +242,9 @@ onMounted(() => {
 
         <!-- CTA final -->
         <div class="mt-12 bg-gradient-to-br from-[#22345F] to-[#1a2847] rounded-2xl p-8 text-center text-white">
-          <h2 class="text-2xl font-bold mb-3">N„o encontrou seu bairro?</h2>
+          <h2 class="text-2xl font-bold mb-3">N√£o encontrou seu bairro?</h2>
           <p class="text-white/80 mb-6 max-w-md mx-auto">
-            Atendemos toda a Grande S„o Paulo. Entre em contato e verificamos a disponibilidade para sua regi„o.
+            Atendemos toda a Grande S√£o Paulo. Entre em contato e verificamos a disponibilidade para sua regi√£o.
           </p>
           <div class="flex flex-wrap justify-center gap-4">
             <NuxtLink
@@ -252,10 +252,10 @@ onMounted(() => {
               class="px-7 py-3.5 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold transition-all shadow-lg flex items-center gap-2"
             >
               <Icon name="lucide:file-text" class="w-5 h-5" />
-              Solicitar OrÁamento
+              Solicitar Or√ßamento
             </NuxtLink>
             <a
-              href="https://wa.me/5511983586611?text=Ol·! Gostaria de saber se atendem meu bairro."
+              href="https://wa.me/5511983586611?text=Ol√°! Gostaria de saber se atendem meu bairro."
               target="_blank"
               rel="noopener noreferrer"
               class="px-7 py-3.5 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold transition-all shadow-lg flex items-center gap-2"

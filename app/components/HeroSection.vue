@@ -1,12 +1,12 @@
-<script setup>
+ï»¿<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const carouselImages = [
-  { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira área externa' },
+  { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira Ã¡rea externa' },
   { src: '/images/mosquiteira_janela.png', alt: 'Mosquiteira para janela' },
   { src: '/images/mosquiteira_para_porta.png', alt: 'Mosquiteira para porta' },
   { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
-  { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
+  { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removÃ­vel' },
   { src: '/images/tela_mosquiteira.png', alt: 'Tela mosquiteira' },
 ]
 
@@ -50,9 +50,9 @@ onUnmounted(() => { clearInterval(timer) })
         <!-- Headline sobre a imagem -->
         <div class="absolute bottom-0 left-0 right-0 px-5 pb-5">
           <h1 class="text-[28px] leading-[1.15] font-bold text-white tracking-tight drop-shadow">
-            Telas Mosquiteiras<br>em São Paulo
+            Telas Mosquiteiras<br>em SÃ£o Paulo
           </h1>
-          <p class="text-white/80 text-sm mt-1">Instalação profissional • Garantia 2 anos</p>
+          <p class="text-white/80 text-sm mt-1">InstalaÃ§Ã£o profissional â€¢ Garantia 2 anos</p>
         </div>
 
         <!-- Dots -->
@@ -67,14 +67,14 @@ onUnmounted(() => { clearInterval(timer) })
         </div>
       </div>
 
-      <!-- Conteúdo abaixo do carrossel -->
+      <!-- ConteÃºdo abaixo do carrossel -->
       <div class="px-5 pt-5 pb-10">
 
         <!-- Trust badges compactos -->
         <div class="flex items-center justify-around py-3 mb-5 bg-gray-50 rounded-2xl">
           <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#F49A1A] font-bold text-base">5.0 ?</span>
-            <span class="text-gray-500 text-[11px]">487 avaliações</span>
+            <span class="text-[#F49A1A] font-bold text-base">5.0 â˜…</span>
+            <span class="text-gray-500 text-[11px]">487 avaliaÃ§Ãµes</span>
           </div>
           <div class="w-px h-8 bg-gray-200"></div>
           <div class="flex flex-col items-center gap-0.5">
@@ -89,7 +89,7 @@ onUnmounted(() => { clearInterval(timer) })
           <div class="w-px h-8 bg-gray-200"></div>
           <div class="flex flex-col items-center gap-0.5">
             <span class="text-[#22345F] font-bold text-base">48h</span>
-            <span class="text-gray-500 text-[11px]">instalação</span>
+            <span class="text-gray-500 text-[11px]">instalaÃ§Ã£o</span>
           </div>
         </div>
 
@@ -107,11 +107,11 @@ onUnmounted(() => { clearInterval(timer) })
             class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
           >
             <Icon name="lucide:shield" class="w-5 h-5" />
-            <span>Redes de Proteção</span>
+            <span>Redes de ProteÃ§Ã£o</span>
           </NuxtLink>
         </div>
 
-        <!-- CTA Notícias -->
+        <!-- CTA NotÃ­cias -->
         <div class="flex justify-center">
           <NuxtLink
             to="/por-que-instalar-tela-mosquiteira"
@@ -130,25 +130,25 @@ onUnmounted(() => { clearInterval(timer) })
       <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
 
-          <!-- Coluna esquerda: conteúdo -->
+          <!-- Coluna esquerda: conteÃºdo -->
           <div>
             <!-- Badge -->
             <div class="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#22345F] rounded-full text-sm font-medium mb-6 border-2 border-[#22345F]/10 shadow-sm">
               <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
-              Instalação em 24h • Garantia 2 Anos
+              InstalaÃ§Ã£o em 24h â€¢ Garantia 2 Anos
             </div>
 
             <!-- Headline -->
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#22345F] mb-4 leading-tight tracking-tight">
               Telas Mosquiteiras<br>
-              <span class="text-[#F49A1A]">em São Paulo</span>
+              <span class="text-[#F49A1A]">em SÃ£o Paulo</span>
             </h1>
 
             <!-- Subheadline -->
             <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg">
-              Instalação profissional de telas e redes para janelas, sacadas e áreas externas. Orçamento grátis e sem compromisso.
+              InstalaÃ§Ã£o profissional de telas e redes para janelas, sacadas e Ã¡reas externas. OrÃ§amento grÃ¡tis e sem compromisso.
             </p>
 
             <!-- Trust badges desktop -->
@@ -160,12 +160,12 @@ onUnmounted(() => { clearInterval(timer) })
                   </svg>
                 </div>
                 <span class="text-sm font-semibold text-[#22345F]">5.0</span>
-                <span class="text-sm text-gray-500">(487 avaliações)</span>
+                <span class="text-sm text-gray-500">(487 avaliaÃ§Ãµes)</span>
               </div>
               <div class="w-px h-5 bg-gray-200"></div>
               <span class="text-sm text-gray-600 font-medium">+500 Clientes</span>
               <div class="w-px h-5 bg-gray-200"></div>
-              <span class="text-sm text-gray-600 font-medium">10+ Anos de experiência</span>
+              <span class="text-sm text-gray-600 font-medium">10+ Anos de experiÃªncia</span>
             </div>
 
             <!-- CTAs -->
@@ -184,10 +184,10 @@ onUnmounted(() => { clearInterval(timer) })
                   class="flex-1 inline-flex items-center justify-center gap-2.5 px-6 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#e08a10] transition-all"
                 >
                   <Icon name="lucide:shield" class="w-5 h-5" />
-                  Redes de Proteção
+                  Redes de ProteÃ§Ã£o
                 </NuxtLink>
               </div>
-              <!-- Notícias abaixo -->
+              <!-- NotÃ­cias abaixo -->
               <NuxtLink
                 to="/por-que-instalar-tela-mosquiteira"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#F49A1A]/20 hover:bg-[#e08a10] transition-all"

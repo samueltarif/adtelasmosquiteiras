@@ -1,10 +1,10 @@
-<script setup>
+Ôªø<script setup>
 import { ref, computed } from 'vue'
 
 // ============================================
-// CONFIGURA«’ES - Edite aqui conforme necess·rio
+// CONFIGURA√á√ïES - Edite aqui conforme necess√°rio
 // ============================================
-const WHATSAPP_NUMBER = '5511983586611' // N˙mero WhatsApp da empresa
+const WHATSAPP_NUMBER = '5511983586611' // N√∫mero WhatsApp da empresa
 const COMPANY_NAME = 'AD Telas Mosquiteiras'
 
 // Estados reativos
@@ -16,7 +16,7 @@ const selectedProperty = ref('')
 const userName = ref('')
 const userNeighborhood = ref('')
 
-// Controle de animaÁ„o de entrada
+// Controle de anima√ß√£o de entrada
 const showContent = ref(false)
 
 // Toast de sucesso
@@ -37,9 +37,9 @@ const canProceedStep4 = computed(() => {
   return userName.value.trim().length > 0 && userNeighborhood.value.trim().length > 0
 })
 
-// Mensagem WhatsApp prÈ-formatada
+// Mensagem WhatsApp pr√©-formatada
 const whatsappMessage = computed(() => {
-  let message = `Ol·! Vim pelo chat r·pido do site.\n\n`
+  let message = `Ol√°! Vim pelo chat r√°pido do site.\n\n`
   message += `Nome: ${userName.value}\n`
   
   if (userNeighborhood.value) {
@@ -51,20 +51,20 @@ const whatsappMessage = computed(() => {
   }
   
   if (selectedService.value) {
-    message += `ServiÁo: ${selectedService.value}\n`
+    message += `Servi√ßo: ${selectedService.value}\n`
   }
   
   if (selectedProperty.value) {
-    message += `Tipo de imÛvel: ${selectedProperty.value}\n`
+    message += `Tipo de im√≥vel: ${selectedProperty.value}\n`
   }
   
-  message += `\nGostaria de receber um orÁamento!`
+  message += `\nGostaria de receber um or√ßamento!`
   
   return encodeURIComponent(message)
 })
 
 // ============================================
-// M…TODOS
+// M√âTODOS
 // ============================================
 const openChat = () => {
   isOpen.value = true
@@ -98,19 +98,19 @@ const resetChat = () => {
 const selectNeed = (need) => {
   selectedNeed.value = need
   
-  // Determinar serviÁo baseado na necessidade
-  if (need === 'CrianÁas' || need === 'Pets') {
-    selectedService.value = 'Rede de ProteÁ„o para janelas/varanda'
+  // Determinar servi√ßo baseado na necessidade
+  if (need === 'Crian√ßas' || need === 'Pets') {
+    selectedService.value = 'Rede de Prote√ß√£o para janelas/varanda'
   } else if (need === 'Contra mosquitos') {
-    selectedService.value = 'Tela Mosquiteira invisÌvel'
+    selectedService.value = 'Tela Mosquiteira invis√≠vel'
   } else if (need === 'Todos os 3') {
-    selectedService.value = 'Pacote completo proteÁ„o familiar'
+    selectedService.value = 'Pacote completo prote√ß√£o familiar'
   }
   
   // GA4 Event
   trackEvent('chat_step1_selected', { need })
   
-  // AvanÁar para prÛxima etapa
+  // Avan√ßar para pr√≥xima etapa
   setTimeout(() => {
     currentStep.value = 2
   }, 300)
@@ -129,7 +129,7 @@ const selectProperty = (property) => {
   // GA4 Event
   trackEvent('chat_step3_selected', { property })
   
-  // AvanÁar para prÛxima etapa
+  // Avan√ßar para pr√≥xima etapa
   setTimeout(() => {
     currentStep.value = 4
   }, 300)
@@ -154,19 +154,19 @@ const openWhatsApp = () => {
     property: selectedProperty.value
   })
   
-  // Abrir WhatsApp apÛs pequeno delay
+  // Abrir WhatsApp ap√≥s pequeno delay
   setTimeout(() => {
     window.open(url, '_blank')
   }, 500)
   
-  // Fechar modal e esconder toast apÛs 2s
+  // Fechar modal e esconder toast ap√≥s 2s
   setTimeout(() => {
     showSuccessToast.value = false
     closeChat()
   }, 2000)
 }
 
-// FunÁ„o para tracking de eventos (integraÁ„o com GA4/GTM)
+// Fun√ß√£o para tracking de eventos (integra√ß√£o com GA4/GTM)
 const trackEvent = (eventName, params = {}) => {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
@@ -204,7 +204,7 @@ const handleBackdropClick = (e) => {
   }
 }
 
-// Sem m·scara necess·ria para bairro
+// Sem m√°scara necess√°ria para bairro
 </script>
 
 <template>
@@ -213,17 +213,17 @@ const handleBackdropClick = (e) => {
     <button
       @click="openChat"
       class="flex items-center gap-2 bg-[#FFF7ED] hover:bg-[#F49A1A] text-[#22345F] hover:text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-[#F49A1A] group"
-      aria-label="Abrir ajuda r·pida"
+      aria-label="Abrir ajuda r√°pida"
       data-gtm="quick_help_bubble_clicked"
     >
-      <!-- Õcone Chat -->
+      <!-- √çcone Chat -->
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
       </svg>
       
       <!-- Texto -->
       <span class="font-semibold text-sm whitespace-nowrap">
-        Ajuda r·pida?
+        Ajuda r√°pida?
       </span>
       
       <!-- Indicador de pulso -->
@@ -276,7 +276,7 @@ const handleBackdropClick = (e) => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                   </svg>
                   <div>
-                    <h3 class="font-bold text-lg">Ajuda R·pida</h3>
+                    <h3 class="font-bold text-lg">Ajuda R√°pida</h3>
                     <p class="text-xs text-white/80">{{ COMPANY_NAME }}</p>
                   </div>
                 </div>
@@ -310,7 +310,7 @@ const handleBackdropClick = (e) => {
             <!-- Content Area -->
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               
-              <!-- ETAPA 1: O que vocÍ precisa proteger? -->
+              <!-- ETAPA 1: O que voc√™ precisa proteger? -->
               <div v-if="currentStep === 1" class="space-y-4 animate-fade-in">
                 <div class="text-center mb-6">
                   <div class="w-16 h-16 bg-[#F49A1A]/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -319,21 +319,21 @@ const handleBackdropClick = (e) => {
                     </svg>
                   </div>
                   <h4 class="text-xl font-bold text-[#22345F] mb-2">
-                    O que vocÍ precisa proteger?
+                    O que voc√™ precisa proteger?
                   </h4>
                   <p class="text-sm text-[#4B5563]">
-                    Escolha a opÁ„o que melhor descreve sua necessidade
+                    Escolha a op√ß√£o que melhor descreve sua necessidade
                   </p>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
                   <button
-                    @click="selectNeed('CrianÁas')"
+                    @click="selectNeed('Crian√ßas')"
                     class="flex flex-col items-center gap-2 p-4 bg-white border-2 border-[#E5EDF8] rounded-2xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step1_criancas"
                   >
-                    <span class="text-3xl">??</span>
-                    <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">CrianÁas</span>
+                    <span class="text-3xl">üë∂</span>
+                    <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Crian√ßas</span>
                   </button>
                   
                   <button
@@ -359,13 +359,13 @@ const handleBackdropClick = (e) => {
                     class="flex flex-col items-center gap-2 p-4 bg-white border-2 border-[#E5EDF8] rounded-2xl hover:border-[#F49A1A] hover:bg-[#FFF7ED] transition-all duration-200 group"
                     data-gtm="chat_step1_todos"
                   >
-                    <span class="text-3xl">?</span>
+                    <span class="text-3xl">‚ú®</span>
                     <span class="text-sm font-semibold text-[#22345F] group-hover:text-[#F49A1A]">Todos os 3</span>
                   </button>
                 </div>
               </div>
 
-              <!-- ETAPA 2: ConfirmaÁ„o do ServiÁo -->
+              <!-- ETAPA 2: Confirma√ß√£o do Servi√ßo -->
               <div v-if="currentStep === 2" class="space-y-4 animate-fade-in">
                 <div class="text-center mb-6">
                   <div class="w-16 h-16 bg-[#25D366]/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -388,14 +388,14 @@ const handleBackdropClick = (e) => {
                     <div>
                       <h5 class="font-bold text-[#22345F] mb-1">{{ selectedService }}</h5>
                       <p class="text-sm text-[#4B5563]">
-                        <span v-if="selectedNeed === 'CrianÁas' || selectedNeed === 'Pets'">
-                          ProteÁ„o certificada com garantia de 2 anos. Suporta atÈ 500kg.
+                        <span v-if="selectedNeed === 'Crian√ßas' || selectedNeed === 'Pets'">
+                          Prote√ß√£o certificada com garantia de 2 anos. Suporta at√© 500kg.
                         </span>
                         <span v-else-if="selectedNeed === 'Contra mosquitos'">
-                          TransparÍncia 85%, eficaz contra dengue e aedes. InstalaÁ„o em 24h.
+                          Transpar√™ncia 85%, eficaz contra dengue e aedes. Instala√ß√£o em 24h.
                         </span>
                         <span v-else>
-                          SoluÁ„o completa: rede de proteÁ„o + tela mosquiteira. M·xima seguranÁa.
+                          Solu√ß√£o completa: rede de prote√ß√£o + tela mosquiteira. M√°xima seguran√ßa.
                         </span>
                       </p>
                     </div>
@@ -407,7 +407,7 @@ const handleBackdropClick = (e) => {
                       <svg class="w-3 h-3 text-[#25D366]" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                       </svg>
-                      500+ instalaÁıes
+                      500+ instala√ß√µes
                     </span>
                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-white rounded-full text-xs font-semibold text-[#22345F] border border-[#E5EDF8]">
                       <svg class="w-3 h-3 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
@@ -421,12 +421,12 @@ const handleBackdropClick = (e) => {
                     <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span>InstalaÁ„o em 24h</span>
-                    <span class="text-gray-300">ï</span>
+                    <span>Instala√ß√£o em 24h</span>
+                    <span class="text-gray-300">‚Ä¢</span>
                     <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span>S„o Paulo</span>
+                    <span>S√£o Paulo</span>
                   </div>
                 </div>
                 
@@ -435,7 +435,7 @@ const handleBackdropClick = (e) => {
                     @click="goBack"
                     class="px-4 py-3 text-[#4B5563] text-sm font-medium hover:text-[#22345F] transition-colors"
                   >
-                    ? Voltar
+                    ‚Üê Voltar
                   </button>
                   <button
                     @click="confirmService"
@@ -447,7 +447,7 @@ const handleBackdropClick = (e) => {
                 </div>
               </div>
 
-              <!-- ETAPA 3: Tipo de ImÛvel -->
+              <!-- ETAPA 3: Tipo de Im√≥vel -->
               <div v-if="currentStep === 3" class="space-y-4 animate-fade-in">
                 <div class="text-center mb-6">
                   <div class="w-16 h-16 bg-[#F49A1A]/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -456,10 +456,10 @@ const handleBackdropClick = (e) => {
                     </svg>
                   </div>
                   <h4 class="text-xl font-bold text-[#22345F] mb-2">
-                    Tipo de imÛvel?
+                    Tipo de im√≥vel?
                   </h4>
                   <p class="text-sm text-[#4B5563]">
-                    Isso nos ajuda a preparar o orÁamento ideal
+                    Isso nos ajuda a preparar o or√ßamento ideal
                   </p>
                 </div>
                 
@@ -496,11 +496,11 @@ const handleBackdropClick = (e) => {
                   @click="goBack"
                   class="w-full px-4 py-3 text-[#4B5563] text-sm font-medium hover:text-[#22345F] transition-colors text-center"
                 >
-                  ? Voltar
+                  ‚Üê Voltar
                 </button>
               </div>
 
-              <!-- ETAPA 4: Dados para OrÁamento -->
+              <!-- ETAPA 4: Dados para Or√ßamento -->
               <div v-if="currentStep === 4" class="space-y-4 animate-fade-in">
                 <div class="text-center mb-6">
                   <div class="w-16 h-16 bg-[#25D366]/10 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -509,10 +509,10 @@ const handleBackdropClick = (e) => {
                     </svg>
                   </div>
                   <h4 class="text-xl font-bold text-[#22345F] mb-2">
-                    Quase l·! ??
+                    Quase l√°! üéâ
                   </h4>
                   <p class="text-sm text-[#4B5563]">
-                    Preencha seus dados para receber o orÁamento
+                    Preencha seus dados para receber o or√ßamento
                   </p>
                 </div>
                 
@@ -564,12 +564,12 @@ const handleBackdropClick = (e) => {
                     @click="goBack"
                     class="w-full px-4 py-2 text-[#4B5563] text-sm font-medium hover:text-[#22345F] transition-colors"
                   >
-                    ? Voltar
+                    ‚Üê Voltar
                   </button>
                 </div>
                 
                 <p class="text-xs text-center text-[#4B5563]">
-                  Ao continuar, vocÍ ser· redirecionado para o WhatsApp
+                  Ao continuar, voc√™ ser√° redirecionado para o WhatsApp
                 </p>
               </div>
               
@@ -609,7 +609,7 @@ const handleBackdropClick = (e) => {
 </template>
 
 <style scoped>
-/* AnimaÁ„o fade-in */
+/* Anima√ß√£o fade-in */
 @keyframes fade-in {
   from {
     opacity: 0;

@@ -1,5 +1,5 @@
-<script setup>
-// Props para customização
+ï»¿<script setup>
+// Props para customizaÃ§Ã£o
 const props = defineProps({
   logoSrc: {
     type: String,
@@ -11,15 +11,15 @@ const props = defineProps({
   },
   whatsappMessage: {
     type: String,
-    default: 'Olá! Gostaria de solicitar um orçamento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home'
+    default: 'OlÃ¡! Gostaria de solicitar um orÃ§amento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home'
   },
   headline: {
     type: String,
-    default: 'Telas mosquiteiras em São Paulo'
+    default: 'Telas Mosqueteiras em SÃ£o Paulo'
   },
   subheadline: {
     type: String,
-    default: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes Satisfeitos'
+    default: 'InstalaÃ§Ã£o em 24h â€¢ Garantia 2 Anos â€¢ +500 Clientes Satisfeitos'
   },
   rating: {
     type: Number,
@@ -31,7 +31,7 @@ const props = defineProps({
   },
   primaryCtaText: {
     type: String,
-    default: 'Orçamento Grátis no WhatsApp'
+    default: 'OrÃ§amento GrÃ¡tis no WhatsApp'
   },
   secondaryCtaText: {
     type: String,
@@ -86,7 +86,7 @@ const whatsappLink = computed(() =>
         {{ headline }}
       </h1>
       
-      <!-- 2. SUBHEADLINE COM BENEFÍCIOS -->
+      <!-- 2. SUBHEADLINE COM BENEFÃCIOS -->
       <p class="text-base font-medium mb-5 text-center text-white/95 leading-relaxed">
         {{ subheadline }}
       </p>
@@ -109,13 +109,13 @@ const whatsappLink = computed(() =>
         <!-- Rating e Reviews -->
         <div class="flex items-center gap-2">
           <span class="text-lg font-bold">{{ rating }}</span>
-          <span class="text-sm text-white/80">({{ reviewCount }} avaliações)</span>
+          <span class="text-sm text-white/80">({{ reviewCount }} avaliaÃ§Ãµes)</span>
         </div>
       </div>
 
       <!-- 4. CTAs VERTICAIS -->
       <div class="space-y-3 mb-6">
-        <!-- CTA Primário - WhatsApp -->
+        <!-- CTA PrimÃ¡rio - WhatsApp -->
         <a 
           :href="whatsappLink"
           target="_blank"
@@ -128,7 +128,7 @@ const whatsappLink = computed(() =>
           <span>{{ primaryCtaText }}</span>
         </a>
 
-        <!-- CTA Secundário - Ligar -->
+        <!-- CTA SecundÃ¡rio - Ligar -->
         <a 
           :href="`tel:${phoneNumber}`"
           class="flex items-center justify-center gap-3 w-full h-12 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-sm border-2 border-white/30 active:scale-[0.98] transition-all"

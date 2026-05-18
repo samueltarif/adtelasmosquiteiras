@@ -173,7 +173,7 @@ onUnmounted(() => {
 
       <!-- Telefone WhatsApp Compacto com Animação -->
       <a 
-        href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
+        href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosqueteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
         target="_blank"
         rel="noopener noreferrer"
         class="relative flex items-center justify-center w-10 h-8 bg-[#25D366] hover:bg-[#20B858] text-white rounded-full transition-all duration-300 active:scale-95 animate-pulse-slow"
