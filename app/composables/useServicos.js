@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // COMPOSABLE: useServicos
 // Sistema completo: 35+ serviços (17 Redes + 18 Telas)
 // Estrutura: 2 Famílias → 4 Categorias cada → Serviços específicos
@@ -40,7 +40,7 @@ export const useServicos = () => {
           servicos: {
             janelas: {
               slug: 'janelas',
-              titulo: 'Redes para Janelas',
+              titulo: 'Redes de Proteção para Janelas',
               descricaoCurta: 'Proteção invisível para todas as janelas',
               destaque: 'Mais vendido',
               imagem: '/images/redes_para_janelas.png',
@@ -49,7 +49,7 @@ export const useServicos = () => {
             },
             portas: {
               slug: 'portas',
-              titulo: 'Redes para Portas',
+              titulo: 'Redes de Proteção para Portas',
               descricaoCurta: 'Segurança sem bloquear a ventilação',
               destaque: 'Ventilação total',
               imagem: '/images/redes_para_portas.png',
@@ -58,7 +58,7 @@ export const useServicos = () => {
             },
             sacadas: {
               slug: 'sacadas',
-              titulo: 'Redes para Sacadas',
+              titulo: 'Redes de Proteção para Sacadas',
               descricaoCurta: 'Aproveite sua sacada com segurança',
               destaque: 'Resiste 500kg',
               imagem: '/images/redes_para_sacadas.jpg',
@@ -67,7 +67,7 @@ export const useServicos = () => {
             },
             varandas: {
               slug: 'varandas',
-              titulo: 'Redes para Varandas',
+              titulo: 'Redes de Proteção para Varandas',
               descricaoCurta: 'Proteção total para varandas',
               destaque: 'Instalação 24h',
               imagem: '/images/bebe.png',
@@ -76,7 +76,7 @@ export const useServicos = () => {
             },
             apartamentos: {
               slug: 'apartamentos',
-              titulo: 'Redes para Apartamentos',
+              titulo: 'Redes de Proteção para Apartamentos',
               descricaoCurta: 'Solução completa para seu apartamento',
               destaque: 'Pacote completo',
               imagem: '/images/redes_para_apartamentos.png',
@@ -85,7 +85,7 @@ export const useServicos = () => {
             },
             escadas: {
               slug: 'escadas',
-              titulo: 'Redes para Escadas',
+              titulo: 'Redes de Proteção para Escadas',
               descricaoCurta: 'Segurança em escadas e mezaninos',
               destaque: 'Sob medida',
               imagem: '/images/redes_para_escadas.jpg',
@@ -94,7 +94,7 @@ export const useServicos = () => {
             },
             basculantes: {
               slug: 'basculantes',
-              titulo: 'Redes para Basculantes',
+              titulo: 'Redes de Proteção para Basculantes',
               descricaoCurta: 'Proteção para janelas basculantes',
               destaque: 'Fácil abertura',
               imagem: '/images/redes_para_basculantes.png',
@@ -115,7 +115,7 @@ export const useServicos = () => {
           servicos: {
             criancas: {
               slug: 'criancas',
-              titulo: 'Redes para Crianças',
+              titulo: 'Redes de Proteção para Crianças',
               descricaoCurta: 'Máxima segurança para os pequenos',
               destaque: 'Certificado INMETRO',
               imagem: '/images/redes_para_criancas.png',
@@ -124,7 +124,7 @@ export const useServicos = () => {
             },
             gatos: {
               slug: 'gatos',
-              titulo: 'Redes para Gatos',
+              titulo: 'Redes de Proteção para Gatos',
               descricaoCurta: 'Impeça fugas e quedas de gatos',
               destaque: 'Malha reforçada',
               imagem: '/images/gato.png',
@@ -133,7 +133,7 @@ export const useServicos = () => {
             },
             cachorros: {
               slug: 'cachorros',
-              titulo: 'Redes para Cachorros',
+              titulo: 'Redes de Proteção para Cachorros',
               descricaoCurta: 'Proteção para cães de todos os portes',
               destaque: 'Extra resistente',
               imagem: '/images/redes_para_cachorros.png',
@@ -142,7 +142,7 @@ export const useServicos = () => {
             },
             animais: {
               slug: 'animais',
-              titulo: 'Redes para Animais',
+              titulo: 'Redes de Proteção para Animais',
               descricaoCurta: 'Proteção para todos os tipos de pets',
               destaque: 'Versátil',
               imagem: '/images/redes_para_animais.png',
@@ -151,7 +151,7 @@ export const useServicos = () => {
             },
             idosos: {
               slug: 'idosos',
-              titulo: 'Redes para Idosos',
+              titulo: 'Redes de Proteção para Idosos',
               descricaoCurta: 'Segurança para a terceira idade',
               destaque: 'Cuidado especial',
               imagem: '/images/redes_para_idosos.png',
@@ -173,7 +173,7 @@ export const useServicos = () => {
           servicos: {
             portoes: {
               slug: 'portoes',
-              titulo: 'Redes para Portões',
+              titulo: 'Redes de Proteção para Portões',
               descricaoCurta: 'Proteção para portões e entradas',
               destaque: 'Alta durabilidade',
               imagem: '/images/redes_para_portoes.jpg',
@@ -182,7 +182,7 @@ export const useServicos = () => {
             },
             muros: {
               slug: 'muros',
-              titulo: 'Redes para Muros',
+              titulo: 'Redes de Proteção para Muros',
               descricaoCurta: 'Segurança adicional em muros',
               destaque: 'Anti-invasão',
               imagem: '/images/redes_para_muros.jpg',
@@ -191,7 +191,7 @@ export const useServicos = () => {
             },
             telhados: {
               slug: 'telhados',
-              titulo: 'Redes para Telhados',
+              titulo: 'Redes de Proteção para Telhados',
               descricaoCurta: 'Proteção contra pombos e pássaros',
               destaque: 'Anti-pombos',
               imagem: '/images/redes_para_telhados.jpg',
@@ -200,7 +200,7 @@ export const useServicos = () => {
             },
             piscinas: {
               slug: 'piscinas',
-              titulo: 'Redes para Piscinas',
+              titulo: 'Redes de Proteção para Piscinas',
               descricaoCurta: 'Segurança em áreas de piscina',
               destaque: 'Resistente à água',
               imagem: '/images/redes_para_piscinas.jpg',
@@ -209,7 +209,7 @@ export const useServicos = () => {
             },
             coberturas: {
               slug: 'coberturas',
-              titulo: 'Redes para Coberturas',
+              titulo: 'Redes de Proteção para Coberturas',
               descricaoCurta: 'Proteção para áreas cobertas',
               destaque: 'Sob medida',
               imagem: '/images/redes_para_coberturas.jpg',
