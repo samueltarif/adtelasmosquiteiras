@@ -6,13 +6,10 @@ useHead({
   ]
 })
 
-// Fire conversion on page load — catches direct landings and GTM triggers
+// Fire conversion on page load — gtag sempre disponível via plugin GTM
 onMounted(() => {
-  if (window.gtag) {
-    window.gtag('event', 'conversion', { 'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C' })
-    window.gtag('event', 'generate_lead', { event_category: 'lead', event_label: 'obrigado_page' })
-  }
-  window.dataLayer = window.dataLayer || []
+  window.gtag('event', 'conversion', { 'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C' })
+  window.gtag('event', 'generate_lead', { event_category: 'lead', event_label: 'obrigado_page' })
   window.dataLayer.push({ event: 'form_submission', event_category: 'lead', event_label: 'obrigado_page' })
 })
 </script>
@@ -48,7 +45,7 @@ onMounted(() => {
           
           <!-- WhatsApp -->
           <a
-            href="https://wa.me/5511983586611?text=Olá!%20Acabei%20de%20enviar%20meu%20orçamento%20pelo%20site%20https://www.adtelasmosquiteiras.com.br/home%20e%20gostaria%20de%20confirmar."
+            href="https://wa.me/5511983586611?text=Olá!%20Acabei%20de%20enviar%20meu%20orçamento%20pelo%20site%20https://www.adtelasmosquiteiras.com.br/%20e%20gostaria%20de%20confirmar."
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#25D366] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#1fb854] transition-all"
@@ -59,7 +56,7 @@ onMounted(() => {
 
           <!-- Voltar ao site -->
           <NuxtLink
-            to="/home"
+            to="/"
             class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-white text-[#22345F] rounded-2xl font-medium text-base border-2 border-[#22345F]/20 hover:bg-gray-50 transition-all"
           >
             <Icon name="lucide:home" class="w-5 h-5" />

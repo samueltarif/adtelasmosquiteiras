@@ -31,7 +31,6 @@ export default defineNuxtConfig({
   // Security Headers
   nitro: {
     routeRules: {
-      '/': { redirect: '/home' },
       // Redirects das URLs antigas /bairros/[slug] → /[slug]
       '/bairros/itaim-bibi': { redirect: '/tela-mosquiteira-em/itaim-bibi' },
       '/bairros/pinheiros': { redirect: '/tela-mosquiteira-em/pinheiros' },
