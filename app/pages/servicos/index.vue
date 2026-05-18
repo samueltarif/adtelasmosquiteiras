@@ -1,4 +1,4 @@
-ï»¿<script setup>
+<script setup>
 import { useServicos } from '~/composables/useServicos'
 
 const { getTotalServicos } = useServicos()
@@ -6,12 +6,12 @@ const totalServicos = getTotalServicos()
 
 // SEO
 useHead({
-  title: 'Nossos ServiÃ§os | Redes de ProteÃ§Ã£o e Telas Mosquiteiras | AD Telas',
+  title: 'Nossos Serviços | Redes de Proteção e Telas Mosquiteiras | AD Telas',
   meta: [
-    { name: 'description', content: `${totalServicos} serviÃ§os de redes de proteÃ§Ã£o e telas mosquiteiras em SÃ£o Paulo. InstalaÃ§Ã£o em 24h. Garantia 2 anos. OrÃ§amento grÃ¡tis!` },
-    { name: 'keywords', content: 'redes de proteÃ§Ã£o, telas mosquiteiras, janelas, sacadas, pets, crianÃ§as, sÃ£o paulo' },
-    { property: 'og:title', content: 'Nossos ServiÃ§os | AD Telas e Redes' },
-    { property: 'og:description', content: `${totalServicos} serviÃ§os disponÃ­veis. ProteÃ§Ã£o para sua famÃ­lia e seu lar.` }
+    { name: 'description', content: `${totalServicos} serviços de redes de proteção e telas mosquiteiras em São Paulo. Instalação em 24h. Garantia 2 anos. Orçamento grátis!` },
+    { name: 'keywords', content: 'redes de proteção, telas mosquiteiras, janelas, sacadas, pets, crianças, são paulo' },
+    { property: 'og:title', content: 'Nossos Serviços | AD Telas e Redes' },
+    { property: 'og:description', content: `${totalServicos} serviços disponíveis. Proteção para sua família e seu lar.` }
   ]
 })
 
@@ -20,7 +20,7 @@ onMounted(() => {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: 'page_view_servicos',
-      page_title: 'ServiÃ§os Principal'
+      page_title: 'Serviços Principal'
     })
   }
 })
@@ -32,8 +32,8 @@ onMounted(() => {
     <!-- Breadcrumb -->
     <BreadcrumbServico
       :items="[
-        { label: 'InÃ­cio', to: '/' },
-        { label: 'ServiÃ§os' }
+        { label: 'Início', to: '/' },
+        { label: 'Serviços' }
       ]"
     />
     
@@ -44,13 +44,13 @@ onMounted(() => {
     <section class="py-12 bg-white border-t border-[#E5EDF8]">
       <div class="container mx-auto px-4 md:px-6 max-w-4xl text-center">
         <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-4">
-          NÃ£o sabe qual serviÃ§o escolher?
+          Não sabe qual serviço escolher?
         </h2>
         <p class="text-base text-[#4B5563] mb-6">
-          Fale com nossos especialistas e receba uma recomendaÃ§Ã£o personalizada
+          Fale com nossos especialistas e receba uma recomendação personalizada
         </p>
         <a
-          href="https://wa.me/5511983586611?text=OlÃ¡!%20Preciso%20de%20ajuda%20para%20escolher%20o%20serviÃ§o%20ideal.%20Vim%20pelo%20site%3A%20https://www.adtelasmosquiteiras.com.br/home"
+          href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20para%20escolher%20o%20serviço%20ideal.%20Vim%20pelo%20site%3A%20https://www.adtelasmosquiteiras.com.br/home"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"

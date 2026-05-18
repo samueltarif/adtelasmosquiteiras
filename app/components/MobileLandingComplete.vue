@@ -1,35 +1,35 @@
-ï»¿<script setup>
+<script setup>
 /**
  * ============================================
- * MOBILE LANDING PAGE - ALTA CONVERSÃƒO
+ * MOBILE LANDING PAGE - ALTA CONVERSÃO
  * ============================================
  * Componente otimizado para Google Ads Mobile
- * Foco: WhatsApp, LigaÃ§Ã£o e FormulÃ¡rio
+ * Foco: WhatsApp, Ligação e Formulário
  * Framework: Nuxt 4 + Vue 3 + Tailwind CSS
  */
 
-// ========== CONFIGURAÃ‡Ã•ES - ALTERE AQUI ==========
+// ========== CONFIGURAÇÕES - ALTERE AQUI ==========
 const config = {
   // WhatsApp
-  whatsappNumber: '5511983586611', // âš ï¸ ALTERAR: NÃºmero sem + e sem espaÃ§os
-  whatsappMessage: 'OlÃ¡! Vi seu anÃºncio e gostaria de um orÃ§amento para telas mosqueteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home',
+  whatsappNumber: '5511983586611', // ?? ALTERAR: Número sem + e sem espaços
+  whatsappMessage: 'Olá! Vi seu anúncio e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home',
   
   // Telefone
-  phoneNumber: '+5511983586611', // âš ï¸ ALTERAR: NÃºmero com + para tel:
-  phoneDisplay: '(11) 98358-6611', // âš ï¸ ALTERAR: Formato de exibiÃ§Ã£o
+  phoneNumber: '+5511983586611', // ?? ALTERAR: Número com + para tel:
+  phoneDisplay: '(11) 98358-6611', // ?? ALTERAR: Formato de exibição
   
   // Textos
-  logo: '/images/logo ad.png', // âš ï¸ ALTERAR: Caminho da logo
-  headline: 'Telas Mosqueteiras em SÃ£o Paulo', // âš ï¸ ALTERAR: TÃ­tulo principal
-  subheadline: 'InstalaÃ§Ã£o em 24h â€¢ Garantia 2 Anos â€¢ +500 Clientes', // âš ï¸ ALTERAR: SubtÃ­tulo
+  logo: '/images/logo ad.png', // ?? ALTERAR: Caminho da logo
+  headline: 'Telas mosquiteiras em São Paulo', // ?? ALTERAR: Título principal
+  subheadline: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes', // ?? ALTERAR: Subtítulo
   
   // Prova Social
-  rating: 5.0, // âš ï¸ ALTERAR: Nota de avaliaÃ§Ã£o
-  reviewCount: 487, // âš ï¸ ALTERAR: NÃºmero de avaliaÃ§Ãµes
-  googleReviewUrl: 'https://www.google.com/search?q=AD+TELAS+MOSQUITEIRAS', // âš ï¸ ALTERAR: Link das avaliaÃ§Ãµes
+  rating: 5.0, // ?? ALTERAR: Nota de avaliação
+  reviewCount: 487, // ?? ALTERAR: Número de avaliações
+  googleReviewUrl: 'https://www.google.com/search?q=AD+TELAS+MOSQUITEIRAS', // ?? ALTERAR: Link das avaliações
   
   // CTAs
-  primaryCtaText: 'OrÃ§amento GrÃ¡tis no WhatsApp',
+  primaryCtaText: 'Orçamento Grátis no WhatsApp',
   secondaryCtaText: 'Ligar Agora',
   
   // Analytics - IDs para tracking
@@ -58,7 +58,7 @@ const formData = ref({
 
 // ========== METHODS ==========
 const handleFormSubmit = () => {
-  // âš ï¸ IMPLEMENTAR: LÃ³gica de envio do formulÃ¡rio
+  // ?? IMPLEMENTAR: Lógica de envio do formulário
   console.log('Form submitted:', formData.value)
   
   // Exemplo: Enviar para API
@@ -72,7 +72,7 @@ const handleFormSubmit = () => {
 }
 
 const trackEvent = (eventName) => {
-  // âš ï¸ IMPLEMENTAR: Tracking GA4/GTM
+  // ?? IMPLEMENTAR: Tracking GA4/GTM
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: eventName,
@@ -158,7 +158,7 @@ const trackEvent = (eventName) => {
         </div>
         
         <p class="text-white/95 text-sm text-center italic">
-          "InstalaÃ§Ã£o perfeita, super pontuais"
+          "Instalação perfeita, super pontuais"
         </p>
       </a>
 
@@ -174,7 +174,7 @@ const trackEvent = (eventName) => {
 
       <!-- 4. CTAs PRINCIPAIS -->
       <div class="space-y-3 mb-6">
-        <!-- CTA PrimÃ¡rio - WhatsApp -->
+        <!-- CTA Primário - WhatsApp -->
         <a 
           :href="whatsappLink"
           target="_blank"
@@ -189,7 +189,7 @@ const trackEvent = (eventName) => {
           <span>{{ config.primaryCtaText }}</span>
         </a>
 
-        <!-- CTA SecundÃ¡rio - Ligar -->
+        <!-- CTA Secundário - Ligar -->
         <a 
           :href="`tel:${config.phoneNumber}`"
           :data-gtm-event="config.gtm.heroPhone"
@@ -228,7 +228,7 @@ const trackEvent = (eventName) => {
     <div class="fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl">
       <div class="flex gap-2 p-3">
         
-        <!-- BotÃ£o WhatsApp (60%) -->
+        <!-- Botão WhatsApp (60%) -->
         <a 
           :href="whatsappLink"
           target="_blank"
@@ -243,7 +243,7 @@ const trackEvent = (eventName) => {
           <span>WhatsApp</span>
         </a>
 
-        <!-- BotÃ£o Ligar (40%) -->
+        <!-- Botão Ligar (40%) -->
         <a 
           :href="`tel:${config.phoneNumber}`"
           :data-gtm-event="config.gtm.stickyPhone"
@@ -260,7 +260,7 @@ const trackEvent = (eventName) => {
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL DE FORMULÃRIO (OPCIONAL)             -->
+    <!-- MODAL DE FORMULÁRIO (OPCIONAL)             -->
     <!-- ========================================== -->
     <Teleport to="body">
       <div 
@@ -272,7 +272,7 @@ const trackEvent = (eventName) => {
           
           <!-- Header -->
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-gray-900">Solicitar OrÃ§amento</h3>
+            <h3 class="text-xl font-bold text-gray-900">Solicitar Orçamento</h3>
             <button 
               @click="showFormModal = false"
               class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
@@ -284,7 +284,7 @@ const trackEvent = (eventName) => {
             </button>
           </div>
 
-          <!-- FormulÃ¡rio -->
+          <!-- Formulário -->
           <form 
             @submit.prevent="handleFormSubmit" 
             :data-gtm-event="config.gtm.formSubmit"
@@ -334,17 +334,17 @@ const trackEvent = (eventName) => {
               ></textarea>
             </div>
 
-            <!-- BotÃ£o Submit -->
+            <!-- Botão Submit -->
             <button 
               type="submit"
               class="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-base shadow-lg active:scale-[0.98] transition-all"
             >
-              Enviar SolicitaÃ§Ã£o
+              Enviar Solicitação
             </button>
 
             <!-- Aviso LGPD -->
             <p class="text-xs text-gray-500 text-center">
-              Ao enviar, vocÃª concorda com nossa polÃ­tica de privacidade
+              Ao enviar, você concorda com nossa política de privacidade
             </p>
           </form>
 
@@ -363,10 +363,10 @@ const trackEvent = (eventName) => {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
       </svg>
       <h1 class="text-2xl font-bold text-gray-900 mb-2">
-        VisualizaÃ§Ã£o Mobile
+        Visualização Mobile
       </h1>
       <p class="text-gray-600 mb-4">
-        Este componente foi otimizado para dispositivos mÃ³veis.
+        Este componente foi otimizado para dispositivos móveis.
       </p>
       <p class="text-sm text-gray-500">
         Abra em um celular ou reduza a largura do navegador.
@@ -376,7 +376,7 @@ const trackEvent = (eventName) => {
 </template>
 
 <style scoped>
-/* AnimaÃ§Ã£o para modal */
+/* Animação para modal */
 @keyframes slide-up {
   from {
     transform: translateY(100%);

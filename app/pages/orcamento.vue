@@ -1,4 +1,4 @@
-ï»¿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // Carrosseis do hero
@@ -15,7 +15,7 @@ const heroCarousels = [
     ]
   },
   {
-    label: 'Redes de ProteÃ§Ã£o',
+    label: 'Redes de Proteção',
     link: '/servicos/redes',
     images: [
       '/images/redes_para_sacadas.jpg',
@@ -58,21 +58,21 @@ onUnmounted(() => {
 
 // SEO
 useHead({
-  title: 'Solicitar OrÃ§amento GrÃ¡tis | AD Telas e Redes SP',
+  title: 'Solicitar Orçamento Grátis | AD Telas e Redes SP',
   meta: [
-    { name: 'description', content: 'Solicite seu orÃ§amento grÃ¡tis de telas mosquiteiras e redes de proteÃ§Ã£o. Atendimento rÃ¡pido via WhatsApp, telefone ou formulÃ¡rio. InstalaÃ§Ã£o em 24h.' },
-    { name: 'keywords', content: 'orÃ§amento telas, orÃ§amento redes proteÃ§Ã£o, orÃ§amento grÃ¡tis, solicitar orÃ§amento sp' },
-    { property: 'og:title', content: 'OrÃ§amento GrÃ¡tis - AD Telas e Redes' },
-    { property: 'og:description', content: 'Receba seu orÃ§amento em minutos. WhatsApp, telefone ou formulÃ¡rio online.' }
+    { name: 'description', content: 'Solicite seu orçamento grátis de telas mosquiteiras e redes de proteção. Atendimento rápido via WhatsApp, telefone ou formulário. Instalação em 24h.' },
+    { name: 'keywords', content: 'orçamento telas, orçamento redes proteção, orçamento grátis, solicitar orçamento sp' },
+    { property: 'og:title', content: 'Orçamento Grátis - AD Telas e Redes' },
+    { property: 'og:description', content: 'Receba seu orçamento em minutos. WhatsApp, telefone ou formulário online.' }
   ]
 })
 
-// Estado do formulÃ¡rio
+// Estado do formulário
 const formData = ref({
   nome: '',
   telefone: '',
   email: '',
-  cidade: 'SÃ£o Paulo',
+  cidade: 'São Paulo',
   bairro: '',
   servico: '',
   mensagem: ''
@@ -81,18 +81,18 @@ const formData = ref({
 const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const submitError = ref(false)
 
-// OpÃ§Ãµes de serviÃ§os
+// Opções de serviços
 const servicosOptions = [
   'Telas Mosquiteiras',
-  'Redes de ProteÃ§Ã£o',
+  'Redes de Proteção',
   'Telas Pet Screen',
-  'Redes para CrianÃ§as',
+  'Redes para Crianças',
   'Redes para Pets',
-  'Telas RemovÃ­veis',
-  'Outro serviÃ§o'
+  'Telas Removíveis',
+  'Outro serviço'
 ]
 
-// Submeter formulÃ¡rio
+// Submeter formulário
 const submitForm = async () => {
   isSubmitting.value = true
   submitError.value = false
@@ -110,7 +110,7 @@ const submitForm = async () => {
       })
     }
     
-    // Redirecionar para pÃ¡gina de obrigado com URL do WhatsApp
+    // Redirecionar para página de obrigado com URL do WhatsApp
     redirectToThankYou(formData.value)
     
   } catch (error) {
@@ -120,7 +120,7 @@ const submitForm = async () => {
   }
 }
 
-const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent('OlÃ¡! Gostaria de solicitar um orÃ§amento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home')}`
+const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent('Olá! Gostaria de solicitar um orçamento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home')}`
 
 const trackWhatsApp = (origem) => {
   if (typeof window !== 'undefined' && window.dataLayer) {
@@ -151,13 +151,13 @@ const callPhone = () => {
     <!-- Hero Section -->
     <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-6 md:py-8">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        <!-- Mobile: tÃ­tulo em cima, cards embaixo | Desktop: tÃ­tulo Ã  esquerda, cards Ã  direita -->
+        <!-- Mobile: título em cima, cards embaixo | Desktop: título à esquerda, cards à direita -->
         <div class="flex flex-col md:flex-row md:items-center md:gap-8">
           
-          <!-- TÃ­tulo -->
+          <!-- Título -->
           <div class="text-center md:text-left md:flex-shrink-0 mb-4 md:mb-0">
             <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-              OrÃ§amento<br class="hidden md:block"/> GrÃ¡tis
+              Orçamento<br class="hidden md:block"/> Grátis
             </h1>
           </div>
 
@@ -185,13 +185,13 @@ const callPhone = () => {
               </div>
               <!-- Hover overlay -->
               <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60"></div>
-              <!-- MÃ£ozinha com ripple -->
+              <!-- Mãozinha com ripple -->
               <div class="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center pointer-events-none">
                 <div class="relative cursor-hand-wrap">
                   <span class="ripple-ring ripple-1"></span>
                   <span class="ripple-ring ripple-2"></span>
                   <span class="ripple-ring ripple-3"></span>
-                  <span class="cursor-hand-svg">ðŸ‘†</span>
+                  <span class="cursor-hand-svg">??</span>
                 </div>
               </div>
             </NuxtLink>
@@ -206,13 +206,13 @@ const callPhone = () => {
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
           
-          <!-- Coluna Esquerda: FormulÃ¡rio -->
+          <!-- Coluna Esquerda: Formulário -->
           <div>
             <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-24">
               
               <div class="text-center mb-6">
                 <h3 class="text-2xl font-bold mb-2 inline-block relative titulo-destaque">
-                  Preencha o FormulÃ¡rio
+                  Preencha o Formulário
                 </h3>
                 <p class="text-[#4B5563] text-sm">
                   Retornamos em alguns minutos
@@ -234,13 +234,13 @@ const callPhone = () => {
                   <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Bairro / RegiÃ£o *</label>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Bairro / Região *</label>
                   <input v-model="formData.bairro" type="text" required placeholder="Ex: Vila Mariana" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">ServiÃ§o de Interesse *</label>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Serviço de Interesse *</label>
                   <select v-model="formData.servico" required class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors">
-                    <option value="">Selecione um serviÃ§o</option>
+                    <option value="">Selecione um serviço</option>
                     <option v-for="servico in servicosOptions" :key="servico" :value="servico">{{ servico }}</option>
                   </select>
                 </div>
@@ -250,11 +250,11 @@ const callPhone = () => {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>{{ isSubmitting ? 'Enviando...' : 'Enviar SolicitaÃ§Ã£o' }}</span>
+                  <span>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação' }}</span>
                 </button>
                 <p class="text-xs text-[#4B5563] text-center">
-                  Ao enviar, vocÃª concorda com nossa 
-                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline">PolÃ­tica de Privacidade</NuxtLink>
+                  Ao enviar, você concorda com nossa 
+                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline">Política de Privacidade</NuxtLink>
                 </p>
               </form>
             </div>
@@ -263,13 +263,13 @@ const callPhone = () => {
           <!-- Coluna Direita: Meios de Contato -->
           <div class="space-y-6">
             
-            <!-- TÃ­tulo -->
+            <!-- Título -->
             <div>
               <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-2">
                 Fale Conosco Agora
               </h2>
               <p class="text-[#4B5563]">
-                Escolha o canal de sua preferÃªncia para contato imediato
+                Escolha o canal de sua preferência para contato imediato
               </p>
             </div>
 
@@ -287,7 +287,7 @@ const callPhone = () => {
                 </div>
                 <div class="flex-1 text-left">
                   <div class="font-bold text-lg mb-1">WhatsApp</div>
-                  <div class="text-white/90 text-sm">Resposta imediata â€¢ Mais rÃ¡pido</div>
+                  <div class="text-white/90 text-sm">Resposta imediata • Mais rápido</div>
                   <div class="text-white font-semibold mt-1">(11) 98358-6611</div>
                 </div>
                 <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
@@ -305,7 +305,7 @@ const callPhone = () => {
                 </div>
                 <div class="flex-1 text-left">
                   <div class="font-bold text-lg mb-1">Telefone</div>
-                  <div class="text-[#4B5563] text-sm">Ligue agora â€¢ Atendimento direto</div>
+                  <div class="text-[#4B5563] text-sm">Ligue agora • Atendimento direto</div>
                   <div class="text-[#22345F] font-semibold mt-1">(11) 98358-6611</div>
                 </div>
                 <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
@@ -323,27 +323,27 @@ const callPhone = () => {
                 </div>
                 <div class="flex-1 text-left">
                   <div class="font-bold text-lg mb-1">E-mail</div>
-                  <div class="text-[#4B5563] text-sm">Envie sua dÃºvida</div>
+                  <div class="text-[#4B5563] text-sm">Envie sua dúvida</div>
                   <div class="text-[#22345F] font-semibold mt-1 text-sm break-all">vendas.adtelaseredes@gmail.com</div>
                 </div>
                 <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
               </div>
             </a>
 
-            <!-- HorÃ¡rio de Atendimento -->
+            <!-- Horário de Atendimento -->
             <div class="bg-gradient-to-br from-[#E5EDF8] to-white p-6 rounded-2xl border-2 border-[#E5EDF8]">
               <div class="flex items-start gap-3">
                 <Icon name="lucide:clock" class="w-6 h-6 text-[#F49A1A] flex-shrink-0 mt-1" />
                 <div>
-                  <div class="font-bold text-[#22345F] mb-2">HorÃ¡rio de Atendimento</div>
+                  <div class="font-bold text-[#22345F] mb-2">Horário de Atendimento</div>
                   <div class="space-y-1 text-sm text-[#4B5563]">
                     <div class="flex justify-between">
                       <span>Segunda a Sexta:</span>
-                      <span class="font-semibold">8h Ã s 18h</span>
+                      <span class="font-semibold">8h às 18h</span>
                     </div>
                     <div class="flex justify-between">
-                      <span>SÃ¡bado:</span>
-                      <span class="font-semibold">8h Ã s 13h</span>
+                      <span>Sábado:</span>
+                      <span class="font-semibold">8h às 13h</span>
                     </div>
                     <div class="flex justify-between">
                       <span>Domingo:</span>
@@ -358,11 +358,11 @@ const callPhone = () => {
             <div class="grid grid-cols-2 gap-4">
               <div class="bg-white p-4 rounded-xl border-2 border-[#E5EDF8] text-center">
                 <Icon name="lucide:shield-check" class="w-8 h-8 text-[#25D366] mx-auto mb-2" />
-                <div class="font-bold text-[#22345F] text-sm">OrÃ§amento GrÃ¡tis</div>
+                <div class="font-bold text-[#22345F] text-sm">Orçamento Grátis</div>
               </div>
               <div class="bg-white p-4 rounded-xl border-2 border-[#E5EDF8] text-center">
                 <Icon name="lucide:zap" class="w-8 h-8 text-[#F49A1A] mx-auto mb-2" />
-                <div class="font-bold text-[#22345F] text-sm">Resposta RÃ¡pida</div>
+                <div class="font-bold text-[#22345F] text-sm">Resposta Rápida</div>
               </div>
             </div>
 
@@ -379,7 +379,7 @@ const callPhone = () => {
           Prefere Falar Direto no WhatsApp?
         </h2>
         <p class="text-white/90 mb-6">
-          Clique no botÃ£o abaixo e fale com nosso time agora mesmo
+          Clique no botão abaixo e fale com nosso time agora mesmo
         </p>
         <a
           :href="whatsappUrl"
