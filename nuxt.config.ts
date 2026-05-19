@@ -120,7 +120,24 @@ export default defineNuxtConfig({
           'X-XSS-Protection': '1; mode=block',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-          'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://googletagmanager.com https://tagmanager.google.com https://vercel.live https://static.cloudflareinsights.com; script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://googletagmanager.com https://tagmanager.google.com https://vercel.live https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://tagmanager.google.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://tagmanager.google.com; img-src 'self' data: https: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.whatsapp.com https://api.whatsapp.com https://viacep.com.br https://servicodados.ibge.gov.br https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://www.google.com https://www.google.com.br https://region1.google-analytics.com https://region1.analytics.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net https://cloudflareinsights.com; frame-src https://www.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://bid.g.doubleclick.net https://vercel.live; frame-ancestors 'none';"
+          'Content-Security-Policy': [
+            "default-src 'self'",
+            // GTM container + GA4 + Google Ads
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://www.googleadservices.com https://www.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://vercel.live https://static.cloudflareinsights.com",
+            "script-src-elem 'self' 'unsafe-inline' https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://www.googleadservices.com https://www.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://vercel.live https://static.cloudflareinsights.com",
+            // Estilos
+            "style-src 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com",
+            "style-src-elem 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com",
+            // Imagens
+            "img-src 'self' data: blob: https: https://*.google-analytics.com https://*.googletagmanager.com https://googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com https://*.g.doubleclick.net https://*.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://ade.googlesyndication.com https://adservice.google.com",
+            // Fontes
+            "font-src 'self' data: https://fonts.gstatic.com",
+            // Conexões (GA4 + GTM + Google Ads + WhatsApp)
+            "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://*.g.doubleclick.net https://*.google.com https://www.google.com.br https://pagead2.googlesyndication.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://region1.google-analytics.com https://region1.analytics.google.com https://stats.g.doubleclick.net https://*.whatsapp.com https://api.whatsapp.com https://viacep.com.br https://servicodados.ibge.gov.br https://cloudflareinsights.com",
+            // Frames
+            "frame-src https://www.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://bid.g.doubleclick.net https://vercel.live",
+            "frame-ancestors 'none'"
+          ].join('; ')
         }
       }
     }
