@@ -126,8 +126,8 @@ export default defineNuxtConfig({
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://www.googleadservices.com https://www.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://vercel.live https://static.cloudflareinsights.com",
             "script-src-elem 'self' 'unsafe-inline' https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://www.googleadservices.com https://www.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://vercel.live https://static.cloudflareinsights.com",
             // Estilos
-            "style-src 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com",
-            "style-src-elem 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://fonts.googleapis.com",
+            "style-src 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com",
+            "style-src-elem 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com",
             // Imagens
             "img-src 'self' data: blob: https: https://*.google-analytics.com https://*.googletagmanager.com https://googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com https://*.g.doubleclick.net https://*.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://ade.googlesyndication.com https://adservice.google.com",
             // Fontes
