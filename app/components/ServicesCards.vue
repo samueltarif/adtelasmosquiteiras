@@ -36,6 +36,20 @@ const servicosCards = [
       { titulo: 'Instalação 24h' }
     ],
     url: '/servicos/telas'
+  },
+  {
+    slug: 'vidracaria',
+    titulo: 'Vidraçaria',
+    subtitulo: 'Box, janelas, portas e espelhos',
+    descricaoCurta: 'Vidro temperado com instalação profissional, sob medida para qualquer ambiente',
+    imagem: '/images/mosquiteira_janela.png',
+    destaque: 'Vidro Temperado',
+    beneficios: [
+      { titulo: 'Box de banheiro' },
+      { titulo: 'Janelas e portas' },
+      { titulo: 'Garantia 2 anos' }
+    ],
+    url: '/servicos/vidracaria'
   }
 ]
 
@@ -76,7 +90,7 @@ const trackEvent = (eventName, params = {}) => {
       </div>
 
       <!-- Grid de Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
         
         <!-- Card de Serviço -->
         <NuxtLink
