@@ -35,7 +35,7 @@
           
           <!-- Botão CTA com ícones da logo -->
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <img src="/images/logo_adt_telas.png" alt="AD Telas" class="w-12 h-12 animate-bounce hidden sm:block" />
+            <img src="/images/logo_adt_telas_nova.png" alt="AD Telas" class="w-12 h-12 animate-bounce hidden sm:block" />
             
             <!-- Botão: fundo branco, texto azul escuro, borda laranja -->
             <a
@@ -50,7 +50,7 @@
               CLIQUE AQUI
             </a>
             
-            <img src="/images/logo_adt_telas.png" alt="AD Telas" class="w-12 h-12 animate-bounce hidden sm:block" />
+            <img src="/images/logo_adt_telas_nova.png" alt="AD Telas" class="w-12 h-12 animate-bounce hidden sm:block" />
           </div>
           
           <!-- Texto de urgência - Laranja -->

@@ -147,9 +147,9 @@ export default defineNuxtConfig({
     head: {
       title: 'AD Telas e Redes SP - Proteção Profissional | Orçamento Rápido',
       link: [
-        { rel: 'icon', type: 'image/png', href: '/images/logo_adt_telas.png' },
-        { rel: 'apple-touch-icon', href: '/images/logo_adt_telas.png' },
-        { rel: 'shortcut icon', href: '/images/logo_adt_telas.png' }
+        { rel: 'icon', type: 'image/png', href: '/images/logo_adt_telas_nova.png' },
+        { rel: 'apple-touch-icon', href: '/images/logo_adt_telas_nova.png' },
+        { rel: 'shortcut icon', href: '/images/logo_adt_telas_nova.png' }
       ],
       meta: [
         { charset: 'utf-8' },
@@ -158,7 +158,7 @@ export default defineNuxtConfig({
         { name: 'keywords', content: 'tela de segurança SP, rede protetora, mosquiteiro, tela para varanda, proteção infantil' },
         { property: 'og:title', content: 'AD Telas e Redes - Proteção Profissional para Sua Família em SP' },
         { property: 'og:description', content: 'Instale telas de segurança com garantia. Proteja crianças, pets e sua casa contra insetos e quedas.' },
-        { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas.png' },
+        { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
         { property: 'og:image:width', content: '512' },
         { property: 'og:image:height', content: '512' },
         { property: 'og:type', content: 'website' },

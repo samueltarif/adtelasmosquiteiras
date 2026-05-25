@@ -12,7 +12,7 @@ useHead({
     { property: 'og:description', content: 'Telas mosquiteiras e redes de proteção com instalação rápida em 24h. Atendemos toda Grande São Paulo com garantia de 2 anos.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.adtelasmosquiteiras.com.br/' },
-    { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas.png' },
+    { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
   ],
   link: [
     { rel: 'canonical', href: 'https://www.adtelasmosquiteiras.com.br/' }

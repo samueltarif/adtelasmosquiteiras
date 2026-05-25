@@ -19,7 +19,7 @@ const config = {
   phoneDisplay: '(11) 98358-6611', // ⚠️ ALTERAR: Formato de exibição
   
   // Textos
-  logo: '/images/logo_adt_telas.png', // ⚠️ ALTERAR: Caminho da logo
+  logo: '/images/logo_adt_telas_nova.png', // ⚠️ ALTERAR: Caminho da logo
   headline: 'Telas mosquiteiras em São Paulo', // ⚠️ ALTERAR: Título principal
   subheadline: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes', // ⚠️ ALTERAR: Subtítulo
   

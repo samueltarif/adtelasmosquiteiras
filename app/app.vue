@@ -12,7 +12,7 @@ useHead({
         name: 'AD Telas e Redes',
         alternateName: 'AD Telas Mosquiteiras',
         url: 'https://www.adtelasmosquiteiras.com.br',
-        logo: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas.png',
+        logo: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png',
         contactPoint: {
           '@type': 'ContactPoint',
           telephone: '+55-11-98358-6611',
