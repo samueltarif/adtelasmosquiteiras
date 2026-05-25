@@ -78,7 +78,7 @@ onUnmounted(() => { clearInterval(timer) })
           </div>
           <div class="w-px h-8 bg-gray-200"></div>
           <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#22345F] font-bold text-base">+500</span>
+            <span class="text-[#22345F] font-bold text-base">+5 Mil</span>
             <span class="text-gray-500 text-[11px]">clientes</span>
           </div>
           <div class="w-px h-8 bg-gray-200"></div>
