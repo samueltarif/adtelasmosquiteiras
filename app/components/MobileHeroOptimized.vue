@@ -19,7 +19,7 @@ const props = defineProps({
   },
   subheadline: {
     type: String,
-    default: 'Instalação em 24h • Garantia 2 Anos • +500 Clientes Satisfeitos'
+    default: 'Instalação em 24h • Garantia 2 Anos • +5 Mil Clientes Satisfeitos'
   },
   rating: {
     type: Number,

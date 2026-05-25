@@ -163,7 +163,7 @@ onUnmounted(() => { clearInterval(timer) })
                 <span class="text-sm text-gray-500">(487 avaliações)</span>
               </div>
               <div class="w-px h-5 bg-gray-200"></div>
-              <span class="text-sm text-gray-600 font-medium">+500 Clientes</span>
+              <span class="text-sm text-gray-600 font-medium">+5 Mil Clientes</span>
               <div class="w-px h-5 bg-gray-200"></div>
               <span class="text-sm text-gray-600 font-medium">10+ Anos de experiência</span>
             </div>
