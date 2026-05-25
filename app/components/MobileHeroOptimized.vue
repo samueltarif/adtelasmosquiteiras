@@ -3,7 +3,7 @@
 const props = defineProps({
   logoSrc: {
     type: String,
-    default: '/images/logo ad.png'
+    default: '/images/logo_adt_telas.png'
   },
   whatsappNumber: {
     type: String,

@@ -94,7 +94,7 @@ onUnmounted(() => {
           class="flex items-center p-2.5 cursor-pointer hover:opacity-80 transition-opacity"
         >
           <img 
-            src="/images/logo ad.png" 
+            src="/images/logo_adt_telas.png" 
             alt="AD Telas e Redes" 
             class="w-[150px] h-auto"
           />
@@ -165,7 +165,7 @@ onUnmounted(() => {
         class="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
       >
         <img 
-          src="/images/logo ad.png" 
+          src="/images/logo_adt_telas.png" 
           alt="AD Telas" 
           class="h-12 w-auto"
         />
