@@ -2,7 +2,7 @@
   <div class="cta-container">
     <!-- WhatsApp Button -->
     <a 
-      href="https://wa.me/5511983586611?text=Olá! Gostaria de solicitar um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
+      href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20telas%20mosquiteiras.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br&type=phone_number&app_absent=0"
       target="_blank"
       rel="noopener noreferrer"
       class="cta-button cta-whatsapp"

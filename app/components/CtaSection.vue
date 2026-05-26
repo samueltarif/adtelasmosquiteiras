@@ -39,7 +39,7 @@
             
             <!-- Botão: fundo branco, texto azul escuro, borda laranja -->
             <a
-              href="https://wa.me/5511983586611?text=Olá! Vi seu site e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home"
+              href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21%20Vi%20seu%20site%20e%20gostaria%20de%20um%20or%C3%A7amento%20para%20telas%20mosquiteiras.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br&type=phone_number&app_absent=0"
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2.5 bg-white text-[#22345F] px-8 py-4 rounded-2xl font-bold text-base md:text-lg hover:bg-gray-50 hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl border-2 border-[#F49A1A] w-full sm:w-auto justify-center min-h-[44px]"

@@ -12,7 +12,7 @@
 const config = {
   // WhatsApp
   whatsappNumber: '5511983586611', // ⚠️ ALTERAR: Número sem + e sem espaços
-  whatsappMessage: 'Olá! Vi seu anúncio e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home',
+  whatsappMessage: 'Olá! Vi seu anúncio e gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br',
   
   // Telefone
   phoneNumber: '+5511983586611', // ⚠️ ALTERAR: Número com + para tel:

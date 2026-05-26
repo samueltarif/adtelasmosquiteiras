@@ -37,11 +37,11 @@ const scrollToSection = (item) => {
   }
 
   const route = useRoute()
-  const isHome = route.path === '/home' || route.path === '/'
+  const isHome = route.path === '/'
 
   if (!isHome) {
     // Navegar para home com hash para scroll após carregamento
-    navigateTo(`/home#${item.id}`)
+    navigateTo(`/#${item.id}`)
     return
   }
 

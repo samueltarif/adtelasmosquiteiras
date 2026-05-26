@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const whatsappLink = 'https://wa.me/5511983586611?text=Oi!%20Gostaria%20de%20um%20orçamento%20para%20instalar%20telas%20de%20segurança.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br%2Fhome'
+const whatsappLink = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21%20Gostaria%20de%20um%20or%C3%A7amento%20para%20instalar%20telas%20de%20seguran%C3%A7a.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br&type=phone_number&app_absent=0'
 
 // Mostra o tooltip expandido após 3s (técnica de "delayed reveal" — aumenta CTR em ~20%)
 const showTooltip = ref(false)

@@ -233,7 +233,7 @@ onUnmounted(() => { timers.forEach(t => clearInterval(t)) })
           Fale com nossos especialistas e encontre a solução perfeita
         </p>
         <a
-          href="https://wa.me/5511983586611?text=Olá!%20Preciso%20de%20ajuda%20com%20Redes%20de%20Proteção.%20Vim%20pelo%20site%3A%20https://www.adtelasmosquiteiras.com.br/home"
+          href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21%20Preciso%20de%20ajuda%20com%20Redes%20de%20Prote%C3%A7%C3%A3o.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br&type=phone_number&app_absent=0"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"

@@ -12,7 +12,7 @@ const props = defineProps({
   },
   whatsappMessage: {
     type: String,
-    default: 'Olá! Gostaria de solicitar um orçamento. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home'
+    default: 'Olá! Gostaria de solicitar um orçamento. Vim pelo site: https://www.adtelasmosquiteiras.com.br'
   },
   phoneNumber: {
     type: String,

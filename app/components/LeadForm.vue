@@ -82,7 +82,7 @@ const sendToWhatsApp = async () => {
     if (formData.value.servico) {
       message += ` Gostaria de um orçamento para: ${formData.value.servico}.`
     } else {
-      message += ` Gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br/home`
+      message += ` Gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br`
     }
     
     const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(message)}`

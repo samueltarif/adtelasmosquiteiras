@@ -27,7 +27,7 @@ const isDragging = ref(false)
 // Computed
 const whatsappUrl = computed(() => {
   const servico = props.servicoAtual ? `\n\nServiço: ${props.servicoAtual}` : ''
-  const mensagem = `${props.msgPadrao}${servico}\n\nVim pelo site: https://www.adtelasmosquiteiras.com.br/home\n\nPode me ajudar?`
+  const mensagem = `${props.msgPadrao}${servico}\n\nVim pelo site: https://www.adtelasmosquiteiras.com.br\n\nPode me ajudar?`
   return `https://wa.me/${props.telefone}?text=${encodeURIComponent(mensagem)}`
 })
 

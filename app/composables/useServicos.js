@@ -524,7 +524,7 @@ export const useServicos = () => {
     const servico = getServicoBySlug(familiaSlug, categoriaSlug, servicoSlug)
     if (!servico) return `https://wa.me/${WHATSAPP_NUMBER}`
     
-    const msg = `Olá! Gostaria de um orçamento para:\n\nServiço: ${servico.titulo}\nCategoria: ${servico.familiaNome} > ${servico.categoriaTitulo}\n\nVim pelo site: https://www.adtelasmosquiteiras.com.br/home\n\nPode me ajudar?`
+    const msg = `Olá! Gostaria de um orçamento para:\n\nServiço: ${servico.titulo}\nCategoria: ${servico.familiaNome} > ${servico.categoriaTitulo}\n\nVim pelo site: https://www.adtelasmosquiteiras.com.br/\n\nPode me ajudar?`
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`
   }
   
