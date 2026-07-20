@@ -39,7 +39,8 @@ export function useFormSubmit() {
           servico: fields.servico || fields.tipoServico || 'Não especificado',
           telefone: fields.telefone || '',
           email: fields.email || '',
-          mensagem: fields.mensagem || ''
+          mensagem: fields.mensagem || '',
+          origem: fields.origem || 'formulario_' + (window?.location?.pathname || 'geral')
         }
       })
     } catch (e) {

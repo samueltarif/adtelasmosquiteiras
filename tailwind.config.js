@@ -28,7 +28,30 @@ export default {
         instagram: '#E4405F',
         'instagram-dark': '#C13584',
         facebook: '#1877F2',
-        'facebook-dark': '#166FE5'
+        'facebook-dark': '#166FE5',
+        // Cores do painel Admin do Stitch
+        admin: {
+          primary: '#091e48',
+          'primary-container': '#22345f',
+          surface: '#f8f9ff',
+          'surface-dim': '#cbdbf5',
+          'surface-bright': '#f8f9ff',
+          'surface-container': '#e5eeff',
+          'surface-container-low': '#eff4ff',
+          'surface-container-lowest': '#ffffff',
+          'surface-container-high': '#dce9ff',
+          'surface-container-highest': '#d3e4fe',
+          'on-surface': '#0b1c30',
+          'on-surface-variant': '#44464f',
+          'outline-variant': '#c5c6d0',
+          'outline': '#757780',
+          'secondary-fixed-dim': '#ffb868',
+          'secondary-fixed': '#ffddbb',
+          'tertiary-fixed': '#66ff8e',
+          'on-tertiary-fixed-variant': '#005322',
+          'primary-fixed-dim': '#b4c5f9',
+          'surface-tint': '#4c5d8b'
+        }
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, computed } from 'vue'
 
 const props = defineProps({
@@ -59,7 +59,8 @@ const sendToWhatsApp = async () => {
         nome: formData.value.nome,
         cidade: formData.value.cidade,
         bairro: formData.value.bairro || '',
-        servico: formData.value.servico || 'Não especificado'
+        servico: formData.value.servico || 'Não especificado',
+        origem: 'formulario_lead_' + (window?.location?.pathname || 'home')
       }
     })
 
