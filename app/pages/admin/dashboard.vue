@@ -10,6 +10,7 @@ const hoveredVisitPoint = ref(null)
 const hoveredDonut = ref(null)
 const animReady = ref(false)
 const chartMode = ref('leads') // 'leads' | 'visits' | 'both'
+const recentEvents = ref([])
 
 const stats = ref({
   totalLeads: 0, whatsappClicks: 0, conversionRate: '0.0%',
@@ -55,7 +56,10 @@ const fbPages = [
 const fetchStats = async () => {
   isLoading.value = true
   try {
-    const d = await $fetch('/api/admin/dashboard-stats')
+    const [d, act] = await Promise.all([
+      $fetch('/api/admin/dashboard-stats'),
+      $fetch('/api/admin/recent-activity')
+    ])
     if (d?.success) {
       stats.value.totalLeads = d.totalLeads
       stats.value.whatsappClicks = d.whatsappClicks
@@ -70,6 +74,7 @@ const fetchStats = async () => {
     } else {
       useFb()
     }
+    recentEvents.value = act?.events || []
   } catch {
     useFb()
   } finally {
@@ -171,6 +176,26 @@ const fmt = (n) => (n || 0).toLocaleString('pt-BR')
 const pageName = (path) => {
   const map = { '/': 'Página Inicial', '/servicos': 'Serviços', '/contato': 'Contato', '/orcamento': 'Orçamento' }
   return map[path] || path.replace(/^\//, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Home'
+}
+
+const eventConfig = (tipo) => {
+  const cfg = {
+    visita:            { icon: 'lucide:eye',            bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20',    color: 'text-cyan-400' },
+    whatsapp:          { icon: 'lucide:message-circle', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', color: 'text-emerald-400' },
+    telefone:          { icon: 'lucide:phone-call',     bg: 'bg-rose-500/10',   border: 'border-rose-500/20',   color: 'text-rose-400' },
+    lead:              { icon: 'lucide:user-plus',      bg: 'bg-indigo-500/10', border: 'border-indigo-500/20', color: 'text-indigo-400' },
+    formulario_submit: { icon: 'lucide:file-text',     bg: 'bg-amber-500/10',  border: 'border-amber-500/20',  color: 'text-amber-400' },
+    cta_interno:       { icon: 'lucide:arrow-right',   bg: 'bg-violet-500/10', border: 'border-violet-500/20', color: 'text-violet-400' }
+  }
+  return cfg[tipo] || cfg['visita']
+}
+
+const timeAgo = (dateStr) => {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000)
+  if (diff < 60) return 'agora'
+  if (diff < 3600) return Math.floor(diff / 60) + ' min'
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h'
+  return Math.floor(diff / 86400) + 'd'
 }
 </script>
 
@@ -458,52 +483,40 @@ const pageName = (path) => {
           <div class="flex items-center justify-between mb-5">
             <div>
               <h3 class="text-sm font-bold text-white">Atividade Recente</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Últimos eventos registrados</p>
+              <p class="text-xs text-slate-500 mt-0.5">Eventos reais · banco de dados</p>
             </div>
             <NuxtLink to="/admin/leads" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition-colors flex items-center gap-1">
-              Ver todos <Icon name="lucide:arrow-right" class="w-3.5 h-3.5"/>
+              Ver leads <Icon name="lucide:arrow-right" class="w-3.5 h-3.5"/>
             </NuxtLink>
           </div>
-          <div class="flex flex-col gap-2.5">
-            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon name="lucide:eye" class="w-4 h-4 text-cyan-400"/>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-slate-300 font-medium">Visita à página inicial</p>
-                <p class="text-xs text-slate-500 mt-0.5">São Paulo · Chrome</p>
-              </div>
-              <span class="text-[10px] text-slate-600 whitespace-nowrap mt-1">agora</span>
+          <div class="flex flex-col gap-2">
+            <!-- Loading -->
+            <div v-if="isLoading" class="flex items-center justify-center py-8">
+              <Icon name="lucide:loader" class="w-5 h-5 text-indigo-400 animate-spin"/>
             </div>
-            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon name="lucide:user-plus" class="w-4 h-4 text-indigo-400"/>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-slate-300 font-medium">Novo lead via formulário</p>
-                <p class="text-xs text-slate-500 mt-0.5">Redes de Proteção · Pinheiros</p>
-              </div>
-              <span class="text-[10px] text-slate-600 whitespace-nowrap mt-1">2 min</span>
+            <!-- Vazio -->
+            <div v-else-if="recentEvents.length === 0" class="flex flex-col items-center justify-center py-8 gap-2">
+              <Icon name="lucide:activity" class="w-8 h-8 text-slate-700"/>
+              <p class="text-xs text-slate-500 text-center">Nenhuma atividade registrada ainda.<br>Acesse o site para começar a capturar dados.</p>
             </div>
-            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon name="lucide:message-circle" class="w-4 h-4 text-emerald-400"/>
+            <!-- Eventos reais -->
+            <div
+              v-else
+              v-for="(ev, idx) in recentEvents"
+              :key="idx"
+              class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors"
+            >
+              <div
+                class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border"
+                :class="[eventConfig(ev.tipo).bg, eventConfig(ev.tipo).border]"
+              >
+                <Icon :name="eventConfig(ev.tipo).icon" class="w-4 h-4" :class="eventConfig(ev.tipo).color"/>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm text-slate-300 font-medium">Clique no WhatsApp</p>
-                <p class="text-xs text-slate-500 mt-0.5">Tela Mosquiteira · Guarulhos</p>
+                <p class="text-sm text-slate-300 font-medium truncate">{{ ev.label }}</p>
+                <p class="text-xs text-slate-500 mt-0.5 truncate">{{ ev.sublabel }}</p>
               </div>
-              <span class="text-[10px] text-slate-600 whitespace-nowrap mt-1">15 min</span>
-            </div>
-            <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors">
-              <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
-                <Icon name="lucide:file-check" class="w-4 h-4 text-amber-400"/>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-slate-300 font-medium">Orçamento enviado</p>
-                <p class="text-xs text-slate-500 mt-0.5">Rede para Piscina · Osasco</p>
-              </div>
-              <span class="text-[10px] text-slate-600 whitespace-nowrap mt-1">1 hora</span>
+              <span class="text-[10px] text-slate-600 whitespace-nowrap mt-1">{{ timeAgo(ev.created_at) }}</span>
             </div>
           </div>
         </div>
