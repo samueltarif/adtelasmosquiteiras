@@ -72,8 +72,8 @@ const fetchLeads = async () => {
   isLoading.value = true
   try {
     const data = await $fetch('/api/admin/leads')
-    if (data && data.success && data.leads && data.leads.length > 0) {
-      leads.value = data.leads
+    if (data && data.success) {
+      leads.value = data.leads || []
     } else {
       leads.value = [...mockLeads.value]
     }
