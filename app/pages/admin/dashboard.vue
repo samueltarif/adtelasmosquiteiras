@@ -57,21 +57,25 @@ const fetchStats = async () => {
   try {
     const d = await $fetch('/api/admin/dashboard-stats')
     if (d?.success) {
-      stats.value.totalLeads = d.totalLeads || 1250
-      stats.value.whatsappClicks = d.whatsappClicks || 890
-      stats.value.conversionRate = d.conversionRate || '12.5%'
-      stats.value.totalVisits = d.totalVisits || 1850
-      stats.value.uniqueVisitors = d.uniqueVisitors || 720
-      const hasD = d.dailyLeads?.some(x => x.count > 0)
-      stats.value.dailyLeads = hasD ? d.dailyLeads : fbDaily
-      const hasV = d.dailyVisits?.some(x => x.count > 0)
-      stats.value.dailyVisits = hasV ? d.dailyVisits : fbVisits
-      stats.value.serviceDistribution = d.serviceDistribution?.some(x => x.count > 0) ? d.serviceDistribution : fbSvc
-      stats.value.topLocations = d.topLocations?.length ? d.topLocations : fbLoc
-      stats.value.topPages = d.topPages?.length ? d.topPages : fbPages
-    } else { useFb() }
-  } catch { useFb() }
-  finally { isLoading.value = false; setTimeout(() => { animReady.value = true }, 150) }
+      stats.value.totalLeads = d.totalLeads
+      stats.value.whatsappClicks = d.whatsappClicks
+      stats.value.conversionRate = d.conversionRate
+      stats.value.totalVisits = d.totalVisits
+      stats.value.uniqueVisitors = d.uniqueVisitors
+      stats.value.dailyLeads = d.dailyLeads || []
+      stats.value.dailyVisits = d.dailyVisits || []
+      stats.value.serviceDistribution = d.serviceDistribution || []
+      stats.value.topLocations = d.topLocations || []
+      stats.value.topPages = d.topPages || []
+    } else {
+      useFb()
+    }
+  } catch {
+    useFb()
+  } finally {
+    isLoading.value = false
+    setTimeout(() => { animReady.value = true }, 150)
+  }
 }
 
 const useFb = () => {
@@ -367,7 +371,10 @@ const pageName = (path) => {
               </div>
             </div>
             <div class="w-full flex flex-col gap-2 px-1">
-              <div v-for="(a, i) in donutArcs" :key="'lg'+i" class="flex items-center justify-between group cursor-pointer rounded-lg px-3 py-2 -mx-1 hover:bg-white/[0.04] transition-colors" @mouseenter="hoveredDonut = i" @mouseleave="hoveredDonut = null">
+              <div v-if="donutArcs.length === 0" class="text-center text-slate-500 text-xs py-4">
+                Nenhum lead registrado para os serviços.
+              </div>
+              <div v-else v-for="(a, i) in donutArcs" :key="'lg'+i" class="flex items-center justify-between group cursor-pointer rounded-lg px-3 py-2 -mx-1 hover:bg-white/[0.04] transition-colors" @mouseenter="hoveredDonut = i" @mouseleave="hoveredDonut = null">
                 <div class="flex items-center gap-2.5">
                   <span class="w-2.5 h-2.5 rounded-full transition-transform" :style="{ backgroundColor: a.color }" :class="hoveredDonut === i ? 'scale-125' : ''"></span>
                   <span class="text-sm text-slate-300 font-medium">{{ a.name }}</span>
@@ -394,7 +401,10 @@ const pageName = (path) => {
             <Icon name="lucide:layout" class="w-5 h-5 text-slate-600"/>
           </div>
           <div class="flex flex-col gap-3">
-            <div v-for="(pg, i) in stats.topPages" :key="i" class="group">
+            <div v-if="stats.topPages.length === 0" class="text-center text-slate-500 text-xs py-8">
+              Nenhuma visita registrada ainda.
+            </div>
+            <div v-else v-for="(pg, i) in stats.topPages" :key="i" class="group">
               <div class="flex items-center justify-between mb-1.5">
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold w-5 text-center tabular-nums" :class="i === 0 ? 'text-cyan-400' : 'text-slate-600'">#{{ i + 1 }}</span>
@@ -422,7 +432,10 @@ const pageName = (path) => {
             <Icon name="lucide:map-pin" class="w-5 h-5 text-slate-600"/>
           </div>
           <div class="flex flex-col gap-4">
-            <div v-for="(loc, i) in stats.topLocations" :key="i" class="group">
+            <div v-if="stats.topLocations.length === 0" class="text-center text-slate-500 text-xs py-8">
+              Nenhum lead com localização registrado.
+            </div>
+            <div v-else v-for="(loc, i) in stats.topLocations" :key="i" class="group">
               <div class="flex items-center justify-between mb-1.5">
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold w-5 text-center text-slate-600">#{{ i + 1 }}</span>
