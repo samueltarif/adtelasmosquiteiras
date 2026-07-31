@@ -1,47 +1,81 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+
 const WHATSAPP_NUMBER = '5511983586611'
 const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6&zx=1768571227913&no_sw_cr=1#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,'
 
-const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Vi o site e gostaria de um orçamento para Vidraçaria. Vim pelo site: https://www.adtelasmosquiteiras.com.br/servicos/vidracaria`
+const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Vi o site e gostaria de um orçamento para Vidraçaria. Vim pelo site: https://www.adtelasmosquiteiras.com.br/servicos/vidracaria')}`
+
+const getWhatsappItemUrl = (itemTitulo) => {
+  const msg = `Olá! Gostaria de um orçamento para:\n\nServiço: ${itemTitulo}\n\nVim pelo site: https://www.adtelasmosquiteiras.com.br/servicos/vidracaria`
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`
+}
 
 const servico = {
   slug: 'vidracaria',
   titulo: 'Vidraçaria',
   destaque: 'Instalação Profissional',
-  descricaoCurta: 'Box de banheiro, janelas, portas e espelhos com instalação rápida e garantia',
-  imagem: '/images/mosquiteira_janela.png',
-  imagemEspecificacoes: '/images/mosquiteira_area_externa.png',
-  metaTitle: 'Vidraçaria em São Paulo | Box, Janelas e Portas de Vidro | AD Telas',
-  metaDescription: 'Serviços de vidraçaria em SP: box de banheiro, janelas, portas e espelhos. Instalação em 24h, garantia 2 anos, orçamento grátis.',
+  descricaoCurta: 'Janelas de vidro temperado, telhados de vidro e fachadas corporativas com instalação rápida e garantia de 2 anos.',
+  imagem: '/images/vidro_janela_8mm.png',
+  imagemEspecificacoes: '/images/vidro_fachada.jpg',
+  metaTitle: 'Vidraçaria em São Paulo | Janelas, Telhados e Fachadas de Vidro | AD Telas',
+  metaDescription: 'Serviços de vidraçaria em SP: janelas de vidro temperado 8mm, telhados de vidro e fachadas corporativas. Instalação em 24h, garantia 2 anos, orçamento grátis.',
   beneficios: [
-    { icone: 'shield', titulo: 'Vidro Temperado', descricao: 'Segurança certificada, resistente a impactos e variações de temperatura' },
-    { icone: 'clock', titulo: 'Instalação em 24h', descricao: 'Agendamento rápido, equipe especializada e pontual' },
-    { icone: 'check', titulo: 'Sob Medida', descricao: 'Medição precisa e corte personalizado para qualquer ambiente' },
+    { icone: 'shield', titulo: 'Vidro Temperado', descricao: 'Segurança certificada, alta resistência a impactos e variações térmicas' },
+    { icone: 'clock', titulo: 'Instalação em 24h', descricao: 'Agendamento rápido, equipe técnica especializada e pontual' },
+    { icone: 'check', titulo: 'Sob Medida', descricao: 'Medição precisa e projeto personalizado para qualquer ambiente' },
     { icone: 'award', titulo: 'Garantia 2 Anos', descricao: 'Cobertura total contra defeitos de material e instalação' }
   ],
   especificacoes: [
     { label: 'Material', valor: 'Vidro temperado 8mm, 10mm ou 12mm' },
-    { label: 'Tipos', valor: 'Box, janelas, portas, espelhos, divisórias' },
-    { label: 'Acabamento', valor: 'Inox, alumínio ou cromado' },
-    { label: 'Garantia', valor: '2 anos' },
-    { label: 'Instalação', valor: '24h após medição' },
-    { label: 'Orçamento', valor: 'Gratuito e sem compromisso' }
+    { label: 'Projetos', valor: 'Janelas de correr, telhados de vidro, fachadas, portas' },
+    { label: 'Acabamento', valor: 'Perfis de alumínio, inox ou cromado' },
+    { label: 'Garantia', valor: '2 anos de garantia completa' },
+    { label: 'Instalação', valor: 'Em até 24h após medição' },
+    { label: 'Orçamento', valor: '100% Gratuito sem compromisso' }
   ],
   comparacao: [
     'Vidro temperado certificado',
-    'Instalação em 24h',
-    'Garantia 2 anos',
-    'Medição gratuita',
+    'Instalação rápida em 24h',
+    'Garantia de 2 anos',
+    'Medição presencial gratuita',
     'Acabamento premium'
   ],
   faq: [
-    { pergunta: 'Qual a diferença entre vidro comum e temperado?', resposta: 'O vidro temperado passa por um processo térmico que aumenta sua resistência em até 5x. Em caso de quebra, fragmenta em pedaços pequenos e arredondados, reduzindo o risco de cortes graves.' },
-    { pergunta: 'Quanto tempo leva a instalação de um box de banheiro?', resposta: 'Após a medição e fabricação, a instalação leva em média 2 a 4 horas. O prazo total do pedido é de 24 a 48 horas.' },
-    { pergunta: 'Vocês fazem medição gratuita?', resposta: 'Sim! A visita técnica e medição são totalmente gratuitas e sem compromisso. Entre em contato pelo WhatsApp para agendar.' },
-    { pergunta: 'Atendem condomínios e empresas?', resposta: 'Sim, atendemos residências, condomínios, escritórios e estabelecimentos comerciais em toda a Grande São Paulo.' },
-    { pergunta: 'A garantia cobre o quê?', resposta: 'Nossa garantia de 2 anos cobre defeitos de fabricação, problemas na instalação e falhas nos ferragens e perfis utilizados.' }
+    { pergunta: 'Qual a vantagem do vidro temperado 8mm?', resposta: 'O vidro temperado de 8mm passa por tratamento térmico que o torna até 5x mais resistente que o vidro comum, oferecendo máxima segurança e durabilidade contra ventos e impactos.' },
+    { pergunta: 'Quanto tempo leva a instalação?', resposta: 'Após medição técnica e aprovação, a instalação é realizada rapidamente, geralmente levando entre 2 a 4 horas.' },
+    { pergunta: 'Vocês realizam medição gratuita?', resposta: 'Sim! A visita técnica e medição no local são 100% gratuitas e sem compromisso em toda a Grande São Paulo.' },
+    { pergunta: 'Atendem condomínios e estabelecimentos comerciais?', resposta: 'Sim, atendemos residências, apartamentos, condomínios, lojas e edifícios corporativos.' }
   ]
 }
+
+// 4 Produtos / Serviços de Vidraçaria solicitados
+const produtosVidracaria = [
+  {
+    titulo: 'Janela de Vidro Temperado 8mm - 4 Folhas',
+    descricao: 'Janela ampla com vidro temperado 8mm incolor, 4 folhas de correr.',
+    imagem: '/images/vidro_janela_8mm.png',
+    destaque: 'Mais Vendido'
+  },
+  {
+    titulo: 'Janela de Vidro',
+    descricao: 'Opção ideal para quem busca luminosidade sem abrir mão do conforto. Vidros de qualidade que proporcionam silêncio, vedação e harmonia visual aos espaços.',
+    imagem: '/images/vidro_janela_slide.jpg',
+    destaque: 'Sob Medida'
+  },
+  {
+    titulo: 'Telhado de Vidro',
+    descricao: 'Perfeito para áreas externas e corredores, o telhado de vidro garante iluminação natural, conforto térmico e sofisticação ao ambiente.',
+    imagem: '/images/vidro_telhado.jpg',
+    destaque: 'Iluminação Natural'
+  },
+  {
+    titulo: 'Fachada de Vidro',
+    descricao: 'Vidros de alta performance para fachadas comerciais e corporativas, com design contemporâneo, proteção solar e excelente resistência às variações climáticas.',
+    imagem: '/images/vidro_fachada.jpg',
+    destaque: 'Alta Performance'
+  }
+]
 
 useHead({
   title: servico.metaTitle,
@@ -86,7 +120,7 @@ const openFormModal = () => { showFormModal.value = true }
       <div class="container mx-auto px-4 md:px-6 max-w-7xl relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
 
-          <!-- Conteúdo -->
+          <!-- Conteúdo Hero -->
           <div>
             <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-4 py-2 rounded-full text-sm font-bold mb-6">
               <Icon name="lucide:check-circle" class="w-4 h-4" />
@@ -94,7 +128,7 @@ const openFormModal = () => { showFormModal.value = true }
             </div>
 
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              {{ servico.titulo }} em São Paulo
+              Serviços de <span class="text-[#38BDF8]">Vidraçaria</span>
             </h1>
 
             <p class="text-lg md:text-xl text-white/90 mb-8">
@@ -125,38 +159,37 @@ const openFormModal = () => { showFormModal.value = true }
                 rel="noopener noreferrer"
                 @click="trackWhatsApp('hero')"
                 class="flex-1 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl"
-                data-gtm="vidracaria-hero-whatsapp"
               >
                 <WhatsappIcon class="w-6 h-6" />
-                Orçamento Grátis
+                Orçamento no WhatsApp
               </a>
-              <NuxtLink
-                to="/servicos"
+              <a
+                href="#catalogo-vidros"
                 class="px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 text-center"
               >
-                Ver Todos os Serviços
-              </NuxtLink>
+                Ver Modelos de Vidros
+              </a>
             </div>
           </div>
 
-          <!-- Imagem -->
+          <!-- Imagem Destaque Hero -->
           <div class="relative">
             <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/20">
               <img
                 :src="servico.imagem"
                 :alt="servico.titulo"
-                class="w-full h-auto"
+                class="w-full h-80 md:h-[420px] object-cover"
                 loading="eager"
               />
             </div>
-            <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-2xl">
+            <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-6 shadow-2xl border border-[#E5EDF8]">
               <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center">
                   <Icon name="lucide:check-circle" class="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <p class="text-2xl font-bold text-[#22345F]">5 Mil+</p>
-                  <p class="text-sm text-[#4B5563]">Clientes</p>
+                  <p class="text-sm text-[#4B5563]">Projetos Entregues</p>
                 </div>
               </div>
             </div>
@@ -166,15 +199,82 @@ const openFormModal = () => { showFormModal.value = true }
       </div>
     </section>
 
+    <!-- SEÇÃO PRINCIPAL: SERVIÇOS DE VIDRAÇARIA (LAYOUT ADAPTADO AO PROJETO) -->
+    <section id="catalogo-vidros" class="py-16 md:py-24 bg-[#0B1528] text-white">
+      <div class="container mx-auto px-4 md:px-6 max-w-7xl">
+        
+        <!-- Header da Seção -->
+        <div class="text-center mb-12 md:mb-16">
+          <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">
+            Serviços de <span class="text-[#38BDF8]">Vidraçaria</span>
+          </h2>
+          <p class="text-base md:text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Instalação e substituição de vidros temperados, janelas e esquadrias de vidro sob medida. Acabamento premium com materiais de alta qualidade.
+          </p>
+        </div>
+
+        <!-- Grid dos 4 Cards de Vidraçaria -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+          <a
+            v-for="produto in produtosVidracaria"
+            :key="produto.titulo"
+            :href="getWhatsappItemUrl(produto.titulo)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#38BDF8] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col bg-white/5 backdrop-blur-sm cursor-pointer"
+          >
+            <!-- Imagem do Card com Overlay Gradient -->
+            <div class="relative h-64 md:h-72 overflow-hidden bg-gray-900">
+              <img
+                :src="produto.imagem"
+                :alt="produto.titulo"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+              
+              <!-- Gradient Overlay de Leitura -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+
+              <!-- Badge do Destaque -->
+              <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                {{ produto.destaque }}
+              </div>
+
+              <!-- Conteúdo sobreposto na imagem (Estilo Card Dark Premium) -->
+              <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                <h3 class="text-lg md:text-xl font-bold text-white mb-2 leading-tight group-hover:text-[#38BDF8] transition-colors">
+                  {{ produto.titulo }}
+                </h3>
+                <p class="text-xs md:text-sm text-gray-200 line-clamp-3 leading-relaxed mb-3">
+                  {{ produto.descricao }}
+                </p>
+
+                <!-- Botão WhatsApp sobreposto -->
+                <div class="flex items-center justify-between pt-2 border-t border-white/20">
+                  <span class="text-xs text-gray-300 flex items-center gap-1">
+                    <Icon name="lucide:clock" class="w-3.5 h-3.5 text-[#F49A1A]" /> Instalação 24h
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 text-[#25D366] text-xs font-bold group-hover:translate-x-1 transition-transform">
+                    <Icon name="lucide:message-circle" class="w-4 h-4" /> WhatsApp
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
     <!-- Benefícios -->
     <section class="py-16 md:py-24 bg-white">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
         <div class="text-center mb-12 md:mb-16">
           <h2 class="text-3xl md:text-5xl font-bold text-[#22345F] mb-4">
-            Por que nossa Vidraçaria?
+            Por que Escolher Nossa Vidraçaria?
           </h2>
           <p class="text-base md:text-lg text-[#4B5563] max-w-2xl mx-auto">
-            Qualidade, segurança e garantia que você pode confiar
+            Qualidade, segurança e garantia que você e sua família podem confiar
           </p>
         </div>
 
@@ -184,19 +284,11 @@ const openFormModal = () => { showFormModal.value = true }
             :key="index"
             class="bg-gradient-to-br from-[#E5EDF8] to-white p-6 rounded-2xl border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl"
           >
-            <div class="w-14 h-14 bg-[#F49A1A] rounded-2xl flex items-center justify-center mb-4">
-              <svg v-if="beneficio.icone === 'shield'" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
-              <svg v-else-if="beneficio.icone === 'clock'" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <svg v-else-if="beneficio.icone === 'check'" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <svg v-else-if="beneficio.icone === 'award'" class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-              </svg>
+            <div class="w-14 h-14 bg-[#F49A1A] rounded-2xl flex items-center justify-center mb-4 text-white">
+              <Icon v-if="beneficio.icone === 'shield'" name="lucide:shield-check" class="w-7 h-7" />
+              <Icon v-else-if="beneficio.icone === 'clock'" name="lucide:clock" class="w-7 h-7" />
+              <Icon v-else-if="beneficio.icone === 'check'" name="lucide:check-circle" class="w-7 h-7" />
+              <Icon v-else name="lucide:award" class="w-7 h-7" />
             </div>
             <h3 class="text-lg font-bold text-[#22345F] mb-2">{{ beneficio.titulo }}</h3>
             <p class="text-sm text-[#4B5563]">{{ beneficio.descricao }}</p>
@@ -211,11 +303,11 @@ const openFormModal = () => { showFormModal.value = true }
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
 
           <div class="order-2 md:order-1">
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
               <img
                 :src="servico.imagemEspecificacoes"
                 :alt="`${servico.titulo} - especificações`"
-                class="w-full h-auto"
+                class="w-full h-[380px] object-cover"
                 loading="lazy"
               />
             </div>
@@ -246,7 +338,6 @@ const openFormModal = () => { showFormModal.value = true }
               rel="noopener noreferrer"
               @click="trackWhatsApp('especificacoes')"
               class="mt-8 w-full px-8 py-4 bg-[#F49A1A] text-white rounded-xl font-bold text-lg hover:bg-[#d88715] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-              data-gtm="vidracaria-specs-whatsapp"
             >
               <WhatsappIcon class="w-6 h-6" />
               Solicitar Orçamento Detalhado
@@ -264,7 +355,7 @@ const openFormModal = () => { showFormModal.value = true }
           <h2 class="text-3xl md:text-4xl font-bold text-[#22345F] mb-4">
             Nossa Vidraçaria vs Concorrentes
           </h2>
-          <p class="text-base md:text-lg text-[#4B5563]">Veja por que somos a melhor escolha</p>
+          <p class="text-base md:text-lg text-[#4B5563]">Veja por que somos a melhor escolha em São Paulo</p>
         </div>
 
         <div class="bg-white rounded-3xl border-2 border-[#E5EDF8] overflow-hidden shadow-xl">
@@ -301,7 +392,6 @@ const openFormModal = () => { showFormModal.value = true }
             rel="noopener noreferrer"
             @click="trackWhatsApp('comparacao')"
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
-            data-gtm="vidracaria-comparacao-whatsapp"
           >
             <WhatsappIcon class="w-6 h-6" />
             Quero a Melhor Opção!
@@ -315,7 +405,7 @@ const openFormModal = () => { showFormModal.value = true }
       <div class="container mx-auto px-4 md:px-6 max-w-4xl">
         <div class="text-center mb-12">
           <h2 class="text-3xl md:text-4xl font-bold text-[#22345F] mb-4">Perguntas Frequentes</h2>
-          <p class="text-base md:text-lg text-[#4B5563]">Tire suas dúvidas sobre vidraçaria</p>
+          <p class="text-base md:text-lg text-[#4B5563]">Tire suas dúvidas sobre serviços de vidraçaria</p>
         </div>
 
         <div class="space-y-4">
@@ -333,59 +423,19 @@ const openFormModal = () => { showFormModal.value = true }
             </div>
           </details>
         </div>
-
-        <div class="text-center mt-12 p-8 bg-gradient-to-br from-[#E5EDF8] to-white rounded-2xl border-2 border-[#E5EDF8]">
-          <p class="text-lg font-semibold text-[#22345F] mb-4">Ainda tem dúvidas?</p>
-          <a
-            :href="whatsappUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            @click="trackWhatsApp('faq')"
-            class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
-            data-gtm="vidracaria-faq-whatsapp"
-          >
-            <WhatsappIcon class="w-6 h-6" />
-            Fale com um Especialista
-          </a>
-        </div>
       </div>
     </section>
 
     <!-- CTA Final -->
     <section id="contato-final" class="py-16 md:py-24 bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white relative overflow-hidden">
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-      </div>
-
       <div class="container mx-auto px-4 md:px-6 max-w-4xl relative z-10 text-center">
-        <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-4 py-2 rounded-full text-sm font-bold mb-6">
-          <Icon name="lucide:clock" class="w-4 h-4" />
-          Oferta por tempo limitado
-        </div>
-
         <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">
           Modernize seu espaço HOJE!<br/>
           Instalação em 24h
         </h2>
-
         <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-          Box de banheiro, janelas, portas e espelhos com vidro temperado de qualidade premium e instalação profissional.
+          Janelas de vidro temperado, telhados de vidro e fachadas corporativas com acabamento premium e garantia.
         </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-3xl mx-auto">
-          <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-            <Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366]" />
-            <span class="font-semibold">Orçamento Grátis</span>
-          </div>
-          <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-            <Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366]" />
-            <span class="font-semibold">Instalação 24h</span>
-          </div>
-          <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-            <Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366]" />
-            <span class="font-semibold">Garantia 2 Anos</span>
-          </div>
-        </div>
 
         <a
           :href="whatsappUrl"
@@ -393,42 +443,10 @@ const openFormModal = () => { showFormModal.value = true }
           rel="noopener noreferrer"
           @click="trackWhatsApp('cta-final')"
           class="inline-flex items-center gap-3 px-10 py-5 bg-[#25D366] text-white rounded-2xl font-bold text-xl hover:bg-[#1fb854] transition-all duration-300 shadow-2xl hover:scale-105 mb-6"
-          data-gtm="vidracaria-cta-final-whatsapp"
         >
           <WhatsappIcon class="w-7 h-7" />
           Solicitar Orçamento GRÁTIS Agora
         </a>
-
-        <div class="flex items-center justify-center gap-6 text-sm text-white/80">
-          <div class="flex items-center gap-2">
-            <Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A]" />
-            <span>5 Mil+ clientes satisfeitos</span>
-          </div>
-          <a
-            :href="GOOGLE_REVIEWS_URL"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 hover:text-white transition-colors"
-          >
-            <span class="font-semibold">Nota 5.0</span>
-            <div class="flex gap-0.5">
-              <Icon v-for="i in 5" :key="i" name="lucide:star" class="w-4 h-4 text-[#F49A1A] fill-current" />
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Voltar -->
-    <section class="py-8 bg-white border-t-2 border-[#E5EDF8]">
-      <div class="container mx-auto px-4 md:px-6 text-center">
-        <NuxtLink
-          to="/servicos"
-          class="inline-flex items-center gap-2 text-[#22345F] hover:text-[#F49A1A] font-semibold transition-colors"
-        >
-          <Icon name="lucide:arrow-left" class="w-5 h-5" />
-          Voltar para Serviços
-        </NuxtLink>
       </div>
     </section>
 
@@ -442,13 +460,3 @@ const openFormModal = () => { showFormModal.value = true }
 
   </div>
 </template>
-
-<style scoped>
-details[open] summary ~ * {
-  animation: slideDown 0.3s ease-out;
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // Estado do menu mobile
@@ -10,12 +10,9 @@ const isScrolled = ref(false)
 // Itens do menu de navegação
 const menuItems = [
   { label: 'Início', id: 'hero', type: 'scroll' },
-  { label: 'Serviços', id: 'problems', type: 'scroll' },
+  { label: 'Serviços', id: 'services', type: 'scroll' },
   { label: 'Bairros', id: '/bairros', type: 'link' },
-  { label: 'Vantagens', id: 'value', type: 'scroll' },
-  { label: 'Cases', id: 'cases', type: 'scroll' },
   { label: 'Avaliações', id: 'reviews', type: 'scroll' },
-  { label: 'Soluções', id: 'solutions', type: 'scroll' },
   { label: 'FAQ', id: 'faq', type: 'scroll' },
   { label: 'Orçamento', id: '/orcamento', type: 'link', highlight: true },
   { label: 'Contato', id: '/contato', type: 'link' }
@@ -49,7 +46,9 @@ const scrollToSection = (item) => {
   if (item.id === 'hero') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   } else {
-    const element = document.querySelector(`[data-section="${item.id}"]`)
+    const element = document.getElementById(item.id) || 
+                    document.querySelector(`[data-section="${item.id}"]`) ||
+                    (item.id === 'services' ? document.getElementById('servicos') : null)
     if (element) {
       const headerHeight = 112
       const elementPosition = element.getBoundingClientRect().top + window.scrollY - headerHeight
@@ -107,7 +106,7 @@ onUnmounted(() => {
             :key="item.id"
             @click="scrollToSection(item)"
             :class="[
-              'px-3 py-2 text-sm font-medium transition-colors duration-200',
+              'px-3 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer',
               item.highlight 
                 ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-lg font-bold' 
                 : 'text-gray-700 hover:text-blue-600'
@@ -121,7 +120,7 @@ onUnmounted(() => {
         <div class="md:hidden">
           <button 
             @click="toggleMobileMenu"
-            class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 cursor-pointer"
           >
             <span class="sr-only">Abrir menu principal</span>
             <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -141,7 +140,7 @@ onUnmounted(() => {
           :key="item.id"
           @click="scrollToSection(item)"
           :class="[
-            'block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200',
+            'block px-3 py-2 text-base font-medium w-full text-left transition-colors duration-200 cursor-pointer',
             item.highlight
               ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-lg font-bold'
               : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'

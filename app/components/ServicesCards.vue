@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { useServicos } from '~/composables/useServicos'
 
 // ============================================
@@ -42,7 +42,7 @@ const servicosCards = [
     titulo: 'Vidraçaria',
     subtitulo: 'Box, janelas, portas e espelhos',
     descricaoCurta: 'Vidro temperado com instalação profissional, sob medida para qualquer ambiente',
-    imagem: '/images/mosquiteira_janela.png',
+    imagem: '/images/vidro_janela_8mm.png',
     destaque: 'Vidro Temperado',
     beneficios: [
       { titulo: 'Box de banheiro' },
@@ -76,7 +76,7 @@ const trackEvent = (eventName, params = {}) => {
 </script>
 
 <template>
-  <section id="servicos" class="py-16 md:py-24 bg-gradient-to-b from-white to-[#F9FAFB]">
+  <section id="servicos" data-section="services" class="py-16 md:py-24 bg-gradient-to-b from-white to-[#F9FAFB]">
     <div class="container mx-auto px-4 md:px-6 max-w-7xl">
       
       <!-- Header da Seção -->
@@ -150,14 +150,13 @@ const trackEvent = (eventName, params = {}) => {
             </div>
             
             <!-- Botão Ver Detalhes -->
-            <NuxtLink
-              :to="servico.url"
+            <div
               class="w-full px-6 py-4 bg-[#25D366] text-white rounded-xl font-bold text-base hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg group-hover:shadow-xl"
               :data-gtm="`servico-btn-${servico.slug}`"
             >
               <span>Ver Detalhes</span>
               <Icon name="lucide:arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </NuxtLink>
+            </div>
             
           </div>
         </NuxtLink>

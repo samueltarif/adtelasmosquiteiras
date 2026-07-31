@@ -290,7 +290,5 @@ const emailLink = `mailto:${EMAIL}`
       </div>
     </section>
 
-    <!-- CTA Final -->
-    <CtaSection />
   </div>
 </template>

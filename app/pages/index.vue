@@ -26,7 +26,9 @@ onMounted(() => {
   const hash = window.location.hash?.replace('#', '')
   if (hash) {
     setTimeout(() => {
-      const el = document.getElementById(hash)
+      const el = document.getElementById(hash) || 
+                 document.querySelector(`[data-section="${hash}"]`) ||
+                 (hash === 'services' ? document.getElementById('servicos') : null)
       if (el) {
         const headerHeight = 112
         const top = el.getBoundingClientRect().top + window.scrollY - headerHeight
@@ -40,18 +42,9 @@ onMounted(() => {
 <template>
   <div>
     <div id="hero"><HeroSection /></div>
-    <div id="problems"><ServicesCards /><ProblemsSection /></div>
-    <div id="value"><ValueProposition /></div>
-    <div id="cases"><CaseStudies /></div>
+    <div id="services"><ServicesCards /></div>
     <div id="reviews"><ReviewsCarousel /></div>
-    <div id="solutions"><SegmentedSolutions /></div>
     <div id="faq"><FaqSection /></div>
-    <CtaSection />
-    <MobileUnifiedCTA
-      servico-atual="Redes de Proteção ou Telas Mosquiteiras"
-      @open-form="openFormModal"
-    />
-    <QuickHelpChat />
     <StickyFormModal v-model="showFormModal" />
   </div>
 </template>
