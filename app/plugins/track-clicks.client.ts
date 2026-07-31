@@ -19,8 +19,14 @@ export default defineNuxtPlugin(() => {
 
     let tipo = ''
 
-    // 1. Links de WhatsApp (wa.me ou api.whatsapp.com)
-    if (href.includes('wa.me') || href.includes('whatsapp.com') || href.includes('whatsapp')) {
+    // 1. Links de WhatsApp (wa.me ou api.whatsapp.com ou whatsapp no text/gtm)
+    if (
+      href.includes('wa.me') || 
+      href.includes('whatsapp.com') || 
+      href.includes('whatsapp') || 
+      text.includes('whatsapp') ||
+      gtm.includes('whatsapp')
+    ) {
       tipo = 'whatsapp'
     }
     // 2. Links de telefone (tel:)
@@ -37,11 +43,7 @@ export default defineNuxtPlugin(() => {
     ) {
       tipo = 'formulario_submit'
     }
-    // 4. CTAs com data-gtm que mencionam whatsapp
-    else if (gtm.includes('whatsapp')) {
-      tipo = 'whatsapp'
-    }
-    // 5. Links para a página de contato ou orçamento (CTAs internos)
+    // 4. Links para a página de contato ou orçamento (CTAs internos)
     else if (href.includes('/contato') || href.includes('/orcamento')) {
       tipo = 'cta_interno'
     }
@@ -52,7 +54,8 @@ export default defineNuxtPlugin(() => {
         method: 'POST',
         body: {
           tipo,
-          origem: path
+          origem: path || '/',
+          text: text.substring(0, 100)
         }
       }).catch(() => {
         // Silencioso — nunca interfere na experiência

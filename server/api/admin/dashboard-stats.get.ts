@@ -94,7 +94,10 @@ export default defineEventHandler(async (event) => {
 
     // 8. Páginas mais visitadas
     const pageMap: Record<string, number> = {}
-    views.forEach(v => { const p = v.path || '/'; pageMap[p] = (pageMap[p] || 0) + 1 })
+    views.forEach(v => {
+      const p = (!v.path || v.path === '/') ? 'Home (/)' : v.path
+      pageMap[p] = (pageMap[p] || 0) + 1
+    })
     const topPages = Object.entries(pageMap)
       .map(([path, count]) => ({ path, count, percentage: totalVisits > 0 ? Math.round((count / totalVisits) * 100) : 0 }))
       .sort((a, b) => b.count - a.count).slice(0, 5)

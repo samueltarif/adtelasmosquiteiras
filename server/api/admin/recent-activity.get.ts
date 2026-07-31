@@ -33,10 +33,11 @@ export default defineEventHandler(async (event) => {
     const events: any[] = []
 
     for (const v of viewsRes || []) {
+      const displayPath = (!v.path || v.path === '/') ? 'Home (/)' : v.path
       events.push({
         tipo: 'visita',
         label: 'Visita a página',
-        sublabel: v.path || '/',
+        sublabel: displayPath,
         created_at: v.created_at
       })
     }
@@ -48,10 +49,11 @@ export default defineEventHandler(async (event) => {
         formulario_submit: 'Início de formulário',
         cta_interno: 'Clique em CTA'
       }
+      const displayPath = (!c.origem || c.origem === '/') ? 'Home (/)' : c.origem
       events.push({
         tipo: c.tipo || 'click',
         label: tipoLabel[c.tipo] || 'Interação no site',
-        sublabel: c.origem || '/',
+        sublabel: displayPath,
         created_at: c.created_at
       })
     }
