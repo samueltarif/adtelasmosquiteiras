@@ -131,7 +131,7 @@ const emailLink = `mailto:${EMAIL}`
                 <div class="flex-1">
                   <h3 class="text-lg font-bold text-gray-900 mb-1">Email</h3>
                   <p class="text-gray-600 text-sm mb-2">Envie sua mensagem</p>
-                  <p class="text-orange-600 font-semibold break-all">{{ EMAIL }}</p>
+                  <p class="text-orange-600 font-semibold break-all" v-html="`<!--email_off-->${EMAIL}<!--/email_off-->`"></p>
                 </div>
                 <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
               </a>

@@ -323,7 +323,7 @@ const callPhone = () => {
                 <div class="flex-1 text-left">
                   <div class="font-bold text-lg mb-1">E-mail</div>
                   <div class="text-[#4B5563] text-sm">Envie sua dúvida</div>
-                  <div class="text-[#22345F] font-semibold mt-1 text-sm break-all">vendas.adtelaseredes@gmail.com</div>
+                  <div class="text-[#22345F] font-semibold mt-1 text-sm break-all" v-html="'<!--email_off-->vendas.adtelaseredes@gmail.com<!--/email_off-->'"></div>
                 </div>
                 <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
               </div>
