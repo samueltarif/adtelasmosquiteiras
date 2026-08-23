@@ -1,4 +1,8 @@
 export const REDIRECT_MAP: Record<string, string> = {
+  // TECHNICAL LEGACY REDIRECT (1)
+  '/home': '/',
+
+  // SEO MIGRATION REDIRECTS (45)
   '/bairros': '/areas-atendidas',
   '/servicos/rede-protecao': '/servicos/redes',
   '/servicos/tela-mosquiteira': '/servicos/telas',
