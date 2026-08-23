@@ -1,6 +1,6 @@
 -- ======================================================================
 -- SCRIPT COMPLETO DE SEED / RESTAURAÇÃO DE DADOS DA AD TELAS E REDES
--- Data da exportação: 2026-08-23T22:32:14.518Z
+-- Data da exportação: 2026-08-23T22:35:42.134Z
 -- Instalação: Execute ESTE script APÓS criar o schema (schema_full.sql)
 -- ======================================================================
 

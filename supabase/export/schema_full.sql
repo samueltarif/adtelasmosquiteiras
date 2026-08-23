@@ -1,6 +1,6 @@
 -- ======================================================================
 -- SCRIPT COMPLETO DE DDL DA AD TELAS E REDES (NOVO SUPABASE)
--- Data da exportação: 2026-08-23T22:32:14.517Z
+-- Data da exportação: 2026-08-23T22:35:42.132Z
 -- Instalação: Copie este script e cole no SQL Editor do seu novo projeto Supabase
 -- ======================================================================
 
@@ -62,8 +62,9 @@ CREATE POLICY "Permitir leitura de page_views apenas de admins autenticados" ON 
 CREATE TABLE IF NOT EXISTS public.cron_ticks (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    status VARCHAR(50) DEFAULT 'ok'
+    valor INT DEFAULT 1
 );
+ALTER TABLE public.cron_ticks ADD COLUMN IF NOT EXISTS valor INT DEFAULT 1;
 ALTER TABLE public.cron_ticks ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Permitir inserções públicas de cron_ticks" ON public.cron_ticks FOR INSERT TO anon WITH CHECK (true);
 
