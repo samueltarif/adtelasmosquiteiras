@@ -44,8 +44,8 @@ const goToStep1 = () => {
 
 // Enviar formulário (envia email e redireciona para página de obrigado)
 const sendToWhatsApp = async () => {
-  if (!canContinue.value) {
-    alert('Por favor, preencha todos os campos obrigatórios.')
+  if (!canContinue.value || isSubmitting.value) {
+    if (!canContinue.value) alert('Por favor, preencha todos os campos obrigatórios.')
     return
   }
 

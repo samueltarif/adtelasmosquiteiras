@@ -1,5 +1,11 @@
-export default defineNuxtPlugin((nuxtApp) => {
-  // Gera um session ID único por sessão do navegador
+export default defineNuxtPlugin(() => {
+  if (typeof window === 'undefined') return
+
+  // Deduplicação em memória para evitar disparo duplo simultâneo (ex: app:mounted + afterEach)
+  let lastTrackedPath = ''
+  let lastTrackedTime = 0
+
+  // Gera um session ID único por sessão do navegador (sessionStorage)
   const getSessionId = () => {
     if (typeof sessionStorage === 'undefined') return ''
     let sid = sessionStorage.getItem('adt_sid')
@@ -12,7 +18,16 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const trackPage = (path: string) => {
     // Ignora rotas admin
-    if (path.startsWith('/admin')) return
+    if (!path || path.startsWith('/admin')) return
+
+    const now = Date.now()
+    // Trava de deduplicação: descarta se for a mesma rota rastreada a menos de 1000ms
+    if (path === lastTrackedPath && (now - lastTrackedTime) < 1000) {
+      return
+    }
+
+    lastTrackedPath = path
+    lastTrackedTime = now
 
     // Fire-and-forget — não bloqueia navegação
     $fetch('/api/track-visit', {
@@ -27,12 +42,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
   }
 
-  // Rastreia a página inicial
-  nuxtApp.hook('app:mounted', () => {
-    trackPage(window.location.pathname)
-  })
-
-  // Rastreia cada mudança de rota (SPA navigation)
+  // Rastreia navegação inicial (hard load / F5) e trocas de rota SPA / Back / Forward
   const router = useRouter()
   router.afterEach((to) => {
     trackPage(to.path)

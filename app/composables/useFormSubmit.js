@@ -1,6 +1,6 @@
 /**
  * Composable reutilizável para submit de formulários
- * Envia email via API e redireciona para /obrigado
+ * Envia email/lead via API e redireciona para /obrigado
  */
 export function useFormSubmit() {
   const isSubmitting = ref(false)
@@ -25,11 +25,15 @@ export function useFormSubmit() {
   }
 
   const redirectToThankYou = async (fields) => {
+    // Trava de segurança contra duplo clique / requisições simultâneas
+    if (isSubmitting.value) return
+    isSubmitting.value = true
+
     // Disparar conversão Google Ads
     reportConversion()
 
     try {
-      // Enviar email via API
+      // Enviar email e gravar lead no banco via API
       await $fetch('/api/send-lead', {
         method: 'POST',
         body: {
@@ -44,7 +48,9 @@ export function useFormSubmit() {
         }
       })
     } catch (e) {
-      console.error('Erro ao enviar email:', e)
+      console.error('Erro ao enviar lead/email:', e)
+    } finally {
+      isSubmitting.value = false
     }
 
     // Redirecionar para /obrigado sem query params

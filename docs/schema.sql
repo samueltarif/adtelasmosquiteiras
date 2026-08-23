@@ -70,3 +70,30 @@ CREATE POLICY "Permitir leitura de cliques apenas de admins autenticados"
 ON public.lead_clicks FOR SELECT 
 TO authenticated 
 USING (true);
+
+-- 3. Tabela Canônica de Page Views (page_views)
+CREATE TABLE IF NOT EXISTS public.page_views (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    path VARCHAR(255) NOT NULL,
+    referrer TEXT,
+    user_agent TEXT,
+    ip_hash VARCHAR(64),
+    session_id VARCHAR(100)
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_views_created_at ON public.page_views(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_page_views_path ON public.page_views(path);
+
+ALTER TABLE public.page_views ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Permitir inserções públicas de page_views" 
+ON public.page_views FOR INSERT 
+TO anon 
+WITH CHECK (true);
+
+CREATE POLICY "Permitir leitura de page_views apenas de admins autenticados" 
+ON public.page_views FOR SELECT 
+TO authenticated 
+USING (true);
+
