@@ -21,7 +21,6 @@ useHead({
   title: `${familia.nome} | Todos os Serviços | AD Telas`,
   meta: [
     { name: 'description', content: `${familia.descricao}. ${totalServicos} serviços disponíveis. Instalação em 24h. Garantia 2 anos.` },
-    { name: 'keywords', content: `${familia.nome.toLowerCase()}, são paulo, instalação, garantia` },
     { property: 'og:title', content: `${familia.nome} | AD Telas` },
     { property: 'og:description', content: familia.descricao }
   ]

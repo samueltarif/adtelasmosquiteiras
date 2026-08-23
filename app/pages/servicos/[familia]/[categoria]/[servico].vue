@@ -20,7 +20,6 @@ useHead({
   title: servico.metaTitle,
   meta: [
     { name: 'description', content: servico.metaDescription },
-    { name: 'keywords', content: servico.keywords.join(', ') },
     { property: 'og:title', content: servico.metaTitle },
     { property: 'og:description', content: servico.metaDescription },
     { property: 'og:image', content: servico.imagem },

@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     port: 3001
   },
   
-  // Security Headers
+  // Security Headers & SEO 301 Redirects
   nitro: {
     routeRules: {
       '/**': {
@@ -57,7 +57,53 @@ export default defineNuxtConfig({
             "frame-ancestors 'none'"
           ].join('; ')
         }
-      }
+      },
+      // Fase 03C: COMPLETE_URL_MIGRATION_MAP (45 Redirects 301)
+      '/bairros': { redirect: { to: '/areas-atendidas', statusCode: 301 } },
+      '/servicos/rede-protecao': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/tela-mosquiteira': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/redes/residencial': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/pets': { redirect: { to: '/servicos/redes/gatos-e-pets', statusCode: 301 } },
+      '/servicos/redes/comercial': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/telas/residencial': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/especiais': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/pet': { redirect: { to: '/servicos/telas/pet-screen', statusCode: 301 } },
+      '/servicos/telas/comercial': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/redes/residencial/janelas': { redirect: { to: '/servicos/redes/janelas', statusCode: 301 } },
+      '/servicos/redes/residencial/sacadas': { redirect: { to: '/servicos/redes/sacadas-e-varandas', statusCode: 301 } },
+      '/servicos/redes/residencial/varandas': { redirect: { to: '/servicos/redes/sacadas-e-varandas', statusCode: 301 } },
+      '/servicos/redes/residencial/apartamentos': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/residencial/portas': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/residencial/escadas': { redirect: { to: '/servicos/redes/escadas-e-mezaninos', statusCode: 301 } },
+      '/servicos/redes/residencial/basculantes': { redirect: { to: '/servicos/redes/janelas', statusCode: 301 } },
+      '/servicos/redes/pets/criancas': { redirect: { to: '/servicos/redes/criancas', statusCode: 301 } },
+      '/servicos/redes/pets/gatos': { redirect: { to: '/servicos/redes/gatos-e-pets', statusCode: 301 } },
+      '/servicos/redes/pets/cachorros': { redirect: { to: '/servicos/redes/gatos-e-pets', statusCode: 301 } },
+      '/servicos/redes/pets/animais': { redirect: { to: '/servicos/redes/gatos-e-pets', statusCode: 301 } },
+      '/servicos/redes/pets/idosos': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/comercial/piscinas': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/comercial/telhados': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/comercial/portoes': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/comercial/muros': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/redes/comercial/coberturas': { redirect: { to: '/servicos/redes', statusCode: 301 } },
+      '/servicos/telas/residencial/janelas': { redirect: { to: '/servicos/telas/janelas', statusCode: 301 } },
+      '/servicos/telas/residencial/portas': { redirect: { to: '/servicos/telas/portas', statusCode: 301 } },
+      '/servicos/telas/residencial/varandas': { redirect: { to: '/servicos/telas/sacadas-e-varandas', statusCode: 301 } },
+      '/servicos/telas/residencial/sacadas': { redirect: { to: '/servicos/telas/sacadas-e-varandas', statusCode: 301 } },
+      '/servicos/telas/residencial/apartamentos': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/residencial/banheiro': { redirect: { to: '/servicos/telas/janelas', statusCode: 301 } },
+      '/servicos/telas/especiais/correr': { redirect: { to: '/servicos/telas/janelas', statusCode: 301 } },
+      '/servicos/telas/especiais/pivotante': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/especiais/removivel': { redirect: { to: '/servicos/telas/removivel', statusCode: 301 } },
+      '/servicos/telas/especiais/basculante': { redirect: { to: '/servicos/telas/janelas', statusCode: 301 } },
+      '/servicos/telas/especiais/aluminio': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/especiais/acoinox': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/pet/pets': { redirect: { to: '/servicos/telas/pet-screen', statusCode: 301 } },
+      '/servicos/telas/pet/pernilongos': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/comercial/fachadas': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/comercial/coberturas': { redirect: { to: '/servicos/telas', statusCode: 301 } },
+      '/servicos/telas/comercial/restaurantes': { redirect: { to: '/servicos/telas/restaurantes', statusCode: 301 } },
+      '/servicos/telas/comercial/industrias': { redirect: { to: '/servicos/telas', statusCode: 301 } }
     }
   },
   
@@ -73,7 +119,6 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'Telas de segurança e redes protetoras instaladas em SP. Proteja sua família com garantia de qualidade e instalação rápida.' },
-        { name: 'keywords', content: 'tela de segurança SP, rede protetora, mosquiteiro, tela para varanda, proteção infantil' },
         { property: 'og:title', content: 'AD Telas e Redes - Proteção Profissional para Sua Família em SP' },
         { property: 'og:description', content: 'Instale telas de segurança com garantia. Proteja crianças, pets e sua casa contra insetos e quedas.' },
         { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },

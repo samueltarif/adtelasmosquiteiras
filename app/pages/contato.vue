@@ -4,7 +4,6 @@ useHead({
   title: 'Contato - AD Telas e Redes | Orçamento Grátis',
   meta: [
     { name: 'description', content: 'Entre em contato com a AD Telas e Redes. WhatsApp, telefone, formulário. Atendimento rápido em São Paulo. Orçamento grátis!' },
-    { name: 'keywords', content: 'contato ad telas, orçamento telas, whatsapp telas, telefone ad telas' },
     { property: 'og:title', content: 'Contato - AD Telas e Redes' },
     { property: 'og:description', content: 'Fale conosco via WhatsApp, telefone ou formulário. Resposta rápida garantida!' }
   ]

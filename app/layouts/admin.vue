@@ -4,6 +4,12 @@ import { ref } from 'vue'
 const route = useRoute()
 const isMobileMenuOpen = ref(false)
 
+useHead({
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }

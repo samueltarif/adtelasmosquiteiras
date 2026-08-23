@@ -1,7 +1,19 @@
 <script setup lang="ts">
 // App principal - Nuxt 4
+const route = useRoute()
+
+const canonicalUrl = computed(() => {
+  const cleanPath = route.path === '/' ? '' : route.path.replace(/\/$/, '')
+  return `https://www.adtelasmosquiteiras.com.br${cleanPath || '/'}`
+})
 
 useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: () => canonicalUrl.value
+    }
+  ],
   script: [
     // Schema.org Organization markup para logo aparecer no Google
     {

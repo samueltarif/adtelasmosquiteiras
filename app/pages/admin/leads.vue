@@ -6,7 +6,10 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Gestão de Leads - AD Telas e Redes'
+  title: 'Gestão de Leads - AD Telas e Redes',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
 })
 
 // Estado de carregamento e dados

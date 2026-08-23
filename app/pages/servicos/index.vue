@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { useServicos } from '~/composables/useServicos'
 
 const { getTotalServicos } = useServicos()
@@ -6,12 +6,11 @@ const totalServicos = getTotalServicos()
 
 // SEO
 useHead({
-  title: 'Nossos Serviços | Redes de Proteção e Telas Mosquiteiras | AD Telas',
+  title: 'Serviços de Redes de Proteção e Telas Mosquiteiras | AD Telas e Redes',
   meta: [
-    { name: 'description', content: `${totalServicos} serviços de redes de proteção e telas mosquiteiras em São Paulo. Instalação em 24h. Garantia 2 anos. Orçamento grátis!` },
-    { name: 'keywords', content: 'redes de proteção, telas mosquiteiras, janelas, sacadas, pets, crianças, são paulo' },
-    { property: 'og:title', content: 'Nossos Serviços | AD Telas e Redes' },
-    { property: 'og:description', content: `${totalServicos} serviços disponíveis. Proteção para sua família e seu lar.` }
+    { name: 'description', content: 'Serviços de redes de proteção e telas mosquiteiras sob medida em São Paulo. Instalação profissional para residências, condomínios e comércios.' },
+    { property: 'og:title', content: 'Serviços | AD Telas e Redes' },
+    { property: 'og:description', content: 'Conheça nossos serviços de redes de proteção e telas mosquiteiras sob medida em São Paulo.' }
   ]
 })
 

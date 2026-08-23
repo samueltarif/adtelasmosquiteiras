@@ -14,9 +14,7 @@ useHead({
     { property: 'og:url', content: 'https://www.adtelasmosquiteiras.com.br/' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
   ],
-  link: [
-    { rel: 'canonical', href: 'https://www.adtelasmosquiteiras.com.br/' }
-  ]
+  // Canonical gerado dinamicamente pelo app.vue para todas as páginas
 })
 
 const showFormModal = ref(false)

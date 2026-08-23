@@ -61,7 +61,6 @@ useHead({
   title: 'Solicitar Orçamento Grátis | AD Telas e Redes SP',
   meta: [
     { name: 'description', content: 'Solicite seu orçamento grátis de telas mosquiteiras e redes de proteção. Atendimento rápido via WhatsApp, telefone ou formulário. Instalação em 24h.' },
-    { name: 'keywords', content: 'orçamento telas, orçamento redes proteção, orçamento grátis, solicitar orçamento sp' },
     { property: 'og:title', content: 'Orçamento Grátis - AD Telas e Redes' },
     { property: 'og:description', content: 'Receba seu orçamento em minutos. WhatsApp, telefone ou formulário online.' }
   ]

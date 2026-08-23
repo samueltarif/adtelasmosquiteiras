@@ -2,7 +2,12 @@
 import { onMounted, ref, computed } from 'vue'
 
 definePageMeta({ layout: 'admin' })
-useHead({ title: 'Dashboard - AD Telas e Redes' })
+useHead({
+  title: 'Dashboard - AD Telas e Redes',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
 
 const isLoading = ref(true)
 const hoveredPoint = ref(null)

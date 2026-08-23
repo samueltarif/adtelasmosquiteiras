@@ -15,7 +15,6 @@ useHead({
   title: servico?.metaTitle || 'Serviços | AD Telas',
   meta: [
     { name: 'description', content: servico?.metaDescription || 'Serviços de redes e telas' },
-    { name: 'keywords', content: servico?.keywords?.join(', ') || '' },
     { property: 'og:title', content: servico?.metaTitle || 'Serviços | AD Telas' },
     { property: 'og:description', content: servico?.metaDescription || 'Serviços de redes e telas' },
     { property: 'og:image', content: servico?.imagemHero || '/images/familia.png' },

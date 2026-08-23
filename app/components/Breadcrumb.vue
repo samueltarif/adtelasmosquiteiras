@@ -5,6 +5,10 @@ const props = defineProps({
   path: {
     type: String,
     default: ''
+  },
+  items: {
+    type: Array,
+    default: null
   }
 })
 
@@ -15,8 +19,12 @@ const { getFamiliaBySlug, getCategoriaBySlug, getServicoBySlug } = useServicos()
 // Usar path da prop ou route atual
 const currentPath = computed(() => props.path || route.path)
 
-// Gerar breadcrumb items baseado no path
+// Gerar breadcrumb items baseado no path ou usar items explícitos
 const breadcrumbItems = computed(() => {
+  if (props.items && Array.isArray(props.items) && props.items.length > 0) {
+    return props.items
+  }
+
   const items = [
     { label: 'Home', path: '/', current: false, icon: 'lucide:home' }
   ]

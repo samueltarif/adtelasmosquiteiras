@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const carouselImages = [
@@ -40,6 +40,8 @@ onUnmounted(() => { clearInterval(timer) })
             :key="img.src"
             :src="img.src"
             :alt="img.alt"
+            :loading="i === 0 ? 'eager' : 'lazy'"
+            :fetchpriority="i === 0 ? 'high' : 'auto'"
             class="absolute inset-0 w-full h-full object-cover"
           />
         </transition-group>
@@ -49,9 +51,9 @@ onUnmounted(() => { clearInterval(timer) })
 
         <!-- Headline sobre a imagem -->
         <div class="absolute bottom-0 left-0 right-0 px-5 pb-5">
-          <h1 class="text-[28px] leading-[1.15] font-bold text-white tracking-tight drop-shadow">
+          <p class="text-[28px] leading-[1.15] font-bold text-white tracking-tight drop-shadow">
             Telas Mosquiteiras<br>em São Paulo
-          </h1>
+          </p>
           <p class="text-white/80 text-sm mt-1">Instalação profissional • Garantia 2 anos</p>
         </div>
 
@@ -208,6 +210,8 @@ onUnmounted(() => { clearInterval(timer) })
                   :key="img.src"
                   :src="img.src"
                   :alt="img.alt"
+                  :loading="i === 0 ? 'eager' : 'lazy'"
+                  :fetchpriority="i === 0 ? 'high' : 'auto'"
                   class="absolute inset-0 w-full h-full object-cover"
                 />
               </transition-group>

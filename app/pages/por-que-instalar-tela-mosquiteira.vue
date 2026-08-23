@@ -3,7 +3,6 @@ useHead({
   title: 'Por que instalar tela mosquiteira? Casos reais e riscos de saúde | AD Telas',
   meta: [
     { name: 'description', content: 'Dengue, zika, malária, chikungunya: veja casos reais de mortes e doenças causadas por mosquitos em SP e entenda por que a tela mosquiteira é essencial.' },
-    { name: 'keywords', content: 'dengue morte, zika gestante, mosquito doença, tela mosquiteira proteção, chikungunya, malária' },
   ],
 })
 
