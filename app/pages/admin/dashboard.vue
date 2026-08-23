@@ -66,22 +66,21 @@ const fetchStats = async () => {
       $fetch('/api/admin/recent-activity')
     ])
     if (d?.success) {
-      stats.value.totalLeads = d.totalLeads
-      stats.value.whatsappClicks = d.whatsappClicks
-      stats.value.conversionRate = d.conversionRate
-      stats.value.totalVisits = d.totalVisits
-      stats.value.uniqueVisitors = d.uniqueVisitors
+      stats.value.totalLeads = d.totalLeads || 0
+      stats.value.legacySyntheticCount = d.legacySyntheticCount || 0
+      stats.value.whatsappClicks = d.whatsappClicks || 0
+      stats.value.conversionRate = d.conversionRate || '0.0%'
+      stats.value.totalVisits = d.totalVisits || 0
+      stats.value.uniqueVisitors = d.uniqueVisitors || 0
       stats.value.dailyLeads = d.dailyLeads || []
       stats.value.dailyVisits = d.dailyVisits || []
       stats.value.serviceDistribution = d.serviceDistribution || []
       stats.value.topLocations = d.topLocations || []
       stats.value.topPages = d.topPages || []
-    } else {
-      useFb()
     }
     recentEvents.value = act?.events || []
-  } catch {
-    useFb()
+  } catch (err) {
+    console.error('Erro ao buscar stats do admin:', err)
   } finally {
     isLoading.value = false
     setTimeout(() => { animReady.value = true }, 150)
