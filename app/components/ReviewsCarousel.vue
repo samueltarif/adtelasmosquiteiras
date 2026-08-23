@@ -50,7 +50,7 @@ const reviews = [
     name: 'Marcelo Souza',
     rating: 5,
     date: 'Há 2 meses',
-    text: 'Excelente profissionalismo. Já é o segundo imóvel que instalo com a AD Telas. Segurança total para minha família.',
+    text: 'Excelente profissionalismo. Já é o segundo imóvel que instalo com a AD Telas. Mais segurança para minha família.',
     service: 'Telas e Redes de Proteção',
     image: '/images/avaliação5.png'
   }

@@ -19,9 +19,9 @@ export const useServicoData = () => {
       slug: 'rede-protecao',
       titulo: 'Rede de Proteção para Janelas e Sacadas',
       subtitulo: 'Segurança para crianças e pets',
-      destaque: 'Resiste até 500kg',
-      descricaoCurta: 'Proteção contra quedas e intrusões',
-      descricaoCompleta: 'Nossa rede de proteção é fabricada com fios de polietileno de alta resistência, suportando até 500kg. Ideal para famílias com crianças pequenas e pets, oferece segurança total em janelas, sacadas e varandas.',
+      destaque: 'Sob medida',
+      descricaoCurta: 'Proteção para janelas, sacadas e varandas',
+      descricaoCompleta: 'Nossa rede de proteção é instalada sob medida para o vão de sua janela ou sacada. Ideal para famílias com crianças e pets, oferece mais segurança em janelas, sacadas e varandas.',
       imagem: '/images/familia.png', // Card principal
       imagemHero: '/images/familia.png', // Hero da página
       imagemDemo: '/images/protecaoinfantil.jpeg', // Seção demo
@@ -30,77 +30,68 @@ export const useServicoData = () => {
       beneficios: [
         {
           icone: 'shield',
-          titulo: 'Resiste Chuva e Sol',
-          descricao: 'Material UV resistente, não desbota nem resseca'
+          titulo: 'Proteção Sob Medida',
+          descricao: 'Instalação adequada para o vão da sua janela ou sacada'
         },
         {
           icone: 'clock',
-          titulo: 'Instalação em 24h',
-          descricao: 'Agendamento rápido, instalação profissional'
+          titulo: 'Atendimento em SP',
+          descricao: 'Agendamento e medição no local'
         },
         {
           icone: 'check',
-          titulo: 'Fácil de Limpar',
+          titulo: 'Fácil Manutenção',
           descricao: 'Manutenção simples com água e sabão neutro'
         },
         {
           icone: 'award',
-          titulo: 'Encaixe Perfeito',
-          descricao: 'Medição precisa, acabamento impecável'
+          titulo: 'Gatos e pets protegidos',
+          descricao: 'Prevenção contra acidentes em vãos externos'
         }
       ],
       
       // Especificações técnicas
       especificacoes: [
-        { label: 'Material', valor: 'Polietileno de alta resistência' },
-        { label: 'Resistência', valor: 'Até 500kg' },
+        { label: 'Material', valor: 'Rede de proteção sob medida' },
+        { label: 'Fixação', valor: 'Pontos de ancoragem no vão' },
         { label: 'Garantia', valor: '2 anos' },
-        { label: 'Malha', valor: '3x3cm ou 5x5cm' },
-        { label: 'Cores', valor: 'Branca, preta, verde' },
-        { label: 'Instalação', valor: '24h após medição' }
+        { label: 'Instalação', valor: 'Agendamento rápido' }
       ],
       
       // Comparação com concorrentes
       comparacao: {
-        nos: ['Garantia 2 anos', 'Instalação 24h', 'Material premium', 'Suporte 500kg', 'Certificado INMETRO'],
-        concorrentes: ['Garantia 6 meses', 'Instalação 7-15 dias', 'Material padrão', 'Suporte 300kg', 'Sem certificação']
+        nos: ['Garantia 2 anos', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida', 'Instalação profissional'],
+        concorrentes: ['Sem garantia formal', 'Demora no atendimento', 'Material comum', 'Sem medição local', 'Sem instalação sob medida']
       },
       
       // Cases específicos
       cases: [
         {
-          cliente: 'Família Silva',
+          cliente: 'Família em Moema',
           local: 'Moema - SP',
-          problema: 'Apartamento 8º andar com criança de 3 anos',
-          solucao: 'Instalação de rede em 3 janelas e sacada',
-          resultado: 'Tranquilidade total para os pais'
-        },
-        {
-          cliente: 'Casal com 2 gatos',
-          local: 'Vila Mariana - SP',
-          problema: 'Gatos tentando pular da janela',
-          solucao: 'Rede de proteção em todas as janelas',
-          resultado: 'Pets seguros, donos tranquilos'
+          problema: 'Janelas e sacada precisando de proteção para pets',
+          solucao: 'Instalação de rede de proteção sob medida em todas as janelas',
+          resultado: 'Ambiente seguro para a família'
         }
       ],
       
       // FAQ específica
       faq: [
         {
-          pergunta: 'A rede suporta o peso de um adulto?',
-          resposta: 'Sim! Nossa rede suporta até 500kg, muito além do peso de um adulto. É testada e certificada pelo INMETRO.'
+          pergunta: 'A rede de proteção aguenta o uso no dia a dia?',
+          resposta: 'Sim! Nossa rede é dimensionada sob medida para a estrutura do seu imóvel e instalada por profissionais capacitados.'
         },
         {
-          pergunta: 'A rede estraga com chuva e sol?',
-          resposta: 'Não! O material é tratado com proteção UV e resistente à água. Garantimos 2 anos contra desgaste natural.'
+          pergunta: 'Precisa de manutenção com sol e chuva?',
+          resposta: 'A manutenção básica requer apenas limpeza periódica. Garantimos 2 anos contra defeitos de instalação.'
         },
         {
           pergunta: 'Quanto tempo demora a instalação?',
-          resposta: 'Após a medição, Instalamos em até 24h. O processo de instalação leva de 2 a 4 horas dependendo do tamanho.'
+          resposta: 'Após a medição no local, a instalação é realizada na data combinada.'
         },
         {
           pergunta: 'Posso escolher a cor da rede?',
-          resposta: 'Sim! Oferecemos branca (mais comum), preta e verde. A cor não afeta a resistência.'
+          resposta: 'Sim! Oferecemos branca (mais comum), preta e verde.'
         },
         {
           pergunta: 'A rede atrapalha a vista da janela?',
@@ -112,8 +103,8 @@ export const useServicoData = () => {
       keywords: ['rede de proteção', 'proteção janela', 'segurança criança', 'proteção pet', 'rede sacada'],
       
       // Meta tags
-      metaTitle: 'Rede de Proteção em São Paulo | Instalação 24h | AD Telas',
-      metaDescription: 'Rede de proteção para janelas e sacadas. Resiste até 500kg. Instalação em 24h. Garantia 2 anos. Proteja sua família e pets. Orçamento grátis!'
+      metaTitle: 'Rede de Proteção em São Paulo | Instalação Sob Medida | AD Telas',
+      metaDescription: 'Rede de proteção para janelas e sacadas sob medida em SP. Garantia de 2 anos. Proteja sua família e pets. Orçamento grátis!'
     },
     
     {

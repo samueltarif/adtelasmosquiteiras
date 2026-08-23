@@ -1,7 +1,7 @@
-# SEO FASE 03B — RELATÓRIO DE CONSTRUÇÃO DE CONTEÚDO DEFINITIVO (REVISÃO FACTUAL E AUDITORIA DE CLAIMS)
+# SEO FASE 03B — RELATÓRIO DE CONSTRUÇÃO DE CONTEÚDO DEFINITIVO
 
 **Projeto:** AD Telas e Redes — `adtelasmosquiteiras.com.br`  
-**Fase:** 03B — Construção das Páginas SEO Definitivas (Taxonomia Factual e Comercial)  
+**Fase:** 03B — Construção das Páginas SEO Definitivas  
 **Data:** 2026-08-23  
 **Status:** `FINAL APPROVED CANDIDATE`
 
@@ -13,11 +13,7 @@ A Fase 03B implementou localmente as **12 páginas comerciais definitivas** da n
 
 Todas as páginas foram construídas com:
 - **Conteúdo editorial 100% próprio e exclusivo** para cada intenção de busca.
-- **Matriz de Validação de Claims em 4 Categorias:**
-  - `OWNER_CONFIRMED`: Claims comerciais, operacionais e históricos confirmados pelo proprietário (Garantia de 2 anos, atendimento sob medida, +5 mil clientes, 10+ anos de experiência).
-  - `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA`: Métricas públicas de perfil externo confirmadas (5.0 ★ e avaliações do Google Meu Negócio).
-  - `TECHNICALLY_DOCUMENTED`: Claims técnicos de desempenho mecânico e química (500kg, anti-UV, INMETRO, NBR) que exigem laudo de laboratório/fabricante em arquivo.
-  - `UNSUPPORTED`: Presunções não fundamentadas e promessas absolutas (*"100% seguro"*), neutralizadas para linguagem funcional e responsável (*"mais segurança"*, *"redução de riscos"*).
+- **Copy factual e neutra**, sem adjetivação ou garantias de desempenho mecânico sem laudo em arquivo.
 - **Componente de Breadcrumb unificado e retrocompatível**, preparado para SEO estruturado.
 - **Imagens pré-existentes no repositório** com alt text puramente descritivo (sem suposições de proveniência de instalação).
 - **Perguntas frequentes (FAQ) customizadas** por aplicação.
@@ -158,38 +154,11 @@ Todas as imagens utilizadas são **imagens pré-existentes no repositório** (`/
 
 ---
 
-## 8. FINAL_CLAIMS_VALIDATION_MATRIX (Auditoria com Correção de Contexto)
-
-Auditoria atualizada de acordo com as 4 categorias de validação de claims:
-
-| CLAIM AUDITADO | CATEGORIA | STATUS DE VALIDAÇÃO | TRATAMENTO REALIZADO NO SITE |
-|---|---|---|---|
-| "Garantia de 2 anos de instalação" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Confirmado expressamente pelo proprietário. |
-| "Atendimento / Agendamento sob medida" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Processo de atendimento real da empresa. |
-| "+5 mil clientes atendidos" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
-| "10+ anos de experiência" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
-| "5.0 ★ (Perfil Google)" | Prova Social | `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA` | **MANTIDO / PERMITIDO** — Nota pública real do perfil Google Meu Negócio. |
-| "Resiste a 500kg / 500kg/m²" | Desempenho Mecânico | `TECHNICALLY_DOCUMENTED` | Exige laudo técnico de laboratório para exibição de valor numérico mecânico. |
-| "Polietileno virgem com aditivo anti-UV" | Composição Química | `TECHNICALLY_DOCUMENTED` | Exige laudo/ficha técnica do fornecedor em arquivo no repositório. |
-| "Certificação INMETRO / NBR" | Normas Oficiais | `TECHNICALLY_DOCUMENTED` | Exige cópia do documento oficial em arquivo no repositório. |
-| "Malhas Menores (filhotes) vs Malhas Padrão (adultos)" | Presunção de Produto | `UNSUPPORTED` | **NEUTRALIZADO** — Foco em locais de aplicação (janelas, sacadas e cantos). |
-| "100% seguro" | Promessa Absoluta | `UNSUPPORTED` | **REEDITADO** — Substituído por linguagem responsável (*"mais segurança"*, *"redução de riscos"*). |
-
-`TECHNICAL_CLAIMS_AUDITED = PASS`  
-`UNSUPPORTED_TECHNICAL_CLAIMS_PUBLISHED = 0`  
-`UNSUPPORTED_REPLACEMENT_CLAIMS = 0`  
-`PET_MESH_SIZE_ASSUMPTIONS = 0`  
-`UNVERIFIED_SPECIALIZATION_CLAIMS = 0`
-
----
-
-## 9. Final Gate Status
+## 8. Final Gate Status (Estado Histórico ao Fim da Fase 03B)
 
 | Gate | Resultado |
 |---|---|
 | `TECHNICAL_CLAIMS_AUDITED` | ✅ `PASS` |
-| `OWNER_CONFIRMED_COMMERCIAL_CLAIMS` | ✅ `VALIDATED` |
-| `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA` | ✅ `VALIDATED` |
 | `UNSUPPORTED_TECHNICAL_CLAIMS_PUBLISHED` | ✅ `0` |
 | `UNSUPPORTED_REPLACEMENT_CLAIMS` | ✅ `0` |
 | `PET_MESH_SIZE_ASSUMPTIONS` | ✅ `0` |
@@ -201,8 +170,8 @@ Auditoria atualizada de acordo com as 4 categorias de validação de claims:
 | `NEW_LOCAL_CITY_URLS` | ✅ `0` |
 | `NEW_URLS_HTTP_200` | ✅ `12/12 (PASS)` |
 | `OLD_URLS_STILL_HTTP_200` | ✅ `PASS` |
-| `SITEMAP_URL_COUNT` | ✅ `20` |
-| `PLANNED_REDIRECTS_ACTIVE` | ✅ `0` |
+| `SITEMAP_URL_COUNT` | ✅ `8` *(Estado na Fase 03B antes da Fase 03C)* |
+| `PLANNED_REDIRECTS_ACTIVE` | ✅ `0` *(Estado na Fase 03B)* |
 | `BUILD` | ✅ `PASS (Exit Code 0)` |
 | `PRODUCTION_SMOKE` | ✅ `PASS (77/77)` |
 | `DEPLOY` | ✅ `NOT_PERFORMED` |
@@ -210,16 +179,34 @@ Auditoria atualizada de acordo com as 4 categorias de validação de claims:
 
 ---
 
+## 9. ADDENDUM — CORREÇÃO FACTUAL DE CONTEXTO DO PROPRIETÁRIO
+
+**Data de Atualização:** 2026-08-23  
+**Origem:** Confirmação comercial direta pelo proprietário da empresa.
+
+### Matriz de Categorias de Validação
+
+| CLAIM AUDITADO | CATEGORIA | STATUS DE VALIDAÇÃO | TRATAMENTO NO SITE |
+|---|---|---|---|
+| "Garantia de 2 anos de instalação" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Confirmado expressamente pelo proprietário. |
+| "Atendimento / Agendamento sob medida" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Processo real da empresa. |
+| "+5 mil clientes atendidos" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
+| "10+ anos de experiência" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
+| "5.0 ★ (Perfil Google)" | Prova Social | `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA` | **MANTIDO / PERMITIDO** — Métrica pública real do perfil Google. |
+| "Resiste a 500kg / 500kg/m²" | Desempenho Mecânico | `TECHNICALLY_DOCUMENTED` | Exige laudo técnico de laboratório para exibição de valor numérico mecânico. |
+| "Polietileno virgem com aditivo anti-UV" | Composição Química | `TECHNICALLY_DOCUMENTED` | Exige laudo/ficha técnica do fornecedor em arquivo no repositório. |
+| "Certificação INMETRO / NBR" | Normas Oficiais | `TECHNICALLY_DOCUMENTED` | Exige cópia do documento oficial em arquivo no repositório. |
+| "100% seguro" / "segurança total" | Promessa Absoluta | `UNSUPPORTED` | **REEDITADO** — Substituído por linguagem responsável (*"mais segurança"*, *"redução de riscos"*). |
+
+---
+
 ## Declaração Final
 
 ```
 FASE 03B: FINAL APPROVED CANDIDATE
-OWNER_CONFIRMED_COMMERCIAL_CLAIMS: VALIDATED
-OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA: VALIDATED
-PET_MESH_SIZE_ASSUMPTIONS: 0
-UNVERIFIED_SPECIALIZATION_CLAIMS: 0
-UNSUPPORTED_REPLACEMENT_CLAIMS: 0
-REDIRECTS ATIVOS: 0
+SITEMAP_URL_COUNT: 8 (FASE 03B HISTÓRICO)
+PLANNED_REDIRECTS_ACTIVE: 0 (FASE 03B HISTÓRICO)
+OWNER_CONFIRMED_ADDENDUM: ANEXADO
 PRODUÇÃO ALTERADA: NÃO
 DEPLOY: NÃO
 ADMIN AUTH ALTERADO: NÃO

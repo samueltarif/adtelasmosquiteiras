@@ -13,12 +13,12 @@ const faqs = [
     answer: 'Nossa rede de segurança tem durabilidade de 5 a 7 anos com manutenção básica. A tela mosquiteira dura 1 a 3 anos dependendo da exposição ao sol e chuva. Incluímos 2 anos de garantia completa contra defeitos.'
   },
   {
-    question: 'A rede aguenta peso? É realmente segura?',
-    answer: 'Sim! Nossa rede é testada para suportar até 500kg distribuído. Cada ponto de fixação é reforçado com parafusos de aço inoxidável. Usamos apenas material de primeira qualidade, aprovado para uso residencial e comercial.'
+    question: 'As redes e telas de proteção são resistentes?',
+    answer: 'Sim! Nossas redes de proteção e telas mosquiteiras são instaladas com pontos de fixação reforçados e materiais apropriados para uso residencial e comercial.'
   },
   {
-    question: 'É seguro para crianças e pets?',
-    answer: '100% seguro! O material é atóxico, testado para crianças e animais de estimação. Não tem arestas ou pontos de risco. A malha é fechada o suficiente para evitar quedas, mas permite ventilação. Todos os acabamentos são arredondados.'
+    question: 'As redes de proteção são seguras para pets e crianças?',
+    answer: 'Proteção para toda a família! O material é indicado para residências com crianças e animais de estimação. A malha permite ventilação e claridade natural com acabamentos cuidados.'
   },
   {
     question: 'Dá para parcelar? Quais são as opções?',

@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // COMPOSABLE: useServicos
 // Sistema completo: 35+ serviços (17 Redes + 18 Telas)
 // Estrutura: 2 Famílias → 4 Categorias cada → Serviços específicos
@@ -60,7 +60,7 @@ export const useServicos = () => {
               slug: 'sacadas',
               titulo: 'Redes de Proteção para Sacadas',
               descricaoCurta: 'Aproveite sua sacada com segurança',
-              destaque: 'Resiste 500kg',
+              destaque: 'Sob medida',
               imagem: '/images/redes_para_sacadas.jpg',
               imagemEspecificacoes: '/images/redes_para_sacadas.jpg',
               keywords: ['sacada', 'varanda', 'terraço']
@@ -117,7 +117,7 @@ export const useServicos = () => {
               slug: 'criancas',
               titulo: 'Redes de Proteção para Crianças',
               descricaoCurta: 'Máxima segurança para os pequenos',
-              destaque: 'Certificado INMETRO',
+              destaque: 'Instalação Profissional',
               imagem: '/images/redes_para_criancas.png',
               imagemEspecificacoes: '/images/redes_para_criancas.png',
               keywords: ['criança', 'bebê', 'infantil']
@@ -134,8 +134,8 @@ export const useServicos = () => {
             cachorros: {
               slug: 'cachorros',
               titulo: 'Redes de Proteção para Cachorros',
-              descricaoCurta: 'Proteção para cães de todos os portes',
-              destaque: 'Extra resistente',
+              descricaoCurta: 'Proteção para cães em janelas e sacadas',
+              destaque: 'Sob medida',
               imagem: '/images/redes_para_cachorros.png',
               imagemEspecificacoes: '/images/redes_para_cachorros.png',
               keywords: ['cachorro', 'cão', 'pet']
@@ -184,7 +184,7 @@ export const useServicos = () => {
               slug: 'muros',
               titulo: 'Redes de Proteção para Muros',
               descricaoCurta: 'Segurança adicional em muros',
-              destaque: 'Anti-invasão',
+              destaque: 'Proteção perimetral',
               imagem: '/images/redes_para_muros.jpg',
               imagemEspecificacoes: '/images/redes_para_muros_especificacoes.png',
               keywords: ['muro', 'cerca', 'perímetro']
@@ -193,7 +193,7 @@ export const useServicos = () => {
               slug: 'telhados',
               titulo: 'Redes de Proteção para Telhados',
               descricaoCurta: 'Proteção contra pombos e pássaros',
-              destaque: 'Anti-pombos',
+              destaque: 'Proteção sob medida',
               imagem: '/images/redes_para_telhados.jpg',
               imagemEspecificacoes: '/images/redes_para_telhados_especificacoes.jpg',
               keywords: ['telhado', 'pombo', 'pássaro']
@@ -202,7 +202,7 @@ export const useServicos = () => {
               slug: 'piscinas',
               titulo: 'Redes de Proteção para Piscinas',
               descricaoCurta: 'Segurança em áreas de piscina',
-              destaque: 'Resistente à água',
+              destaque: 'Piscinas',
               imagem: '/images/redes_para_piscinas.jpg',
               imagemEspecificacoes: '/images/redes_para_piscinas_especificacoes.jpg',
               keywords: ['piscina', 'área de lazer']
@@ -247,8 +247,8 @@ export const useServicos = () => {
             janelas: {
               slug: 'janelas',
               titulo: 'Telas Mosquiteiras para Janelas',
-              descricaoCurta: 'Visão 100% clara, proteção total',
-              destaque: '85% transparência',
+              descricaoCurta: 'Visão clara, proteção total',
+              destaque: 'Sob medida',
               imagem: '/images/tela_mosquiteira.png',
               keywords: ['tela mosquiteira janela', 'mosquiteira', 'dengue']
             },
@@ -292,7 +292,7 @@ export const useServicos = () => {
               slug: 'banheiro',
               titulo: 'Telas Mosquiteiras para Banheiro',
               descricaoCurta: 'Proteção em áreas úmidas',
-              destaque: 'Anti-mofo',
+              destaque: 'Ventilação livre',
               imagem: '/images/telas_para_banheiro.jpg',
               imagemEspecificacoes: '/images/telas_para_banheiro_especificacoes.jpg',
               keywords: ['tela mosquiteira banheiro', 'mosquiteira banheiro']
@@ -346,8 +346,8 @@ export const useServicos = () => {
             },
             aluminio: {
               slug: 'aluminio',
-              titulo: 'Telas Mosquiteiras com Alumínio',
-              descricaoCurta: 'Estrutura em alumínio reforçado',
+              titulo: 'Telas Mosquiteiras com Perfis',
+              descricaoCurta: 'Estrutura com perfis sob medida',
               destaque: 'Durável',
               imagem: '/images/telas_com_aluminio.jpg',
               imagemEspecificacoes: '/images/telas_com_aluminio_especificacoes.jpg',
@@ -355,9 +355,9 @@ export const useServicos = () => {
             },
             acoinox: {
               slug: 'acoinox',
-              titulo: 'Telas Mosquiteiras com Aço Inox',
-              descricaoCurta: 'Máxima resistência e durabilidade',
-              destaque: 'Premium',
+              titulo: 'Telas Mosquiteiras Especiais',
+              descricaoCurta: 'Opção sob medida para projetos específicos',
+              destaque: 'Sob medida',
               imagem: '/images/telas_com_aco_inox.jpg',
               imagemEspecificacoes: '/images/telas_com_aco_inox_especificacoes.png',
               keywords: ['tela mosquiteira aço inox', 'inox']
@@ -372,14 +372,14 @@ export const useServicos = () => {
           titulo: 'Pet Screen',
           emoji: '🐾',
           iconName: 'lucide:paw-print',
-          descricao: 'Telas reforçadas para pets',
+          descricao: 'Telas para pets',
           
           servicos: {
             pets: {
               slug: 'pets',
               titulo: 'Telas Mosquiteiras Pet Screen',
-              descricaoCurta: 'Resistente a arranhões de pets',
-              destaque: 'Anti-arranhão',
+              descricaoCurta: 'Modelo sob medida para pets',
+              destaque: 'Pet Screen',
               imagem: '/images/telas_pet_screen_especificacoes.jpg',
               imagemEspecificacoes: '/images/telas_pet_screen_especificacoes.jpg',
               keywords: ['tela mosquiteira pet', 'pet screen', 'gato', 'cachorro']
@@ -387,8 +387,8 @@ export const useServicos = () => {
             pernilongos: {
               slug: 'pernilongos',
               titulo: 'Telas Mosquiteiras Anti-Pernilongos',
-              descricaoCurta: 'Malha extra fina contra pernilongos',
-              destaque: 'Malha micro',
+              descricaoCurta: 'Malha fina para proteção contra insetos',
+              destaque: 'Malha Fina',
               imagem: '/images/telas_anti-pernilongos.jpg',
               imagemEspecificacoes: '/images/telas_anti-pernilongos.jpg',
               keywords: ['pernilongo', 'mosquito', 'inseto']
@@ -409,7 +409,7 @@ export const useServicos = () => {
               slug: 'fachadas',
               titulo: 'Telas Mosquiteiras para Fachadas',
               descricaoCurta: 'Proteção para grandes fachadas',
-              destaque: 'Grande porte',
+              destaque: 'Fachadas',
               imagem: '/images/telas_para_fachadas_especificacoes.png',
               imagemEspecificacoes: '/images/telas_para_fachadas_especificacoes.png',
               keywords: ['tela mosquiteira fachada', 'prédio', 'comercial']
@@ -436,7 +436,7 @@ export const useServicos = () => {
               slug: 'industrias',
               titulo: 'Telas Mosquiteiras para Indústrias',
               descricaoCurta: 'Proteção industrial',
-              destaque: 'Alta resistência',
+              destaque: 'Sob medida',
               imagem: '/images/telas_para_coberturas.jpg',
               imagemEspecificacoes: '/images/telas_para_coberturas_especificacoes.jpg',
               keywords: ['tela mosquiteira indústria', 'fábrica', 'galpão']
@@ -453,25 +453,25 @@ export const useServicos = () => {
   // ============================================
   const servicoTemplateBase = {
     beneficios: [
-      { icone: 'shield', titulo: 'Resiste Chuva e Sol', descricao: 'Material UV resistente' },
-      { icone: 'clock', titulo: 'Instalação em 24h', descricao: 'Agendamento rápido' },
-      { icone: 'check', titulo: 'Fácil de Limpar', descricao: 'Manutenção simples' },
-      { icone: 'award', titulo: 'Encaixe Perfeito', descricao: 'Medição precisa' }
+      { icone: 'shield', titulo: 'Sob Medida', descricao: 'Instalação ajustada ao seu vão' },
+      { icone: 'clock', titulo: 'Atendimento Rápido', descricao: 'Agendamento simplificado' },
+      { icone: 'check', titulo: 'Fácil Manutenção', descricao: 'Limpeza simples no dia a dia' },
+      { icone: 'award', titulo: 'Encaixe Preciso', descricao: 'Medição técnica local' }
     ],
     especificacoes: [
-      { label: 'Material', valor: 'Polietileno alta resistência' },
+      { label: 'Material', valor: 'Sob medida para o vão' },
       { label: 'Fácil Limpeza', valor: 'Passa pano úmido' },
       { label: 'Garantia', valor: '2 anos' },
-      { label: 'Instalação', valor: '24h após medição' }
+      { label: 'Instalação', valor: 'Agendamento rápido' }
     ],
     comparacao: {
-      nos: ['Garantia 2 anos', 'Instalação 24h', 'Material premium', 'Certificado INMETRO'],
-      concorrentes: ['Garantia 6 meses', 'Instalação 7-15 dias', 'Material padrão', 'Sem certificação']
+      nos: ['Garantia 2 anos', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida'],
+      concorrentes: ['Sem garantia formal', 'Demora no atendimento', 'Material comum', 'Sem sob medida']
     },
     faq: [
-      { pergunta: 'Quanto tempo demora a instalação?', resposta: 'Após medição, Instalamos em até 24h.' },
-      { pergunta: 'Tem garantia?', resposta: 'Sim! 2 anos de garantia contra defeitos.' },
-      { pergunta: 'Fazem orçamento grátis?', resposta: 'Sim! Orçamento 100% gratuito sem compromisso.' }
+      { pergunta: 'Quanto tempo demora a instalação?', resposta: 'Após medição, combinamos a data para instalação rápida.' },
+      { pergunta: 'Tem garantia?', resposta: 'Sim! 2 anos de garantia contra defeitos de instalação.' },
+      { pergunta: 'Fazem orçamento grátis?', resposta: 'Sim! Orçamento 100% gratuito sem compromisso via WhatsApp.' }
     ]
   }
   

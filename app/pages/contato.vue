@@ -274,7 +274,7 @@ const emailLink = `mailto:${EMAIL}`
                 <div class="flex items-center justify-center gap-4 text-xs text-gray-500 pt-2">
                   <div class="flex items-center gap-1">
                     <Icon name="lucide:shield-check" class="w-4 h-4 text-green-500" />
-                    <span>100% Seguro</span>
+                    <span>Mais Segurança</span>
                   </div>
                   <div class="flex items-center gap-1">
                     <Icon name="lucide:zap" class="w-4 h-4 text-yellow-500" />

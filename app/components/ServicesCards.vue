@@ -17,7 +17,7 @@ const servicosCards = [
     imagem: '/images/familia.png',
     destaque: 'Mais Procurado',
     beneficios: [
-      { titulo: 'Resiste até 500kg' },
+      { titulo: 'Instalação sob medida' },
       { titulo: 'Instalação em 24h' },
       { titulo: 'Garantia 2 anos' }
     ],
