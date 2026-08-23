@@ -47,7 +47,7 @@ https://www.adtelasmosquiteiras.com.br/sitemap.xml
 
 Recomenda-se a utilização da ferramenta **Inspeção de URL** (*URL Inspection*) do Search Console para solicitar a reindexação prioritária da nova estrutura em duas fases, respeitando o limite diário da API/Painel do Google.
 
-### Prioridade P0 — Páginas Núcleo e Topo de Funil (Execução no Dia D):
+### Prioridade P0 — Páginas Núcleo e Topo de Funil (9 URLs):
 
 | # | URL Canônica Final | Intenção / Categoria | Ação Recomendada no GSC |
 | :-: | :--- | :--- | :--- |
@@ -61,18 +61,21 @@ Recomenda-se a utilização da ferramenta **Inspeção de URL** (*URL Inspection
 | 8 | `https://www.adtelasmosquiteiras.com.br/servicos/redes/gatos-e-pets` | Landing Redes para Gatos e Pets | Inspecionar URL ➔ *Solicitar Indexação* |
 | 9 | `https://www.adtelasmosquiteiras.com.br/areas-atendidas` | Hub Geográfico / Busca CEP | Inspecionar URL ➔ *Solicitar Indexação* |
 
-### Prioridade P1 — Demais URLs do Sitemap (Execução em D+1 ou D+2):
+### Prioridade P1 — Demais URLs do Sitemap (11 URLs):
 
-10. `https://www.adtelasmosquiteiras.com.br/servicos/telas/sacadas-e-varandas`
-11. `https://www.adtelasmosquiteiras.com.br/servicos/telas/pet-screen`
-12. `https://www.adtelasmosquiteiras.com.br/servicos/telas/restaurantes`
-13. `https://www.adtelasmosquiteiras.com.br/servicos/redes/sacadas-e-varandas`
-14. `https://www.adtelasmosquiteiras.com.br/servicos/redes/criancas`
-15. `https://www.adtelasmosquiteiras.com.br/servicos/redes/escadas-e-mezaninos`
-16. `https://www.adtelasmosquiteiras.com.br/servicos/vidracaria`
-17. `https://www.adtelasmosquiteiras.com.br/orcamento`
-18. `https://www.adtelasmosquiteiras.com.br/contato`
-19. `https://www.adtelasmosquiteiras.com.br/por-que-instalar-tela-mosquiteira`
+10. `https://www.adtelasmosquiteiras.com.br/servicos`
+11. `https://www.adtelasmosquiteiras.com.br/servicos/telas/sacadas-e-varandas`
+12. `https://www.adtelasmosquiteiras.com.br/servicos/telas/pet-screen`
+13. `https://www.adtelasmosquiteiras.com.br/servicos/telas/restaurantes`
+14. `https://www.adtelasmosquiteiras.com.br/servicos/redes/sacadas-e-varandas`
+15. `https://www.adtelasmosquiteiras.com.br/servicos/redes/criancas`
+16. `https://www.adtelasmosquiteiras.com.br/servicos/redes/escadas-e-mezaninos`
+17. `https://www.adtelasmosquiteiras.com.br/servicos/vidracaria`
+18. `https://www.adtelasmosquiteiras.com.br/orcamento`
+19. `https://www.adtelasmosquiteiras.com.br/contato`
+20. `https://www.adtelasmosquiteiras.com.br/por-que-instalar-tela-mosquiteira`
+
+**Total de URLs Canônicas Mapeadas:** P0 (9) + P1 (11) = **20 URLs**.
 
 > [!IMPORTANT]
 > Se o Search Console exibir a mensagem de limite diário atingido (*"Cota de solicitações excedida"*), **não insista**. O Googlebot descobrirá as URLs restantes naturalmente através do `sitemap.xml` e da navegação interna.
@@ -81,7 +84,7 @@ Recomenda-se a utilização da ferramenta **Inspeção de URL** (*URL Inspection
 
 ## 4. Legacy URL Handling (Tratamento das 45 URLs Antigas)
 
-- **Ferramenta de Remoção Temporária (*Removals*):** **NUNCA UTILIZAR**. A ferramenta *Removals* oculta a URL das buscas e impede o Googlebot de seguir o redirecionamento 301, bloqueando a transferência de autoridade (PageRank) e o reconhecimento da nova canonical.
+- **Ferramenta de Remoção Temporária (*Removals*):** **NÃO UTILIZAR NESTA MIGRAÇÃO**. A ferramenta Removals produz ocultação temporária nos resultados de pesquisa e não é necessária para esta migração baseada em 301.
 - **Bloqueio no `robots.txt`:** **NÃO BLOQUEAR**. As origens antigas devem permanecer 100% rastreáveis para que o Googlebot acesse o HTTP 301 e consolide o novo índice.
 - **Processamento Natural:** O Googlebot atualizará gradualmente o status das URLs antigas no relatório de *Páginas* do Search Console para *"Página com redirecionamento"*.
 
@@ -108,7 +111,8 @@ Deverá ser registrada uma linha de base (*baseline*) das métricas do Search Co
 | **OUTROS** | `/orcamento`, `/contato`, etc. | *Registrar no GSC* | *Registrar no GSC* | *GSC* | *GSC* |
 
 ### Métricas de Indexação a Acompanhar no GSC:
-- **Páginas Indexadas:** Meta final = `20`
+- `INDEXABLE_CANONICAL_URLS = 20`
+- `TARGET_INDEXED_URLS = até 20` (A ausência temporária de uma URL no índice não gera rollback automaticamente).
 - **Páginas com Redirecionamento:** Transição gradativa das 45 URLs legadas para esta categoria.
 - **Não Encontradas (404):** Estabilização de URLs de bairros antigos sem equivalente.
 - **Canonical Selecionada pelo Google:** Deve coincidir 100% com a *Canonical Declarada pelo Usuário*.
@@ -148,7 +152,7 @@ Oscilações de posição e tráfego são normais nos primeiros 7 a 14 dias pós
 
 ## 8. Rollback Triggers (Gatilhos Estritos de Reversão)
 
-A migração NÃO deve ser revertida por pequenas oscilações de posição nas duas primeiras semanas. A reversão só será considerada caso ocorra um dos seguintes eventos críticos:
+A migração NÃO deve ser revertida por pequenas oscilações de posição nas duas primeiras semanas ou por ausência temporária de indexação de uma URL individual. A reversão só será considerada caso ocorra um dos seguintes eventos críticos:
 1. **Desindexação massiva não intencional da Home (`/`)** por mais de 5 dias seguidos.
 2. **Surgimento de Loops de Redirecionamento (HTTP 310 / ERR_TOO_MANY_REDIRECTS)** detectados em produção pelo Googlebot.
 3. **Surto de Erros de Servidor HTTP 500** afetando os hubs principais por mais de 24 horas.
@@ -157,11 +161,11 @@ A migração NÃO deve ser revertida por pequenas oscilações de posição nas 
 
 ## 9. Do Not Do List (O Que NÃO Fazer no Search Console)
 
-- ❌ **NUNCA** usar a ferramenta *Removals* para as 45 URLs redirecionadas.
-- ❌ **NUNCA** bloquear as URLs antigas ou o parâmetro de query no `robots.txt`.
-- ❌ **NUNCA** remover os 45 redirecionamentos 301 do servidor Nitro após as páginas novas serem indexadas.
-- ❌ **NUNCA** apagar os arquivos legados no repositório antes do checkpoint de D+60.
-- ❌ **NUNCA** alterar configurações de parâmetros de URL sem auditoria prévia.
+- ❌ **NÃO UTILIZAR NESTA MIGRAÇÃO** a ferramenta Removals para as 45 URLs redirecionadas (a ferramenta produz apenas ocultação temporária nos resultados de pesquisa e não é necessária).
+- ❌ **NÃO BLOQUEAR** as URLs antigas ou o parâmetro de query no `robots.txt`.
+- ❌ **MANTER OS REDIRECTS** por pelo menos 1 ano e preferencialmente por mais tempo/indefinidamente enquanto URLs antigas ainda puderem receber tráfego ou backlinks.
+- ❌ **NÃO APAGAR** os arquivos legados no repositório antes do período de estabilidade da migração.
+- ❌ **NÃO ALTERAR** configurações de parâmetros de URL sem auditoria prévia.
 
 ---
 
@@ -174,26 +178,25 @@ A migração NÃO deve ser revertida por pequenas oscilações de posição nas 
 | `LIVE_SITEMAP_URLS` | ✅ `20 (PASS)` |
 | `REDIRECT_CHAINS` | ✅ `0` |
 | `REDIRECT_LOOPS` | ✅ `0` |
-| `P0_INSPECTION_URLS_PREPARED` | ✅ `9` |
-| `P1_INSPECTION_URLS_PREPARED` | ✅ `11` |
-| `SITEMAP_SUBMISSION_READY` | ✅ `https://www.adtelasmosquiteiras.com.br/sitemap.xml` |
-| `REMOVALS_TOOL_PROHIBITED` | ✅ `CONFIRMED` |
-| `ROBOTS_TXT_BLOCKING_PROHIBITED` | ✅ `CONFIRMED` |
+| `P0_INSPECTION_URLS` | ✅ `9` |
+| `P1_INSPECTION_URLS` | ✅ `11` |
+| `TOTAL_CANONICAL_URLS` | ✅ `20` |
+| `INDEXABLE_CANONICAL_URLS` | ✅ `20` |
+| `TARGET_INDEXED_URLS` | ✅ `até 20` |
+| `REMOVALS_TOOL_RATIONALE` | ✅ `UPDATED (Ocultação Temporária)` |
+| `REDIRECT_LONGEVITY_POLICY` | ✅ `UPDATED (≥1 ano / Indefinido)` |
 | `SEARCH_CONSOLE_CHANGED` | ✅ `NO` |
 | `ADMIN_AUTH_IMPLEMENTATION` | ✅ `DEFERRED_BY_USER` |
-| `BUILD` | ✅ `PASS (Exit Code 0)` |
-| `PRODUCTION_SMOKE` | ✅ `PASS (248/248)` |
 
 ---
 
 ## Declaração Final
 
 ```
-FASE 03D SEARCH CONSOLE RELEASE: READY FOR REVIEW
-LIVE REDIRECTS: 45/45
-LIVE FINAL URLS: 20/20
-SITEMAP URLS: 20
+FASE 03D DOCUMENTATION CORRECTION: PASS
+P0 URLS: 9
+P1 URLS: 11
+TOTAL CANONICAL URLS: 20
 SEARCH CONSOLE ALTERADO: NÃO
 ADMIN AUTH ALTERADO: NÃO
-SEO_PHASE_03D_SEARCH_CONSOLE_RELEASE.md: CRIADO
 ```
