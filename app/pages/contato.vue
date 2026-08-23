@@ -34,13 +34,10 @@ const sendToWhatsApp = async () => {
     alert('Por favor, preencha pelo menos nome e telefone.')
     return
   }
-  isSubmitting.value = true
   try {
     await redirectToThankYou(formData.value)
   } catch (e) {
-    console.error(e)
-  } finally {
-    isSubmitting.value = false
+    console.error('Erro ao enviar contato:', e)
   }
 }
 

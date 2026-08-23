@@ -93,29 +93,12 @@ const servicosOptions = [
 
 // Submeter formulário
 const submitForm = async () => {
-  isSubmitting.value = true
   submitError.value = false
-  
   try {
-    // Simular envio (substituir por API real)
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // Tracking GA4
-    if (typeof window !== 'undefined' && window.dataLayer) {
-      window.dataLayer.push({
-        event: 'form_submit',
-        form_name: 'orcamento',
-        servico: formData.value.servico
-      })
-    }
-    
-    // Redirecionar para página de obrigado com URL do WhatsApp
-    redirectToThankYou(formData.value)
-    
+    await redirectToThankYou(formData.value)
   } catch (error) {
+    console.error('Erro no formulário de orçamento:', error)
     submitError.value = true
-  } finally {
-    isSubmitting.value = false
   }
 }
 

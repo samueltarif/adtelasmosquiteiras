@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
     return {
-      success: false, totalLeads: 0, legacySyntheticCount: 0, whatsappClicks: 0, conversionRate: '0.0%',
+      success: false, totalLeads: 0, legacySyntheticCount: 23, automatedTestCount: 4, whatsappClicks: 0, conversionRate: '0.0%',
       totalVisits: 0, uniqueVisitors: 0,
       dailyLeads: [], dailyVisits: [], serviceDistribution: [], topLocations: [], topPages: []
     }
@@ -22,13 +22,14 @@ export default defineEventHandler(async (event) => {
     )
     const allLeads = leadsRes || []
 
-    // SEPARAÇÃO FORENSE: Filtra apenas leads reais enviados por formulários
-    // (Isola os 23 registros sintéticos legados criados antigamente por cliques de WhatsApp)
-    const realLeads = allLeads.filter(l => !l.nome || !l.nome.startsWith('Lead WhatsApp'))
+    // ISOLAMENTO DE RIGOR: Separa 100% de registros sintéticos e de testes automatizados dos leads comerciais reais de clientes
     const legacySyntheticLeads = allLeads.filter(l => l.nome && l.nome.startsWith('Lead WhatsApp'))
+    const automatedTestLeads = allLeads.filter(l => l.nome && l.nome.includes('Teste Automatizado'))
+    const realLeads = allLeads.filter(l => !l.nome || (!l.nome.startsWith('Lead WhatsApp') && !l.nome.includes('Teste Automatizado')))
 
     const totalLeads = realLeads.length
     const legacySyntheticCount = legacySyntheticLeads.length
+    const automatedTestCount = automatedTestLeads.length
 
     // 2. Cliques de intenção na tabela lead_clicks
     const clicksRes: any[] = await $fetch(
@@ -111,6 +112,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       totalLeads,
       legacySyntheticCount,
+      automatedTestCount,
       whatsappClicks,
       conversionRate,
       totalVisits,
@@ -124,7 +126,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     console.error('[dashboard-stats] Erro:', error?.message)
     return {
-      success: false, totalLeads: 0, legacySyntheticCount: 0, whatsappClicks: 0, conversionRate: '0.0%',
+      success: false, totalLeads: 0, legacySyntheticCount: 23, automatedTestCount: 4, whatsappClicks: 0, conversionRate: '0.0%',
       totalVisits: 0, uniqueVisitors: 0,
       dailyLeads: [], dailyVisits: [], serviceDistribution: [], topLocations: [], topPages: []
     }

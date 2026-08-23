@@ -57,10 +57,13 @@ const sendToWhatsApp = async () => {
       method: 'POST',
       body: {
         nome: formData.value.nome,
-        cidade: formData.value.cidade,
+        cidade: formData.value.cidade || 'São Paulo',
         bairro: formData.value.bairro || '',
         servico: formData.value.servico || 'Não especificado',
-        origem: 'formulario_lead_' + (window?.location?.pathname || 'home')
+        telefone: formData.value.telefone || '',
+        email: formData.value.email || '',
+        mensagem: formData.value.mensagem || '',
+        origem: 'formulario_hero_' + (typeof window !== 'undefined' ? window.location.pathname : 'home')
       }
     })
 

@@ -2,22 +2,27 @@ import { createHash } from 'crypto'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const body = await readBody(event)
+  const body = await readBody(event) || {}
   const headers = getHeaders(event)
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
     return { success: false }
   }
 
-  // Não rastrear rotas do admin
-  if (body.path?.startsWith('/admin')) {
-    return { success: true, tracked: false }
+  const isTestMode = body.isTest === true || headers['x-test-mode'] === 'true'
+
+  if (isTestMode) {
+    return { success: true, isTest: true }
   }
 
-  // Hash do IP para privacidade (sem armazenar IP real)
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
   const rawIp = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim()
-  const ipHash = createHash('sha256').update(rawIp + 'adt-salt').digest('hex').substring(0, 16)
+  const ipHash = createHash('sha256').update(rawIp + 'adt-salt-2026').digest('hex').substring(0, 16)
+
+  const path = body.path || '/'
+  const referrer = body.referrer || null
+  const sessionId = body.sessionId || null
+  const userAgent = (headers['user-agent'] || '').substring(0, 500)
 
   try {
     await $fetch(`${config.supabaseUrl}/rest/v1/page_views`, {
@@ -29,17 +34,17 @@ export default defineEventHandler(async (event) => {
         'Prefer': 'return=minimal'
       },
       body: {
-        path: body.path || '/',
-        referrer: body.referrer || null,
-        user_agent: (headers['user-agent'] || '').substring(0, 500),
+        path,
+        referrer,
+        user_agent: userAgent,
         ip_hash: ipHash,
-        session_id: body.sessionId || null
+        session_id: sessionId
       }
     })
 
-    return { success: true, tracked: true }
+    return { success: true }
   } catch (error: any) {
-    console.error('[track-visit] Erro:', error?.message)
+    console.error('[track-visit] Erro ao gravar pageview:', error?.message)
     return { success: false }
   }
 })
