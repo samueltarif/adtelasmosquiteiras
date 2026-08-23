@@ -9,12 +9,6 @@ export default defineEventHandler(async (event) => {
     return { success: false }
   }
 
-  const isTestMode = body.isTest === true || headers['x-test-mode'] === 'true'
-
-  if (isTestMode) {
-    return { success: true, isTest: true }
-  }
-
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
   const rawIp = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim()
   const ipHash = createHash('sha256').update(rawIp + 'adt-click-salt').digest('hex').substring(0, 16)

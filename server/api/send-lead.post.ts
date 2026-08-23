@@ -1,19 +1,11 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event) || {}
-  const headers = getHeaders(event)
 
-  const { nome, cidade, bairro, servico, telefone, email, mensagem, origem, isTest } = body
-  const isTestMode = isTest === true || headers['x-test-mode'] === 'true' || headers['user-agent']?.includes('Node')
+  const { nome, cidade, bairro, servico, telefone, email, mensagem, origem } = body
 
   if (!nome || !cidade) {
     throw createError({ statusCode: 400, message: 'Nome e cidade são obrigatórios' })
-  }
-
-  // MOCK DE TESTE: se for chamada de suíte automatizada de teste, ignora a escrita no Supabase real
-  if (isTestMode) {
-    console.log('[send-lead] [TEST_MODE] Requisição de teste simulada com sucesso sem gravar no banco de produção')
-    return { success: true, isTest: true }
   }
 
   // 1. GRAVAR NO BANCO DE DADOS (Supabase - tabela leads)
