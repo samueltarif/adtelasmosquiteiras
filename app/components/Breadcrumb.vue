@@ -16,6 +16,8 @@ const route = useRoute()
 const router = useRouter()
 const { getFamiliaBySlug, getCategoriaBySlug, getServicoBySlug } = useServicos()
 
+const BASE_URL = 'https://www.adtelasmosquiteiras.com.br'
+
 // Usar path da prop ou route atual
 const currentPath = computed(() => props.path || route.path)
 
@@ -90,7 +92,7 @@ const breadcrumbItems = computed(() => {
   return items
 })
 
-// Breadcrumb truncado para mobile (Home > ... > Atual)
+// Breadcrumb truncado para exibição visual mobile (Home > ... > Atual)
 const truncatedItems = computed(() => {
   if (breadcrumbItems.value.length <= 3) {
     return breadcrumbItems.value
@@ -98,24 +100,27 @@ const truncatedItems = computed(() => {
   
   return [
     breadcrumbItems.value[0], // Home
-    { label: '...', path: '', truncated: true }, // Ellipsis
+    { label: '...', path: '', truncated: true }, // Ellipsis visual
     breadcrumbItems.value[breadcrumbItems.value.length - 1] // Atual
   ]
 })
 
-// Schema.org structured data para SEO
+// Schema.org structured data em JSON-LD para SEO 100% válido no GSC
 const breadcrumbSchema = computed(() => {
-  if (breadcrumbItems.value.length === 0) return null
+  if (!breadcrumbItems.value || breadcrumbItems.value.length === 0) return null
   
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    'itemListElement': breadcrumbItems.value.map((item, index) => ({
-      '@type': 'ListItem',
-      'position': index + 1,
-      'name': item.label,
-      'item': `https://adtelaseredes.com.br${item.path}`
-    }))
+    'itemListElement': breadcrumbItems.value.map((item, index) => {
+      const cleanPath = item.path ? (item.path.startsWith('/') ? item.path : `/${item.path}`) : '/'
+      return {
+        '@type': 'ListItem',
+        'position': index + 1,
+        'name': item.label || 'Home',
+        'item': `${BASE_URL}${cleanPath}`
+      }
+    })
   }
 })
 
@@ -123,13 +128,13 @@ const breadcrumbSchema = computed(() => {
 const handleSwipeLeft = () => {
   if (breadcrumbItems.value.length > 1) {
     const previousItem = breadcrumbItems.value[breadcrumbItems.value.length - 2]
-    if (previousItem && !previousItem.current) {
+    if (previousItem && !previousItem.current && previousItem.path) {
       router.push(previousItem.path)
     }
   }
 }
 
-// Inject Schema.org structured data via useHead
+// Inject Schema.org structured data em JSON-LD no <head> via useHead
 useHead(() => {
   if (!breadcrumbSchema.value) return {}
   
@@ -137,7 +142,7 @@ useHead(() => {
     script: [
       {
         type: 'application/ld+json',
-        children: JSON.stringify(breadcrumbSchema.value)
+        innerHTML: JSON.stringify(breadcrumbSchema.value)
       }
     ]
   }
@@ -146,7 +151,7 @@ useHead(() => {
 
 <template>
   <div v-if="breadcrumbItems.length > 0">
-    <!-- Breadcrumb Navigation -->
+    <!-- Breadcrumb Visual Navigation -->
     <nav 
       class="bg-gray-50 border-b border-gray-200 py-3 px-4 sm:px-6 lg:px-8 z-10 relative"
       aria-label="Navegação breadcrumb"
@@ -158,18 +163,11 @@ useHead(() => {
     >
       <div class="max-w-7xl mx-auto">
         <!-- Desktop: Breadcrumb completo -->
-        <ol 
-          class="hidden md:flex items-center space-x-1 text-sm"
-          itemscope 
-          itemtype="https://schema.org/BreadcrumbList"
-        >
+        <ol class="hidden md:flex items-center space-x-1 text-sm">
           <li
             v-for="(item, index) in breadcrumbItems"
-            :key="item.path"
+            :key="item.path || index"
             class="flex items-center"
-            itemprop="itemListElement"
-            itemscope
-            itemtype="https://schema.org/ListItem"
           >
             <!-- Separador (exceto primeiro) -->
             <Icon
@@ -187,39 +185,28 @@ useHead(() => {
 
             <!-- Link ou texto atual -->
             <NuxtLink
-              v-if="!item.current"
+              v-if="!item.current && item.path"
               :to="item.path"
               class="text-gray-700 hover:text-emerald-600 hover:underline transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded px-1"
-              itemprop="item"
             >
-              <span itemprop="name">{{ item.label }}</span>
+              <span>{{ item.label }}</span>
             </NuxtLink>
             <span
               v-else
               class="text-gray-900 font-semibold"
               aria-current="page"
-              itemprop="name"
             >
               {{ item.label }}
             </span>
-
-            <meta itemprop="position" :content="String(index + 1)" />
           </li>
         </ol>
 
-        <!-- Mobile: Breadcrumb truncado -->
-        <ol 
-          class="flex md:hidden items-center space-x-1 text-sm overflow-x-auto"
-          itemscope 
-          itemtype="https://schema.org/BreadcrumbList"
-        >
+        <!-- Mobile: Breadcrumb visual truncado -->
+        <ol class="flex md:hidden items-center space-x-1 text-sm overflow-x-auto">
           <li
             v-for="(item, index) in truncatedItems"
             :key="item.path || index"
             class="flex items-center flex-shrink-0"
-            itemprop="itemListElement"
-            itemscope
-            itemtype="https://schema.org/ListItem"
           >
             <!-- Separador (exceto primeiro) -->
             <Icon
@@ -245,23 +232,19 @@ useHead(() => {
 
             <!-- Link ou texto atual -->
             <NuxtLink
-              v-else-if="!item.current"
+              v-else-if="!item.current && item.path"
               :to="item.path"
               class="text-gray-700 hover:text-emerald-600 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-1"
-              itemprop="item"
             >
-              <span itemprop="name">{{ item.label }}</span>
+              <span>{{ item.label }}</span>
             </NuxtLink>
             <span
               v-else
               class="text-gray-900 font-semibold truncate max-w-[200px]"
               aria-current="page"
-              itemprop="name"
             >
               {{ item.label }}
             </span>
-
-            <meta itemprop="position" :content="String(index + 1)" />
           </li>
         </ol>
       </div>
