@@ -16,7 +16,7 @@ const noticias = [
     data: 'Agosto 2024',
     fonte: 'Ministério da Saúde — Painel de Arboviroses',
     fonteUrl: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/a/aedes-aegypti/monitoramento-das-arboviroses',
-    resumo: 'O Brasil registrou mais de 5.000 mortes por dengue em 2024 — quatro vezes mais do que em 2023. Com 6,5 milhões de casos prováveis, foi o maior surto da história do país, segundo o Painel de Monitoramento das Arboviroses do Ministério da Saúde. São Paulo foi um dos estados mais afetados, com bairros residenciais entre os principais focos de transmissão.',
+    resumo: 'O Brasil registrou mais de 5.000 mortes por dengue em 2024 — quatro vezes mais do que em 2023. Com 6,5 milhões de casos prováveis, foi o maior surto da história do país, segundo o Painel de Monitoramento das Arboviroses do Ministério da Saúde. São Paulo foi um dos estados mais afetados, com áreas residenciais entre os principais focos de transmissão.',
     destaque: 'A dengue grave pode evoluir para óbito em menos de 48 horas. Crianças, idosos e gestantes são os grupos de maior risco. A tela mosquiteira é a barreira física mais eficaz dentro de casa.',
   },
   {
@@ -49,7 +49,7 @@ const noticias = [
     data: '2024',
     fonte: 'Ministério da Saúde — Dengue',
     fonteUrl: 'https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/dengue',
-    resumo: 'O Ministério da Saúde registrou 2024 como o ano com o maior número de casos de dengue da história do Brasil. A epidemia se espalhou por todas as regiões do país, com São Paulo entre os estados de maior incidência. O calor, as chuvas e a urbanização aceleraram a proliferação do Aedes aegypti em bairros residenciais.',
+    resumo: 'O Ministério da Saúde registrou 2024 como o ano com o maior número de casos de dengue da história do Brasil. A epidemia se espalhou por todas as regiões do país, com São Paulo entre os estados de maior incidência. O calor, as chuvas e a urbanização aceleraram a proliferação do Aedes aegypti em regiões residenciais.',
     destaque: 'A expansão urbana e o calor intenso aumentam a reprodução do mosquito em cidades como São Paulo. Janelas sem tela são a principal porta de entrada do Aedes aegypti nas residências.',
   },
   {

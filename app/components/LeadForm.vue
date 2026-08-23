@@ -75,7 +75,7 @@ const sendToWhatsApp = async () => {
     let message = `Olá! Meu nome é ${formData.value.nome}, moro em ${formData.value.cidade}`
     
     if (formData.value.bairro) {
-      message += `, bairro ${formData.value.bairro}`
+      message += `, região ${formData.value.bairro}`
     }
     
     message += `.`
@@ -235,15 +235,15 @@ const sendToWhatsApp = async () => {
           </p>
         </div>
 
-        <!-- Bairro/Região -->
+        <!-- Região / Endereço -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Bairro/Região <span class="text-gray-400 text-xs">(opcional)</span>
+            Região / Endereço <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <input
             v-model="formData.bairro"
             type="text"
-            placeholder="Ex: Vila Mariana, Pinheiros"
+            placeholder="Ex: Zona Sul, Moema, Centro"
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
             :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
           />

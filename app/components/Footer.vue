@@ -1,21 +1,6 @@
 <template>
   <footer class="bg-text-primary text-white py-10">
     <div class="max-w-[1200px] mx-auto px-5">
-      
-      <!-- Bairros Atendidos -->
-      <div class="mb-8 pb-8 border-b border-white/20">
-        <h3 class="font-bold text-lg mb-4 text-center">Bairros Atendidos em São Paulo</h3>
-        <div class="text-center">
-          <NuxtLink 
-            to="/bairros" 
-            class="inline-flex items-center gap-2 px-6 py-3 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-semibold transition-colors"
-          >
-            <Icon name="lucide:map-pin" class="w-4 h-4" />
-            Ver todos os bairros atendidos
-          </NuxtLink>
-        </div>
-      </div>
-
       <!-- Informações da Empresa -->
       <div class="text-center">
         <p class="font-bold">AD Telas e Redes © 2026 — Proteção Profissional em São Paulo</p>

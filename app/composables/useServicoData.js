@@ -172,7 +172,7 @@ export const useServicoData = () => {
         {
           cliente: 'Família Oliveira',
           local: 'Tatuapé - SP',
-          problema: 'Surto de dengue no bairro, medo de mosquitos',
+          problema: 'Surto de dengue na região, medo de mosquitos',
           solucao: 'Tela mosquiteira em todas as janelas',
           resultado: 'Zero picadas, casa ventilada'
         },

@@ -4,7 +4,6 @@ import { ref, computed } from 'vue'
 interface CepResult {
   cep: string
   logradouro: string
-  bairro: string
   cidade: string
   uf: string
   atendido: boolean
@@ -55,8 +54,8 @@ function onKeydown(e: KeyboardEvent) {
 
 const whatsappUrl = computed(() => {
   if (!result.value) return '#'
-  const loc = result.value.bairro
-    ? `${result.value.bairro}, ${result.value.cidade}`
+  const loc = result.value.logradouro
+    ? `${result.value.logradouro}, ${result.value.cidade}`
     : result.value.cidade
   const msg = `Olá! Gostaria de um orçamento para ${loc} (CEP ${result.value.cep}). Vim pelo site.`
   return `https://wa.me/5511983586611?text=${encodeURIComponent(msg)}`
@@ -126,8 +125,7 @@ const whatsappUrl = computed(() => {
             <div class="flex-1 min-w-0">
               <p class="font-bold text-[#22345F] text-sm">Atendemos sua região!</p>
               <p class="text-gray-700 text-sm mt-0.5">
-                <span v-if="result.logradouro">{{ result.logradouro }}, </span>
-                <span v-if="result.bairro" class="font-semibold">{{ result.bairro }}</span>
+                <span v-if="result.logradouro">{{ result.logradouro }}, </span>{{ result.cidade }}
               </p>
               <p class="text-gray-500 text-xs mt-0.5">{{ result.cidade }} — {{ result.cep }}</p>
             </div>
@@ -139,7 +137,7 @@ const whatsappUrl = computed(() => {
             class="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl text-sm font-bold transition-colors"
           >
             <Icon name="lucide:message-circle" class="w-4 h-4" />
-            Pedir orçamento para {{ result.bairro || result.cidade }}
+            Pedir orçamento para {{ result.cidade }}
           </a>
         </div>
 
@@ -155,7 +153,7 @@ const whatsappUrl = computed(() => {
             <div class="flex-1 min-w-0">
               <p class="font-bold text-gray-800 text-sm">Fora da área de atendimento</p>
               <p class="text-gray-600 text-sm mt-0.5">
-                <span v-if="result.bairro" class="font-semibold">{{ result.bairro }}, </span>{{ result.cidade }} não está na nossa cobertura atual.
+                {{ result.cidade }} não está na nossa cobertura atual.
               </p>
             </div>
           </div>

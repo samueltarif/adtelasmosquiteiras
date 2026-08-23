@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
 // Carrosseis do hero
@@ -234,8 +234,8 @@ const callPhone = () => {
                   <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Bairro / Região *</label>
-                  <input v-model="formData.bairro" type="text" required placeholder="Ex: Vila Mariana" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Região / Endereço *</label>
+                  <input v-model="formData.bairro" type="text" required placeholder="Ex: Zona Sul, Moema, Centro" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
                   <label class="block text-sm font-semibold text-[#22345F] mb-2">Serviço de Interesse *</label>

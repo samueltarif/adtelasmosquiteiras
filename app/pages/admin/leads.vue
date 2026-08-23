@@ -196,7 +196,7 @@ const formatCurrency = (val) => {
             <input 
               v-model="searchQuery"
               class="w-full h-11 pl-10 pr-4 rounded-lg bg-admin-surface-container-lowest border border-admin-outline-variant focus:border-admin-primary outline-none transition-all text-sm shadow-sm" 
-              placeholder="Buscar lead por nome, bairro..." 
+              placeholder="Buscar lead por nome, cidade..." 
               type="text"
             />
           </div>
