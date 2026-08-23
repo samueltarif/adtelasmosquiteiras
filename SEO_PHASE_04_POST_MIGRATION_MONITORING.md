@@ -38,20 +38,28 @@ A Fase 04 estabelece a **estrutura de acompanhamento e controle pós-migração*
 
 ---
 
-## 3. D0 Baseline (Estado Inicial em 2026-08-23)
+## 3. D0 Baseline & Estado Real do Search Console (2026-08-23)
 
-### A) Estado Técnico da Produção
-- `LIVE_REDIRECTS = 45/45 PASS` (100% dos 45 redirects 301 respondem diretamente na borda Nitro/Vercel).
+### A) Estado Real do Search Console (Ações Manuais Autorizadas)
+- `SEARCH_CONSOLE_CHANGED = YES` (Execução de ações manuais autorizadas pelo operador humano no painel GSC).
+- `SEARCH_CONSOLE_AUTOMATED_CHANGES = NO` (Nenhuma ferramenta ou script teve acesso automatizado ao GSC).
+- `SITEMAP_SUBMITTED = YES` (`https://www.adtelasmosquiteiras.com.br/sitemap.xml` submetido manualmente).
+- `SITEMAP_STATUS = PROCESSED` (Processado com sucesso pelo Google).
+- `SITEMAP_DISCOVERED_URLS = 20` (Todas as 20 URLs canônicas descobertas).
+- `P0_INDEXATION_REQUESTS = 9/9` (Solicitações de indexação prioritária enviadas manualmente).
+
+### B) Estado Técnico da Produção & Contabilidade de Redirects
 - `LIVE_FINAL_URLS = 20/20 PASS` (20 URLs canônicas ativas com HTTP 200).
-- `SITEMAP_STATUS = PROCESSED` (20 URLs no `sitemap.xml`, 0 redirects, 0 noindex, 0 404).
-- `SITEMAP_DISCOVERED_URLS = 20`
-- `P0_INDEXATION_REQUESTS = 9/9` (Solicitadas no GSC).
-- `BREADCRUMB_HOTFIX_LIVE = PASS` (11/11 landings validadas com JSON-LD em `https://www.adtelasmosquiteiras.com.br`).
-- `REDIRECT_CHAINS = 0` | `REDIRECT_LOOPS = 0`
-- `ADMIN_AUTH_IMPLEMENTATION = DEFERRED_BY_USER`
-- `SEARCH_CONSOLE_CHANGED = NO` (Pendente execução humana manual).
+- `SEO_MIGRATION_REDIRECTS = 45` (45 redirecionamentos 301 de URLs comerciais legadas).
+- `TECHNICAL_LEGACY_REDIRECTS = 1` (`/home` ➔ `/`).
+- `TOTAL_SERVER_REDIRECTS = 46` (Todas centralizadas no `server/redirectsMap.ts`).
+- `HOME_TECHNICAL_REDIRECT = PASS` (`/home` ➔ HTTP 301 ➔ `/` ➔ HTTP 200 | `CHAIN_LENGTH = 1`, `LOOP = 0`).
+- `GSC_REDIRECT_VALIDATION = STARTED_MANUALLY` (Validação de correção no GSC iniciada manualmente).
+- `BREADCRUMB_HOTFIX_LIVE = PASS` (11/11 landings validadas com JSON-LD em produção | Commit `2bb31b2`).
+- `INTERNAL_LINKS_TO_CDN_CGI = 0` (Bypass `<!--email_off-->` ativo | Commit `8d34da9`).
+- `ADMIN_AUTH_IMPLEMENTATION = DEFERRED_BY_USER`.
 
-### B) Baseline de Desempenho no GSC (Dia D0)
+### C) Baseline de Desempenho no GSC (Dia D0)
 
 | Cluster de Páginas | URLs Incluídas | Cliques (D0) | Impressões (D0) | CTR Médio (D0) | Posição Média (D0) |
 |---|---|:---:|:---:|:---:|:---:|
@@ -78,7 +86,7 @@ A Fase 04 estabelece a **estrutura de acompanhamento e controle pós-migração*
 - `5XX_COUNT:` (Meta = 0)
 
 #### Bateria Automatizada de Teste HTTP (Execução Local/Nitro):
-- `REDIRECTS_ACTIVE = 45/45`
+- `REDIRECTS_ACTIVE = 46/46` (45 SEO + 1 Técnico)
 - `REDIRECT_CHAINS = 0`
 - `REDIRECT_LOOPS = 0`
 - `FINAL_URLS_HTTP_200 = 20/20`
@@ -122,12 +130,12 @@ A Fase 04 estabelece a **estrutura de acompanhamento e controle pós-migração*
 ## 7. Distribuição de Tráfego Orgânico & Conversões
 
 ### A) Participação no Tráfego Orgânico (Share por Cluster)
-Objetivo analítico: Reduzir a dependência exclusiva da Home e aumentar a entrada orgânica direta pelas landing pages específicas.
+Objetivo analítico: Observar se o tráfego orgânico começa a se distribuir entre Home, hubs e landings específicas sem estabelecer percentuais-alvo arbitrários antes do acúmulo de dados históricos.
 
-- `HOME_ORGANIC_SHARE:` `NEEDS_GSC_DATA` (Meta = <50% do tráfego orgânico total)
-- `TELAS_ORGANIC_SHARE:` `NEEDS_GSC_DATA` (Meta = >20%)
-- `REDES_ORGANIC_SHARE:` `NEEDS_GSC_DATA` (Meta = >25%)
-- `LOCAL_ORGANIC_SHARE:` `NEEDS_GSC_DATA` (Meta = >5%)
+- `HOME_ORGANIC_SHARE:` `MEASURE`
+- `TELAS_ORGANIC_SHARE:` `MEASURE`
+- `REDES_ORGANIC_SHARE:` `MEASURE`
+- `LOCAL_ORGANIC_SHARE:` `MEASURE`
 
 ### B) Métricas de Conversão Orgânica (Leads e Oportunidades)
 - `ORGANIC_WHATSAPP_CLICKS:` `NEEDS_ANALYTICS_DATA`
@@ -164,17 +172,18 @@ Na data D+60, será gerado o relatório `SEO_OPTIMIZATION_OPPORTUNITIES` cobrind
 
 ---
 
-## 10. Política de SEO Local e Novas Páginas Municipais
+## 10. Política de SEO Local, URLs de Bairros & CDN-CGI
 
+### A) Páginas Municipais
 > [!WARNING]
 > **REGRA PARA PÁGINAS MUNICIPAIS:**
 > **NÃO** criar landing pages locais/municipais adicionais durante o período inicial de 90 dias com a finalidade exclusiva de aumentar volume de URLs.
-> 
-> Qualquer expansão geográfica futura dependerá obrigatoriamente de:
-> 1. Demanda comprovada no Search Console (*Search Console demand*).
-> 2. Confirmação operacional de atendimento pela empresa (*business service-area confirmation*).
-> 3. Intenção local distinta (*distinct local intent*).
-> 4. Unicidade total de conteúdo (*content uniqueness*).
+> Qualificação futura dependerá de demanda comprovada no GSC, confirmação comercial de atendimento, intenção local distinta e conteúdo 100% exclusivo.
+
+### B) URL de Legado Técnico CDN-CGI
+- **URL Identificada:** `https://www.adtelasmosquiteiras.com.br/cdn-cgi/l/email-protection`
+- **Contagem de Links Internos:** `INTERNAL_LINKS_TO_CDN_CGI = 0` (Endereços de e-mail envelopados em `<!--email_off-->` no código).
+- **Ação:** `ACTION = NONE` (Não criar redirect nem página. O status HTTP 404 natural do servidor pode permanecer).
 
 ---
 
@@ -185,7 +194,7 @@ Apenas os seguintes eventos críticos serão considerados incidentes P0 e exigir
 1. `HOME_NOINDEX` — Tag noindex inserida acidentalmente na Home.
 2. `HOME_404` / `HOME_5XX` — Indisponibilidade da página principal.
 3. `SITEMAP_FETCH_FAILURE_PERSISTENT` — Googlebot incapaz de ler o `sitemap.xml` por mais de 3 dias.
-4. `REDIRECT_LOOP` — Surgimento de loops HTTP 310 em produção.
+4. `REDIRECT_LOOP = TRUE` — Detectado por repetição de URL na cadeia, excesso de redirecionamentos, `ERR_TOO_MANY_REDIRECTS` ou equivalente em produção.
 5. `MASS_CANONICAL_MISMATCH` — Google rejeitando canonicals de mais de 50% das páginas.
 6. `FINAL_URLS_RETURNING_404` — URLs canônicas retornando HTTP 404 em produção.
 7. `ROBOTS_BLOCKING_INDEXABLE_URLS` — `robots.txt` bloqueando URLs canônicas.
@@ -197,14 +206,15 @@ Apenas os seguintes eventos críticos serão considerados incidentes P0 e exigir
 ## 12. Final Status & Framework Declaration
 
 ```
-FASE 04 MONITORING FRAMEWORK: READY
-D0: 2026-08-23
-D+7: 2026-08-30
-D+14: 2026-09-06
-D+30: 2026-09-22
-D+60: 2026-10-22
-D+90: 2026-11-21
-PRODUCTION CHANGED: NO
-SEARCH CONSOLE CHANGED: NO
+FASE 04 DOCUMENTATION UPDATE: PASS
+SEARCH_CONSOLE_CHANGED: YES
+SEARCH_CONSOLE_AUTOMATED_CHANGES: NO
+SITEMAP PROCESSED: YES
+DISCOVERED URLS: 20
+P0 REQUESTS: 9/9
+SEO REDIRECTS: 45
+TECHNICAL REDIRECTS: 1
+TOTAL SERVER REDIRECTS: 46
+ARBITRARY TRAFFIC THRESHOLDS: 0
 ADMIN AUTH ALTERADO: NÃO
 ```
