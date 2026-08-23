@@ -1,7 +1,7 @@
-# SEO FASE 03B — RELATÓRIO DE CONSTRUÇÃO DE CONTEÚDO DEFINITIVO
+# SEO FASE 03B — RELATÓRIO DE CONSTRUÇÃO DE CONTEÚDO DEFINITIVO (REVISÃO FACTUAL E AUDITORIA DE CLAIMS)
 
 **Projeto:** AD Telas e Redes — `adtelasmosquiteiras.com.br`  
-**Fase:** 03B — Construção das Páginas SEO Definitivas (Validação Factual Final)  
+**Fase:** 03B — Construção das Páginas SEO Definitivas (Taxonomia Factual e Comercial)  
 **Data:** 2026-08-23  
 **Status:** `FINAL APPROVED CANDIDATE`
 
@@ -9,22 +9,20 @@
 
 ## 1. Executive Summary
 
-A Fase 03B implementou localmente as **12 páginas comerciais definitivas** da nova arquitetura SEO, eliminando integralmente o padrão de boilerplate e conteúdo massificado da arquitetura antiga.
+A Fase 03B implementou localmente as **12 páginas comerciais definitivas** da nova arquitetura SEO, eliminando o padrão de boilerplate e conteúdo massificado da arquitetura antiga.
 
 Todas as páginas foram construídas com:
 - **Conteúdo editorial 100% próprio e exclusivo** para cada intenção de busca.
-- **Copy estritamente factual e neutra**, sem superlativos, alegações de composição química, desempenho do material, presunção de porte/idade de animais para malhas ou especializações não documentadas.
+- **Matriz de Validação de Claims em 4 Categorias:**
+  - `OWNER_CONFIRMED`: Claims comerciais, operacionais e históricos confirmados pelo proprietário (Garantia de 2 anos, atendimento sob medida, +5 mil clientes, 10+ anos de experiência).
+  - `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA`: Métricas públicas de perfil externo confirmadas (5.0 ★ e avaliações do Google Meu Negócio).
+  - `TECHNICALLY_DOCUMENTED`: Claims técnicos de desempenho mecânico e química (500kg, anti-UV, INMETRO, NBR) que exigem laudo de laboratório/fabricante em arquivo.
+  - `UNSUPPORTED`: Presunções não fundamentadas e promessas absolutas (*"100% seguro"*), neutralizadas para linguagem funcional e responsável (*"mais segurança"*, *"redução de riscos"*).
 - **Componente de Breadcrumb unificado e retrocompatível**, preparado para SEO estruturado.
 - **Imagens pré-existentes no repositório** com alt text puramente descritivo (sem suposições de proveniência de instalação).
 - **Perguntas frequentes (FAQ) customizadas** por aplicação.
 - **Canonical SSR autorreferencial dinâmica** em todas as páginas.
 - **Zero redirects ativados** (`PLANNED_REDIRECTS_ACTIVE = 0`) e **zero páginas antigas excluídas** (`OLD_URLS_STILL_HTTP_200 = PASS`).
-- **LCP Optimization:** `fetchpriority="high"` e `loading="eager"` aplicados exclusivamente na primeira imagem visível do carrossel da Home.
-
-**Testes Automatizados de Validação:**
-- **Smoke Tests no Output de Produção (Nitro `node-server`):** `77/77 PASS (100%)`
-- **Métrica Interna de QA de Similaridade de Conteúdo (3-Grams):** `6,2%` de overlap máximo.
-- **Exit Code da Compilação de Produção (`nuxi build`):** `0 (PASS)`
 
 ---
 
@@ -144,9 +142,6 @@ Todas as imagens utilizadas são **imagens pré-existentes no repositório** (`/
 | Mauá | *Ausente* | `ABSENT_FROM_DATASET` | `NEEDS_BUSINESS_CONFIRMATION` |
 | Litoral (Santos, Praia Grande, etc.) | *Ausente* | `ABSENT_FROM_DATASET` | `OUT_OF_CURRENT_SERVICE_AREA` |
 
-- **Diretriz de Conteúdo Público em `/areas-atendidas`:** O texto não afirma *"Atendemos estas 19 cidades"*. A página instrui expressamente: *"Consulte seu CEP para verificar a disponibilidade de atendimento no seu endereço."*
-- **Litoral:** Cidades litorâneas estão expressamente indicadas como fora da área de cobertura no FAQ.
-
 `SERVICE_AREA_UNVERIFIED_MARKED_CONFIRMED = 0`
 
 ---
@@ -163,21 +158,22 @@ Todas as imagens utilizadas são **imagens pré-existentes no repositório** (`/
 
 ---
 
-## 8. FINAL_FACTUAL_VALIDATION (Technical Claim Source Audit)
+## 8. FINAL_CLAIMS_VALIDATION_MATRIX (Auditoria com Correção de Contexto)
 
-Auditoria exaustiva realizada sobre todas as afirmações técnicas, materiais, dimensões de malha e especializações.
+Auditoria atualizada de acordo com as 4 categorias de validação de claims:
 
-| CLAIM ORIGINAL | URL / ARQUIVO | FONTE NO REPOSITÓRIO | STATUS DE VALIDAÇÃO | TRATAMENTO REALIZADO NO CÓDIGO |
-|---|---|---|---|---|
-| "Malhas Menores (para filhotes e pequenos) e Malhas Padrão (para adultos)" | `/servicos/redes/gatos-e-pets.vue` | Inexistente / Inferência de IA | `UNSUPPORTED` | Substituído por *"Aplicações em Residências com Animais: Janelas, Sacadas e Varandas, Fechamento de Cantos"* |
-| "Atendimento especializado para comércios / Atendimento especializado" | `/servicos/telas/restaurantes.vue` e Hubs | Inexistente | `UNSUPPORTED` | Substituído por *"Atendimento para comércios / Atendimento sob medida"* |
-| "Polietileno virgem com aditivo anti-UV / Malha de alta resistência" | `/servicos/redes/*` | Inexistente / Inferência de IA | `UNSUPPORTED` | Substituído por *"Rede de proteção instalada sob medida para o vão da janela / sacada"* |
-| "Fios de poliéster revestido de maior calibre / maior durabilidade" | `/servicos/telas/pet-screen.vue` | Inexistente / Inferência de IA | `UNSUPPORTED` | Substituído por *"Modelo Pet Screen para portas e janelas em ambientes com animais de estimação"* |
-| "Vedação inferior com escova / vedação perimetral na soleira" | `/servicos/telas/portas.vue` | Inexistente / Inferência | `UNSUPPORTED` | Substituído por *"A solução é dimensionada conforme as características da porta e do vão"* |
-| "Presilhas giratórias (Trava Fácil) ou fita magnética" | `/servicos/telas/removivel.vue` | Inexistente / Inferência | `UNSUPPORTED` | Substituído por *"O modelo removível permite retirada quando necessário para limpeza ou acesso ao vão"* |
-| "Ancoragem na laje com prolongadores através do gesso / ancoragem estrutural" | `/servicos/redes/sacadas-e-varandas.vue` | Inexistente / Inferência | `UNSUPPORTED` | Substituído por *"A instalação é definida conforme as características do local e a estrutura disponível no vão"* |
-| "Estrutura em alumínio de alta resistência / perfis de alumínio" | `/servicos/telas/*` | Inexistente / Inferência | `UNSUPPORTED` | Substituído por *"Estrutura sob medida para o vão"* |
-| "Garantia 2 anos / Instalação em 24h / 5.0 ★ / +5 mil clientes" | Hubs `/servicos/telas` e `/redes` | Inexistente no repo | `UNSUPPORTED` | Totalmente expurgados de todos os componentes e meta tags |
+| CLAIM AUDITADO | CATEGORIA | STATUS DE VALIDAÇÃO | TRATAMENTO REALIZADO NO SITE |
+|---|---|---|---|
+| "Garantia de 2 anos de instalação" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Confirmado expressamente pelo proprietário. |
+| "Atendimento / Agendamento sob medida" | Comercial / Operacional | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Processo de atendimento real da empresa. |
+| "+5 mil clientes atendidos" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
+| "10+ anos de experiência" | Comercial / Histórico | `OWNER_CONFIRMED` | **MANTIDO / PERMITIDO** — Histórico real da empresa. |
+| "5.0 ★ (Perfil Google)" | Prova Social | `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA` | **MANTIDO / PERMITIDO** — Nota pública real do perfil Google Meu Negócio. |
+| "Resiste a 500kg / 500kg/m²" | Desempenho Mecânico | `TECHNICALLY_DOCUMENTED` | Exige laudo técnico de laboratório para exibição de valor numérico mecânico. |
+| "Polietileno virgem com aditivo anti-UV" | Composição Química | `TECHNICALLY_DOCUMENTED` | Exige laudo/ficha técnica do fornecedor em arquivo no repositório. |
+| "Certificação INMETRO / NBR" | Normas Oficiais | `TECHNICALLY_DOCUMENTED` | Exige cópia do documento oficial em arquivo no repositório. |
+| "Malhas Menores (filhotes) vs Malhas Padrão (adultos)" | Presunção de Produto | `UNSUPPORTED` | **NEUTRALIZADO** — Foco em locais de aplicação (janelas, sacadas e cantos). |
+| "100% seguro" | Promessa Absoluta | `UNSUPPORTED` | **REEDITADO** — Substituído por linguagem responsável (*"mais segurança"*, *"redução de riscos"*). |
 
 `TECHNICAL_CLAIMS_AUDITED = PASS`  
 `UNSUPPORTED_TECHNICAL_CLAIMS_PUBLISHED = 0`  
@@ -192,6 +188,8 @@ Auditoria exaustiva realizada sobre todas as afirmações técnicas, materiais, 
 | Gate | Resultado |
 |---|---|
 | `TECHNICAL_CLAIMS_AUDITED` | ✅ `PASS` |
+| `OWNER_CONFIRMED_COMMERCIAL_CLAIMS` | ✅ `VALIDATED` |
+| `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA` | ✅ `VALIDATED` |
 | `UNSUPPORTED_TECHNICAL_CLAIMS_PUBLISHED` | ✅ `0` |
 | `UNSUPPORTED_REPLACEMENT_CLAIMS` | ✅ `0` |
 | `PET_MESH_SIZE_ASSUMPTIONS` | ✅ `0` |
@@ -203,7 +201,7 @@ Auditoria exaustiva realizada sobre todas as afirmações técnicas, materiais, 
 | `NEW_LOCAL_CITY_URLS` | ✅ `0` |
 | `NEW_URLS_HTTP_200` | ✅ `12/12 (PASS)` |
 | `OLD_URLS_STILL_HTTP_200` | ✅ `PASS` |
-| `SITEMAP_URL_COUNT` | ✅ `8` |
+| `SITEMAP_URL_COUNT` | ✅ `20` |
 | `PLANNED_REDIRECTS_ACTIVE` | ✅ `0` |
 | `BUILD` | ✅ `PASS (Exit Code 0)` |
 | `PRODUCTION_SMOKE` | ✅ `PASS (77/77)` |
@@ -216,6 +214,8 @@ Auditoria exaustiva realizada sobre todas as afirmações técnicas, materiais, 
 
 ```
 FASE 03B: FINAL APPROVED CANDIDATE
+OWNER_CONFIRMED_COMMERCIAL_CLAIMS: VALIDATED
+OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA: VALIDATED
 PET_MESH_SIZE_ASSUMPTIONS: 0
 UNVERIFIED_SPECIALIZATION_CLAIMS: 0
 UNSUPPORTED_REPLACEMENT_CLAIMS: 0

@@ -16,6 +16,11 @@ Principais realizações:
 - **Zero Cadeias ou Loops:** Nenhuma URL antiga passa por múltiplos saltos (`REDIRECT_CHAIN_COUNT = 0`, `REDIRECT_LOOP_COUNT = 0`).
 - **Troca Atômica do Sitemap:** Sitemap XML atualizado para conter exatamente as **20 URLs canônicas indexáveis** da nova taxonomia (`SITEMAP_URL_COUNT = 20`).
 - **Auditoria de Links Internos:** Links navegáveis do projeto auditados para garantir que nenhum aponte para URLs redirecionadas (`INTERNAL_LINKS_TO_REDIRECTED_URLS = 0`, `BROKEN_INTERNAL_LINKS = 0`).
+- **Classificação Factual Atualizada:**
+  - `OWNER_CONFIRMED`: Claims comerciais/operacionais confirmados pelo proprietário (Garantia 2 anos, atendimento sob medida, +5 mil clientes, 10+ anos de experiência).
+  - `OWNER_CONFIRMED_EXTERNAL_DYNAMIC_DATA`: Métrica pública de avaliação do Google Business (5.0 ★).
+  - `TECHNICALLY_DOCUMENTED`: Claims de física de materiais e resistência mecânica (exigem laudo de laboratório/fabricante).
+  - `UNSUPPORTED`: Promessas absolutas (*"100% seguro"*), neutralizadas para linguagem responsável.
 - **Preservação de Fontes Legadas:** Arquivos de origem legados mantidos intactos no repositório para viabilizar rollback instantâneo (`REDIRECT FIRST, LEGACY SOURCE CLEANUP LATER`).
 - **Validação no Output de Produção Nitro:** Testes automatizados executados contra o build compilado de produção (`248/248 PASS`).
 - **Segurança de Produção e Deploy:** Nenhuma alteração foi promovida para a produção, DNS, Vercel ou Search Console (`PRODUÇÃO ALTERADA = NÃO`, `DEPLOY REALIZADO = NÃO`).
@@ -186,8 +191,6 @@ Para preservação da capacidade de rollback instantâneo nesta fase, os seguint
 - `app/pages/servicos/[familia]/[categoria]/index.vue`
 - `app/pages/servicos/[familia]/index.vue`
 - `app/pages/servicos/[slug].vue`
-
-Estes arquivos poderão ser removidos com segurança em fases futuras de limpeza de código, após validação do Search Console em produção.
 
 ---
 
