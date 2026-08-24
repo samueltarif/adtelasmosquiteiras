@@ -13,6 +13,18 @@ export default defineEventHandler(async (event) => {
     channel,
     session_channel,
     first_touch_channel,
+    first_touch_landing_path,
+    first_touch_referrer,
+    first_touch_utm_source,
+    first_touch_utm_medium,
+    first_touch_utm_campaign,
+    first_touch_utm_content,
+    first_touch_utm_term,
+    first_touch_gclid,
+    first_touch_gbraid,
+    first_touch_wbraid,
+    first_touch_fbclid,
+    first_touch_msclkid,
     utm_source,
     utm_medium,
     utm_campaign,
@@ -44,7 +56,7 @@ export default defineEventHandler(async (event) => {
     return { success: true, idempotent: true }
   }
 
-  // 1. GRAVAR NO BANCO DE DADOS (Supabase - tabela leads com atribuição Phase B reconciliada)
+  // 1. GRAVAR NO BANCO DE DADOS (Supabase - tabela leads com atribuição Phase B.2)
   if (config.supabaseUrl && config.supabaseServiceRoleKey) {
     try {
       await $fetch(`${config.supabaseUrl}/rest/v1/leads`, {
@@ -61,8 +73,10 @@ export default defineEventHandler(async (event) => {
           session_id: session_id || null,
           landing_path: landing_path || null,
           conversion_path: conversion_path || null,
-          session_channel: session_channel || channel || 'direct',
-          first_touch_channel: first_touch_channel || 'direct',
+          session_channel: session_channel || channel || null,
+
+          // Atribuição de Sessão Atual
+          referrer: referrer || null,
           utm_source: utm_source || null,
           utm_medium: utm_medium || null,
           utm_campaign: utm_campaign || null,
@@ -73,7 +87,22 @@ export default defineEventHandler(async (event) => {
           wbraid: wbraid || null,
           fbclid: fbclid || null,
           msclkid: msclkid || null,
-          referrer: referrer || null,
+
+          // Atribuição First Touch Completa
+          first_touch_channel: first_touch_channel || null,
+          first_touch_landing_path: first_touch_landing_path || null,
+          first_touch_referrer: first_touch_referrer || null,
+          first_touch_utm_source: first_touch_utm_source || null,
+          first_touch_utm_medium: first_touch_utm_medium || null,
+          first_touch_utm_campaign: first_touch_utm_campaign || null,
+          first_touch_utm_content: first_touch_utm_content || null,
+          first_touch_utm_term: first_touch_utm_term || null,
+          first_touch_gclid: first_touch_gclid || null,
+          first_touch_gbraid: first_touch_gbraid || null,
+          first_touch_wbraid: first_touch_wbraid || null,
+          first_touch_fbclid: first_touch_fbclid || null,
+          first_touch_msclkid: first_touch_msclkid || null,
+
           nome,
           cidade,
           bairro: bairro || null,
@@ -86,9 +115,9 @@ export default defineEventHandler(async (event) => {
           valor_orcamento: 0
         }
       })
-      console.log('[send-lead] Lead real com telemetria Phase B gravado no Supabase com sucesso')
+      console.log('[send-lead] Lead real com telemetria Phase B.2 gravado no Supabase com sucesso')
     } catch (dbErr: any) {
-      // Se for violação de UNIQUE constraint no banco (código Postgres 23505), responde sucesso idempotente
+      // Se for violação de UNIQUE constraint no banco (código Postgres 23505/409), responde sucesso idempotente
       if (dbErr?.message?.includes('duplicate key') || dbErr?.message?.includes('23505') || dbErr?.status === 409) {
         console.log('[send-lead] [IDEMPOTENCY_DB] Conflito UNIQUE de submission_id no Supabase capturado com sucesso')
         return { success: true, idempotent: true }

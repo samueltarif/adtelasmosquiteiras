@@ -56,47 +56,52 @@ export function classifyAcquisitionChannel(params: AttributionContext): string {
   const medium = (utm_medium || '').toLowerCase()
   const ref = (referrer || '').toLowerCase()
 
-  // 1. Google Ads
-  if (gclid || gbraid || wbraid || (source.includes('google') && (medium.includes('cpc') || medium.includes('paid')))) {
+  // 1. Google Ads (Identificador Pago Vence Referrer Orgânico)
+  if (gclid || gbraid || wbraid || (source.includes('google') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'google_ads'
   }
 
-  // 2. Facebook / Meta Ads
-  if (fbclid || (source.includes('facebook') && (medium.includes('cpc') || medium.includes('paid')))) {
+  // 2. Microsoft Ads / Bing Paid (Identificador Pago msclkid Vence Referrer Orgânico)
+  if (msclkid || (source.includes('bing') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
+    return 'microsoft_ads'
+  }
+
+  // 3. Facebook / Meta Ads
+  if (fbclid || (source.includes('facebook') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'facebook_ads'
   }
 
-  // 3. Instagram
+  // 4. Instagram
   if (source.includes('instagram') || ref.includes('instagram.com') || ref.includes('l.instagram.com')) {
     return 'instagram'
   }
 
-  // 4. Facebook Organic/Social
+  // 5. Facebook Organic/Social
   if (source.includes('facebook') || ref.includes('facebook.com') || ref.includes('m.facebook.com')) {
     return 'facebook'
   }
 
-  // 5. Google Organic
+  // 6. Google Organic
   if (source.includes('google') || ref.includes('google.com') || ref.includes('google.com.br')) {
     return 'google_organic'
   }
 
-  // 6. Bing Organic
-  if (msclkid || source.includes('bing') || ref.includes('bing.com')) {
+  // 7. Bing Organic
+  if (source.includes('bing') || ref.includes('bing.com')) {
     return 'bing_organic'
   }
 
-  // 7. Other Paid
+  // 8. Other Paid
   if (medium.includes('cpc') || medium.includes('paid') || medium.includes('banner') || medium.includes('ppc')) {
     return 'other_paid'
   }
 
-  // 8. Direct
+  // 9. Direct
   if (!source && !ref) {
     return 'direct'
   }
 
-  // 9. Referral
+  // 10. Referral
   if (ref) {
     return 'referral'
   }
@@ -104,7 +109,7 @@ export function classifyAcquisitionChannel(params: AttributionContext): string {
   return 'unknown'
 }
 
-// In-Memory LRU Cache para Idempotência no Servidor
+// In-Memory LRU Cache para Idempotência no Servidor (Best-effort em serverless)
 const processedIds = new Set<string>()
 const MAX_IDEMPOTENCY_CACHE = 5000
 

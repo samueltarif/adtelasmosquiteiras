@@ -3,16 +3,31 @@ import { ref } from 'vue'
 const VISITOR_COOKIE_NAME = 'adt_vid'
 const SESSION_COOKIE_NAME = 'adt_sid'
 const LANDING_COOKIE_NAME = 'adt_landing_path'
-const FIRST_TOUCH_COOKIE_NAME = 'adt_ft_channel'
+const FIRST_TOUCH_COOKIE_NAME = 'adt_ft_context'
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutos em milissegundos
 const VISITOR_EXPIRATION_SECONDS = 365 * 24 * 60 * 60 // 365 dias
+
+export interface FirstTouchContext {
+  first_touch_channel: string
+  first_touch_landing_path: string | null
+  first_touch_referrer: string | null
+  first_touch_utm_source: string | null
+  first_touch_utm_medium: string | null
+  first_touch_utm_campaign: string | null
+  first_touch_utm_content: string | null
+  first_touch_utm_term: string | null
+  first_touch_gclid: string | null
+  first_touch_gbraid: string | null
+  first_touch_wbraid: string | null
+  first_touch_fbclid: string | null
+  first_touch_msclkid: string | null
+}
 
 export function generateUUID(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID()
   }
-  // Fallback seguro de UUID v4 caso crypto.randomUUID não esteja disponível
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
     const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -41,16 +56,12 @@ export function useAnalyticsIdentity() {
     sameSite: 'lax'
   })
 
-  const firstTouchCookie = useCookie<string | null>(FIRST_TOUCH_COOKIE_NAME, {
+  const firstTouchCookie = useCookie<FirstTouchContext | null>(FIRST_TOUCH_COOKIE_NAME, {
     maxAge: VISITOR_EXPIRATION_SECONDS,
     path: '/',
     sameSite: 'lax'
   })
 
-  /**
-   * Obtém ou cria o Visitor ID (adt_vid) persistente por 365 dias.
-   * Não utiliza PII, IP ou User-Agent para derivar o ID.
-   */
   function getOrCreateVisitorId(): string {
     if (!visitorCookie.value) {
       visitorCookie.value = generateUUID()
@@ -58,11 +69,6 @@ export function useAnalyticsIdentity() {
     return visitorCookie.value
   }
 
-  /**
-   * Obtém ou cria a sessão atual (adt_sid).
-   * Renova a expiração de 30 min se houver atividade contínua.
-   * Cria um novo session_id se mais de 30 min de inatividade ocorrerem.
-   */
   function getOrCreateSessionId(currentPath: string = '/'): { sessionId: string; isNewSession: boolean } {
     let isNewSession = false
     const now = Date.now()
@@ -86,9 +92,6 @@ export function useAnalyticsIdentity() {
     return { sessionId: sessionCookie.value, isNewSession }
   }
 
-  /**
-   * Registra a Landing Page da Sessão caso seja uma nova sessão.
-   */
   function getSessionLandingPath(currentPath: string = '/'): string {
     if (!landingCookie.value) {
       landingCookie.value = currentPath || '/'
@@ -97,25 +100,53 @@ export function useAnalyticsIdentity() {
   }
 
   /**
-   * Registra o First Touch Channel (Primeira origem de aquisição conhecida).
-   * Jamais sobrescreve depois de gravado na primeira visita.
+   * Grava o contexto completo do First Touch (Primeira Aquisição Conhecida).
+   * Não sobrescreve após gravado no primeiro acesso do visitante.
    */
-  function setFirstTouchChannelOnce(channel: string) {
-    if (!firstTouchCookie.value && channel && channel !== 'unknown') {
-      firstTouchCookie.value = channel
+  function setFirstTouchContextOnce(context: Partial<FirstTouchContext>) {
+    if (!firstTouchCookie.value && context.first_touch_channel && context.first_touch_channel !== 'unknown') {
+      firstTouchCookie.value = {
+        first_touch_channel: context.first_touch_channel || 'direct',
+        first_touch_landing_path: context.first_touch_landing_path || null,
+        first_touch_referrer: context.first_touch_referrer || null,
+        first_touch_utm_source: context.first_touch_utm_source || null,
+        first_touch_utm_medium: context.first_touch_utm_medium || null,
+        first_touch_utm_campaign: context.first_touch_utm_campaign || null,
+        first_touch_utm_content: context.first_touch_utm_content || null,
+        first_touch_utm_term: context.first_touch_utm_term || null,
+        first_touch_gclid: context.first_touch_gclid || null,
+        first_touch_gbraid: context.first_touch_gbraid || null,
+        first_touch_wbraid: context.first_touch_wbraid || null,
+        first_touch_fbclid: context.first_touch_fbclid || null,
+        first_touch_msclkid: context.first_touch_msclkid || null
+      }
     }
   }
 
-  function getFirstTouchChannel(): string {
-    return firstTouchCookie.value || 'direct'
+  function getFirstTouchContext(): Partial<FirstTouchContext> {
+    return firstTouchCookie.value || {
+      first_touch_channel: 'direct',
+      first_touch_landing_path: null,
+      first_touch_referrer: null,
+      first_touch_utm_source: null,
+      first_touch_utm_medium: null,
+      first_touch_utm_campaign: null,
+      first_touch_utm_content: null,
+      first_touch_utm_term: null,
+      first_touch_gclid: null,
+      first_touch_gbraid: null,
+      first_touch_wbraid: null,
+      first_touch_fbclid: null,
+      first_touch_msclkid: null
+    }
   }
 
   return {
     getOrCreateVisitorId,
     getOrCreateSessionId,
     getSessionLandingPath,
-    setFirstTouchChannelOnce,
-    getFirstTouchChannel,
+    setFirstTouchContextOnce,
+    getFirstTouchContext,
     generateUUID
   }
 }

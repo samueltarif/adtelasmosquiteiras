@@ -1,83 +1,71 @@
-# ARQUITETURA DE IDENTIDADE, ATRIBUIÇÃO DE TRÁFEGO E IDEMPOTÊNCIA — FASE B & FASE B.1
+# ARQUITETURA DE IDENTIDADE, ATRIBUIÇÃO DE TRÁFEGO E IDEMPOTÊNCIA — FASE B, B.1 & B.2
 
 **Projeto:** AD Telas e Redes (`adtelasmosquiteiras.com.br`)  
-**Data:** 2026-08-23  
-**Fase:** Fase B.1 — Reconciliação do Schema Real e Correção da Migration 003  
-**Status:** `PHASE B.1 SCHEMA RECONCILIATION: READY FOR REVIEW`  
+**Data:** 2026-08-24  
+**Fase:** Fase B.2 — Final Database Migration Hardening  
+**Status:** `PHASE B.2 FINAL MIGRATION HARDENING: READY FOR REVIEW`  
 **Deploy em Produção:** `PRODUCTION_CHANGED = NO (NÃO DEPLOYADO)`  
 **Alterações de Banco:** `DATABASE_CHANGED = NO (AGUARDANDO AÇÃO MANUAL)`
 
 ---
 
-## 1. Executive Summary & Reconciliação do Schema Real
+## 1. Executive Summary & Baseline Real de 28 Registros
 
-Na Fase B.1, o schema REAL das tabelas do Supabase foi confirmado manualmente pelo operador através da consulta à `information_schema.columns`. O script de migração [`supabase/manual/003_phase_b_identity_attribution_idempotency.sql`](file:///d:/sicons/ADT/supabase/manual/003_phase_b_identity_attribution_idempotency.sql) foi totalmente corrigido para adicionar previamente todas as colunas necessárias antes da criação dos índices únicos de idempotência, e todos os valores padrão (`DEFAULT`) que forçavam suposições semânticas em registros históricos foram removidos.
+Na Fase B.2, realizou-se o endurecimento final do script de migração [`supabase/manual/003_phase_b_identity_attribution_idempotency.sql`](file:///d:/sicons/ADT/supabase/manual/003_phase_b_identity_attribution_idempotency.sql). O baseline real do banco de dados em `public.leads` foi atualizado para **28 registros** (devido a 1 teste de validação manual do formulário real em produção).
 
----
-
-## 2. Schema Real Confirmado no Supabase
-
-### A. Tabela `public.lead_clicks` (7 colunas originais existentes):
-- `id` (`uuid`), `created_at` (`timestamptz`), `tipo` (`varchar`), `origem` (`varchar`), `url_origem` (`text`), `user_agent` (`text`), `ip_hash` (`varchar`).
-
-### B. Tabela `public.leads` (13 colunas originais existentes):
-- `id` (`uuid`), `created_at` (`timestamptz`), `nome` (`varchar`), `cidade` (`varchar`), `bairro` (`varchar`), `servico` (`varchar`), `telefone` (`varchar`), `email` (`varchar`), `mensagem` (`text`), `origem` (`varchar`), `status` (`varchar`), `valor_orcamento` (`numeric`), `observacoes` (`text`).
-
-### C. Tabela `public.page_views` (7 colunas originais existentes):
-- `id` (`uuid`), `created_at` (`timestamptz`), `path` (`varchar`), `referrer` (`text`), `user_agent` (`text`), `ip_hash` (`varchar`), **`session_id` (`varchar`)**.
-- *Nota Crítica:* A coluna `session_id` já existia previamente no schema de `page_views`.
+### Detalhamento do Baseline Real (`TOTAL_LEADS_ROWS = 28`):
+- `LEGACY_SYNTHETIC_WHATSAPP`: 23 registros legados
+- `AUTOMATED_TEST_LEADS`: 4 registros de testes automatizados
+- `MANUAL_VALIDATION_TEST_LEADS`: 1 registro de validação manual de produção
+- `CONFIRMED_REAL_CUSTOMER_LEADS`: 0 registros comerciais de clientes reais
+- `LEGACY_ROWS_DELETED`: 0 (Todos os 28 registros permanecem 100% intactos).
 
 ---
 
-## 3. Correções Aplicadas no Script SQL `003`
+## 2. Endurecimento dos Tipos de Dados (`TEXT` vs `VARCHAR`)
 
-1. **Ordenação de Execução DDL:** Todas as colunas são criadas via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` **antes** da execução de `CREATE INDEX`.
-2. **Remoção de Defaults Semânticos:** Removidos `DEFAULT 'direct'`, `DEFAULT false`, `DEFAULT 'unknown'`, `DEFAULT 'other'`. Colunas analíticas novas são `NULLABLE` sem default, preservando registros históricos com o valor `NULL` (Significando *Não Rastreado Historicamente*).
-3. **Compatibilidade dos Identificadores:** `visitor_id`, `session_id`, `event_id`, `submission_id` utilizam o tipo `VARCHAR(100)`.
-4. **Idempotência por Unique Partial Indexes:** Índices `UNIQUE PARTIAL` (`WHERE event_id IS NOT NULL` e `WHERE submission_id IS NOT NULL`) ignoram linhas históricas `NULL`.
-5. **Rollback Simétrico Completo:** O bloco de rollback remove exclusivamente as colunas e índices adicionados pela migração `003`, preservando colunas históricas como `page_views.session_id` e `page_views.referrer`.
+- **Identificadores Internos String:** `event_id`, `visitor_id`, `session_id`, `submission_id` utilizam `VARCHAR(100)`.
+- **Parâmetros de Atribuição Externa (Derivados de Query String / Referrer):** `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `referrer`, `landing_path`, `conversion_path`, e todos os campos `first_touch_*` utilizam o tipo **`TEXT`**.
+- *Motivo:* URLs externas, UTMs ou IDs de clique longos jamais correm o risco de causar estouro de limite (`string truncation error`) ou impedir a criação de um lead comercial.
 
 ---
 
-## 4. Lista Exata das Colunas a Serem Adicionadas por Tabela
+## 3. Taxonomia de Canais & Prioridade de Anúncios (`microsoft_ads`)
 
-### `public.page_views`:
-`event_id`, `visitor_id`, `landing_path`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `channel`, `device_type`, `is_bot`, `bot_name`.
-
-### `public.lead_clicks`:
-`event_id`, `visitor_id`, `session_id`, `landing_path`, `cta_location`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `referrer`, `channel`, `device_type`, `is_bot`, `bot_name`.
-
-### `public.leads`:
-`submission_id`, `visitor_id`, `session_id`, `landing_path`, `conversion_path`, `first_touch_channel`, `session_channel`, `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `referrer`.
+- **Nova Regra de Canais:**
+  - `msclkid` presente ➔ `microsoft_ads` (Identificador pago de anúncio vence referrer orgânico do Bing).
+  - Referrer `bing.com` sem `msclkid` ➔ `bing_organic`.
+  - Identificadores pagos de anúncios (`gclid`, `gbraid`, `wbraid`, `msclkid`, `fbclid`) possuem prioridade sobre referrers orgânicos.
 
 ---
 
-## 5. Lista Exata dos Índices a Serem Criados
+## 4. Persistência do Contexto Completo de First Touch em `public.leads`
 
-1. `unq_page_views_event_id` (UNIQUE PARTIAL em `page_views(event_id) WHERE event_id IS NOT NULL`)
-2. `idx_page_views_visitor_id` (Índice em `page_views(visitor_id)`)
-3. `idx_page_views_session_id` (Índice em `page_views(session_id)`)
-4. `unq_lead_clicks_event_id` (UNIQUE PARTIAL em `lead_clicks(event_id) WHERE event_id IS NOT NULL`)
-5. `idx_lead_clicks_visitor_id` (Índice em `lead_clicks(visitor_id)`)
-6. `idx_lead_clicks_session_id` (Índice em `lead_clicks(session_id)`)
-7. `unq_leads_submission_id` (UNIQUE PARTIAL em `leads(submission_id) WHERE submission_id IS NOT NULL`)
-8. `idx_leads_visitor_id` (Índice em `leads(visitor_id)`)
-9. `idx_leads_session_id` (Índice em `leads(session_id)`)
+Para garantir que a campanha de primeira aquisição de um visitante nunca seja perdida quando ele retornar ao site semanas depois via acesso direto ou outro canal, a tabela `public.leads` foi expandida com o contexto `first_touch_*` completo:
+- `first_touch_channel`, `first_touch_landing_path`, `first_touch_referrer`, `first_touch_utm_source`, `first_touch_utm_medium`, `first_touch_utm_campaign`, `first_touch_utm_content`, `first_touch_utm_term`, `first_touch_gclid`, `first_touch_gbraid`, `first_touch_wbraid`, `first_touch_fbclid`, `first_touch_msclkid`.
+- Gravado no cookie `adt_ft_context` (365 dias) na primeira visita do usuário e enviado para o banco de dados durante a submissão de formulários comerciais.
 
 ---
 
-## 6. Declaração de Ação Manual do Operador
+## 5. Estrutura Transacional do Script SQL `003` (`BEGIN; ... COMMIT;`)
 
-**`MANUAL_SUPABASE_ACTION_REQUIRED = YES`**  
-- **Script a ser executado:** [`supabase/manual/003_phase_b_identity_attribution_idempotency.sql`](file:///d:/sicons/ADT/supabase/manual/003_phase_b_identity_attribution_idempotency.sql)  
-- **Status Atual:** **NÃO EXECUTADO VIA MCP (`SUPABASE_MCP_WRITES = 0`)**. O operador humano deverá copiar e colar este script no SQL Editor do Supabase oficial quando aprovar o deploy da Fase B.1.
+As instruções DDL de alteração de schema foram empacotadas dentro de um bloco transacional atômico:
+```sql
+BEGIN;
+ALTER TABLE public.page_views ADD COLUMN IF NOT EXISTS ...;
+ALTER TABLE public.lead_clicks ADD COLUMN IF NOT EXISTS ...;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS ...;
+-- Criar os 9 índices únicos e secundários
+COMMIT;
+```
+O bloco de rollback é simétrico e remove exclusivamente as colunas e índices criados, sem tocar nas 28 linhas históricas de `leads` nem em `page_views.session_id` ou `page_views.referrer`.
 
 ---
 
-## 7. Resultados do Pre-Deploy Gate & Testes
+## 6. Resultados da Matriz de Testes Expandida & SEO
 
 - **`npx nuxi build`:** **Exit Code 0 (PASS)**
-- **Matriz de Testes da Fase B.1 (`test-phase-a.mjs`):** **7/7 PASSED (100%)**
+- **Matriz de Testes Expandida da Fase B.2 (`test-phase-a.mjs` com mock local na porta 9999):** **20/20 PASSED (100%)**
 - **Suíte de Integridade SEO (`seo-validate-03c.mjs`):** **248/248 PASSED (100%)**
 - **Redirects SEO:** `46/46 PASS`
 

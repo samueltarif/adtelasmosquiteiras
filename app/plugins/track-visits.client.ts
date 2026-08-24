@@ -29,8 +29,22 @@ export default defineNuxtPlugin(() => {
     const attr = attribution.getOrInitAttribution()
     const eventId = identity.generateUUID()
 
-    // Registrar First Touch se for um canal válido
-    identity.setFirstTouchChannelOnce(attr.channel)
+    // Registrar contexto First Touch completo na primeira visita do visitante
+    identity.setFirstTouchContextOnce({
+      first_touch_channel: attr.channel,
+      first_touch_landing_path: landingPath,
+      first_touch_referrer: attr.referrer,
+      first_touch_utm_source: attr.utm_source,
+      first_touch_utm_medium: attr.utm_medium,
+      first_touch_utm_campaign: attr.utm_campaign,
+      first_touch_utm_content: attr.utm_content,
+      first_touch_utm_term: attr.utm_term,
+      first_touch_gclid: attr.gclid,
+      first_touch_gbraid: attr.gbraid,
+      first_touch_wbraid: attr.wbraid,
+      first_touch_fbclid: attr.fbclid,
+      first_touch_msclkid: attr.msclkid
+    })
 
     // Fire-and-forget com beacon/fetch keepalive
     $fetch('/api/track-visit', {
@@ -48,10 +62,14 @@ export default defineNuxtPlugin(() => {
         utm_content: attr.utm_content,
         utm_term: attr.utm_term,
         gclid: attr.gclid,
+        gbraid: attr.gbraid,
+        wbraid: attr.wbraid,
+        fbclid: attr.fbclid,
+        msclkid: attr.msclkid,
         channel: attr.channel
       }
     }).catch(() => {
-      // Silencioso — rastreamento nunca deve quebrar a experiência
+      // Silencioso — rastreamento nunca deve quebrar a experiência do usuário
     })
   }
 

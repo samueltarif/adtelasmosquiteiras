@@ -22,30 +22,43 @@ export function classifyClientChannel(params: Partial<SessionAttribution>): stri
   const medium = (params.utm_medium || '').toLowerCase()
   const ref = (params.referrer || '').toLowerCase()
 
-  if (params.gclid || params.gbraid || params.wbraid || (source.includes('google') && (medium.includes('cpc') || medium.includes('paid')))) {
+  // 1. Google Ads (Identificador Pago Vence Referrer Orgânico)
+  if (params.gclid || params.gbraid || params.wbraid || (source.includes('google') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'google_ads'
   }
-  if (params.fbclid || (source.includes('facebook') && (medium.includes('cpc') || medium.includes('paid')))) {
+  // 2. Microsoft Ads / Bing Paid (Identificador Pago msclkid Vence Referrer Orgânico)
+  if (params.msclkid || (source.includes('bing') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
+    return 'microsoft_ads'
+  }
+  // 3. Facebook Ads
+  if (params.fbclid || (source.includes('facebook') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'facebook_ads'
   }
+  // 4. Instagram
   if (source.includes('instagram') || ref.includes('instagram.com') || ref.includes('l.instagram.com')) {
     return 'instagram'
   }
+  // 5. Facebook
   if (source.includes('facebook') || ref.includes('facebook.com') || ref.includes('m.facebook.com')) {
     return 'facebook'
   }
+  // 6. Google Organic
   if (source.includes('google') || ref.includes('google.com') || ref.includes('google.com.br')) {
     return 'google_organic'
   }
-  if (params.msclkid || source.includes('bing') || ref.includes('bing.com')) {
+  // 7. Bing Organic
+  if (source.includes('bing') || ref.includes('bing.com')) {
     return 'bing_organic'
   }
+  // 8. Other Paid
   if (medium.includes('cpc') || medium.includes('paid') || medium.includes('banner') || medium.includes('ppc')) {
     return 'other_paid'
   }
+  // 9. Direct
   if (!source && !ref) {
     return 'direct'
   }
+  // 10. Referral
   if (ref) {
     return 'referral'
   }
@@ -79,7 +92,6 @@ export function useAttribution() {
       }
     }
 
-    // Se houver novos parâmetros na URL ou referrer externo ou se a atribuição ainda não existia:
     if (hasParamsInUrl || externalReferrer || !attributionCookie.value) {
       const newAttr: SessionAttribution = {
         utm_source: (query.utm_source as string) || attributionCookie.value?.utm_source || null,
