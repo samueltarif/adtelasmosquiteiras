@@ -3,7 +3,7 @@ import { ref } from 'vue'
 const VISITOR_COOKIE_NAME = 'adt_vid'
 const SESSION_COOKIE_NAME = 'adt_sid'
 const LANDING_COOKIE_NAME = 'adt_landing_path'
-const FIRST_TOUCH_COOKIE_NAME = 'adt_ft_context'
+const FIRST_TOUCH_STORAGE_KEY = 'adt_ft_context'
 
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutos em milissegundos
 const VISITOR_EXPIRATION_SECONDS = 365 * 24 * 60 * 60 // 365 dias
@@ -56,12 +56,6 @@ export function useAnalyticsIdentity() {
     sameSite: 'lax'
   })
 
-  const firstTouchCookie = useCookie<FirstTouchContext | null>(FIRST_TOUCH_COOKIE_NAME, {
-    maxAge: VISITOR_EXPIRATION_SECONDS,
-    path: '/',
-    sameSite: 'lax'
-  })
-
   function getOrCreateVisitorId(): string {
     if (!visitorCookie.value) {
       visitorCookie.value = generateUUID()
@@ -100,31 +94,45 @@ export function useAnalyticsIdentity() {
   }
 
   /**
-   * Grava o contexto completo do First Touch (Primeira Aquisição Conhecida).
-   * Não sobrescreve após gravado no primeiro acesso do visitante.
+   * Grava o contexto completo do First Touch em localStorage para evitar enviar payload pesado em cabeçalhos HTTP.
+   * Preserva permanentemente a primeira aquisição conhecida do visitante.
    */
   function setFirstTouchContextOnce(context: Partial<FirstTouchContext>) {
-    if (!firstTouchCookie.value && context.first_touch_channel && context.first_touch_channel !== 'unknown') {
-      firstTouchCookie.value = {
-        first_touch_channel: context.first_touch_channel || 'direct',
-        first_touch_landing_path: context.first_touch_landing_path || null,
-        first_touch_referrer: context.first_touch_referrer || null,
-        first_touch_utm_source: context.first_touch_utm_source || null,
-        first_touch_utm_medium: context.first_touch_utm_medium || null,
-        first_touch_utm_campaign: context.first_touch_utm_campaign || null,
-        first_touch_utm_content: context.first_touch_utm_content || null,
-        first_touch_utm_term: context.first_touch_utm_term || null,
-        first_touch_gclid: context.first_touch_gclid || null,
-        first_touch_gbraid: context.first_touch_gbraid || null,
-        first_touch_wbraid: context.first_touch_wbraid || null,
-        first_touch_fbclid: context.first_touch_fbclid || null,
-        first_touch_msclkid: context.first_touch_msclkid || null
+    if (import.meta.client) {
+      const existing = localStorage.getItem(FIRST_TOUCH_STORAGE_KEY)
+      if (!existing && context.first_touch_channel && context.first_touch_channel !== 'unknown') {
+        const data: FirstTouchContext = {
+          first_touch_channel: context.first_touch_channel || 'direct',
+          first_touch_landing_path: context.first_touch_landing_path || null,
+          first_touch_referrer: context.first_touch_referrer || null,
+          first_touch_utm_source: context.first_touch_utm_source || null,
+          first_touch_utm_medium: context.first_touch_utm_medium || null,
+          first_touch_utm_campaign: context.first_touch_utm_campaign || null,
+          first_touch_utm_content: context.first_touch_utm_content || null,
+          first_touch_utm_term: context.first_touch_utm_term || null,
+          first_touch_gclid: context.first_touch_gclid || null,
+          first_touch_gbraid: context.first_touch_gbraid || null,
+          first_touch_wbraid: context.first_touch_wbraid || null,
+          first_touch_fbclid: context.first_touch_fbclid || null,
+          first_touch_msclkid: context.first_touch_msclkid || null
+        }
+        localStorage.setItem(FIRST_TOUCH_STORAGE_KEY, JSON.stringify(data))
       }
     }
   }
 
   function getFirstTouchContext(): Partial<FirstTouchContext> {
-    return firstTouchCookie.value || {
+    if (import.meta.client) {
+      const stored = localStorage.getItem(FIRST_TOUCH_STORAGE_KEY)
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch (e) {
+          // Fallback se JSON for inválido
+        }
+      }
+    }
+    return {
       first_touch_channel: 'direct',
       first_touch_landing_path: null,
       first_touch_referrer: null,
