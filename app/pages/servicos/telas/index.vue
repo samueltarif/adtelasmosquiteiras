@@ -88,6 +88,19 @@ const getWhatsappUrl = (servicoTitulo) => {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`
 }
 
+const getTelasServiceKey = (slug) => {
+  const map = {
+    removivel: 'telas_removiveis',
+    aluminio: 'telas_perfis',
+    basculante: 'telas_basculantes',
+    pivotante: 'telas_pivotantes',
+    acoinox: 'telas_especiais',
+    pets: 'pet_screen',
+    pernilongos: 'telas_anti_pernilongos'
+  }
+  return map[slug] || (slug.startsWith('telas') ? slug : 'telas_' + slug)
+}
+
 // Hero carousel & Card image indices
 const heroImages = [
   { src: '/images/tela_mosquiteira.png',        alt: 'Tela mosquiteira para janela' },
@@ -226,7 +239,7 @@ onUnmounted(() => {
               target="_blank"
               rel="noopener noreferrer"
               data-cta-location="service_card"
-              :data-service-key="servico.slug === 'pets' ? 'pet_screen' : (servico.slug.startsWith('telas') ? servico.slug : 'telas_' + servico.slug)"
+              :data-service-key="getTelasServiceKey(servico.slug)"
               :data-service-name="servico.titulo"
               class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col cursor-pointer"
             >

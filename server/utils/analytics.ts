@@ -63,6 +63,29 @@ export const CANONICAL_SERVICE_TAXONOMY: Record<string, string> = {
   vidracaria: 'Serviços de Vidraçaria'
 }
 
+// Mapeamento de Alias/Variações comuns para Chaves Canônicas
+export const SERVICE_KEY_ALIASES: Record<string, string> = {
+  telas_removivel: 'telas_removiveis',
+  telas_basculante: 'telas_basculantes',
+  telas_pivotante: 'telas_pivotantes',
+  telas_aluminio: 'telas_perfis',
+  telas_acoinox: 'telas_especiais',
+  telas_pernilongos: 'telas_anti_pernilongos',
+  redes_gatos: 'redes_pets',
+  redes_varandas: 'redes_sacadas',
+  redes_apartamentos: 'redes_janelas',
+  redes_portas: 'redes_janelas',
+  redes_basculantes: 'redes_janelas',
+  redes_cachorros: 'redes_pets',
+  redes_animais: 'redes_pets',
+  redes_idosos: 'redes_criancas',
+  redes_piscinas: 'redes_sacadas',
+  redes_telhados: 'redes_escadas',
+  redes_portoes: 'redes_janelas',
+  redes_muros: 'redes_escadas',
+  redes_coberturas: 'redes_escadas'
+}
+
 export function validateCtaLocation(location: string | null | undefined): string {
   if (!location) return 'other'
   return ALLOWED_CTA_LOCATIONS.has(location) ? location : 'other'
@@ -79,10 +102,18 @@ export function resolveCanonicalService(key: string | null | undefined): { servi
     return { service_key: null, service_name: null }
   }
   const cleanKey = key.trim()
-  const name = CANONICAL_SERVICE_TAXONOMY[cleanKey]
-  if (name) {
-    return { service_key: cleanKey, service_name: name }
+  
+  // 1. Tentar chave canônica direta
+  if (CANONICAL_SERVICE_TAXONOMY[cleanKey]) {
+    return { service_key: cleanKey, service_name: CANONICAL_SERVICE_TAXONOMY[cleanKey] }
   }
+
+  // 2. Tentar alias conhecido (ex: telas_removivel -> telas_removiveis)
+  const canonicalKey = SERVICE_KEY_ALIASES[cleanKey]
+  if (canonicalKey && CANONICAL_SERVICE_TAXONOMY[canonicalKey]) {
+    return { service_key: canonicalKey, service_name: CANONICAL_SERVICE_TAXONOMY[canonicalKey] }
+  }
+
   return { service_key: null, service_name: null }
 }
 
@@ -127,12 +158,12 @@ export function classifyAcquisitionChannel(params: AttributionContext): string {
   const medium = (utm_medium || '').toLowerCase()
   const ref = (referrer || '').toLowerCase()
 
-  // 1. Google Ads (Identificador Pago Vence Referrer Orgânico)
+  // 1. Google Ads
   if (gclid || gbraid || wbraid || (source.includes('google') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'google_ads'
   }
 
-  // 2. Microsoft Ads / Bing Paid (Identificador Pago msclkid Vence Referrer Orgânico)
+  // 2. Microsoft Ads / Bing Paid
   if (msclkid || (source.includes('bing') && (medium.includes('cpc') || medium.includes('paid') || medium.includes('ppc')))) {
     return 'microsoft_ads'
   }

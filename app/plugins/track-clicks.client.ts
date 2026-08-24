@@ -25,8 +25,18 @@ export default defineNuxtPlugin(() => {
     return 'other'
   }
 
-  function getServiceContext(target: HTMLElement): { serviceKey: string | null; serviceName: string | null } {
-    const serviceEl = target.closest('[data-service-key]') as HTMLElement | null
+  function getServiceContext(target: HTMLElement, rawTarget?: HTMLElement | null): { serviceKey: string | null; serviceName: string | null } {
+    let serviceEl = target.closest('[data-service-key]') as HTMLElement | null
+    if (!serviceEl && rawTarget) {
+      serviceEl = rawTarget.closest('[data-service-key]') as HTMLElement | null
+    }
+    if (!serviceEl) {
+      const ctaEl = target.closest('[data-cta-location]')
+      if (ctaEl && ctaEl.parentElement) {
+        serviceEl = ctaEl.parentElement.closest('[data-service-key]') as HTMLElement | null
+      }
+    }
+
     if (!serviceEl) return { serviceKey: null, serviceName: null }
 
     const key = serviceEl.getAttribute('data-service-key') || null
@@ -77,7 +87,7 @@ export default defineNuxtPlugin(() => {
       const attr = attribution.getOrInitAttribution()
       const eventId = identity.generateUUID()
       const ctaLocation = getCtaLocation(target)
-      const { serviceKey, serviceName } = getServiceContext(target)
+      const { serviceKey, serviceName } = getServiceContext(target, e.target as HTMLElement)
 
       $fetch('/api/track-click', {
         method: 'POST',

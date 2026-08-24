@@ -77,6 +77,29 @@ const getWhatsappUrl = (servicoTitulo) => {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`
 }
 
+const getRedesServiceKey = (slug) => {
+  const map = {
+    janelas: 'redes_janelas',
+    sacadas: 'redes_sacadas',
+    varandas: 'redes_sacadas',
+    apartamentos: 'redes_janelas',
+    portas: 'redes_janelas',
+    escadas: 'redes_escadas',
+    basculantes: 'redes_janelas',
+    gatos: 'redes_pets',
+    criancas: 'redes_criancas',
+    cachorros: 'redes_pets',
+    animais: 'redes_pets',
+    idosos: 'redes_criancas',
+    piscinas: 'redes_sacadas',
+    telhados: 'redes_escadas',
+    portoes: 'redes_janelas',
+    muros: 'redes_escadas',
+    coberturas: 'redes_escadas'
+  }
+  return map[slug] || (slug.startsWith('redes') ? slug : 'redes_' + slug)
+}
+
 // Hero carousel & Card image indices
 const heroImages = [
   { src: '/images/redes_para_janelas.png',     alt: 'Redes para janelas' },
@@ -215,7 +238,7 @@ onUnmounted(() => {
               target="_blank"
               rel="noopener noreferrer"
               data-cta-location="service_card"
-              :data-service-key="servico.slug === 'gatos' ? 'redes_pets' : (servico.slug.startsWith('redes') ? servico.slug : 'redes_' + servico.slug)"
+              :data-service-key="getRedesServiceKey(servico.slug)"
               :data-service-name="servico.titulo"
               class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col cursor-pointer"
             >
