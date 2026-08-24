@@ -1,278 +1,251 @@
-# FASE 03B — PLANO DE IMPLEMENTAÇÃO
+# IMPLEMENTATION PLAN — LEAD EMAIL DELIVERY HARDENING & DURABILITY
 
-**Projeto:** AD Telas e Redes  
-**Data:** 2026-08-23  
-**Status:** AGUARDANDO APROVAÇÃO
-
----
-
-## Escopo
-
-Criar 12 páginas novas com conteúdo próprio e único, sem ativar redirects, sem excluir páginas antigas, sem deploy.
-
-**NEW_BASE_URLS = 12**  
-**NEW_LOCAL_CITY_URLS = 0**  
-**PLANNED_REDIRECTS_ACTIVE = 0**  
-**DEPLOY = NOT_PERFORMED**
+**Projeto:** AD Telas e Redes (`https://www.adtelasmosquiteiras.com.br`)  
+**Data:** 2026-08-24  
+**Fase:** Lead Email Delivery Hardening & Durability  
+**Status:** `READY_FOR_HUMAN_SQL_REVIEW`  
+**Ação Manual no Supabase:** `MANUAL_SUPABASE_ACTION_REQUIRED = YES`  
+**Execução de SQL:** `SQL_006_EXECUTED = NO` | `SUPABASE_MCP_WRITES = 0`  
 
 ---
 
-## Service Area Data Review
+## 1. Revisão Forense de Durabilidade (`EMAIL_DELIVERY_DURABILITY_REVIEW`)
 
-**Fonte:** `server/api/cep/[cep].get.ts`
+### 1.1. Contexto de Execução Serverless (Vercel)
+Em ambientes serverless como a Vercel, o ciclo de vida das instâncias do runtime Nitro/Node é efêmero. Mecanismos em memória local (`Map`, `Set`, LRU cache ou variáveis globais de processo) **não são autoritativos** entre invocações concorrentes ou após cold starts.
 
-| Cidade | IBGE | Status |
-|---|---|---|
-| São Paulo | 3550308 | CONFIRMED |
-| Guarulhos | 3518800 | CONFIRMED |
-| Osasco | 3534401 | CONFIRMED |
-| São Bernardo do Campo | 3548708 | CONFIRMED |
-| Barueri | 3505708 | CONFIRMED |
-| Jundiaí | 3525904 | CONFIRMED |
-| Mogi das Cruzes | 3530607 | CONFIRMED |
-| Taboão da Serra | 3552809 | CONFIRMED |
-| Suzano | 3552502 | CONFIRMED |
-| Itapevi | 3522505 | CONFIRMED |
-| Embu-Guaçu | 3515103 | CONFIRMED |
-| Sorocaba | 3552205 | CONFIRMED |
-| Cajamar | 3509205 | CONFIRMED |
-| Mairiporã | 3528502 | CONFIRMED |
-| Santana de Parnaíba | 3547304 | CONFIRMED |
-| Cotia | 3513009 | CONFIRMED |
-| Itapecerica da Serra | 3522208 | CONFIRMED |
-| Embu das Artes | 3515004 | CONFIRMED |
-| São Roque | 3550605 | CONFIRMED |
-
-**Cidades litorâneas presentes:** NENHUMA ✓  
-**Mauá:** Ausente do dataset (não confirmada → NEEDS_BUSINESS_CONFIRMATION)  
-**Fonte do dado:** IBGE codes do API CEP — mapeamento real, não marketing  
-**Total:** 19 cidades confirmadas no sistema
+A **única fonte durável e autoritativa da verdade** para o estado do lead e da entrega de e-mail é a base de dados **PostgreSQL (Supabase)**.
 
 ---
 
-## Estrutura de Arquivos a Criar
-
-```
-app/pages/servicos/telas/
-  janelas.vue            → /servicos/telas/janelas
-  portas.vue             → /servicos/telas/portas
-  sacadas-e-varandas.vue → /servicos/telas/sacadas-e-varandas
-  removivel.vue          → /servicos/telas/removivel
-  pet-screen.vue         → /servicos/telas/pet-screen
-  restaurantes.vue       → /servicos/telas/restaurantes
-
-app/pages/servicos/redes/
-  janelas.vue              → /servicos/redes/janelas
-  sacadas-e-varandas.vue   → /servicos/redes/sacadas-e-varandas
-  gatos-e-pets.vue         → /servicos/redes/gatos-e-pets
-  criancas.vue             → /servicos/redes/criancas
-  escadas-e-mezaninos.vue  → /servicos/redes/escadas-e-mezaninos
-
-app/pages/
-  areas-atendidas.vue    → /areas-atendidas
-```
+### 1.2. Semântica Formal de Entrega: `SINGLE_ATTEMPT_WITH_DURABLE_FAILURE_STATE`
+- **Definição da Fase Atual:** Como **não** será implementado nenhum worker, fila ou cron de retry automático nesta fase, a semântica formal do envio de e-mail é estritamente:
+  `EMAIL_DELIVERY_SEMANTICS = SINGLE_ATTEMPT_WITH_DURABLE_FAILURE_STATE`
+- **Ciclo de Vida da Notificação:**
+  1. Cada novo lead submetido dispara exatamente **uma tentativa síncrona de envio SMTP**.
+  2. **Sucesso SMTP** ➔ `notification_email_status` é atualizado para `'sent'` com `notification_email_sent_at = now()`.
+  3. **Falha SMTP** ➔ `notification_email_status` é atualizado para `'failed'` com `notification_email_attempts = 1`, `notification_email_last_attempt_at = now()` e mensagem sanitizada em `notification_email_last_error`.
+  4. **Queda do processo antes do SMTP** ➔ O registro permanece no banco com `notification_email_status = 'pending'`.
+  5. **Queda durante o envio** ➔ O status permanece `'pending'` ou `'sending'`.
+  6. **Evolução Futura:** Quando futuramente for implementado um reprocessador controlado para registros `pending`/`failed`, a semântica poderá evoluir para `AT_LEAST_ONCE_WITH_DUPLICATE_MITIGATION`.
 
 ---
 
-## Intent Map por URL
+### 1.3. Modelo de Estado Durável no Banco de Dados (`public.leads`)
 
-| URL | H1 | Intenção Principal |
-|---|---|---|
-| `/servicos/telas/janelas` | Tela Mosquiteira para Janelas Sob Medida | Proteção contra mosquitos em janelas residenciais |
-| `/servicos/telas/portas` | Tela Mosquiteira para Portas | Ventilação com proteção em portas e acessos |
-| `/servicos/telas/sacadas-e-varandas` | Tela Mosquiteira para Sacada e Varanda | Aproveitamento de área externa sem insetos |
-| `/servicos/telas/removivel` | Tela Mosquiteira Removível | Instalação sem obra, fácil de remover e limpar |
-| `/servicos/telas/pet-screen` | Tela Pet Screen para Casas com Animais | Tela reforçada resistente a arranhões |
-| `/servicos/telas/restaurantes` | Tela Mosquiteira para Restaurantes e Cozinhas | Proteção contra insetos em ambientes B2B |
-| `/servicos/redes/janelas` | Rede de Proteção para Janelas | Segurança em janelas residenciais |
-| `/servicos/redes/sacadas-e-varandas` | Rede de Proteção para Sacadas e Varandas | Fechamento de vão em sacadas e varandas |
-| `/servicos/redes/gatos-e-pets` | Rede de Proteção para Gatos e Pets | Prevenir fugas e quedas de animais |
-| `/servicos/redes/criancas` | Rede de Proteção para Crianças | Segurança em janelas e sacadas com crianças |
-| `/servicos/redes/escadas-e-mezaninos` | Rede de Proteção para Escadas e Mezaninos | Proteção em vãos internos e desníveis |
-| `/areas-atendidas` | Áreas Atendidas — Grande São Paulo | Verificação de cobertura geográfica |
+Para persistir o ciclo de vida da entrega com integridade estrita, são adicionadas as seguintes colunas e CHECK constraints em `public.leads` via [`supabase/manual/006_lead_email_delivery_state.sql`](file:///d:/sicons/ADT/supabase/manual/006_lead_email_delivery_state.sql):
 
----
-
-## Conteúdo Exclusivo por Página
-
-Cada página terá seções únicas relevantes para sua intenção, selecionadas do conjunto:
-
-- Hero com imagem real específica do serviço
-- Problema que resolve (específico para aquela aplicação)
-- Onde é aplicada (ambientes reais)
-- Como funciona a instalação
-- O que considerar ao contratar
-- FAQ específico (perguntas únicas por página)
-- Serviços relacionados (links internos)
-- CTA
-
-**Módulos NÃO presentes em todas as páginas:**
-- Telas/Janelas: tipos de abertura (correr, basculante, pivotante)
-- Telas/Removível: comparação instalação permanente vs removível
-- Telas/Pet-screen: diferença para tela convencional
-- Telas/Restaurantes: foco em higiene de ambiente (sem claims ANVISA)
-- Redes/Escadas: foco em vãos internos, não mencionar sacadas
-- Redes/Gatos: distinção entre fuga e queda
-- Áreas Atendidas: busca por CEP interativa
-
----
-
-## Imagens Mapeadas por Página
-
-| URL | Imagem Principal | Imagem Secundária |
-|---|---|---|
-| `/servicos/telas/janelas` | `tela_mosquiteira.png` | `mosquiteira_janela.png` |
-| `/servicos/telas/portas` | `telas_para_portas.jpeg` | `mosquiteira_para_porta.png` |
-| `/servicos/telas/sacadas-e-varandas` | `telas_para_varandas.jpg` | `mosquiteira_area_externa.png` |
-| `/servicos/telas/removivel` | `mosquiteira_removivel.png` | `telas_removiveis_especificacoes.jpg` |
-| `/servicos/telas/pet-screen` | `telas_pet_screen_especificacoes.jpg` | `pets_pro.png` |
-| `/servicos/telas/restaurantes` | `telas_para_restaurantes.jpg` | `telas_para_restaurantes_especificacoes.jpeg` |
-| `/servicos/redes/janelas` | `redes_para_janelas.png` | `redes_para_janelas_especificacoes.png` |
-| `/servicos/redes/sacadas-e-varandas` | `redes_para_sacadas.jpg` | `redes_para_sacadas_especificacoes.jpg` |
-| `/servicos/redes/gatos-e-pets` | `gato.png` | `redes_para_gatos_especificacoes.png` |
-| `/servicos/redes/criancas` | `redes_para_criancas.png` | `protecaoinfantil.jpeg` |
-| `/servicos/redes/escadas-e-mezaninos` | `redes_para_escadas.jpg` | `redes_para_escadas_especificacoes.png` |
-| `/areas-atendidas` | `familia.png` | (componente CepSearch) |
-
----
-
-## Claim Validation Matrix
-
-| Claim | Status | Ação |
-|---|---|---|
-| "Instalação em 24h" | NÃO VALIDADO | Remover das novas páginas |
-| "Garantia 2 anos" | NÃO VALIDADO | Remover das novas páginas |
-| "5.0 ★ (487 avaliações)" | NÃO VALIDADO | Não incluir nas novas páginas |
-| "+5 Mil Clientes" | NÃO VALIDADO | Não incluir nas novas páginas |
-| "10+ Anos de experiência" | NÃO VALIDADO | Não incluir nas novas páginas |
-| "Certificado INMETRO" | NÃO VALIDADO | Não incluir |
-| "Resistente 500kg" | NÃO VALIDADO | Não incluir |
-| "ANVISA / RDC 216" | NÃO VALIDADO | Não incluir |
-| "Instalação sob medida" | FACTUAL | ✓ Usar |
-| "Instalação profissional" | FACTUAL | ✓ Usar |
-| "Orçamento sem compromisso" | FACTUAL | ✓ Usar |
-| "Atendemos Grande São Paulo" | FACTUAL (19 cidades) | ✓ Usar |
-
-**Nota:** As páginas existentes (hubs telas/redes, home) mantêm seus claims atuais — NÃO alterados nesta fase.
-
----
-
-## SEO Matrix (Title / Description / H1)
-
-| URL | Title | Meta Description | H1 |
+| Coluna | Tipo | Constraint / Default | Descrição |
 |---|---|---|---|
-| `/servicos/telas/janelas` | Tela Mosquiteira para Janelas Sob Medida em SP \| AD Telas | Tela mosquiteira para janelas em São Paulo. Instalação profissional sob medida para janelas de correr, basculantes e pivotantes. Orçamento grátis. | Tela Mosquiteira para Janelas Sob Medida |
-| `/servicos/telas/portas` | Tela Mosquiteira para Porta em SP \| AD Telas e Redes | Tela mosquiteira para portas em São Paulo. Ventilação total com proteção contra mosquitos. Instalação profissional, orçamento sem compromisso. | Tela Mosquiteira para Porta |
-| `/servicos/telas/sacadas-e-varandas` | Tela Mosquiteira para Sacada e Varanda em SP \| AD Telas | Tela mosquiteira para sacadas e varandas em São Paulo. Aproveite sua área externa sem insetos. Instalação profissional e orçamento grátis. | Tela Mosquiteira para Sacada e Varanda |
-| `/servicos/telas/removivel` | Tela Mosquiteira Removível em SP \| AD Telas e Redes | Tela mosquiteira removível instalada em São Paulo. Sem obra, fácil de remover para limpeza. Sob medida para sua janela. Orçamento grátis. | Tela Mosquiteira Removível |
-| `/servicos/telas/pet-screen` | Tela Pet Screen para Casas com Animais em SP \| AD Telas | Pet Screen instalado em São Paulo. Tela mosquiteira reforçada para casas com gatos e cachorros. Mais resistente à arranhões. Orçamento grátis. | Tela Pet Screen para Casas com Animais |
-| `/servicos/telas/restaurantes` | Tela Mosquiteira para Restaurantes em SP \| AD Telas | Tela mosquiteira para restaurantes e cozinhas em São Paulo. Proteção contra insetos em ambientes comerciais. Instalação profissional. | Tela Mosquiteira para Restaurantes e Cozinhas |
-| `/servicos/redes/janelas` | Rede de Proteção para Janelas em SP \| AD Telas e Redes | Rede de proteção para janelas em São Paulo. Instalação profissional em apartamentos e casas. Sob medida. Orçamento grátis. | Rede de Proteção para Janelas |
-| `/servicos/redes/sacadas-e-varandas` | Rede de Proteção para Sacadas e Varandas em SP \| AD Telas | Rede de proteção para sacadas e varandas em São Paulo. Fechamento do vão com instalação profissional. Orçamento sem compromisso. | Rede de Proteção para Sacadas e Varandas |
-| `/servicos/redes/gatos-e-pets` | Rede de Proteção para Gatos em SP \| AD Telas e Redes | Rede de proteção para gatos e pets em São Paulo. Previna fugas e quedas com instalação profissional. Orçamento grátis. | Rede de Proteção para Gatos e Pets |
-| `/servicos/redes/criancas` | Rede de Proteção para Crianças em SP \| AD Telas e Redes | Rede de proteção para crianças em São Paulo. Instalação em janelas e sacadas para maior segurança. Orçamento sem compromisso. | Rede de Proteção para Crianças |
-| `/servicos/redes/escadas-e-mezaninos` | Rede de Proteção para Escadas e Mezaninos em SP \| AD Telas | Rede de proteção para escadas e mezaninos em São Paulo. Segurança em vãos internos de casas e sobrados. Orçamento grátis. | Rede de Proteção para Escadas e Mezaninos |
-| `/areas-atendidas` | Áreas Atendidas — Grande São Paulo \| AD Telas e Redes | Veja as cidades e regiões atendidas pela AD Telas e Redes em São Paulo. Consulte seu CEP para confirmar atendimento. | Áreas Atendidas pela AD Telas e Redes |
+| `notification_email_status` | `VARCHAR(20)` | `NOT NULL DEFAULT 'pending'` + `CHECK (status IN ('pending', 'sending', 'sent', 'failed'))` | Estado estrito do ciclo de vida |
+| `notification_email_sent_at` | `TIMESTAMPTZ` | `NULL` | Data/hora exata em que o Gmail SMTP aceitou a mensagem |
+| `notification_email_attempts` | `INT` | `NOT NULL DEFAULT 0` + `CHECK (attempts >= 0)` | Contador de tentativas de entrega realizadas |
+| `notification_email_last_attempt_at` | `TIMESTAMPTZ` | `NULL` | Data/hora da última tentativa executada |
+| `notification_email_last_error` | `TEXT` | `NULL` | Mensagem de erro sanitizada (sem credenciais ou secrets) |
 
 ---
 
-## Internal Linking Changes
+### 1.4. Análise Rigorosa de Concorrência e Falhas
 
-**`/servicos/telas`** (telas.vue):
-- Adicionar seção de links diretos para as 6 landings de tela
-
-**`/servicos/redes`** (redes.vue):
-- Adicionar seção de links diretos para as 5 landings de rede
-
-**`/servicos`** (index.vue):
-- Confirmar links para telas, redes e vidraçaria (já existentes)
-
-**Home** (`index.vue`):
-- Link contextual para `/areas-atendidas` na seção de cobertura (se existir)
-- NÃO transformar a home em lista de links
+| Cenário de Concorrência / Falha | Comportamento do Sistema | Garantia de Integridade |
+|---|---|---|
+| **A. Dois POST simultâneos com mesmo `submission_id`** | O primeiro request executa `INSERT` com sucesso no Supabase. O segundo request recebe violação da restrição `unq_leads_submission_id` (código Postgres 23505 / HTTP 409). | **Apenas 1 lead é criado no banco.** |
+| **B. Execução do envio de e-mail** | Apenas a requisição que obteve sucesso na criação do registro no banco prossegue para o bloco de envio SMTP. O request concorrente recebe resposta idempotente `{ success: true, idempotent: true }` e **NÃO dispara e-mail**. | **Double-click não gera e-mails duplicados.** |
+| **C. Falha de rede / erro do SMTP Gmail** | O `INSERT` do lead já foi confirmado no banco. O bloco `catch` do envio captura o erro, sanitiza a mensagem e atualiza o lead para `notification_email_status = 'failed'`, incrementando `attempts = 1`. A API responde `{ success: true, leadSaved: true, emailSent: false }`. | **O lead NUNCA é perdido.** O visitante navega com sucesso para `/obrigado`. |
+| **D. Queda do processo antes do SMTP** | O lead foi gravado com `notification_email_status = 'pending'`. O registro permanece identificável no banco para auditoria. | **Lead preservado.** |
+| **E. Queda do processo durante / após aceitação pelo Gmail antes do `UPDATE sent`** | O Gmail entrega a mensagem ao destinatário, mas a instância serverless é terminada antes de persistir `'sent'`. O status permanece `'pending'` ou `'sending'`. | **Lead preservado no banco e notificação entregue.** |
 
 ---
 
-## Breadcrumb Architecture
+## 2. Script SQL de Migração (`supabase/manual/006_lead_email_delivery_state.sql`)
 
-| URL | Breadcrumb |
-|---|---|
-| `/servicos/telas/janelas` | Home → Serviços → Telas Mosquiteiras → Janelas |
-| `/servicos/telas/portas` | Home → Serviços → Telas Mosquiteiras → Portas |
-| `/servicos/telas/sacadas-e-varandas` | Home → Serviços → Telas Mosquiteiras → Sacadas e Varandas |
-| `/servicos/telas/removivel` | Home → Serviços → Telas Mosquiteiras → Removível |
-| `/servicos/telas/pet-screen` | Home → Serviços → Telas Mosquiteiras → Pet Screen |
-| `/servicos/telas/restaurantes` | Home → Serviços → Telas Mosquiteiras → Restaurantes |
-| `/servicos/redes/janelas` | Home → Serviços → Redes de Proteção → Janelas |
-| `/servicos/redes/sacadas-e-varandas` | Home → Serviços → Redes de Proteção → Sacadas e Varandas |
-| `/servicos/redes/gatos-e-pets` | Home → Serviços → Redes de Proteção → Gatos e Pets |
-| `/servicos/redes/criancas` | Home → Serviços → Redes de Proteção → Crianças |
-| `/servicos/redes/escadas-e-mezaninos` | Home → Serviços → Redes de Proteção → Escadas e Mezaninos |
-| `/areas-atendidas` | Home → Áreas Atendidas |
+```sql
+-- ======================================================================
+-- AÇÃO MANUAL NECESSÁRIA NO SUPABASE (NÃO EXECUTAR AUTOMATICAMENTE VIA MCP)
+-- ======================================================================
+-- Projeto: AD Telas e Redes — https://www.adtelasmosquiteiras.com.br
+-- Arquivo: supabase/manual/006_lead_email_delivery_state.sql
+-- Fase: Lead Email Delivery Hardening — Estado Durável de Notificação
+-- Finalidade: Adicionar colunas duráveis e CHECK constraints para rastreamento de envio de e-mail na tabela public.leads.
+--
+-- REGRAS E SEGURANÇA:
+-- 1. Cria colunas com tipos rígidos e CHECK constraints (status válidos e tentativas >= 0).
+-- 2. Preserva 100% dos dados existentes, constraints, RLS policies, triggers e índices.
+-- 3. Não afeta auth.users, storage, páginas públicas ou analytics.
+-- 4. Status de execução: FINAL_REVIEW_NOT_EXECUTED (Aguardando execução manual do operador).
+-- ======================================================================
 
-O componente `Breadcrumb.vue` atual usa `getFamiliaBySlug` do `useServicos`. Como as novas páginas têm paths estáticos (não usam o composable de dados), vou passar breadcrumb manual via prop ou criar breadcrumb inline simples e autocontido.
+-- ======================================================================
+-- 1. PRE-CHECK — VERIFICAÇÃO DE SEGURANÇA DAS COLUNAS ATUAIS
+-- ======================================================================
+SELECT 
+    table_name, 
+    column_name, 
+    data_type, 
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+  AND table_name = 'leads'
+ORDER BY ordinal_position;
+
+
+-- ======================================================================
+-- 2. MIGRATION TRANSACTIONAL (BEGIN ... COMMIT)
+-- ======================================================================
+BEGIN;
+
+-- A. Status do envio da notificação por e-mail (NOT NULL, padrão 'pending')
+ALTER TABLE public.leads 
+ADD COLUMN IF NOT EXISTS notification_email_status VARCHAR(20) NOT NULL DEFAULT 'pending';
+
+-- B. Timestamp de entrega confirmada pelo servidor SMTP
+ALTER TABLE public.leads 
+ADD COLUMN IF NOT EXISTS notification_email_sent_at TIMESTAMP WITH TIME ZONE;
+
+-- C. Contador de tentativas de envio executadas (NOT NULL, padrão 0)
+ALTER TABLE public.leads 
+ADD COLUMN IF NOT EXISTS notification_email_attempts INT NOT NULL DEFAULT 0;
+
+-- D. Timestamp da última tentativa realizada
+ALTER TABLE public.leads 
+ADD COLUMN IF NOT EXISTS notification_email_last_attempt_at TIMESTAMP WITH TIME ZONE;
+
+-- E. Mensagem sanitizada do último erro de entrega (sem credenciais ou secrets)
+ALTER TABLE public.leads 
+ADD COLUMN IF NOT EXISTS notification_email_last_error TEXT;
+
+-- F. CHECK constraint garantindo exclusivamente os 4 estados permitidos
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conname = 'chk_leads_notification_email_status'
+          AND conrelid = 'public.leads'::regclass
+    ) THEN
+        ALTER TABLE public.leads 
+        ADD CONSTRAINT chk_leads_notification_email_status 
+        CHECK (notification_email_status IN ('pending', 'sending', 'sent', 'failed'));
+    END IF;
+END $$;
+
+-- G. CHECK constraint impedindo valores negativos no contador de tentativas
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM pg_constraint 
+        WHERE conname = 'chk_leads_notification_email_attempts'
+          AND conrelid = 'public.leads'::regclass
+    ) THEN
+        ALTER TABLE public.leads 
+        ADD CONSTRAINT chk_leads_notification_email_attempts 
+        CHECK (notification_email_attempts >= 0);
+    END IF;
+END $$;
+
+-- H. Índice para consultas eficientes de status de notificação e auditoria
+CREATE INDEX IF NOT EXISTS idx_leads_notification_email_status 
+ON public.leads(notification_email_status);
+
+COMMIT;
+
+
+-- ======================================================================
+-- 3. POST-CHECK — VERIFICAÇÃO DE INTEGRIDADE PÓS-MIGRATION
+-- ======================================================================
+SELECT 
+    table_name, 
+    column_name, 
+    data_type, 
+    is_nullable,
+    column_default
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+  AND table_name = 'leads'
+  AND column_name LIKE 'notification_email_%'
+ORDER BY ordinal_position;
+
+SELECT 
+    conname AS constraint_name,
+    pg_get_constraintdef(c.oid) AS constraint_definition
+FROM pg_constraint c
+JOIN pg_namespace n ON n.oid = c.connamespace
+WHERE n.nspname = 'public'
+  AND c.conrelid = 'public.leads'::regclass
+  AND c.conname IN ('chk_leads_notification_email_status', 'chk_leads_notification_email_attempts')
+ORDER BY c.conname;
+
+SELECT 
+    tablename, 
+    indexname, 
+    indexdef
+FROM pg_indexes
+WHERE schemaname = 'public' 
+  AND tablename = 'leads'
+  AND indexname = 'idx_leads_notification_email_status';
+
+
+-- ======================================================================
+-- 4. ROLLBACK SIMÉTRICO COMPLETO (EXECUTAR APENAS SE NECESSÁRIO)
+-- ======================================================================
+/*
+BEGIN;
+
+DROP INDEX IF EXISTS public.idx_leads_notification_email_status;
+
+ALTER TABLE public.leads 
+DROP CONSTRAINT IF EXISTS chk_leads_notification_email_status;
+
+ALTER TABLE public.leads 
+DROP CONSTRAINT IF EXISTS chk_leads_notification_email_attempts;
+
+ALTER TABLE public.leads 
+  DROP COLUMN IF EXISTS notification_email_status,
+  DROP COLUMN IF EXISTS notification_email_sent_at,
+  DROP COLUMN IF EXISTS notification_email_attempts,
+  DROP COLUMN IF EXISTS notification_email_last_attempt_at,
+  DROP COLUMN IF EXISTS notification_email_last_error;
+
+COMMIT;
+*/
+```
 
 ---
 
-## LCP P1 (Fase 03A pendente)
+## 3. Formato do E-mail e Sanitização de Erros
 
-No `HeroSection.vue` da Home, a primeira imagem do carrossel (`mosquiteira_area_externa.png`) deve receber `fetchpriority="high"` e `loading="eager"`. As demais permanecem com lazy.
+### 3.1. Assunto e Corpo
+- **Assunto:** `Novo orçamento pelo site — {servico}` (ou `Novo lead pelo site — AD Telas e Redes`)
+- **Corpo HTML & Texto:**
+  - Dados completos do lead (Nome, Telefone, E-mail, Cidade, Bairro, Serviço, Mensagem, Origem, Data/Hora em SP).
+  - Link/Botão de atendimento rápido via WhatsApp: `https://wa.me/55{telefone_limpo}`.
+  - Atribuição comercial (Canal de sessão, First Touch, Landing Page, Conversion Page, UTMs).
+  - Identificadores técnicos discretos (`submission_id`, `visitor_id`, `session_id`).
 
-Esta alteração será feita como parte do LCP improvement na Fase 03B.
-
----
-
-## Estrutura de Componentes
-
-Não criar template base compartilhado. Cada página é autossuficiente.
-
-Componentes globais reutilizados por todas as páginas (já existentes):
-- `<Breadcrumb>` — breadcrumb inline por URL
-- `<MobileUnifiedCTA>` — CTA mobile fixo  
-- `<StickyFormModal>` — modal de formulário
-- `<WhatsappIcon>` — ícone whatsapp
-- `<Icon>` — ícones lucide
-
-Componente NOVO a criar:
-- `<ServiceRelated>` — grade de links para serviços relacionados (reutilizável sem conteúdo compartilhado)
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Alteração |
-|---|---|
-| `app/pages/servicos/telas.vue` | Adicionar seção de links diretos para as 6 landings |
-| `app/pages/servicos/redes.vue` | Adicionar seção de links diretos para as 5 landings |
-| `app/components/HeroSection.vue` | LCP: fetchpriority=high na primeira imagem do carrossel |
+### 3.2. Função de Sanitização de Erros (`sanitizeEmailError`)
+Garante que qualquer erro capturado pelo Nodemailer remova credenciais, senhas ou tokens antes de ser registrado no banco:
+```typescript
+export function sanitizeEmailError(err: any): string {
+  if (!err) return 'Erro desconhecido'
+  let msg = typeof err === 'string' ? err : (err.message || String(err))
+  // Remove potenciais senhas de app, tokens e secrets
+  msg = msg.replace(/[a-z]{16}/gi, '***')
+  msg = msg.replace(/(password|pass|secret|key)=([^&\s]+)/gi, '$1=***')
+  return msg.slice(0, 500)
+}
+```
 
 ---
 
-## Verificações de Gate
+## 4. Plano de Testes & Validação Automatizada (`test-lead-email.mjs`)
 
-| Gate | Esperado |
-|---|---|
-| NEW_BASE_URLS | 12 |
-| NEW_LOCAL_CITY_URLS | 0 |
-| NEW_URLS_HTTP_200 | 12/12 |
-| OLD_URLS_STILL_HTTP_200 | PASS |
-| SITEMAP_URL_COUNT | 8 |
-| CANONICAL | PASS |
-| H1_UNIQUE | PASS |
-| META_KEYWORDS | 0 |
-| PLANNED_REDIRECTS_ACTIVE | 0 |
-| DEPLOY | NOT_PERFORMED |
-| ADMIN_AUTH_IMPLEMENTATION | DEFERRED_BY_USER |
-
----
-
-## Questões Abertas
-
-> [!IMPORTANT]
-> **Breadcrumb Component:** O `Breadcrumb.vue` existente usa `getFamiliaBySlug()` do composable `useServicos` para montar labels. As novas páginas `/servicos/telas/*` e `/servicos/redes/*` com pathnames simplificados (ex: `telas` em vez de `familia`) podem não ser reconhecidas automaticamente. Solução planejada: passar breadcrumb como prop ou usar breadcrumb inline simples e correto.
-
-> [!NOTE]
-> **Claims nas páginas hubs existentes:** `telas.vue` e `redes.vue` ainda exibem "Garantia 2 anos", "Instalação em 24h", "5.0 ★ (487 avaliações)". Esses claims NÃO serão alterados nesta fase (páginas existentes mantêm estado atual). As 12 novas páginas usarão copy factual.
-
-> [!NOTE]
-> **`/areas-atendidas`:** A página exibirá as 19 cidades do dataset do CEP API como cobertura confirmada. Mauá está ausente do dataset. Não será incluída.
+Serão executados testes unitários isolados com mocks locais:
+1. **Formulário Válido:** 1 lead salvo (`notification_email_status = 'sent'`), 1 envio SMTP.
+2. **Double Click / Concorrência:** 2 POSTs com mesmo `submission_id` ➔ 1 lead salvo, 1 e-mail disparado, 1 resposta idempotente sem envio duplicado.
+3. **Falha de SMTP:** Supabase grava lead com sucesso ➔ SMTP lança erro ➔ status atualizado para `'failed'` com mensagem sanitizada ➔ resposta da API retorna `{ success: true, leadSaved: true, emailSent: false }` sem perda de dados.
+4. **Campos Nulos / Opcionais:** E-mail e mensagem opcionais tratados sem erros.
+5. **Formatação de Telefone:** Link `wa.me/55...` gerado perfeitamente.
+6. **Caracteres UTF-8:** Acentuação (`São Paulo`, `Orçamento`, `Telas Mosquiteiras Removíveis`) preservada.
+7. **Regressão de Build & Testes:** `npx nuxi build`, `test-admin-v2.mjs`, `test-phase-a.mjs`, `seo-validate-03c.mjs`.
