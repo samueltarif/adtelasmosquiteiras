@@ -81,6 +81,7 @@ onUnmounted(() => {
 <template>
   <!-- Header Desktop -->
   <header 
+    data-cta-location="header"
     class="hidden md:block fixed top-0 left-0 right-0 border-b border-gray-200 z-40 shadow-sm transition-all duration-300"
     :class="isScrolled ? 'bg-white/70 backdrop-blur-md' : 'bg-white'"
   >
@@ -151,7 +152,7 @@ onUnmounted(() => {
   </header>
 
   <!-- Header Mobile -->
-  <header class="md:hidden fixed top-0 left-0 right-0 z-40 px-3 py-2">
+  <header data-cta-location="header" class="md:hidden fixed top-0 left-0 right-0 z-40 px-3 py-2">
     <div
       class="flex items-center bg-white rounded-full shadow-md px-2 h-14 gap-1 transition-all duration-300"
       :class="isScrolled ? 'shadow-xl' : 'shadow-md'"

@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-text-primary text-white py-10">
+  <footer data-cta-location="footer" class="bg-text-primary text-white py-10">
     <div class="max-w-[1200px] mx-auto px-5">
       <!-- Informações da Empresa -->
       <div class="text-center">

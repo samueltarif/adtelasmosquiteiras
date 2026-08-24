@@ -225,6 +225,9 @@ onUnmounted(() => {
               :href="getWhatsappUrl(servico.titulo)"
               target="_blank"
               rel="noopener noreferrer"
+              data-cta-location="service_card"
+              :data-service-key="servico.slug === 'pets' ? 'pet_screen' : (servico.slug.startsWith('telas') ? servico.slug : 'telas_' + servico.slug)"
+              :data-service-name="servico.titulo"
               class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col cursor-pointer"
             >
               <!-- Imagem -->

@@ -221,6 +221,9 @@ const openFormModal = () => { showFormModal.value = true }
             :href="getWhatsappItemUrl(produto.titulo)"
             target="_blank"
             rel="noopener noreferrer"
+            data-cta-location="service_card"
+            data-service-key="vidracaria"
+            data-service-name="Serviços de Vidraçaria"
             class="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#38BDF8] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col bg-white/5 backdrop-blur-sm cursor-pointer"
           >
             <!-- Imagem do Card com Overlay Gradient -->

@@ -1,4 +1,12 @@
-import { classifyDevice, classifyBot, isIdempotentRequest, generateIpHash } from '../utils/analytics'
+import { 
+  classifyDevice, 
+  classifyBot, 
+  isIdempotentRequest, 
+  generateIpHash,
+  validateCtaLocation,
+  normalizeActionType,
+  resolveCanonicalService
+} from '../utils/analytics'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -16,6 +24,7 @@ export default defineEventHandler(async (event) => {
     tipo = 'whatsapp',
     origem = '/',
     cta_location,
+    service_key,
     landing_path,
     utm_source,
     utm_medium,
@@ -45,10 +54,15 @@ export default defineEventHandler(async (event) => {
   const deviceType = classifyDevice(userAgent)
   const botInfo = classifyBot(userAgent)
 
+  // Validações e Resoluções Canônicas de Servidor
+  const validatedCtaLocation = validateCtaLocation(cta_location)
+  const canonicalActionType = normalizeActionType(tipo)
+  const { service_key: canonicalServiceKey, service_name: canonicalServiceName } = resolveCanonicalService(service_key)
+
   const path = (origem === '/' || origem === '') ? 'Home (/)' : origem
 
   try {
-    // Grava exclusivamente na tabela lead_clicks (NUNCA na tabela leads)
+    // Grava na tabela lead_clicks com validação e saneamento server-side
     await $fetch(`${config.supabaseUrl}/rest/v1/lead_clicks`, {
       method: 'POST',
       headers: {
@@ -61,10 +75,12 @@ export default defineEventHandler(async (event) => {
         event_id: event_id || null,
         visitor_id: visitor_id || null,
         session_id: session_id || null,
-        tipo,
+        tipo: canonicalActionType,
         origem: path,
         url_origem: path,
-        cta_location: cta_location || null,
+        cta_location: validatedCtaLocation,
+        service_key: canonicalServiceKey,
+        service_name: canonicalServiceName,
         landing_path: landing_path || path,
         device_type: deviceType,
         is_bot: botInfo.isBot,

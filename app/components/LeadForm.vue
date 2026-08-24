@@ -136,10 +136,13 @@ const sendToWhatsApp = async () => {
 </script>
 
 <template>
-  <div :class="[
-    'bg-white rounded-xl shadow-lg border border-gray-200',
-    variant === 'desktop' ? 'p-6' : 'p-5'
-  ]">
+  <div
+    data-cta-location="quote_form"
+    :class="[
+      'bg-white rounded-xl shadow-lg border border-gray-200',
+      variant === 'desktop' ? 'p-6' : 'p-5'
+    ]"
+  >
     <!-- Header -->
     <div class="text-center mb-5">
       <h3 :class="[

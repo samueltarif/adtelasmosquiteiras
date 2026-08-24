@@ -97,6 +97,9 @@ const trackEvent = (eventName, params = {}) => {
           v-for="servico in servicosCards"
           :key="servico.slug"
           :to="servico.url"
+          data-cta-location="service_card"
+          :data-service-key="servico.slug === 'telas' ? 'telas_janelas' : (servico.slug === 'redes' ? 'redes_janelas' : 'vidracaria')"
+          :data-service-name="servico.titulo"
           class="group bg-white rounded-3xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 cursor-pointer"
           :data-gtm="`servico-card-${servico.slug}`"
         >

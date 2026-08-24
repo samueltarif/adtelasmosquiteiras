@@ -111,6 +111,7 @@ onUnmounted(() => {
 
     <!-- Container Principal -->
     <div
+      data-cta-location="sticky_mobile"
       class="bg-white rounded-t-3xl shadow-2xl transition-all duration-300 ease-out"
       :class="isExpanded ? 'h-[240px]' : 'h-[70px]'"
       @touchstart="handleTouchStart"

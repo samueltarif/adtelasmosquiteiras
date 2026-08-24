@@ -15,6 +15,77 @@ export interface AttributionContext {
   landing_path?: string | null
 }
 
+export const ALLOWED_CTA_LOCATIONS = new Set([
+  'header',
+  'hero',
+  'footer',
+  'floating_whatsapp',
+  'sticky_mobile',
+  'service_card',
+  'service_page',
+  'quote_form',
+  'contact_form',
+  'cep_result',
+  'modal',
+  'faq',
+  'other'
+])
+
+export const CANONICAL_SERVICE_TAXONOMY: Record<string, string> = {
+  // Telas Mosquiteiras
+  telas_janelas: 'Telas Mosquiteiras para Janelas',
+  telas_portas: 'Telas Mosquiteiras para Portas',
+  telas_varandas: 'Telas Mosquiteiras para Varandas',
+  telas_sacadas: 'Telas Mosquiteiras para Sacadas',
+  telas_apartamentos: 'Telas Mosquiteiras para Apartamentos',
+  telas_banheiro: 'Telas Mosquiteiras para Banheiro',
+  telas_correr: 'Telas Mosquiteiras de Correr',
+  telas_removiveis: 'Telas Mosquiteiras Removíveis',
+  telas_perfis: 'Telas Mosquiteiras com Perfis',
+  telas_basculantes: 'Telas Mosquiteiras para Basculantes',
+  telas_pivotantes: 'Telas Mosquiteiras Pivotantes',
+  telas_especiais: 'Telas Mosquiteiras Especiais',
+  telas_anti_pernilongos: 'Telas Mosquiteiras Anti-Pernilongos',
+  telas_fachadas: 'Telas Mosquiteiras para Fachadas',
+  telas_coberturas: 'Telas Mosquiteiras para Coberturas',
+  telas_restaurantes: 'Telas Mosquiteiras para Restaurantes',
+  telas_industrias: 'Telas Mosquiteiras para Indústrias',
+  pet_screen: 'Telas Mosquiteiras Pet Screen',
+
+  // Redes de Proteção
+  redes_janelas: 'Redes de Proteção para Janelas',
+  redes_sacadas: 'Redes de Proteção para Sacadas e Varandas',
+  redes_pets: 'Redes de Proteção para Gatos e Pets',
+  redes_criancas: 'Redes de Proteção para Crianças',
+  redes_escadas: 'Redes de Proteção para Escadas e Mezaninos',
+
+  // Vidraçaria
+  vidracaria: 'Serviços de Vidraçaria'
+}
+
+export function validateCtaLocation(location: string | null | undefined): string {
+  if (!location) return 'other'
+  return ALLOWED_CTA_LOCATIONS.has(location) ? location : 'other'
+}
+
+export function normalizeActionType(type: string | null | undefined): string {
+  if (!type) return 'other'
+  if (type === 'cta_interno') return 'internal_cta'
+  return type
+}
+
+export function resolveCanonicalService(key: string | null | undefined): { service_key: string | null; service_name: string | null } {
+  if (!key || typeof key !== 'string') {
+    return { service_key: null, service_name: null }
+  }
+  const cleanKey = key.trim()
+  const name = CANONICAL_SERVICE_TAXONOMY[cleanKey]
+  if (name) {
+    return { service_key: cleanKey, service_name: name }
+  }
+  return { service_key: null, service_name: null }
+}
+
 export function classifyDevice(userAgent: string): 'mobile' | 'tablet' | 'desktop' | 'unknown' {
   if (!userAgent) return 'unknown'
   const ua = userAgent.toLowerCase()
@@ -109,7 +180,7 @@ export function classifyAcquisitionChannel(params: AttributionContext): string {
   return 'unknown'
 }
 
-// In-Memory LRU Cache para Idempotência no Servidor (Best-effort em serverless)
+// In-Memory LRU Cache para Idempotência no Servidor
 const processedIds = new Set<string>()
 const MAX_IDEMPOTENCY_CACHE = 5000
 

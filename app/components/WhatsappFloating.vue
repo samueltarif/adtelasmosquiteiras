@@ -50,6 +50,7 @@ onUnmounted(() => clearTimeout(tooltipTimer))
         :href="whatsappLink"
         target="_blank"
         rel="noopener noreferrer"
+        data-cta-location="floating_whatsapp"
         title="Falar no WhatsApp agora"
         class="relative flex items-center gap-2 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-full shadow-2xl transition-colors duration-300 active:scale-95 pl-3 pr-4 py-3 md:pl-4 md:pr-5 md:py-3.5 wpp-bounce"
         @mouseenter="showTooltip = false"

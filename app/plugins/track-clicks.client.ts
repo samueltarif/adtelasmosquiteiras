@@ -1,5 +1,6 @@
 import { useAnalyticsIdentity } from '~/composables/useAnalyticsIdentity'
 import { useAttribution } from '~/composables/useAttribution'
+import { SERVICE_TAXONOMY } from '~/utils/ctaTaxonomy'
 
 export default defineNuxtPlugin(() => {
   if (typeof document === 'undefined') return
@@ -8,6 +9,11 @@ export default defineNuxtPlugin(() => {
   const attribution = useAttribution()
 
   function getCtaLocation(target: HTMLElement): string {
+    // 1. Explicit data-cta-location attribute on target or closest ancestor
+    const explicitLocation = target.closest('[data-cta-location]')?.getAttribute('data-cta-location')
+    if (explicitLocation) return explicitLocation
+
+    // 2. DOM structural fallback
     if (target.closest('header')) return 'header'
     if (target.closest('footer')) return 'footer'
     if (target.closest('.hero, [class*="hero"]')) return 'hero'
@@ -15,7 +21,22 @@ export default defineNuxtPlugin(() => {
     if (target.closest('[class*="sticky-mobile"], [class*="mobile-cta"]')) return 'sticky_mobile'
     if (target.closest('.modal, [class*="modal"]')) return 'modal'
     if (target.closest('.service-card, [class*="card"]')) return 'service_card'
+
     return 'other'
+  }
+
+  function getServiceContext(target: HTMLElement): { serviceKey: string | null; serviceName: string | null } {
+    const serviceEl = target.closest('[data-service-key]') as HTMLElement | null
+    if (!serviceEl) return { serviceKey: null, serviceName: null }
+
+    const key = serviceEl.getAttribute('data-service-key') || null
+    let name = serviceEl.getAttribute('data-service-name') || null
+
+    if (key && !name && SERVICE_TAXONOMY[key]) {
+      name = SERVICE_TAXONOMY[key].name
+    }
+
+    return { serviceKey: key, serviceName: name }
   }
 
   document.addEventListener('click', (e) => {
@@ -45,7 +66,7 @@ export default defineNuxtPlugin(() => {
     }
     // 3. Links para a página de contato ou orçamento (CTAs internos)
     else if (href.includes('/contato') || href.includes('/orcamento')) {
-      tipo = 'cta_interno'
+      tipo = 'internal_cta'
     }
 
     // Se identificou um tipo de clique de intenção de contato rastreável, grava
@@ -56,6 +77,7 @@ export default defineNuxtPlugin(() => {
       const attr = attribution.getOrInitAttribution()
       const eventId = identity.generateUUID()
       const ctaLocation = getCtaLocation(target)
+      const { serviceKey, serviceName } = getServiceContext(target)
 
       $fetch('/api/track-click', {
         method: 'POST',
@@ -66,6 +88,8 @@ export default defineNuxtPlugin(() => {
           tipo,
           origem: path || '/',
           cta_location: ctaLocation,
+          service_key: serviceKey,
+          service_name: serviceName,
           landing_path: landingPath,
           utm_source: attr.utm_source,
           utm_medium: attr.utm_medium,

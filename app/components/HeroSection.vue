@@ -26,7 +26,7 @@ onUnmounted(() => { clearInterval(timer) })
 </script>
 
 <template>
-  <section class="mt-16 md:mt-28 bg-white relative overflow-hidden">
+  <section data-cta-location="hero" class="mt-16 md:mt-28 bg-white relative overflow-hidden">
 
     <!-- ===== MOBILE (< 768px) ===== -->
     <div class="block md:hidden">
