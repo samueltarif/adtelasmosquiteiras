@@ -23,6 +23,11 @@ export default defineEventHandler(async (event) => {
     utm_content,
     utm_term,
     gclid,
+    gbraid,
+    wbraid,
+    fbclid,
+    msclkid,
+    referrer,
     channel
   } = body
 
@@ -59,24 +64,33 @@ export default defineEventHandler(async (event) => {
         tipo,
         origem: path,
         url_origem: path,
-        cta_location: cta_location || 'other',
+        cta_location: cta_location || null,
         landing_path: landing_path || path,
         device_type: deviceType,
         is_bot: botInfo.isBot,
+        bot_name: botInfo.botName,
         user_agent: userAgent.substring(0, 500),
         ip_hash: ipHash,
-        channel: channel || 'direct',
+        channel: channel || null,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
         utm_content: utm_content || null,
         utm_term: utm_term || null,
-        gclid: gclid || null
+        gclid: gclid || null,
+        gbraid: gbraid || null,
+        wbraid: wbraid || null,
+        fbclid: fbclid || null,
+        msclkid: msclkid || null,
+        referrer: referrer || null
       }
     })
 
     return { success: true }
   } catch (error: any) {
+    if (error?.message?.includes('duplicate key') || error?.message?.includes('23505') || error?.status === 409) {
+      return { success: true, idempotent: true }
+    }
     console.error('[track-click] Erro:', error?.message)
     return { success: false }
   }

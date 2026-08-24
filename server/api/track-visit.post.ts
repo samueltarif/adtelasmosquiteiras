@@ -22,6 +22,10 @@ export default defineEventHandler(async (event) => {
     utm_content,
     utm_term,
     gclid,
+    gbraid,
+    wbraid,
+    fbclid,
+    msclkid,
     channel
   } = body
 
@@ -60,18 +64,25 @@ export default defineEventHandler(async (event) => {
         is_bot: botInfo.isBot,
         bot_name: botInfo.botName,
         ip_hash: ipHash,
-        channel: channel || 'direct',
+        channel: channel || null,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
         utm_content: utm_content || null,
         utm_term: utm_term || null,
-        gclid: gclid || null
+        gclid: gclid || null,
+        gbraid: gbraid || null,
+        wbraid: wbraid || null,
+        fbclid: fbclid || null,
+        msclkid: msclkid || null
       }
     })
 
     return { success: true }
   } catch (error: any) {
+    if (error?.message?.includes('duplicate key') || error?.message?.includes('23505') || error?.status === 409) {
+      return { success: true, idempotent: true }
+    }
     console.error('[track-visit] Erro ao gravar pageview:', error?.message)
     return { success: false }
   }

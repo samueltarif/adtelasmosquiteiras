@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
     landing_path,
     conversion_path,
     channel,
+    session_channel,
     first_touch_channel,
     utm_source,
     utm_medium,
@@ -18,6 +19,11 @@ export default defineEventHandler(async (event) => {
     utm_content,
     utm_term,
     gclid,
+    gbraid,
+    wbraid,
+    fbclid,
+    msclkid,
+    referrer,
     nome,
     cidade,
     bairro,
@@ -38,7 +44,7 @@ export default defineEventHandler(async (event) => {
     return { success: true, idempotent: true }
   }
 
-  // 1. GRAVAR NO BANCO DE DADOS (Supabase - tabela leads com atribuição Phase B)
+  // 1. GRAVAR NO BANCO DE DADOS (Supabase - tabela leads com atribuição Phase B reconciliada)
   if (config.supabaseUrl && config.supabaseServiceRoleKey) {
     try {
       await $fetch(`${config.supabaseUrl}/rest/v1/leads`, {
@@ -55,7 +61,7 @@ export default defineEventHandler(async (event) => {
           session_id: session_id || null,
           landing_path: landing_path || null,
           conversion_path: conversion_path || null,
-          channel: channel || 'direct',
+          session_channel: session_channel || channel || 'direct',
           first_touch_channel: first_touch_channel || 'direct',
           utm_source: utm_source || null,
           utm_medium: utm_medium || null,
@@ -63,6 +69,11 @@ export default defineEventHandler(async (event) => {
           utm_content: utm_content || null,
           utm_term: utm_term || null,
           gclid: gclid || null,
+          gbraid: gbraid || null,
+          wbraid: wbraid || null,
+          fbclid: fbclid || null,
+          msclkid: msclkid || null,
+          referrer: referrer || null,
           nome,
           cidade,
           bairro: bairro || null,
@@ -77,6 +88,11 @@ export default defineEventHandler(async (event) => {
       })
       console.log('[send-lead] Lead real com telemetria Phase B gravado no Supabase com sucesso')
     } catch (dbErr: any) {
+      // Se for violação de UNIQUE constraint no banco (código Postgres 23505), responde sucesso idempotente
+      if (dbErr?.message?.includes('duplicate key') || dbErr?.message?.includes('23505') || dbErr?.status === 409) {
+        console.log('[send-lead] [IDEMPOTENCY_DB] Conflito UNIQUE de submission_id no Supabase capturado com sucesso')
+        return { success: true, idempotent: true }
+      }
       console.error('[send-lead] Erro ao gravar lead no Supabase:', dbErr?.message || dbErr)
     }
   }
