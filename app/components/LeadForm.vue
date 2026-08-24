@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useAnalyticsIdentity } from '~/composables/useAnalyticsIdentity'
+import { useAttribution } from '~/composables/useAttribution'
 
 const props = defineProps({
   variant: {
@@ -7,6 +9,10 @@ const props = defineProps({
     default: 'desktop' // 'desktop' ou 'modal'
   }
 })
+
+const identity = useAnalyticsIdentity()
+const attribution = useAttribution()
+let activeSubmissionId = null
 
 // Estado do formulário em 2 passos
 const currentStep = ref(1)
@@ -52,10 +58,34 @@ const sendToWhatsApp = async () => {
   isSubmitting.value = true
   
   try {
-    // Enviar para API (email)
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : 'home'
+    const visitorId = identity.getOrCreateVisitorId()
+    const { sessionId } = identity.getOrCreateSessionId(currentPath)
+    const landingPath = identity.getSessionLandingPath(currentPath)
+    const attr = attribution.getOrInitAttribution()
+    const firstTouch = identity.getFirstTouchChannel()
+
+    if (!activeSubmissionId) {
+      activeSubmissionId = identity.generateUUID()
+    }
+
+    // Enviar para API (/api/send-lead)
     const response = await $fetch('/api/send-lead', {
       method: 'POST',
       body: {
+        submission_id: activeSubmissionId,
+        visitor_id: visitorId,
+        session_id: sessionId,
+        landing_path: landingPath,
+        conversion_path: currentPath,
+        channel: attr.channel,
+        first_touch_channel: firstTouch,
+        utm_source: attr.utm_source,
+        utm_medium: attr.utm_medium,
+        utm_campaign: attr.utm_campaign,
+        utm_content: attr.utm_content,
+        utm_term: attr.utm_term,
+        gclid: attr.gclid,
         nome: formData.value.nome,
         cidade: formData.value.cidade || 'São Paulo',
         bairro: formData.value.bairro || '',
@@ -63,14 +93,14 @@ const sendToWhatsApp = async () => {
         telefone: formData.value.telefone || '',
         email: formData.value.email || '',
         mensagem: formData.value.mensagem || '',
-        origem: 'formulario_hero_' + (typeof window !== 'undefined' ? window.location.pathname : 'home')
+        origem: 'formulario_hero_' + currentPath
       }
     })
 
     if (response.success) {
+      activeSubmissionId = null
       await navigateTo('/obrigado')
     }
-    
   } catch (error) {
     console.error('Erro ao enviar:', error)
     
@@ -100,6 +130,7 @@ const sendToWhatsApp = async () => {
     isSubmitting.value = false
   }
 }
+
 
 // Remover funções de máscara WhatsApp (não é mais necessário)
 </script>

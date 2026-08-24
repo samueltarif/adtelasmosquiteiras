@@ -1,9 +1,17 @@
+import { ref } from 'vue'
+import { useAnalyticsIdentity } from './useAnalyticsIdentity'
+import { useAttribution } from './useAttribution'
+
+let activeSubmissionId = null
+
 /**
  * Composable reutilizável para submit de formulários comerciais
- * Envia lead via API /api/send-lead, grava no Supabase e redireciona para /obrigado
+ * Envia lead via API /api/send-lead com idempotência, atribuição e telemetria completa.
  */
 export function useFormSubmit() {
   const isSubmitting = ref(false)
+  const identity = useAnalyticsIdentity()
+  const attribution = useAttribution()
 
   // Função de conversão Google Ads & GTM
   const reportConversion = () => {
@@ -23,12 +31,37 @@ export function useFormSubmit() {
   }
 
   const redirectToThankYou = async (fields) => {
-    // Evita submissões simultâneas duplicadas
+    // Evita submissões simultâneas duplicadas client-side
     if (isSubmitting.value) return
     isSubmitting.value = true
 
     try {
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
+      const visitorId = identity.getOrCreateVisitorId()
+      const { sessionId } = identity.getOrCreateSessionId(currentPath)
+      const landingPath = identity.getSessionLandingPath(currentPath)
+      const attr = attribution.getOrInitAttribution()
+      const firstTouch = identity.getFirstTouchChannel()
+
+      // Reutiliza o mesmo submission_id em caso de retries da mesma tentativa de submissão
+      if (!activeSubmissionId) {
+        activeSubmissionId = identity.generateUUID()
+      }
+
       const payload = {
+        submission_id: activeSubmissionId,
+        visitor_id: visitorId,
+        session_id: sessionId,
+        landing_path: landingPath,
+        conversion_path: currentPath,
+        channel: attr.channel,
+        first_touch_channel: firstTouch,
+        utm_source: attr.utm_source,
+        utm_medium: attr.utm_medium,
+        utm_campaign: attr.utm_campaign,
+        utm_content: attr.utm_content,
+        utm_term: attr.utm_term,
+        gclid: attr.gclid,
         nome: fields?.nome || '',
         cidade: fields?.cidade || fields?.bairro || 'São Paulo',
         bairro: fields?.bairro || '',
@@ -36,10 +69,10 @@ export function useFormSubmit() {
         telefone: fields?.telefone || fields?.celular || '',
         email: fields?.email || '',
         mensagem: fields?.mensagem || '',
-        origem: fields?.origem || ('formulario_' + (typeof window !== 'undefined' ? window.location.pathname : 'geral'))
+        origem: fields?.origem || ('formulario_' + currentPath)
       }
 
-      console.log('[useFormSubmit] Disparando POST /api/send-lead com payload:', payload)
+      console.log('[useFormSubmit] Disparando POST /api/send-lead com payload e idempotência:', payload)
 
       const response = await $fetch('/api/send-lead', {
         method: 'POST',
@@ -52,11 +85,13 @@ export function useFormSubmit() {
       // Registrar conversão
       reportConversion()
 
+      // Reset do submissionId após sucesso
+      activeSubmissionId = null
+
       // Redirecionar para página de obrigado
       await navigateTo('/obrigado')
     } catch (e) {
       console.error('[useFormSubmit] Erro ao enviar formulário:', e)
-      // Fallback em caso de falha de rede
       throw e
     } finally {
       isSubmitting.value = false

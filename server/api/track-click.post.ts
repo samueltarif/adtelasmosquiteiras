@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { classifyDevice, classifyBot, isIdempotentRequest, generateIpHash } from '../utils/analytics'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -9,12 +9,38 @@ export default defineEventHandler(async (event) => {
     return { success: false }
   }
 
+  const {
+    event_id,
+    visitor_id,
+    session_id,
+    tipo = 'whatsapp',
+    origem = '/',
+    cta_location,
+    landing_path,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    gclid,
+    channel
+  } = body
+
+  // 0. VERIFICAR IDEMPOTÊNCIA DE SERVIDOR
+  if (event_id && isIdempotentRequest(event_id)) {
+    console.log(`[track-click] [IDEMPOTENCY] Clique duplicado ignorado para event_id: ${event_id}`)
+    return { success: true, idempotent: true }
+  }
+
+  const userAgent = headers['user-agent'] || ''
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
   const rawIp = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim()
-  const ipHash = createHash('sha256').update(rawIp + 'adt-click-salt').digest('hex').substring(0, 16)
+  const ipHash = generateIpHash(rawIp)
 
-  const rawPath = body.origem || '/'
-  const path = (rawPath === '/' || rawPath === '') ? 'Home (/)' : rawPath
+  const deviceType = classifyDevice(userAgent)
+  const botInfo = classifyBot(userAgent)
+
+  const path = (origem === '/' || origem === '') ? 'Home (/)' : origem
 
   try {
     // Grava exclusivamente na tabela lead_clicks (NUNCA na tabela leads)
@@ -27,11 +53,25 @@ export default defineEventHandler(async (event) => {
         'Prefer': 'return=minimal'
       },
       body: {
-        tipo: body.tipo || 'whatsapp',
+        event_id: event_id || null,
+        visitor_id: visitor_id || null,
+        session_id: session_id || null,
+        tipo,
         origem: path,
         url_origem: path,
-        user_agent: (headers['user-agent'] || '').substring(0, 500),
-        ip_hash: ipHash
+        cta_location: cta_location || 'other',
+        landing_path: landing_path || path,
+        device_type: deviceType,
+        is_bot: botInfo.isBot,
+        user_agent: userAgent.substring(0, 500),
+        ip_hash: ipHash,
+        channel: channel || 'direct',
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_content: utm_content || null,
+        utm_term: utm_term || null,
+        gclid: gclid || null
       }
     })
 

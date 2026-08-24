@@ -1,27 +1,21 @@
+import { useAnalyticsIdentity } from '~/composables/useAnalyticsIdentity'
+import { useAttribution } from '~/composables/useAttribution'
+
 export default defineNuxtPlugin(() => {
   if (typeof window === 'undefined') return
 
-  // Deduplicação em memória para evitar disparo duplo simultâneo (ex: app:mounted + afterEach)
+  const identity = useAnalyticsIdentity()
+  const attribution = useAttribution()
+
   let lastTrackedPath = ''
   let lastTrackedTime = 0
-
-  // Gera um session ID único por sessão do navegador (sessionStorage)
-  const getSessionId = () => {
-    if (typeof sessionStorage === 'undefined') return ''
-    let sid = sessionStorage.getItem('adt_sid')
-    if (!sid) {
-      sid = Math.random().toString(36).substring(2) + Date.now().toString(36)
-      sessionStorage.setItem('adt_sid', sid)
-    }
-    return sid
-  }
 
   const trackPage = (path: string) => {
     // Ignora rotas admin
     if (!path || path.startsWith('/admin')) return
 
     const now = Date.now()
-    // Trava de deduplicação: descarta se for a mesma rota rastreada a menos de 1000ms
+    // Trava de deduplicação client-side para o mesmo path dentro de 1000ms
     if (path === lastTrackedPath && (now - lastTrackedTime) < 1000) {
       return
     }
@@ -29,20 +23,39 @@ export default defineNuxtPlugin(() => {
     lastTrackedPath = path
     lastTrackedTime = now
 
-    // Fire-and-forget — não bloqueia navegação
+    const visitorId = identity.getOrCreateVisitorId()
+    const { sessionId } = identity.getOrCreateSessionId(path)
+    const landingPath = identity.getSessionLandingPath(path)
+    const attr = attribution.getOrInitAttribution()
+    const eventId = identity.generateUUID()
+
+    // Registrar First Touch se for um canal válido
+    identity.setFirstTouchChannelOnce(attr.channel)
+
+    // Fire-and-forget com beacon/fetch keepalive
     $fetch('/api/track-visit', {
       method: 'POST',
       body: {
+        event_id: eventId,
+        visitor_id: visitorId,
+        session_id: sessionId,
         path,
-        referrer: document.referrer || null,
-        sessionId: getSessionId()
+        landing_path: landingPath,
+        referrer: attr.referrer,
+        utm_source: attr.utm_source,
+        utm_medium: attr.utm_medium,
+        utm_campaign: attr.utm_campaign,
+        utm_content: attr.utm_content,
+        utm_term: attr.utm_term,
+        gclid: attr.gclid,
+        channel: attr.channel
       }
     }).catch(() => {
       // Silencioso — rastreamento nunca deve quebrar a experiência
     })
   }
 
-  // Rastreia navegação inicial (hard load / F5) e trocas de rota SPA / Back / Forward
+  // Rastreia navegação SPA / Back / Forward
   const router = useRouter()
   router.afterEach((to) => {
     trackPage(to.path)

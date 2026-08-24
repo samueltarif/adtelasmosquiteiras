@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+import { classifyDevice, classifyBot, isIdempotentRequest, generateIpHash } from '../utils/analytics'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -9,14 +9,35 @@ export default defineEventHandler(async (event) => {
     return { success: false }
   }
 
+  const {
+    event_id,
+    visitor_id,
+    session_id,
+    path = '/',
+    landing_path,
+    referrer,
+    utm_source,
+    utm_medium,
+    utm_campaign,
+    utm_content,
+    utm_term,
+    gclid,
+    channel
+  } = body
+
+  // 0. VERIFICAR IDEMPOTÊNCIA DE SERVIDOR
+  if (event_id && isIdempotentRequest(event_id)) {
+    console.log(`[track-visit] [IDEMPOTENCY] Pageview duplicado ignorado para event_id: ${event_id}`)
+    return { success: true, idempotent: true }
+  }
+
+  const userAgent = headers['user-agent'] || ''
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
   const rawIp = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim()
-  const ipHash = createHash('sha256').update(rawIp + 'adt-salt-2026').digest('hex').substring(0, 16)
+  const ipHash = generateIpHash(rawIp)
 
-  const path = body.path || '/'
-  const referrer = body.referrer || null
-  const sessionId = body.sessionId || null
-  const userAgent = (headers['user-agent'] || '').substring(0, 500)
+  const deviceType = classifyDevice(userAgent)
+  const botInfo = classifyBot(userAgent)
 
   try {
     await $fetch(`${config.supabaseUrl}/rest/v1/page_views`, {
@@ -28,11 +49,24 @@ export default defineEventHandler(async (event) => {
         'Prefer': 'return=minimal'
       },
       body: {
+        event_id: event_id || null,
+        visitor_id: visitor_id || null,
+        session_id: session_id || null,
         path,
-        referrer,
-        user_agent: userAgent,
+        landing_path: landing_path || path,
+        referrer: referrer || null,
+        user_agent: userAgent.substring(0, 500),
+        device_type: deviceType,
+        is_bot: botInfo.isBot,
+        bot_name: botInfo.botName,
         ip_hash: ipHash,
-        session_id: sessionId
+        channel: channel || 'direct',
+        utm_source: utm_source || null,
+        utm_medium: utm_medium || null,
+        utm_campaign: utm_campaign || null,
+        utm_content: utm_content || null,
+        utm_term: utm_term || null,
+        gclid: gclid || null
       }
     })
 

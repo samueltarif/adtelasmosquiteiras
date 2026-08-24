@@ -1,12 +1,22 @@
-/**
- * Plugin global que intercepta automaticamente cliques em links de WhatsApp,
- * telefone e botões CTA em TODAS as páginas do site.
- * 
- * Funciona via event delegation no document — não precisa editar nenhuma página.
- * Grava cada clique na tabela lead_clicks do Supabase via /api/track-click.
- */
+import { useAnalyticsIdentity } from '~/composables/useAnalyticsIdentity'
+import { useAttribution } from '~/composables/useAttribution'
+
 export default defineNuxtPlugin(() => {
   if (typeof document === 'undefined') return
+
+  const identity = useAnalyticsIdentity()
+  const attribution = useAttribution()
+
+  function getCtaLocation(target: HTMLElement): string {
+    if (target.closest('header')) return 'header'
+    if (target.closest('footer')) return 'footer'
+    if (target.closest('.hero, [class*="hero"]')) return 'hero'
+    if (target.closest('#sticky-whatsapp, [class*="floating"], [class*="whatsapp-float"]')) return 'floating_whatsapp'
+    if (target.closest('[class*="sticky-mobile"], [class*="mobile-cta"]')) return 'sticky_mobile'
+    if (target.closest('.modal, [class*="modal"]')) return 'modal'
+    if (target.closest('.service-card, [class*="card"]')) return 'service_card'
+    return 'other'
+  }
 
   document.addEventListener('click', (e) => {
     const target = (e.target as HTMLElement)?.closest('a, button') as HTMLElement | null
@@ -33,32 +43,41 @@ export default defineNuxtPlugin(() => {
     else if (href.startsWith('tel:')) {
       tipo = 'telefone'
     }
-    // 3. Botões de envio de formulário
-    else if (
-      target.getAttribute('type') === 'submit' ||
-      text.includes('enviar') ||
-      text.includes('solicitar') ||
-      text.includes('orçamento') ||
-      text.includes('orcamento')
-    ) {
-      tipo = 'formulario_submit'
-    }
-    // 4. Links para a página de contato ou orçamento (CTAs internos)
+    // 3. Links para a página de contato ou orçamento (CTAs internos)
     else if (href.includes('/contato') || href.includes('/orcamento')) {
       tipo = 'cta_interno'
     }
 
-    // Se identificou um tipo de clique rastreável, grava
+    // Se identificou um tipo de clique de intenção de contato rastreável, grava
     if (tipo) {
+      const visitorId = identity.getOrCreateVisitorId()
+      const { sessionId } = identity.getOrCreateSessionId(path)
+      const landingPath = identity.getSessionLandingPath(path)
+      const attr = attribution.getOrInitAttribution()
+      const eventId = identity.generateUUID()
+      const ctaLocation = getCtaLocation(target)
+
       $fetch('/api/track-click', {
         method: 'POST',
         body: {
+          event_id: eventId,
+          visitor_id: visitorId,
+          session_id: sessionId,
           tipo,
           origem: path || '/',
+          cta_location: ctaLocation,
+          landing_path: landingPath,
+          utm_source: attr.utm_source,
+          utm_medium: attr.utm_medium,
+          utm_campaign: attr.utm_campaign,
+          utm_content: attr.utm_content,
+          utm_term: attr.utm_term,
+          gclid: attr.gclid,
+          channel: attr.channel,
           text: text.substring(0, 100)
         }
       }).catch(() => {
-        // Silencioso — nunca interfere na experiência
+        // Silencioso — nunca interfere na experiência do usuário
       })
     }
   }, { passive: true, capture: true })
