@@ -36,7 +36,7 @@ const counts = ref({
 async function fetchLeads() {
   isLoading.value = true
   try {
-    const data = await $fetch(`/api/admin/leads?tab=${activeTab.value}`)
+    const data = await $fetch<any>(`/api/admin/leads?tab=${activeTab.value}`)
     if (data?.success) {
       leads.value = data.leads || []
       if (data.counts) {
@@ -92,79 +92,89 @@ function formatDate(iso: string) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
+function formatPhoneForWhatsApp(phone: string) {
+  if (!phone) return ''
+  const raw = phone.replace(/\D/g, '')
+  return raw.startsWith('55') ? raw : '55' + raw
+}
+
 onMounted(() => {
   fetchLeads()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-4 md:p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto flex flex-col gap-6">
+  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-3 sm:p-5 md:p-6 lg:p-8 w-full max-w-full overflow-x-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col gap-4 sm:gap-6 w-full">
 
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/[0.06] pb-5">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 border-b border-white/[0.06] pb-4 sm:pb-5">
         <div>
-          <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+          <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
             Gestão Comercial de Leads V2
-          </h2>
-          <p class="text-xs text-slate-400 mt-1">Isolamento rigoroso de registros técnicos e jornada completa de conversão</p>
+          </h1>
+          <p class="text-xs text-slate-400 mt-0.5 sm:mt-1">Isolamento rigoroso de registros técnicos e jornada completa de conversão</p>
         </div>
 
         <button 
           @click="fetchLeads" 
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition-all"
+          class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-h-[40px] active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Icon name="lucide:refresh-cw" class="w-3.5 h-3.5" :class="isLoading ? 'animate-spin' : ''" />
-          Atualizar
+          <span>Atualizar</span>
         </button>
       </div>
 
       <!-- Tab Switcher (Reais vs Histórico Técnico) -->
-      <div class="flex items-center gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
         <button 
           @click="handleTabChange('real')"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all"
+          class="flex items-center justify-between sm:justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] cursor-pointer"
           :class="activeTab === 'real' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:text-white'"
         >
-          <Icon name="lucide:user-check" class="w-4 h-4" />
-          Leads Comerciais Reais
-          <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono">
+          <div class="flex items-center gap-1.5 truncate">
+            <Icon name="lucide:user-check" class="w-4 h-4 shrink-0" />
+            <span class="truncate">Leads Comerciais</span>
+          </div>
+          <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono shrink-0">
             {{ counts.real }}
           </span>
         </button>
 
         <button 
           @click="handleTabChange('technical_history')"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all"
+          class="flex items-center justify-between sm:justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all min-h-[44px] cursor-pointer"
           :class="activeTab === 'technical_history' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:text-white'"
         >
-          <Icon name="lucide:archive" class="w-4 h-4" />
-          Histórico Técnico & Testes
-          <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono">
+          <div class="flex items-center gap-1.5 truncate">
+            <Icon name="lucide:archive" class="w-4 h-4 shrink-0" />
+            <span class="truncate">Histórico Técnico</span>
+          </div>
+          <span class="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-white/20 text-white font-mono shrink-0">
             {{ counts.legacy_synthetic + counts.automated_test + counts.manual_validation }}
           </span>
         </button>
       </div>
 
       <!-- Filters Row -->
-      <div class="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white/[0.02] p-3 rounded-2xl border border-white/[0.04]">
+      <div class="flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch sm:items-center justify-between bg-white/[0.02] p-2.5 sm:p-3 rounded-2xl border border-white/[0.04]">
         <!-- Search -->
         <div class="relative w-full sm:w-80">
           <Icon name="lucide:search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
           <input 
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar por nome, bairro, cidade, serviço..."
-            class="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            placeholder="Buscar por nome, bairro, telefone..."
+            class="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-9 pr-4 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[42px]"
           />
         </div>
 
         <!-- Status Filter -->
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <span class="text-xs text-slate-400 font-medium">Status:</span>
+          <span class="text-xs text-slate-400 font-medium shrink-0">Status:</span>
           <select 
             v-model="selectedStatusFilter" 
-            class="bg-slate-900 border border-slate-700/60 text-white text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500"
+            class="w-full sm:w-auto bg-slate-900 border border-slate-700/60 text-white text-base sm:text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 min-h-[42px]"
           >
             <option value="">Todos os status</option>
             <option value="Novo">Novo</option>
@@ -176,11 +186,88 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Leads Table -->
-      <Card class="p-0 overflow-hidden">
+      <!-- ====================================================================== -->
+      <!-- MOBILE CARDS VIEW (< 768px)                                             -->
+      <!-- ====================================================================== -->
+      <div class="block md:hidden space-y-3">
+        <!-- Skeleton Loading Mobile -->
+        <div v-if="isLoading" v-for="i in 3" :key="i" class="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] animate-pulse space-y-3">
+          <div class="h-4 bg-white/10 rounded w-1/2"></div>
+          <div class="h-3 bg-white/5 rounded w-3/4"></div>
+          <div class="h-8 bg-white/10 rounded w-full"></div>
+        </div>
+
+        <!-- Empty State Mobile -->
+        <div v-else-if="filteredLeads.length === 0" class="p-8 text-center rounded-2xl bg-white/[0.02] border border-white/[0.06] text-slate-400">
+          <Icon name="lucide:inbox" class="w-8 h-8 mx-auto mb-2 text-slate-500" />
+          <p class="text-xs font-semibold">Nenhum lead encontrado com os filtros atuais.</p>
+        </div>
+
+        <!-- Leads List Cards Mobile -->
+        <div 
+          v-else
+          v-for="lead in filteredLeads" 
+          :key="'mob-' + lead.id"
+          class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-indigo-500/40 transition-all space-y-3 shadow-md"
+        >
+          <!-- Top Row: Nome & Badge Status -->
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <h3 class="font-bold text-white text-sm truncate">{{ lead.nome || 'Sem nome informado' }}</h3>
+              <p class="text-slate-400 text-xs mt-0.5 font-mono">{{ lead.telefone || 'Sem telefone' }}</p>
+            </div>
+            <Badge :variant="statusBadgeVariant(lead.status || 'Novo')" class="uppercase tracking-wider text-[10px] shrink-0">
+              {{ lead.status || 'Novo' }}
+            </Badge>
+          </div>
+
+          <!-- Middle Row: Serviço & Cidade -->
+          <div class="grid grid-cols-2 gap-2 text-xs py-2 border-y border-white/[0.04]">
+            <div>
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Serviço</span>
+              <span class="text-slate-200 font-medium truncate block">{{ lead.servico || 'Não especificado' }}</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 font-bold uppercase block">Local</span>
+              <span class="text-slate-300 truncate block">{{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || 'SP' }}</span>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Data + Ações -->
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <span class="text-[11px] text-slate-500 font-mono">{{ formatDate(lead.created_at) }}</span>
+
+            <div class="flex items-center gap-2">
+              <a
+                v-if="lead.telefone"
+                :href="'https://wa.me/' + formatPhoneForWhatsApp(lead.telefone)"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="p-2 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
+                title="Abrir no WhatsApp"
+              >
+                <Icon name="lucide:message-circle" class="w-4 h-4" />
+              </a>
+
+              <button
+                @click="openLeadDetails(lead)"
+                class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors min-h-[38px] cursor-pointer"
+              >
+                <Icon name="lucide:eye" class="w-3.5 h-3.5" />
+                <span>Ver Detalhes</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================== -->
+      <!-- DESKTOP TABLE VIEW (>= 768px)                                           -->
+      <!-- ====================================================================== -->
+      <Card class="hidden md:block p-0 overflow-hidden border border-white/[0.08] shadow-xl">
         <Table>
           <TableHeader>
-            <TableRow class="bg-white/[0.01]">
+            <TableRow class="bg-white/[0.02]">
               <TableHead class="py-3.5 px-4">Nome & Contato</TableHead>
               <TableHead class="py-3.5 px-4">Serviço de Interesse</TableHead>
               <TableHead class="py-3.5 px-4">Canal</TableHead>
@@ -198,13 +285,13 @@ onMounted(() => {
             <TableRow 
               v-else-if="filteredLeads.length > 0"
               v-for="lead in filteredLeads" 
-              :key="lead.id"
-              class="cursor-pointer"
+              :key="'desk-' + lead.id"
+              class="cursor-pointer hover:bg-white/[0.02] transition-colors"
               @click="openLeadDetails(lead)"
             >
               <TableCell class="py-3.5 px-4">
                 <p class="font-bold text-white text-sm">{{ lead.nome || 'Sem nome' }}</p>
-                <p class="text-slate-400 text-[11px] mt-0.5">{{ lead.telefone || lead.email || '-' }}</p>
+                <p class="text-slate-400 text-[11px] mt-0.5 font-mono">{{ lead.telefone || lead.email || '-' }}</p>
               </TableCell>
 
               <TableCell class="py-3.5 px-4">
@@ -217,24 +304,24 @@ onMounted(() => {
                 </Badge>
               </TableCell>
 
-              <TableCell class="py-3.5 px-4 text-slate-400">
+              <TableCell class="py-3.5 px-4 text-slate-400 text-xs">
                 {{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || '-' }}
               </TableCell>
 
               <TableCell class="py-3.5 px-4">
-                <Badge :variant="statusBadgeVariant(lead.status || 'Novo')" class="uppercase tracking-wider">
+                <Badge :variant="statusBadgeVariant(lead.status || 'Novo')" class="uppercase tracking-wider text-[10px]">
                   {{ lead.status || 'Novo' }}
                 </Badge>
               </TableCell>
 
-              <TableCell class="py-3.5 px-4 text-right text-slate-400 font-medium tabular-nums">
+              <TableCell class="py-3.5 px-4 text-right text-slate-400 font-medium tabular-nums text-xs">
                 {{ formatDate(lead.created_at) }}
               </TableCell>
 
               <TableCell class="py-3.5 px-4 text-center" @click.stop>
                 <button 
                   @click="openLeadDetails(lead)" 
-                  class="p-2 rounded-xl bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors"
+                  class="p-2 rounded-xl bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center mx-auto"
                   title="Ver jornada e detalhes"
                 >
                   <Icon name="lucide:eye" class="w-4 h-4" />
@@ -243,9 +330,8 @@ onMounted(() => {
             </TableRow>
 
             <TableRow v-else>
-              <TableCell colspan="7" class="py-12 text-center text-slate-500">
-                <Icon name="lucide:inbox" class="w-8 h-8 mx-auto mb-2 text-slate-700" />
-                Nenhum lead encontrado com os filtros selecionados.
+              <TableCell colspan="7" class="py-8 text-center text-slate-500 text-xs">
+                Nenhum lead encontrado com os filtros atuais.
               </TableCell>
             </TableRow>
           </TableBody>
@@ -254,7 +340,7 @@ onMounted(() => {
 
     </div>
 
-    <!-- Lead Journey Drawer -->
+    <!-- Drawer de Detalhes da Jornada do Lead -->
     <LeadJourneyDrawer 
       :lead-id="selectedLeadId"
       :is-open="isDrawerOpen"

@@ -228,25 +228,33 @@ function closeLightbox() {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm transition-all duration-300">
-    <div class="bg-slate-900 border-l border-white/10 w-full max-w-xl h-full flex flex-col shadow-2xl overflow-hidden">
-      <!-- Header -->
-      <div class="p-5 border-b border-white/10 flex items-center justify-between bg-slate-950/60">
-        <div>
-          <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">Jornada do Visitante & Lead</span>
-          <h3 class="text-lg font-bold text-white mt-0.5">
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm transition-all duration-300">
+    <!-- Backdrop dismiss -->
+    <div class="fixed inset-0" @click="$emit('close')"></div>
+
+    <div class="relative z-10 bg-slate-900 border-l border-white/10 w-full sm:max-w-xl h-full h-[100dvh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Header Sticky com Safe Area Top -->
+      <div class="p-4 sm:p-5 pt-[calc(1rem+env(safe-area-inset-top,0px))] border-b border-white/10 flex items-center justify-between bg-slate-950/90 backdrop-blur-md sticky top-0 z-20 shrink-0">
+        <div class="min-w-0 flex-1 pr-2">
+          <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Jornada do Visitante & Lead</span>
+          <h2 class="text-base sm:text-lg font-bold text-white mt-0.5 truncate">
             {{ journeyData?.lead?.nome || 'Detalhes do Lead' }}
-          </h3>
+          </h2>
         </div>
-        <button @click="$emit('close')" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.05] cursor-pointer">
+        <button 
+          @click="$emit('close')" 
+          class="p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.05] cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
+          aria-label="Fechar gaveta"
+        >
           <Icon name="lucide:x" class="w-5 h-5" />
         </button>
       </div>
 
       <!-- Loading State Geral -->
-      <div v-if="isLoading" class="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400">
+      <div v-if="isLoading" class="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400 p-6">
         <Icon name="lucide:loader-2" class="w-8 h-8 text-indigo-400 animate-spin" />
-        <span class="text-xs">Carregando detalhes do lead...</span>
+        <span class="text-xs">Carregando jornada do lead...</span>
       </div>
 
       <!-- Error State Geral com Botão de Retry -->
@@ -255,54 +263,55 @@ function closeLightbox() {
           <Icon name="lucide:alert-circle" class="w-6 h-6" />
         </div>
         <div class="max-w-sm space-y-1">
-          <h4 class="text-sm font-bold text-white">Falha ao carregar informações</h4>
+          <h3 class="text-sm font-bold text-white">Falha ao carregar informações</h3>
           <p class="text-xs text-slate-400">{{ drawerError }}</p>
         </div>
         <button
           v-if="leadId"
           type="button"
           @click="fetchJourney(leadId)"
-          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+          class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 min-h-[44px]"
         >
           <Icon name="lucide:refresh-cw" class="w-3.5 h-3.5" /> Tentar novamente
         </button>
       </div>
 
-      <!-- Content -->
-      <div v-else-if="journeyData && journeyData.lead" class="flex-1 overflow-y-auto p-5 space-y-6">
+      <!-- Content Scroll Único com Safe Area Bottom -->
+      <div v-else-if="journeyData && journeyData.lead" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))]">
+        
         <!-- Lead Contact Summary Card -->
-        <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-between">
-          <div class="flex flex-col gap-1">
-            <span class="text-xs text-slate-400 font-medium">Contato Principal</span>
-            <span class="text-sm font-bold text-white">{{ journeyData.lead.telefone || 'Telefone não informado' }}</span>
-            <span v-if="journeyData.lead.email" class="text-xs text-slate-400">{{ journeyData.lead.email }}</span>
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex flex-col gap-0.5 min-w-0">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Contato Principal</span>
+            <span class="text-sm font-bold text-white font-mono truncate">{{ journeyData.lead.telefone || 'Telefone não informado' }}</span>
+            <span v-if="journeyData.lead.email" class="text-xs text-slate-400 truncate">{{ journeyData.lead.email }}</span>
           </div>
           <button 
             @click="startWhatsapp"
-            class="px-4 py-2 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer min-h-[44px] shrink-0"
           >
             <Icon name="lucide:message-circle" class="w-4 h-4" /> Abrir WhatsApp
           </button>
         </div>
 
         <!-- Origem & Atribuição -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+        <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+          <div class="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Origem / Canal</span>
-            <span class="text-xs font-semibold text-slate-200 block">{{ journeyData.attribution?.channel || journeyData.attribution?.first_touch?.channel || 'Direto' }}</span>
-            <span class="text-[11px] text-slate-400 truncate block">{{ journeyData.attribution?.landingPath || journeyData.lead.landing_path || '/' }}</span>
+            <span class="text-xs font-semibold text-slate-200 block truncate">{{ journeyData.attribution?.channel || journeyData.attribution?.first_touch?.channel || 'Direto' }}</span>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">{{ journeyData.attribution?.landingPath || journeyData.lead.landing_path || '/' }}</span>
           </div>
-          <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+          <div class="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Serviço Solicitado</span>
             <span class="text-xs font-semibold text-indigo-400 block truncate">{{ journeyData.lead.servico || 'Não especificado' }}</span>
-            <span class="text-[11px] text-slate-400 truncate block">{{ journeyData.lead.bairro ? `${journeyData.lead.bairro}, ` : '' }}{{ journeyData.lead.cidade || 'SP' }}</span>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">{{ [journeyData.lead.bairro, journeyData.lead.cidade].filter(Boolean).join(', ') || 'SP' }}</span>
           </div>
         </div>
 
         <!-- Mensagem do Lead -->
-        <div v-if="journeyData.lead.mensagem" class="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+        <div v-if="journeyData.lead.mensagem" class="p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Mensagem do Cliente</span>
-          <p class="text-xs text-slate-300 leading-relaxed italic bg-black/20 p-3 rounded-xl border border-white/[0.02]">
+          <p class="text-xs text-slate-300 leading-relaxed italic bg-black/30 p-3 rounded-xl border border-white/[0.02] break-words">
             "{{ journeyData.lead.mensagem }}"
           </p>
         </div>
@@ -310,7 +319,7 @@ function closeLightbox() {
         <!-- ====================================================================== -->
         <!-- GALERIA DE MÍDIAS PRIVADAS (FOTOS COM THUMBNAILS REAIS & VÍDEOS)        -->
         <!-- ====================================================================== -->
-        <div class="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-3">
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
               Arquivos Enviados pelo Cliente
@@ -321,7 +330,7 @@ function closeLightbox() {
           </div>
 
           <!-- Galeria com Mídias -->
-          <div v-if="journeyData.media && journeyData.media.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div v-if="journeyData.media && journeyData.media.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
             <div
               v-for="m in journeyData.media"
               :key="m.id"
@@ -352,7 +361,7 @@ function closeLightbox() {
                     <button
                       type="button"
                       @click.stop="retryPhotoThumbnail(m.id)"
-                      class="text-[9px] text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                      class="text-[9px] text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer min-h-[30px]"
                     >
                       <Icon name="lucide:refresh-cw" class="w-2.5 h-2.5" /> Recarregar
                     </button>
@@ -374,7 +383,7 @@ function closeLightbox() {
                   class="w-full aspect-square rounded-lg bg-slate-900 border border-purple-500/20 flex flex-col items-center justify-center text-center p-2 cursor-pointer hover:bg-slate-800/80 transition-colors"
                   @click="openMediaPreview(m)"
                 >
-                  <Icon name="lucide:play-circle" class="w-8 h-8 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
+                  <Icon name="lucide:play-circle" class="w-7 h-7 sm:w-8 sm:h-8 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
                   <p class="text-[10px] text-slate-300 font-bold truncate max-w-full px-1">{{ m.safe_filename }}</p>
                 </div>
                 <div class="flex items-center justify-between text-[10px] text-slate-500">
@@ -382,7 +391,7 @@ function closeLightbox() {
                   <button
                     type="button"
                     @click="openMediaPreview(m)"
-                    class="text-purple-400 font-bold hover:underline cursor-pointer flex items-center gap-0.5"
+                    class="text-purple-400 font-bold hover:underline cursor-pointer flex items-center gap-0.5 min-h-[30px]"
                   >
                     <Icon name="lucide:play" class="w-3 h-3" /> Ver Vídeo
                   </button>
@@ -398,14 +407,14 @@ function closeLightbox() {
           </div>
         </div>
 
-        <!-- Commercial Status & Edit -->
-        <div class="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col gap-3">
+        <!-- Gestão Comercial & Edição -->
+        <div class="p-3.5 sm:p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col gap-3">
           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gestão Comercial</span>
 
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-400 font-medium mb-1">Status</label>
-              <select v-model="editStatus" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+              <label class="block text-slate-300 text-xs font-semibold mb-1">Status</label>
+              <select v-model="editStatus" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white text-base sm:text-xs focus:outline-none focus:border-indigo-500 min-h-[44px]">
                 <option value="Novo">Novo</option>
                 <option value="Em Atendimento">Em Atendimento</option>
                 <option value="Orçado">Orçado</option>
@@ -415,36 +424,36 @@ function closeLightbox() {
             </div>
 
             <div>
-              <label class="block text-slate-400 font-medium mb-1">Valor Orçado (R$)</label>
-              <input v-model="editValor" type="number" step="0.01" placeholder="0,00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500" />
+              <label class="block text-slate-300 text-xs font-semibold mb-1">Valor Orçado (R$)</label>
+              <input v-model="editValor" type="number" step="0.01" placeholder="0,00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white text-base sm:text-xs focus:outline-none focus:border-indigo-500 min-h-[44px]" />
             </div>
           </div>
 
           <div>
-            <label class="block text-slate-400 font-medium mb-1">Observações Internas</label>
-            <textarea v-model="editObs" rows="2" placeholder="Anotações comerciais..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"></textarea>
+            <label class="block text-slate-300 text-xs font-semibold mb-1">Observações Internas</label>
+            <textarea v-model="editObs" rows="2" placeholder="Anotações comerciais..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white text-base sm:text-xs focus:outline-none focus:border-indigo-500 resize-y"></textarea>
           </div>
 
           <button 
             @click="saveChanges" 
             :disabled="isSaving"
-            class="self-end px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition-colors disabled:opacity-50 cursor-pointer"
+            class="w-full sm:w-auto self-end px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-500 transition-colors disabled:opacity-50 cursor-pointer min-h-[44px]"
           >
             {{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
           </button>
         </div>
 
-        <!-- Timeline of Events -->
+        <!-- Linha do Tempo de Acessos -->
         <div class="flex flex-col gap-3">
           <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Linha do Tempo de Acessos</span>
-          <div v-if="journeyData.timeline && journeyData.timeline.length > 0" class="relative pl-6 space-y-4 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/10">
+          <div v-if="journeyData.timeline && journeyData.timeline.length > 0" class="relative pl-5 sm:pl-6 space-y-3.5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-white/10">
             <div 
               v-for="(ev, idx) in journeyData.timeline" 
               :key="idx"
               class="relative flex flex-col gap-1 text-xs"
             >
               <div 
-                class="absolute -left-6 top-1 w-2.5 h-2.5 rounded-full border-2 border-slate-900"
+                class="absolute -left-5 sm:-left-6 top-1 w-2.5 h-2.5 rounded-full border-2 border-slate-900"
                 :class="[
                   ev.type === 'form_submission' || ev.type === 'conversion' ? 'bg-indigo-400 ring-2 ring-indigo-400/20' :
                   ev.type === 'whatsapp_click' || ev.type === 'phone_click' || ev.type === 'interaction' ? 'bg-emerald-400 ring-2 ring-emerald-400/20' :
@@ -453,10 +462,10 @@ function closeLightbox() {
                 ]"
               ></div>
               <div class="flex items-center justify-between text-slate-400">
-                <span class="font-bold text-white">{{ ev.type === 'form_submission' ? 'Envio de Formulário' : ev.type === 'pageview' ? 'Visualização de Página' : ev.type === 'whatsapp_click' ? 'Clique no WhatsApp' : ev.type }}</span>
-                <span class="text-[10px] font-mono">{{ formatDate(ev.created_at || ev.timestamp) }}</span>
+                <span class="font-bold text-white truncate mr-2">{{ ev.type === 'form_submission' ? 'Envio de Formulário' : ev.type === 'pageview' ? 'Visualização de Página' : ev.type === 'whatsapp_click' ? 'Clique no WhatsApp' : ev.type }}</span>
+                <span class="text-[10px] font-mono shrink-0">{{ formatDate(ev.created_at || ev.timestamp) }}</span>
               </div>
-              <p class="text-slate-400 text-[11px]">{{ ev.path || ev.description }}</p>
+              <p class="text-slate-400 text-[11px] break-words">{{ ev.path || ev.description }}</p>
               <div v-if="ev.channel || ev.cta_location" class="flex flex-wrap gap-2 text-[10px] text-slate-500">
                 <span v-if="ev.channel" class="text-indigo-400/80">Canal: {{ ev.channel }}</span>
                 <span v-if="ev.cta_location" class="text-slate-500">CTA: {{ ev.cta_location }}</span>
@@ -471,21 +480,21 @@ function closeLightbox() {
     </div>
 
     <!-- Lightbox Modal para Visualização de Fotos e Vídeos Privados -->
-    <div v-if="selectedPreviewUrl" class="fixed inset-0 z-60 bg-black/90 flex flex-col items-center justify-center p-4 backdrop-blur-md">
+    <div v-if="selectedPreviewUrl" class="fixed inset-0 z-60 bg-black/95 flex flex-col items-center justify-center p-3 sm:p-4 backdrop-blur-md">
       <div class="w-full max-w-3xl flex items-center justify-between mb-3 text-white">
-        <h4 class="text-sm font-bold truncate">{{ selectedPreviewName }}</h4>
-        <div class="flex items-center gap-3">
-          <a :href="selectedPreviewUrl" target="_blank" download referrerpolicy="no-referrer" class="text-xs px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center gap-1">
-            <Icon name="lucide:download" class="w-3.5 h-3.5" /> Baixar
+        <h4 class="text-xs sm:text-sm font-bold truncate pr-2">{{ selectedPreviewName }}</h4>
+        <div class="flex items-center gap-2">
+          <a :href="selectedPreviewUrl" target="_blank" download referrerpolicy="no-referrer" class="text-xs px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-1 min-h-[40px]">
+            <Icon name="lucide:download" class="w-3.5 h-3.5" /> <span>Baixar</span>
           </a>
-          <button @click="closeLightbox" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer">
+          <button @click="closeLightbox" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center">
             <Icon name="lucide:x" class="w-5 h-5" />
           </button>
         </div>
       </div>
-      <div class="max-w-3xl max-h-[80vh] flex items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black">
-        <img v-if="selectedPreviewType === 'photo'" :src="selectedPreviewUrl" :alt="selectedPreviewName || ''" referrerpolicy="no-referrer" class="max-w-full max-h-[75vh] object-contain rounded-lg" />
-        <video v-else controls preload="metadata" :src="selectedPreviewUrl" class="max-w-full max-h-[75vh] rounded-lg"></video>
+      <div class="w-full max-w-3xl max-h-[80vh] max-h-[80dvh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black">
+        <img v-if="selectedPreviewType === 'photo'" :src="selectedPreviewUrl" :alt="selectedPreviewName || ''" referrerpolicy="no-referrer" class="max-w-full max-h-[75vh] max-h-[75dvh] object-contain rounded-xl" />
+        <video v-else controls preload="metadata" :src="selectedPreviewUrl" class="max-w-full max-h-[75vh] max-h-[75dvh] rounded-xl"></video>
       </div>
     </div>
   </div>

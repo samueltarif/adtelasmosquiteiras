@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from 'vue'
+
 // SEO
 useHead({
   title: 'Contato - AD Telas e Redes | Orçamento Grátis',
@@ -61,15 +63,15 @@ const emailLink = `mailto:${EMAIL}`
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 overflow-x-hidden">
     <!-- Hero Contato -->
-    <section class="bg-gradient-to-br from-[#1D7BA6] to-[#0F4F7D] text-white py-16 md:py-24 mt-28 md:mt-28">
+    <section class="bg-gradient-to-br from-[#1D7BA6] to-[#0F4F7D] text-white py-10 sm:py-14 md:py-20 mt-16 md:mt-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center">
-          <h1 class="text-3xl md:text-5xl font-bold mb-4">
+          <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4">
             Entre em Contato
           </h1>
-          <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
+          <p class="text-sm sm:text-base md:text-xl text-white/90 max-w-2xl mx-auto">
             Estamos prontos para atender você. Escolha a forma de contato que preferir!
           </p>
         </div>
@@ -77,99 +79,82 @@ const emailLink = `mailto:${EMAIL}`
     </section>
 
     <!-- Conteúdo Principal -->
-    <section class="py-12 md:py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+    <section class="py-8 sm:py-12 md:py-16">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start">
           
           <!-- Coluna Esquerda - Informações de Contato -->
-          <div class="space-y-6">
-            <!-- Título -->
+          <div class="space-y-4 sm:space-y-6">
             <div>
-              <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
                 Fale Conosco
               </h2>
-              <p class="text-gray-600">
+              <p class="text-xs sm:text-sm text-gray-600">
                 Resposta rápida garantida! Atendemos de segunda a sábado.
               </p>
             </div>
 
             <!-- Cards de Contato -->
-            <div class="space-y-4">
-              
+            <div class="space-y-3 sm:space-y-4">
               <!-- WhatsApp -->
               <a 
-                :href="whatsappLink"
+                :href="whatsappLink" 
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-transparent hover:border-[#25D366] group"
+                class="flex items-center p-4 sm:p-5 bg-gradient-to-r from-[#25D366] to-[#20BA5A] text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="flex-shrink-0 w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <WhatsappIcon class="w-6 h-6 text-white" />
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
+                  <WhatsappIcon class="w-7 h-7" />
                 </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 mb-1">WhatsApp</h3>
-                  <p class="text-gray-600 text-sm mb-2">Resposta mais rápida</p>
-                  <p class="text-[#25D366] font-semibold">{{ PHONE_DISPLAY }}</p>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-white/80 font-medium">WhatsApp Oficial</div>
+                  <div class="text-base sm:text-lg font-bold truncate">{{ PHONE_DISPLAY }}</div>
+                  <div class="text-xs text-white/90">Atendimento Imediato</div>
                 </div>
-                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-[#25D366] group-hover:translate-x-1 transition-all" />
+                <Icon name="lucide:arrow-right" class="w-5 h-5 opacity-75 group-hover:opacity-100 group-hover:translate-x-1 transition-all flex-shrink-0" />
               </a>
 
               <!-- Telefone -->
               <a 
                 :href="phoneLink"
-                class="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-transparent hover:border-blue-500 group"
+                class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Icon name="lucide:phone" class="w-6 h-6 text-white" />
+                <div class="w-12 h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-[#1D7BA6]">
+                  <Icon name="lucide:phone" class="w-6 h-6" />
                 </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 mb-1">Telefone</h3>
-                  <p class="text-gray-600 text-sm mb-2">Ligue agora</p>
-                  <p class="text-blue-600 font-semibold">{{ PHONE_DISPLAY }}</p>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 font-medium">Ligue para nós</div>
+                  <div class="text-base sm:text-lg font-bold truncate text-[#1D7BA6]">{{ PHONE_DISPLAY }}</div>
+                  <div class="text-xs text-gray-600">Seg a Sáb: 8h às 18h</div>
                 </div>
-                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-[#1D7BA6] group-hover:translate-x-1 transition-all flex-shrink-0" />
               </a>
 
-              <!-- Email -->
+              <!-- E-mail -->
               <a 
                 :href="emailLink"
-                class="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 border-transparent hover:border-orange-500 group"
+                class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Icon name="lucide:mail" class="w-6 h-6 text-white" />
+                <div class="w-12 h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-[#1D7BA6]">
+                  <Icon name="lucide:mail" class="w-6 h-6" />
                 </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 mb-1">Email</h3>
-                  <p class="text-gray-600 text-sm mb-2">Envie sua mensagem</p>
-                  <p class="text-orange-600 font-semibold break-all" v-html="`<!--email_off-->${EMAIL}<!--/email_off-->`"></p>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 font-medium">E-mail Comercial</div>
+                  <div class="text-xs sm:text-sm font-bold truncate text-gray-900">{{ EMAIL }}</div>
+                  <div class="text-xs text-gray-600">Retorno em até 24h</div>
                 </div>
-                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
+                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-400 group-hover:text-[#1D7BA6] group-hover:translate-x-1 transition-all flex-shrink-0" />
               </a>
 
-              <!-- Localização -->
-              <div class="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md">
-                <div class="flex-shrink-0 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
-                  <Icon name="lucide:map-pin" class="w-6 h-6 text-white" />
+              <!-- Endereço -->
+              <div class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 text-gray-900 rounded-2xl shadow-sm">
+                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-gray-600">
+                  <Icon name="lucide:map-pin" class="w-6 h-6 text-[#F49A1A]" />
                 </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900 mb-1">Localização</h3>
-                  <p class="text-gray-600 text-sm mb-2">Atendemos toda região</p>
-                  <p class="text-purple-600 font-semibold">{{ ADDRESS }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Horário de Atendimento -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <div class="flex items-start gap-3">
-                <Icon name="lucide:clock" class="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h3 class="text-lg font-bold text-gray-900 mb-2">Horário de Atendimento</h3>
-                  <div class="space-y-1 text-sm text-gray-700">
-                    <p><strong>Segunda a Sexta:</strong> 8h às 18h</p>
-                    <p><strong>Sábado:</strong> 8h às 13h</p>
-                    <p><strong>Domingo:</strong> Fechado</p>
-                  </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 font-medium">Localização</div>
+                  <div class="text-base font-bold text-gray-900">{{ ADDRESS }}</div>
+                  <div class="text-xs text-gray-600">Atendemos 19 cidades da Grande SP</div>
                 </div>
               </div>
             </div>
@@ -177,18 +162,18 @@ const emailLink = `mailto:${EMAIL}`
 
           <!-- Coluna Direita - Formulário -->
           <div>
-            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 sticky top-32">
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 md:p-8">
+              <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
                 Envie sua Mensagem
               </h2>
-              <p class="text-gray-600 mb-6">
+              <p class="text-xs sm:text-sm text-gray-600 mb-5">
                 Preencha o formulário e entraremos em contato rapidamente
               </p>
 
               <form @submit.prevent="sendToWhatsApp" class="space-y-4">
                 <!-- Nome -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">
                     Nome Completo <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -196,13 +181,13 @@ const emailLink = `mailto:${EMAIL}`
                     type="text"
                     required
                     placeholder="Seu nome"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all"
+                    class="w-full px-3.5 sm:px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all text-base"
                   />
                 </div>
 
                 <!-- Telefone -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">
                     Telefone/WhatsApp <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -210,47 +195,47 @@ const emailLink = `mailto:${EMAIL}`
                     type="tel"
                     required
                     placeholder="(11) 99999-9999"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all"
+                    class="w-full px-3.5 sm:px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all text-base"
                   />
                 </div>
 
                 <!-- Email -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">
                     Email <span class="text-gray-400 text-xs">(opcional)</span>
                   </label>
                   <input
                     v-model="formData.email"
                     type="email"
                     placeholder="seu@email.com"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all"
+                    class="w-full px-3.5 sm:px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all text-base"
                   />
                 </div>
 
                 <!-- Cidade -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">
                     Cidade <span class="text-gray-400 text-xs">(opcional)</span>
                   </label>
                   <input
                     v-model="formData.cidade"
                     type="text"
                     placeholder="Ex: São Paulo"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all"
+                    class="w-full px-3.5 sm:px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all text-base"
                   />
                 </div>
 
                 <!-- Mensagem -->
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1">
                     Mensagem <span class="text-gray-400 text-xs">(opcional)</span>
                   </label>
                   <textarea
                     v-model="formData.mensagem"
-                    rows="4"
+                    rows="3"
                     maxlength="1500"
-                    placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas, portas, sacadas ou outras informações que possam ajudar no orçamento."
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all resize-none text-sm"
+                    placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas ou outras informações..."
+                    class="w-full px-3.5 sm:px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all resize-y text-base"
                   ></textarea>
                 </div>
 
@@ -261,12 +246,7 @@ const emailLink = `mailto:${EMAIL}`
                 <button
                   type="submit"
                   :disabled="isSubmitting || isSubmitted"
-                  :class="[
-                    'w-full py-4 rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-2',
-                    isSubmitted
-                      ? 'bg-green-500 text-white cursor-default'
-                      : 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg hover:scale-[1.02] active:scale-95'
-                  ]"
+                  class="w-full min-h-[50px] px-6 py-3.5 bg-[#25D366] hover:bg-[#20B858] text-white rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
                   <svg v-if="isSubmitting" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -281,20 +261,8 @@ const emailLink = `mailto:${EMAIL}`
 
                   <span v-if="isSubmitting">Enviando...</span>
                   <span v-else-if="isSubmitted">Enviado!</span>
-                  <span v-else>Enviar via WhatsApp</span>
+                  <span v-else>Enviar Mensagem</span>
                 </button>
-
-                <!-- Trust Indicators -->
-                <div class="flex items-center justify-center gap-4 text-xs text-gray-500 pt-2">
-                  <div class="flex items-center gap-1">
-                    <Icon name="lucide:shield-check" class="w-4 h-4 text-green-500" />
-                    <span>Mais Segurança</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <Icon name="lucide:zap" class="w-4 h-4 text-yellow-500" />
-                    <span>Resposta Rápida</span>
-                  </div>
-                </div>
               </form>
             </div>
           </div>
@@ -302,6 +270,5 @@ const emailLink = `mailto:${EMAIL}`
         </div>
       </div>
     </section>
-
   </div>
 </template>

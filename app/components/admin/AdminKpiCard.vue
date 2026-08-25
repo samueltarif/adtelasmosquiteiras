@@ -117,8 +117,8 @@ const formattedValue = computed(() => {
         </span>
       </div>
 
-      <div v-if="loading" class="h-8 w-24 bg-white/10 rounded animate-pulse my-1"></div>
-      <p v-else class="text-2xl lg:text-3xl font-extrabold text-white tabular-nums tracking-tight">
+      <div v-if="loading" class="h-7 sm:h-8 w-20 sm:w-24 bg-white/10 rounded animate-pulse my-1"></div>
+      <p v-else class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tabular-nums tracking-tight truncate">
         {{ formattedValue }}
       </p>
 

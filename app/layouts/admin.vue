@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useAdminAuth } from '../composables/useAdminAuth'
 
 const route = useRoute()
@@ -16,51 +16,61 @@ const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
+
+// Fecha o menu mobile automaticamente ao mudar de rota
+watch(() => route.path, () => {
+  isMobileMenuOpen.value = false
+})
+
 const handleLogout = async () => {
+  isMobileMenuOpen.value = false
   await logout()
 }
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-admin-surface font-sans text-admin-on-surface antialiased overflow-x-hidden">
-    <!-- Sidebar Desktop -->
-    <aside class="hidden md:flex flex-col h-full py-6 px-4 bg-admin-surface-container-lowest fixed h-full w-[280px] left-0 top-0 border-r border-admin-outline-variant/30 z-40">
+  <div class="flex min-h-screen min-h-[100dvh] w-full max-w-full bg-slate-950 font-sans text-slate-100 antialiased overflow-x-hidden">
+    <!-- Sidebar Desktop (>= 768px) -->
+    <aside class="hidden md:flex flex-col h-full py-6 px-4 bg-slate-900/95 fixed h-full w-[260px] lg:w-[280px] left-0 top-0 border-r border-white/10 z-40">
       <div class="flex items-center gap-3 mb-8 px-2">
-        <div class="w-10 h-10 rounded-lg bg-admin-primary-container flex items-center justify-center shrink-0">
-          <Icon name="lucide:shield" class="text-white w-6 h-6" />
+        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400 shadow-md">
+          <Icon name="lucide:shield" class="w-6 h-6" />
         </div>
         <div>
-          <h1 class="text-lg font-bold text-admin-primary leading-tight tracking-tight">AD Telas e Redes</h1>
-          <p class="text-xs text-admin-on-surface-variant font-semibold uppercase tracking-wider">Painel Admin</p>
+          <h1 class="text-base font-bold text-white leading-tight tracking-tight">AD Telas e Redes</h1>
+          <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Painel Admin</p>
         </div>
       </div>
       
-      <nav class="flex flex-col gap-2 flex-1">
+      <nav class="flex flex-col gap-1.5 flex-1">
         <NuxtLink 
           to="/admin/dashboard" 
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
-          :class="route.path === '/admin/dashboard' ? 'bg-admin-primary/5 text-admin-primary font-bold' : 'text-admin-on-surface-variant hover:text-admin-primary hover:bg-admin-surface-container-low'"
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path === '/admin/dashboard' || route.path === '/admin' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
         >
-          <Icon name="lucide:layout-dashboard" class="w-5 h-5" />
-          <span class="text-sm font-medium">Dashboard</span>
+          <Icon name="lucide:layout-dashboard" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Dashboard</span>
         </NuxtLink>
         
         <NuxtLink 
           to="/admin/leads" 
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
-          :class="route.path === '/admin/leads' ? 'bg-admin-primary/5 text-admin-primary font-bold' : 'text-admin-on-surface-variant hover:text-admin-primary hover:bg-admin-surface-container-low'"
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path === '/admin/leads' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
         >
-          <Icon name="lucide:users" class="w-5 h-5" />
-          <span class="text-sm font-medium">Leads</span>
+          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Leads</span>
         </NuxtLink>
       </nav>
       
-      <div class="mt-auto border-t border-admin-outline-variant/20 pt-4">
+      <div class="mt-auto border-t border-white/10 pt-4">
         <button 
           @click="handleLogout" 
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
+          class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 cursor-pointer min-h-[44px]"
         >
-          <Icon name="lucide:log-out" class="w-5 h-5" />
+          <Icon name="lucide:log-out" class="w-5 h-5 shrink-0" />
           <span class="text-sm font-medium">Sair</span>
         </button>
       </div>
@@ -69,92 +79,107 @@ const handleLogout = async () => {
     <!-- Sidebar Mobile Drawer Overlay -->
     <div 
       v-if="isMobileMenuOpen" 
-      @click="toggleMobileMenu" 
-      class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+      @click="closeMobileMenu" 
+      class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden transition-opacity"
     ></div>
 
-    <!-- Sidebar Mobile Drawer -->
+    <!-- Sidebar Mobile Drawer (Sheet pattern) -->
     <aside 
-      class="fixed inset-y-0 left-0 w-[280px] bg-admin-surface-container-lowest py-6 px-4 z-50 flex flex-col border-r border-admin-outline-variant/30 transform transition-transform duration-300 md:hidden"
+      class="fixed inset-y-0 left-0 w-[280px] max-w-[85vw] bg-slate-900 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 z-50 flex flex-col border-r border-white/10 transform transition-transform duration-300 md:hidden shadow-2xl"
       :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <div class="flex items-center justify-between mb-8 px-2">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-admin-primary-container flex items-center justify-center shrink-0">
-            <Icon name="lucide:shield" class="text-white w-6 h-6" />
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400">
+            <Icon name="lucide:shield" class="w-5 h-5" />
           </div>
           <div>
-            <h1 class="text-lg font-bold text-admin-primary leading-tight">AD Telas</h1>
-            <p class="text-xs text-admin-on-surface-variant font-semibold">Painel Admin</p>
+            <h2 class="text-sm font-bold text-white leading-tight">AD Telas</h2>
+            <p class="text-[10px] text-slate-400 font-semibold uppercase">Admin V2</p>
           </div>
         </div>
-        <button @click="toggleMobileMenu" class="p-1 rounded-full hover:bg-admin-surface-container-low text-admin-on-surface-variant">
-          <Icon name="lucide:x" class="w-6 h-6" />
+        <button 
+          @click="closeMobileMenu" 
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          aria-label="Fechar menu"
+        >
+          <Icon name="lucide:x" class="w-5 h-5" />
         </button>
       </div>
 
       <nav class="flex flex-col gap-2 flex-1">
         <NuxtLink 
           to="/admin/dashboard" 
-          @click="isMobileMenuOpen = false"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
-          :class="route.path === '/admin/dashboard' ? 'bg-admin-primary/5 text-admin-primary font-bold' : 'text-admin-on-surface-variant'"
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path === '/admin/dashboard' || route.path === '/admin' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
         >
-          <Icon name="lucide:layout-dashboard" class="w-5 h-5" />
-          <span class="text-sm font-medium">Dashboard</span>
+          <Icon name="lucide:layout-dashboard" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Dashboard</span>
         </NuxtLink>
         
         <NuxtLink 
           to="/admin/leads" 
-          @click="isMobileMenuOpen = false"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200"
-          :class="route.path === '/admin/leads' ? 'bg-admin-primary/5 text-admin-primary font-bold' : 'text-admin-on-surface-variant'"
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path === '/admin/leads' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
         >
-          <Icon name="lucide:users" class="w-5 h-5" />
-          <span class="text-sm font-medium">Leads</span>
+          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Leads</span>
         </NuxtLink>
       </nav>
       
-      <div class="mt-auto border-t border-admin-outline-variant/20 pt-4">
+      <div class="mt-auto border-t border-white/10 pt-4">
         <button 
           @click="handleLogout" 
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 cursor-pointer min-h-[48px]"
         >
-          <Icon name="lucide:log-out" class="w-5 h-5" />
+          <Icon name="lucide:log-out" class="w-5 h-5 shrink-0" />
           <span class="text-sm font-medium">Sair</span>
         </button>
       </div>
     </aside>
 
     <!-- Main Content Area -->
-    <div class="flex-1 md:ml-[280px] flex flex-col min-h-screen">
+    <div class="flex-1 md:ml-[260px] lg:ml-[280px] flex flex-col min-h-screen min-h-[100dvh] w-full max-w-full overflow-x-hidden">
       <!-- TopNavBar -->
-      <header class="flex justify-between items-center h-16 px-6 bg-admin-surface/80 backdrop-blur-md sticky top-0 z-30 border-b border-admin-outline-variant/30 shadow-sm">
-        <div class="flex items-center gap-4">
-          <button @click="toggleMobileMenu" class="md:hidden text-admin-primary p-2 rounded-full hover:bg-admin-surface-container-high transition-colors active:scale-95 flex items-center">
+      <header class="flex justify-between items-center h-16 px-4 sm:px-6 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-white/10 shadow-sm w-full">
+        <div class="flex items-center gap-3">
+          <button 
+            @click="toggleMobileMenu" 
+            class="md:hidden text-slate-300 p-2.5 rounded-xl hover:bg-white/10 transition-colors active:scale-95 flex items-center justify-center min-h-[44px] min-w-[44px]"
+            aria-label="Abrir menu"
+          >
             <Icon name="lucide:menu" class="w-6 h-6" />
           </button>
-          <div class="text-sm text-admin-on-surface-variant hidden sm:block">
-            Administração <span class="mx-2 text-admin-outline-variant">/</span> <span class="text-admin-primary font-medium">{{ route.path === '/admin/dashboard' ? 'Dashboard' : 'Leads' }}</span>
+          <div class="text-xs sm:text-sm text-slate-400 truncate">
+            Administração <span class="mx-1 text-slate-600">/</span> 
+            <span class="text-white font-semibold">{{ route.path === '/admin/leads' ? 'Leads' : 'Dashboard' }}</span>
           </div>
         </div>
         
-        <div class="flex items-center gap-4">
-          <button class="p-2 rounded-full text-admin-primary hover:bg-admin-surface-container-high transition-colors relative flex items-center">
-            <Icon name="lucide:bell" class="w-5 h-5" />
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-600 rounded-full"></span>
-          </button>
+        <div class="flex items-center gap-3">
+          <NuxtLink 
+            to="/" 
+            target="_blank"
+            class="text-xs text-slate-400 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors hidden sm:flex items-center gap-1.5 min-h-[36px]"
+            title="Ver site público"
+          >
+            <Icon name="lucide:external-link" class="w-3.5 h-3.5" />
+            <span>Ver Site</span>
+          </NuxtLink>
+
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-admin-primary flex items-center justify-center text-white text-sm font-bold">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-xs">
               A
             </div>
-            <span class="text-sm font-medium text-admin-on-surface hidden sm:block">Admin</span>
+            <span class="text-xs font-medium text-slate-300 hidden sm:block">Admin</span>
           </div>
         </div>
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 bg-admin-surface">
+      <main class="flex-1 bg-slate-950 w-full max-w-full overflow-x-hidden">
         <slot />
       </main>
     </div>

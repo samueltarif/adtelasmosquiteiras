@@ -524,11 +524,11 @@ defineExpose({
     </div>
 
     <!-- Grid de Miniaturas e Previews com Estados Individuais -->
-    <div v-if="mediaItems.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+    <div v-if="mediaItems.length > 0" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-2.5 pt-1">
       <div
         v-for="(item, index) in mediaItems"
         :key="item.id"
-        class="relative group rounded-xl border overflow-hidden bg-white shadow-sm transition-all"
+        class="relative group rounded-xl border overflow-hidden bg-white shadow-xs transition-all"
         :class="[
           item.status === 'failed' ? 'border-red-300 bg-red-50/20' : 
           item.status === 'uploaded' ? 'border-emerald-300' : 

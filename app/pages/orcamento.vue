@@ -140,31 +140,31 @@ const callPhone = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 md:pt-24 overflow-x-hidden">
     
     <!-- Breadcrumb -->
     <Breadcrumb />
     
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-6 md:py-8">
-      <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        <!-- Mobile: título em cima, cards embaixo | Desktop: título à esquerda, cards à direita -->
+    <section class="bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-5 sm:py-6 md:py-8">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
         <div class="flex flex-col md:flex-row md:items-center md:gap-8">
           
           <!-- Título -->
           <div class="text-center md:text-left md:flex-shrink-0 mb-4 md:mb-0">
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
               Orçamento<br class="hidden md:block"/> Grátis
             </h1>
+            <p class="text-xs sm:text-sm text-white/80 mt-1">Resposta rápida em poucos minutos</p>
           </div>
 
           <!-- 3 carrosseis lado a lado -->
-          <div class="grid grid-cols-3 gap-3 flex-1">
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 flex-1">
             <NuxtLink
               v-for="(carousel, i) in heroCarousels"
               :key="i"
               :to="carousel.link"
-              class="card-glow relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-48 md:h-56"
+              class="card-glow relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-32 sm:h-44 md:h-56"
             >
               <transition-group name="fade">
                 <img
@@ -177,20 +177,11 @@ const callPhone = () => {
                 />
               </transition-group>
               <!-- Label -->
-              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                <p class="text-white text-xs font-bold text-center">{{ carousel.label }}</p>
+              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-1.5 sm:p-3">
+                <p class="text-white text-[10px] sm:text-xs font-bold text-center leading-tight truncate">{{ carousel.label }}</p>
               </div>
               <!-- Hover overlay -->
               <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60"></div>
-              <!-- Mãozinha com ripple -->
-              <div class="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center pointer-events-none">
-                <div class="relative cursor-hand-wrap">
-                  <span class="ripple-ring ripple-1"></span>
-                  <span class="ripple-ring ripple-2"></span>
-                  <span class="ripple-ring ripple-3"></span>
-                  <span class="cursor-hand-svg">👆</span>
-                </div>
-              </div>
             </NuxtLink>
           </div>
 
@@ -199,89 +190,132 @@ const callPhone = () => {
     </section>
 
     <!-- Main Content -->
-    <section class="py-6 md:py-8">
-      <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+    <section class="py-6 md:py-10">
+      <div class="container mx-auto px-3 sm:px-4 md:px-6 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10 items-start">
           
-          <!-- Coluna Esquerda: Formulário -->
-          <div>
-            <div class="bg-white rounded-2xl shadow-xl border-2 border-[#E5EDF8] p-6 md:p-8 sticky top-24">
+          <!-- Coluna Esquerda: Formulário Comercial -->
+          <div class="w-full">
+            <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-[#E5EDF8] p-4 sm:p-6 md:p-8">
               
-              <div class="text-center mb-6">
-                <h3 class="text-2xl font-bold mb-2 inline-block relative titulo-destaque">
+              <div class="text-center mb-5 sm:mb-6">
+                <h2 class="text-xl sm:text-2xl font-bold text-[#22345F] mb-1">
                   Preencha o Formulário
-                </h3>
-                <p class="text-[#4B5563] text-sm">
-                  Retornamos em alguns minutos
+                </h2>
+                <p class="text-[#4B5563] text-xs sm:text-sm">
+                  Retornamos em alguns minutos via WhatsApp
                 </p>
               </div>
 
-              <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-center">
-                <Icon name="lucide:alert-circle" class="w-8 h-8 text-red-500 mx-auto mb-2" />
-                <div class="text-sm text-red-600">Erro ao enviar. Tente novamente ou use WhatsApp.</div>
+              <div v-if="submitError" class="bg-red-50 border-2 border-red-200 rounded-xl p-3.5 mb-5 text-center">
+                <Icon name="lucide:alert-circle" class="w-6 h-6 text-red-500 mx-auto mb-1.5" />
+                <div class="text-xs sm:text-sm text-red-600 font-medium">Erro ao enviar. Tente novamente ou use nosso WhatsApp direto.</div>
               </div>
 
               <form @submit.prevent="submitForm" class="space-y-4">
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Nome Completo *</label>
-                  <input v-model="formData.nome" type="text" required placeholder="Seu nome" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">Nome Completo *</label>
+                  <input
+                    v-model="formData.nome"
+                    type="text"
+                    required
+                    placeholder="Seu nome"
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors text-base"
+                  />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">WhatsApp / Telefone *</label>
-                  <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">WhatsApp / Telefone *</label>
+                  <input
+                    v-model="formData.telefone"
+                    type="tel"
+                    required
+                    placeholder="(11) 98765-4321"
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors text-base"
+                  />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">E-mail <span class="text-xs font-normal text-gray-500">(opcional)</span></label>
-                  <input v-model="formData.email" type="email" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">
+                    E-mail <span class="text-[11px] font-normal text-gray-500">(opcional)</span>
+                  </label>
+                  <input
+                    v-model="formData.email"
+                    type="email"
+                    placeholder="seuemail@exemplo.com"
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors text-base"
+                  />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Região / Endereço *</label>
-                  <input v-model="formData.bairro" type="text" required placeholder="Ex: Zona Sul, Moema, Centro" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">Bairro / Região *</label>
+                  <input
+                    v-model="formData.bairro"
+                    type="text"
+                    required
+                    placeholder="Ex: Moema, Morumbi, Tatuapé, Centro"
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors text-base"
+                  />
                 </div>
+
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Serviço de Interesse *</label>
-                  <select v-model="formData.servico" required class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors">
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">Serviço de Interesse *</label>
+                  <select
+                    v-model="formData.servico"
+                    required
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors text-base bg-white"
+                  >
                     <option value="">Selecione um serviço</option>
                     <option v-for="servico in servicosOptions" :key="servico" :value="servico">{{ servico }}</option>
                   </select>
                 </div>
+
                 <div>
-                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Mensagem ou observações <span class="text-xs font-normal text-gray-500">(opcional)</span></label>
+                  <label class="block text-xs sm:text-sm font-semibold text-[#22345F] mb-1.5">
+                    Mensagem ou observações <span class="text-[11px] font-normal text-gray-500">(opcional)</span>
+                  </label>
                   <textarea
                     v-model="formData.mensagem"
                     rows="3"
                     maxlength="1500"
-                    placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas, portas, sacadas ou outras informações que possam ajudar no orçamento."
-                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-y text-sm"
+                    placeholder="Medidas aproximadas, quantidade de janelas, portas, sacadas ou detalhes para o orçamento..."
+                    class="w-full px-3.5 sm:px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-y text-base"
                   ></textarea>
                 </div>
+
+                <!-- Componente de Upload de Fotos e Vídeos -->
                 <MediaUploader ref="mediaUploaderRef" :max-photos="4" :max-videos="2" />
-                <button type="submit" :disabled="isSubmitting" class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+
+                <!-- Botão Enviar -->
+                <button
+                  type="submit"
+                  :disabled="isSubmitting"
+                  class="w-full min-h-[52px] px-6 py-3.5 sm:py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                >
                   <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
                   <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação' }}</span>
+                  <span>{{ isSubmitting ? 'Enviando Solicitação...' : 'Enviar Solicitação' }}</span>
                 </button>
-                <p class="text-xs text-[#4B5563] text-center">
+
+                <p class="text-[11px] text-[#4B5563] text-center pt-1">
                   Ao enviar, você concorda com nossa 
-                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline">Política de Privacidade</NuxtLink>
+                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline font-medium">Política de Privacidade</NuxtLink>
                 </p>
               </form>
             </div>
           </div>
 
-          <!-- Coluna Direita: Meios de Contato -->
-          <div class="space-y-6">
-            
-            <!-- Título -->
+          <!-- Coluna Direita: Meios de Contato Imediato -->
+          <div class="space-y-4 sm:space-y-6">
             <div>
-              <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-2">
+              <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-[#22345F] mb-1">
                 Fale Conosco Agora
               </h2>
-              <p class="text-[#4B5563]">
-                Escolha o canal de sua preferência para contato imediato
+              <p class="text-xs sm:text-sm text-[#4B5563]">
+                Escolha o canal de sua preferência para atendimento imediato
               </p>
             </div>
 
@@ -291,204 +325,72 @@ const callPhone = () => {
               target="_blank"
               rel="noopener noreferrer"
               @click="trackWhatsApp('card')"
-              class="w-full bg-[#25D366] hover:bg-[#1fb854] text-white p-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl group flex"
+              class="w-full bg-[#25D366] hover:bg-[#1fb854] text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-lg hover:shadow-xl group flex items-center gap-3 sm:gap-4"
             >
-              <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <WhatsappIcon class="w-8 h-8" />
-                </div>
-                <div class="flex-1 text-left">
-                  <div class="font-bold text-lg mb-1">WhatsApp</div>
-                  <div class="text-white/90 text-sm">Resposta imediata • Mais rápido</div>
-                  <div class="text-white font-semibold mt-1">(11) 98358-6611</div>
-                </div>
-                <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                <WhatsappIcon class="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
+              <div class="flex-1 text-left min-w-0">
+                <div class="font-bold text-base sm:text-lg leading-tight">WhatsApp Oficial</div>
+                <div class="text-white/90 text-xs sm:text-sm mt-0.5">Resposta imediata • Orçamento rápido</div>
+                <div class="text-white font-semibold text-xs sm:text-sm mt-1">(11) 98358-6611</div>
+              </div>
+              <Icon name="lucide:arrow-right" class="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1" />
             </a>
 
             <!-- Telefone Card -->
             <button
               @click="callPhone"
-              class="w-full bg-white hover:bg-gray-50 border-2 border-[#22345F] text-[#22345F] p-6 rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg group"
+              class="w-full bg-white hover:bg-gray-50 border-2 border-[#22345F] text-[#22345F] p-4 sm:p-6 rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-md hover:shadow-lg group flex items-center gap-3 sm:gap-4 text-left cursor-pointer"
             >
-              <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-[#22345F]/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Icon name="lucide:phone" class="w-8 h-8 text-[#22345F]" />
-                </div>
-                <div class="flex-1 text-left">
-                  <div class="font-bold text-lg mb-1">Telefone</div>
-                  <div class="text-[#4B5563] text-sm">Ligue agora • Atendimento direto</div>
-                  <div class="text-[#22345F] font-semibold mt-1">(11) 98358-6611</div>
-                </div>
-                <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
+              <div class="w-12 h-12 sm:w-14 sm:h-14 bg-[#22345F]/10 rounded-2xl flex items-center justify-center shrink-0">
+                <Icon name="lucide:phone" class="w-6 h-6 sm:w-7 sm:h-7 text-[#22345F]" />
               </div>
+              <div class="flex-1 text-left min-w-0">
+                <div class="font-bold text-base sm:text-lg leading-tight">Telefone Direto</div>
+                <div class="text-[#4B5563] text-xs sm:text-sm mt-0.5">Ligue agora • Atendimento direto</div>
+                <div class="text-[#22345F] font-semibold text-xs sm:text-sm mt-1">(11) 98358-6611</div>
+              </div>
+              <Icon name="lucide:arrow-right" class="w-5 h-5 shrink-0 transition-transform group-hover:translate-x-1" />
             </button>
 
-            <!-- Email Card -->
-            <a
-              href="mailto:vendas.adtelaseredes@gmail.com"
-              class="block w-full bg-white hover:bg-gray-50 border-2 border-[#E5EDF8] text-[#22345F] p-6 rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg group"
-            >
-              <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-[#F49A1A]/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Icon name="lucide:mail" class="w-8 h-8 text-[#F49A1A]" />
+            <!-- Trust Badges Card -->
+            <div class="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-xs space-y-3">
+              <div class="text-xs font-bold text-gray-700 uppercase tracking-wider">Garantia & Confiança</div>
+              <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:shield-check" class="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>2 Anos de Garantia</span>
                 </div>
-                <div class="flex-1 text-left">
-                  <div class="font-bold text-lg mb-1">E-mail</div>
-                  <div class="text-[#4B5563] text-sm">Envie sua dúvida</div>
-                  <div class="text-[#22345F] font-semibold mt-1 text-sm break-all" v-html="'<!--email_off-->vendas.adtelaseredes@gmail.com<!--/email_off-->'"></div>
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:clock" class="w-4 h-4 text-indigo-500 shrink-0" />
+                  <span>Instalação em 24h</span>
                 </div>
-                <Icon name="lucide:arrow-right" class="w-6 h-6 transition-transform group-hover:translate-x-1" />
-              </div>
-            </a>
-
-            <!-- Horário de Atendimento -->
-            <div class="bg-gradient-to-br from-[#E5EDF8] to-white p-6 rounded-2xl border-2 border-[#E5EDF8]">
-              <div class="flex items-start gap-3">
-                <Icon name="lucide:clock" class="w-6 h-6 text-[#F49A1A] flex-shrink-0 mt-1" />
-                <div>
-                  <div class="font-bold text-[#22345F] mb-2">Horário de Atendimento</div>
-                  <div class="space-y-1 text-sm text-[#4B5563]">
-                    <div class="flex justify-between">
-                      <span>Segunda a Sexta:</span>
-                      <span class="font-semibold">8h às 18h</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span>Sábado:</span>
-                      <span class="font-semibold">8h às 13h</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span>Domingo:</span>
-                      <span class="font-semibold">Fechado</span>
-                    </div>
-                  </div>
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:award" class="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>Materiais Certificados</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Icon name="lucide:map-pin" class="w-4 h-4 text-rose-500 shrink-0" />
+                  <span>Toda Grande SP</span>
                 </div>
               </div>
             </div>
-
-            <!-- Garantias -->
-            <div class="grid grid-cols-2 gap-4">
-              <div class="bg-white p-4 rounded-xl border-2 border-[#E5EDF8] text-center">
-                <Icon name="lucide:shield-check" class="w-8 h-8 text-[#25D366] mx-auto mb-2" />
-                <div class="font-bold text-[#22345F] text-sm">Orçamento Grátis</div>
-              </div>
-              <div class="bg-white p-4 rounded-xl border-2 border-[#E5EDF8] text-center">
-                <Icon name="lucide:zap" class="w-8 h-8 text-[#F49A1A] mx-auto mb-2" />
-                <div class="font-bold text-[#22345F] text-sm">Resposta Rápida</div>
-              </div>
-            </div>
-
           </div>
 
         </div>
       </div>
     </section>
-
-    <!-- CTA Final -->
-    <section class="py-12 bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white">
-      <div class="container mx-auto px-4 md:px-6 max-w-4xl text-center">
-        <h2 class="text-2xl md:text-3xl font-bold mb-4">
-          Prefere Falar Direto no WhatsApp?
-        </h2>
-        <p class="text-white/90 mb-6">
-          Clique no botão abaixo e fale com nosso time agora mesmo
-        </p>
-        <a
-          :href="whatsappUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          @click="trackWhatsApp('footer')"
-          class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-xl"
-        >
-          <WhatsappIcon class="w-6 h-6" />
-          Abrir WhatsApp Agora
-        </a>
-      </div>
-    </section>
-
   </div>
 </template>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.8s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
 }
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-}
-
-.titulo-destaque {
-  background: linear-gradient(135deg, #22345F, #F49A1A);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.titulo-destaque::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, #F49A1A, #22345F);
-  border-radius: 2px;
-}
-
-/* Animated border cards */
-.card-glow {
-  padding: 3px;
-  background: linear-gradient(90deg, #F49A1A, #25D366, #F49A1A);
-  background-size: 200% 200%;
-  animation: border-spin 2.5s linear infinite;
-}
-.card-glow > * {
-  border-radius: 10px;
-}
-
-@keyframes border-spin {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes click-hint {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  30%       { transform: translateY(-6px) rotate(-8deg); }
-  60%       { transform: translateY(-2px) rotate(4deg); }
-}
-.cursor-hand-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cursor-hand-svg {
-  font-size: 2rem;
-  animation: click-hint 1.4s ease-in-out infinite;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  position: relative;
-  z-index: 10;
-}
-
-/* Ripple sai da ponta do dedo indicador (topo do SVG) */
-.ripple-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  width: 12px;
-  height: 12px;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%) scale(0);
-  animation: ripple-expand 1.4s ease-out infinite;
-  pointer-events: none;
-}
-.ripple-2 { animation-delay: 0.35s; }
-.ripple-3 { animation-delay: 0.7s; }
-
-@keyframes ripple-expand {
-  0%   { transform: translateX(-50%) scale(0); opacity: 1; }
-  70%  { transform: translateX(-50%) scale(4); opacity: 0; }
-  100% { transform: translateX(-50%) scale(4); opacity: 0; }
 }
 </style>
