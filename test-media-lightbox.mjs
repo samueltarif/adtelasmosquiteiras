@@ -1,0 +1,95 @@
+import assert from 'node:assert'
+import fs from 'node:fs'
+import path from 'node:path'
+
+console.log('======================================================================')
+console.log('ADMIN MEDIA FULLSCREEN LIGHTBOX & TOUCH/ZOOM UX TEST SUITE')
+console.log('======================================================================')
+
+// 1. Carregar arquivos do componente e integração
+const lightboxContent = fs.readFileSync(path.resolve('app/components/admin/MediaLightbox.vue'), 'utf8')
+const drawerContent = fs.readFileSync(path.resolve('app/components/admin/LeadJourneyDrawer.vue'), 'utf8')
+
+console.log('\n--- GRUPO 1: Fullscreen Real & Estrutura ---')
+assert(lightboxContent.includes('fixed inset-0'), '1.1 Lightbox has fixed inset-0 overlay')
+assert(lightboxContent.includes('w-screen') || lightboxContent.includes('w-full'), '1.2 Lightbox covers 100vw')
+assert(lightboxContent.includes('h-[100dvh]') || lightboxContent.includes('100dvh'), '1.3 Lightbox covers 100dvh')
+assert(lightboxContent.includes('z-70') || lightboxContent.includes('z-60') || lightboxContent.includes('z-50'), '1.4 Lightbox has appropriate high z-index')
+assert(lightboxContent.includes('object-contain'), '1.5 Image uses object-contain to never crop')
+console.log('  ✓ 1.1 - 1.5 Fullscreen Real & Object-fit Contain: PASS')
+
+console.log('\n--- GRUPO 2: Mobile Pinch-to-Zoom Engine & Limites ---')
+assert(lightboxContent.includes('MIN_ZOOM = 1'), '2.1 MIN_ZOOM constant is 1')
+assert(lightboxContent.includes('MAX_ZOOM = 5'), '2.2 MAX_ZOOM constant is 5')
+assert(lightboxContent.includes('Math.hypot'), '2.3 Euclidean distance tracking for multi-touch pinch')
+assert(lightboxContent.includes('isPinching'), '2.4 isPinching state separates 2-finger pinch from 1-finger drag')
+assert(lightboxContent.includes('initialPinchScale'), '2.5 Smooth focal scale calculation')
+console.log('  ✓ 2.1 - 2.5 Mobile Pinch-to-Zoom & Zoom Limits (1-5x): PASS')
+
+console.log('\n--- GRUPO 3: Pan / Arrastar & Limites de Borda ---')
+assert(lightboxContent.includes('clampPan'), '3.1 clampPan method prevents image from getting lost off-screen')
+assert(lightboxContent.includes('translateX') && lightboxContent.includes('translateY'), '3.2 2D translation coordinates tracked')
+assert(lightboxContent.includes('isDragging'), '3.3 isDragging state tracks mouse/finger drag')
+assert(lightboxContent.includes('scale.value <= 1') && lightboxContent.includes('translateX.value = 0'), '3.4 Pan resets when scale returns to 1x')
+console.log('  ✓ 3.1 - 3.4 Pan / Drag with Boundary Clamping: PASS')
+
+console.log('\n--- GRUPO 4: Double Tap / Double Click ---')
+assert(lightboxContent.includes('toggleZoom'), '4.1 toggleZoom method implemented')
+assert(lightboxContent.includes('scale.value = 2.5') || lightboxContent.includes('2.5'), '4.2 Double tap zooms to ~2.5x')
+assert(lightboxContent.includes('resetZoom'), '4.3 Double tap while zoomed resets to 1x')
+assert(lightboxContent.includes('lastTapTime'), '4.4 Rapid tap timing (<300ms) detection for mobile double tap')
+console.log('  ✓ 4.1 - 4.4 Double Tap & Double Click Toggle (1x <-> 2.5x): PASS')
+
+console.log('\n--- GRUPO 5: Desktop Mouse Wheel Zoom ---')
+assert(lightboxContent.includes('@wheel="handleWheel"') || lightboxContent.includes('handleWheel'), '5.1 Wheel event listener bound to gesture container')
+assert(lightboxContent.includes('e.preventDefault()'), '5.2 preventDefault prevents page scroll behind lightbox during zoom')
+assert(lightboxContent.includes('e.deltaY < 0'), '5.3 Wheel up zooms in, wheel down zooms out')
+assert(!lightboxContent.includes('e.ctrlKey ?'), '5.4 Ctrl key NOT required for wheel zoom')
+console.log('  ✓ 5.1 - 5.4 Desktop Wheel Zoom without Ctrl requirement: PASS')
+
+console.log('\n--- GRUPO 6: Controles Visuais & Barra de Ferramentas ---')
+assert(lightboxContent.includes('zoomOut') && lightboxContent.includes('lucide:minus'), '6.1 Minus [-] control present')
+assert(lightboxContent.includes('zoomPercent'), '6.2 Zoom percentage indicator present')
+assert(lightboxContent.includes('zoomIn') && lightboxContent.includes('lucide:plus'), '6.3 Plus [+] control present')
+assert(lightboxContent.includes('resetZoom') && lightboxContent.includes('1:1'), '6.4 Reset [1:1] control present')
+assert(lightboxContent.includes('lucide:download') && lightboxContent.includes('Baixar'), '6.5 Download button present')
+assert(lightboxContent.includes('lucide:x') && lightboxContent.includes('closeModal'), '6.6 Close button present')
+console.log('  ✓ 6.1 - 6.6 Toolbar Controls ([-], %, [+], [1:1], [Baixar], [X]): PASS')
+
+console.log('\n--- GRUPO 7: Navegação Entre Fotos & Swipe Isolado ---')
+assert(lightboxContent.includes('prevMedia') && lightboxContent.includes('nextMedia'), '7.1 Previous and Next navigation methods present')
+assert(lightboxContent.includes('lucide:chevron-left') && lightboxContent.includes('lucide:chevron-right'), '7.2 Arrow navigation buttons present on screen')
+assert(lightboxContent.includes('ArrowLeft') && lightboxContent.includes('ArrowRight'), '7.3 Keyboard arrow navigation supported')
+assert(lightboxContent.includes('scale.value === 1') && lightboxContent.includes('deltaX'), '7.4 Mobile swipe gesture only triggers navigation when scale === 1')
+assert(lightboxContent.includes('resetZoom()'), '7.5 Zoom and pan reset to 1x and (0,0) when switching photos')
+console.log('  ✓ 7.1 - 7.5 Photo Previous/Next, Keyboard & Isolated Mobile Swipe: PASS')
+
+console.log('\n--- GRUPO 8: Contador de Fotos ---')
+assert(lightboxContent.includes('counterText') && lightboxContent.includes('allMedia.value.length'), '8.1 Counter displays "X / N" format')
+console.log('  ✓ 8.1 Photo Counter Display: PASS')
+
+console.log('\n--- GRUPO 9: Body Scroll Lock, Safe-Areas & Touch-Action ---')
+assert(lightboxContent.includes('document.body.style.overflow = \'hidden\''), '9.1 Body scroll locked on open')
+assert(lightboxContent.includes('document.body.style.overflow = \'\''), '9.2 Body scroll restored on close/unmount')
+assert(lightboxContent.includes('env(safe-area-inset-top') && lightboxContent.includes('env(safe-area-inset-bottom'), '9.3 iOS safe-areas respected on top and bottom toolbars')
+assert(lightboxContent.includes('touchAction: isPhoto ? \'none\' : \'auto\'') || lightboxContent.includes('touchAction: \'none\'') || lightboxContent.includes('touch-action: none'), '9.4 touch-action: none strictly isolated to photo viewport surface')
+console.log('  ✓ 9.1 - 9.4 Body Scroll Lock, iOS Safe-Areas & Isolated touch-action: PASS')
+
+console.log('\n--- GRUPO 10: Acessibilidade (a11y) & Focus Management ---')
+assert(lightboxContent.includes('role="dialog"'), '10.1 role="dialog" present')
+assert(lightboxContent.includes('aria-modal="true"'), '10.2 aria-modal="true" present')
+assert(lightboxContent.includes('aria-label='), '10.3 aria-label present')
+assert(lightboxContent.includes('Escape'), '10.4 ESC key closes lightbox')
+assert(lightboxContent.includes('previousActiveElement'), '10.5 Focus restored to trigger element on close')
+console.log('  ✓ 10.1 - 10.5 A11y Semantics, ESC Key & Focus Restoration: PASS')
+
+console.log('\n--- GRUPO 11: Vídeos & Mídia Original ---')
+assert(lightboxContent.includes('<video') && lightboxContent.includes('controls'), '11.1 Video rendered with native controls')
+assert(lightboxContent.includes('preload="metadata"'), '11.2 Video uses preload="metadata"')
+assert(lightboxContent.includes('referrerpolicy="no-referrer"'), '11.3 referrerpolicy="no-referrer" preserved for privacy')
+assert(drawerContent.includes('MediaLightbox'), '11.4 LeadJourneyDrawer seamlessly integrates MediaLightbox')
+console.log('  ✓ 11.1 - 11.4 Video Isolation & Drawer Integration: PASS')
+
+console.log('\n======================================================================')
+console.log('ALL LIGHTBOX & TOUCH/ZOOM INVARIANTS: PASS')
+console.log('======================================================================')

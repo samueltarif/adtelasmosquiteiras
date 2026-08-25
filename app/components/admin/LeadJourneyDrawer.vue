@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import MediaLightbox from './MediaLightbox.vue'
 
 const props = defineProps<{
   leadId: string | null
@@ -210,20 +211,18 @@ async function retryPhotoThumbnail(photoId: string) {
   }
 }
 
+// Estado do Fullscreen Lightbox
+const isLightboxOpen = ref(false)
+const activeMediaId = ref<string | null>(null)
+
 async function openMediaPreview(media: any) {
-  isMediaLoading.value = true
-  const url = await requestSignedUrl(media.id)
-  isMediaLoading.value = false
-  if (url) {
-    selectedPreviewUrl.value = url
-    selectedPreviewName.value = media.safe_filename || (media.media_type === 'video' ? 'Vídeo do Cliente' : 'Foto do Cliente')
-    selectedPreviewType.value = media.media_type === 'video' ? 'video' : 'photo'
-  }
+  activeMediaId.value = media.id
+  isLightboxOpen.value = true
 }
 
 function closeLightbox() {
-  selectedPreviewUrl.value = null
-  selectedPreviewName.value = null
+  isLightboxOpen.value = false
+  activeMediaId.value = null
 }
 </script>
 
@@ -479,23 +478,14 @@ function closeLightbox() {
       </div>
     </div>
 
-    <!-- Lightbox Modal para Visualização de Fotos e Vídeos Privados -->
-    <div v-if="selectedPreviewUrl" class="fixed inset-0 z-60 bg-black/95 flex flex-col items-center justify-center p-3 sm:p-4 backdrop-blur-md">
-      <div class="w-full max-w-3xl flex items-center justify-between mb-3 text-white">
-        <h4 class="text-xs sm:text-sm font-bold truncate pr-2">{{ selectedPreviewName }}</h4>
-        <div class="flex items-center gap-2">
-          <a :href="selectedPreviewUrl" target="_blank" download referrerpolicy="no-referrer" class="text-xs px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors flex items-center gap-1 min-h-[40px]">
-            <Icon name="lucide:download" class="w-3.5 h-3.5" /> <span>Baixar</span>
-          </a>
-          <button @click="closeLightbox" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center">
-            <Icon name="lucide:x" class="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-      <div class="w-full max-w-3xl max-h-[80vh] max-h-[80dvh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-black">
-        <img v-if="selectedPreviewType === 'photo'" :src="selectedPreviewUrl" :alt="selectedPreviewName || ''" referrerpolicy="no-referrer" class="max-w-full max-h-[75vh] max-h-[75dvh] object-contain rounded-xl" />
-        <video v-else controls preload="metadata" :src="selectedPreviewUrl" class="max-w-full max-h-[75vh] max-h-[75dvh] rounded-xl"></video>
-      </div>
-    </div>
+    <!-- Fullscreen Media Lightbox com Suporte Completo a Touch / Pinch Zoom / Pan / Wheel -->
+    <MediaLightbox
+      :is-open="isLightboxOpen"
+      :media-list="journeyData?.media || []"
+      :initial-media-id="activeMediaId"
+      :lead-id="leadId || ''"
+      :request-signed-url="requestSignedUrl"
+      @close="closeLightbox"
+    />
   </div>
 </template>
