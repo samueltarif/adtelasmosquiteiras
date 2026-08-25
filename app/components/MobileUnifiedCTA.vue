@@ -74,12 +74,8 @@ const toggleExpand = () => {
 // Abrir modal de formulário
 const emit = defineEmits(['open-form'])
 const openForm = () => {
-  console.log('🔵 MobileUnifiedCTA: openForm() chamado')
-  console.log('🔵 Emitindo evento: open-form')
   emit('open-form')
-  console.log('🔵 Fechando CTA expandido')
   isExpanded.value = false
-  console.log('🔵 isExpanded agora é:', isExpanded.value)
 }
 
 // Lifecycle

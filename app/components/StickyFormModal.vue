@@ -18,12 +18,9 @@ const isDragging = ref(false)
 
 // Watch para sincronizar com v-model
 watch(() => props.modelValue, (newValue) => {
-  console.log('🟡 [MODAL] v-model mudou para:', newValue)
   if (newValue) {
-    console.log('🟡 [MODAL] Abrindo modal...')
     document.body.style.overflow = 'hidden'
   } else {
-    console.log('🟡 [MODAL] Fechando modal...')
     document.body.style.overflow = ''
     isDragging.value = false
     currentY.value = 0
@@ -32,23 +29,14 @@ watch(() => props.modelValue, (newValue) => {
 
 const handleScroll = () => {
   // Mostrar botão após rolar 400px
-  const shouldShow = window.scrollY > 400
-  if (shouldShow !== isVisible.value) {
-    console.log('🟡 [STICKY-MODAL] Scroll detectado:', window.scrollY, 'px')
-    console.log('🟡 [STICKY-MODAL] Botão sticky visível:', shouldShow)
-  }
-  isVisible.value = shouldShow
+  isVisible.value = window.scrollY > 400
 }
 
 const openModal = () => {
-  console.log('🟡 [STICKY-MODAL] openModal() chamado (botão próprio)')
-  console.log('🟡 [STICKY-MODAL] Emitindo update:modelValue = true')
   emit('update:modelValue', true)
 }
 
 const closeModal = () => {
-  console.log('🟡 [STICKY-MODAL] closeModal() chamado')
-  console.log('🟡 [STICKY-MODAL] Emitindo update:modelValue = false')
   emit('update:modelValue', false)
 }
 
@@ -83,11 +71,8 @@ const handleTouchEnd = () => {
 }
 
 onMounted(() => {
-  console.log('🟡 [STICKY-MODAL] Componente montado')
-  console.log('🟡 [STICKY-MODAL] modelValue inicial:', props.modelValue)
   if (typeof window !== 'undefined') {
     window.addEventListener('scroll', handleScroll, { passive: true })
-    console.log('🟡 [STICKY-MODAL] Scroll listener adicionado')
     // Verificar posição inicial
     handleScroll()
   }

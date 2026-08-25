@@ -14,24 +14,31 @@ const identity = useAnalyticsIdentity()
 const attribution = useAttribution()
 let activeSubmissionId = null
 
+const mediaUploaderRef = ref(null)
+
 // Estado do formulário em 2 passos
 const currentStep = ref(1)
 const formData = ref({
   // Passo 1 - Obrigatórios
   nome: '',
   cidade: '',
+  telefone: '',
   // Passo 2 - Opcionais
   bairro: '',
-  servico: ''
+  servico: '',
+  email: '',
+  mensagem: ''
 })
 
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
 
-// Validação do passo 1
+// Validação estrita do passo 1 (Nome >= 2 chars e Telefone 10-11 dígitos)
 const canContinue = computed(() => {
-  return formData.value.nome.trim() !== '' && 
-         formData.value.cidade.trim() !== ''
+  const cleanNome = (formData.value.nome || '').trim()
+  const rawDigits = (formData.value.telefone || '').replace(/\D/g, '')
+  const cleanDigits = rawDigits.startsWith('55') && rawDigits.length >= 12 ? rawDigits.slice(2) : (rawDigits.startsWith('0') ? rawDigits.slice(1) : rawDigits)
+  return cleanNome.length >= 2 && cleanDigits.length >= 10 && cleanDigits.length <= 11
 })
 
 // Ir para passo 2 (opcional)
@@ -39,7 +46,7 @@ const goToStep2 = () => {
   if (canContinue.value) {
     currentStep.value = 2
   } else {
-    alert('Por favor, preencha todos os campos.')
+    alert('Por favor, preencha seu nome e um WhatsApp/telefone válido com DDD.')
   }
 }
 
@@ -48,10 +55,10 @@ const goToStep1 = () => {
   currentStep.value = 1
 }
 
-// Enviar formulário (envia email e redireciona para página de obrigado)
-const sendToWhatsApp = async () => {
+// Enviar formulário (envia lead, aciona upload de mídias e redireciona para obrigado)
+const submitLead = async () => {
   if (!canContinue.value || isSubmitting.value) {
-    if (!canContinue.value) alert('Por favor, preencha todos os campos obrigatórios.')
+    if (!canContinue.value) alert('Por favor, preencha nome e telefone com DDD.')
     return
   }
 
@@ -69,7 +76,7 @@ const sendToWhatsApp = async () => {
       activeSubmissionId = identity.generateUUID()
     }
 
-    // Enviar para API (/api/send-lead)
+    // 1. Enviar lead comercial para API (/api/send-lead)
     const response = await $fetch('/api/send-lead', {
       method: 'POST',
       body: {
@@ -93,18 +100,33 @@ const sendToWhatsApp = async () => {
         telefone: formData.value.telefone || '',
         email: formData.value.email || '',
         mensagem: formData.value.mensagem || '',
-        origem: 'formulario_hero_' + currentPath
+        origem: 'formulario_hero_' + currentPath,
+        media_selection_summary: (mediaUploaderRef.value?.photos?.length || mediaUploaderRef.value?.videos?.length)
+          ? {
+              photoCount: mediaUploaderRef.value.photos?.length || 0,
+              videoCount: mediaUploaderRef.value.videos?.length || 0
+            }
+          : null
       }
     })
 
-    if (response.success) {
+    // 2. Se houver fotos/vídeos selecionados e uploadToken retornado, envia diretamente ao R2
+    if (response?.success) {
+      if (mediaUploaderRef.value?.hasFiles && response.uploadToken) {
+        try {
+          await mediaUploaderRef.value.uploadAllMedia(response.uploadToken)
+        } catch (mediaErr) {
+          console.warn('[LeadForm] Erro no upload de mídias:', mediaErr)
+        }
+      }
+
       activeSubmissionId = null
       await navigateTo('/obrigado')
     }
   } catch (error) {
-    console.error('Erro ao enviar:', error)
+    console.error('Erro ao enviar lead:', error)
     
-    // Fallback: abrir WhatsApp se o email falhar
+    // Fallback: abrir WhatsApp se a requisição falhar
     let message = `Olá! Meu nome é ${formData.value.nome}, moro em ${formData.value.cidade}`
     
     if (formData.value.bairro) {
@@ -125,14 +147,11 @@ const sendToWhatsApp = async () => {
       window.open(whatsappUrl, '_blank')
     }
     
-    alert('Não foi possível enviar o email, mas você pode continuar pelo WhatsApp.')
+    alert('Não foi possível enviar pelo formulário, mas você pode continuar pelo WhatsApp.')
   } finally {
     isSubmitting.value = false
   }
 }
-
-
-// Remover funções de máscara WhatsApp (não é mais necessário)
 </script>
 
 <template>
@@ -178,12 +197,12 @@ const sendToWhatsApp = async () => {
         </div>
       </div>
       <p class="text-xs text-gray-500 mt-2">
-        {{ currentStep === 1 ? 'Passo 1 - Dados Rápidos' : 'Passo 2 - Detalhes (Opcional)' }}
+        {{ currentStep === 1 ? 'Passo 1 - Dados Rápidos' : 'Passo 2 - Detalhes e Fotos (Opcional)' }}
       </p>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="currentStep === 1 ? sendToWhatsApp() : sendToWhatsApp()" class="space-y-4">
+    <form @submit.prevent="submitLead" class="space-y-4">
       
       <!-- ========== PASSO 1: DADOS RÁPIDOS ========== -->
       <div v-show="currentStep === 1" class="space-y-4">
@@ -197,6 +216,20 @@ const sendToWhatsApp = async () => {
             type="text"
             placeholder="Digite seu nome"
             required
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
+            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+          />
+        </div>
+
+        <!-- Telefone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            WhatsApp / Telefone <span class="text-xs font-normal text-gray-500">(opcional)</span>
+          </label>
+          <input
+            v-model="formData.telefone"
+            type="tel"
+            placeholder="(11) 98765-4321"
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
             :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
           />
@@ -217,7 +250,7 @@ const sendToWhatsApp = async () => {
           />
         </div>
 
-        <!-- Botão Continuar no WhatsApp -->
+        <!-- Botão Continuar / Enviar -->
         <button
           type="submit"
           :disabled="!canContinue || isSubmitting || isSubmitted"
@@ -240,13 +273,11 @@ const sendToWhatsApp = async () => {
             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
           </svg>
           
-          <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-          </svg>
+          <Icon v-else name="lucide:send" class="w-5 h-5" />
 
           <span v-if="isSubmitting">Enviando...</span>
           <span v-else-if="isSubmitted">Enviado!</span>
-          <span v-else>Continuar no WhatsApp</span>
+          <span v-else>Solicitar Orçamento</span>
         </button>
 
         <!-- Link para passo 2 (opcional) -->
@@ -256,20 +287,30 @@ const sendToWhatsApp = async () => {
           :disabled="!canContinue"
           class="w-full text-sm text-gray-600 hover:text-primary underline transition-colors"
         >
-          Ou adicionar mais detalhes para orçamento mais preciso
+          Ou adicionar fotos e detalhes para orçamento mais preciso
         </button>
       </div>
 
       <!-- ========== PASSO 2: DETALHES OPCIONAIS ========== -->
       <div v-show="currentStep === 2" class="space-y-4">
         <!-- Aviso de Opcional -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-          <p class="text-sm text-blue-800 text-center">
-            <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-            </svg>
-            <strong>Opcional</strong> - Ajuda a enviar um orçamento mais preciso
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <p class="text-xs text-blue-800 text-center">
+            <strong>Opcional</strong> — Ajuda a enviar um orçamento mais rápido e preciso
           </p>
+        </div>
+
+        <!-- E-mail -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            E-mail <span class="text-gray-400 text-xs">(opcional)</span>
+          </label>
+          <input
+            v-model="formData.email"
+            type="email"
+            placeholder="seuemail@exemplo.com"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
+          />
         </div>
 
         <!-- Região / Endereço -->
@@ -281,8 +322,7 @@ const sendToWhatsApp = async () => {
             v-model="formData.bairro"
             type="text"
             placeholder="Ex: Zona Sul, Moema, Centro"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
-            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
           />
         </div>
 
@@ -293,29 +333,45 @@ const sendToWhatsApp = async () => {
           </label>
           <select
             v-model="formData.servico"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
-            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
           >
             <option value="">Selecione um serviço</option>
-            <option value="Tela Mosqueteira">Tela Mosqueteira</option>
-            <option value="Rede de Proteção">Rede de Proteção</option>
-            <option value="Tela Pet Screen">Tela Pet Screen</option>
-            <option value="Proteção Infantil">Proteção Infantil</option>
-            <option value="Outro">Outro</option>
+            <option value="Telas Mosquiteiras">Telas Mosquiteiras</option>
+            <option value="Redes de Proteção">Redes de Proteção</option>
+            <option value="Telas Pet Screen">Telas Pet Screen</option>
+            <option value="Redes para Crianças">Redes para Crianças</option>
+            <option value="Redes para Pets">Redes para Pets</option>
+            <option value="Telas Removíveis">Telas Removíveis</option>
+            <option value="Outro">Outro serviço</option>
           </select>
         </div>
 
+        <!-- Mensagem / Observações -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Mensagem ou observações <span class="text-gray-400 text-xs">(opcional)</span>
+          </label>
+          <textarea
+            v-model="formData.mensagem"
+            rows="3"
+            maxlength="1500"
+            placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas..."
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Uploader de Fotos e Vídeos -->
+        <MediaUploader ref="mediaUploaderRef" :max-photos="4" :max-videos="2" />
+
         <!-- Botões -->
-        <div class="flex gap-2">
+        <div class="flex gap-2 pt-2">
           <!-- Voltar -->
           <button
             type="button"
             @click="goToStep1"
-            class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2"
+            class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-1 text-sm"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
-            </svg>
+            <Icon name="lucide:arrow-left" class="w-4 h-4" />
             <span>Voltar</span>
           </button>
 
@@ -324,8 +380,7 @@ const sendToWhatsApp = async () => {
             type="submit"
             :disabled="isSubmitting || isSubmitted"
             :class="[
-              'flex-[2] font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2',
-              'py-3 text-base',
+              'flex-[2] font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 py-3 text-base',
               isSubmitted 
                 ? 'bg-green-500 text-white cursor-default' 
                 : 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg hover:scale-105 active:scale-95'
@@ -340,13 +395,11 @@ const sendToWhatsApp = async () => {
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
             </svg>
             
-            <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-            </svg>
+            <Icon v-else name="lucide:send" class="w-5 h-5" />
 
             <span v-if="isSubmitting">Enviando...</span>
             <span v-else-if="isSubmitted">Enviado!</span>
-            <span v-else>Enviar no WhatsApp</span>
+            <span v-else>Enviar Solicitação</span>
           </button>
         </div>
       </div>
@@ -357,16 +410,11 @@ const sendToWhatsApp = async () => {
     <div class="mt-4 pt-4 border-t border-gray-100">
       <div class="flex items-center justify-center gap-4 text-xs text-gray-500">
         <div class="flex items-center gap-1">
-          <svg class="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-          </svg>
+          <Icon name="lucide:shield-check" class="w-3.5 h-3.5 text-green-500" />
           <span>Mais Segurança</span>
         </div>
         <div class="flex items-center gap-1">
-          <svg class="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-          </svg>
+          <Icon name="lucide:lock" class="w-3.5 h-3.5 text-blue-500" />
           <span>Sem Spam</span>
         </div>
       </div>
@@ -375,7 +423,6 @@ const sendToWhatsApp = async () => {
 </template>
 
 <style scoped>
-/* Correção para inputs com texto invisível */
 @media (min-width: 1024px) {
   .form-input {
     color: #1f2937 !important;
@@ -390,13 +437,6 @@ const sendToWhatsApp = async () => {
   
   .form-input:focus {
     color: #1f2937 !important;
-    -webkit-text-fill-color: #1f2937 !important;
-  }
-  
-  .form-input:-webkit-autofill,
-  .form-input:-webkit-autofill:hover,
-  .form-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
     -webkit-text-fill-color: #1f2937 !important;
   }
 }

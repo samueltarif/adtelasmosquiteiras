@@ -77,6 +77,7 @@ const formData = ref({
   mensagem: ''
 })
 
+const mediaUploaderRef = ref(null)
 const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const submitError = ref(false)
 
@@ -94,8 +95,22 @@ const servicosOptions = [
 // Submeter formulário
 const submitForm = async () => {
   submitError.value = false
+
+  const cleanNome = (formData.value.nome || '').trim()
+  if (cleanNome.length < 2) {
+    alert('Por favor, informe seu nome completo (mínimo 2 caracteres).')
+    return
+  }
+
+  const digits = (formData.value.telefone || '').replace(/\D/g, '')
+  const cleanDigits = digits.startsWith('55') && digits.length >= 12 ? digits.slice(2) : (digits.startsWith('0') ? digits.slice(1) : digits)
+  if (cleanDigits.length < 10 || cleanDigits.length > 11) {
+    alert('Por favor, informe um telefone/WhatsApp válido com DDD (10 ou 11 dígitos).')
+    return
+  }
+
   try {
-    await redirectToThankYou(formData.value)
+    await redirectToThankYou(formData.value, mediaUploaderRef)
   } catch (error) {
     console.error('Erro no formulário de orçamento:', error)
     submitError.value = true
@@ -216,6 +231,10 @@ const callPhone = () => {
                   <input v-model="formData.telefone" type="tel" required placeholder="(11) 98765-4321" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
                 <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">E-mail <span class="text-xs font-normal text-gray-500">(opcional)</span></label>
+                  <input v-model="formData.email" type="email" placeholder="seuemail@exemplo.com" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
+                </div>
+                <div>
                   <label class="block text-sm font-semibold text-[#22345F] mb-2">Região / Endereço *</label>
                   <input v-model="formData.bairro" type="text" required placeholder="Ex: Zona Sul, Moema, Centro" class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors" />
                 </div>
@@ -226,6 +245,17 @@ const callPhone = () => {
                     <option v-for="servico in servicosOptions" :key="servico" :value="servico">{{ servico }}</option>
                   </select>
                 </div>
+                <div>
+                  <label class="block text-sm font-semibold text-[#22345F] mb-2">Mensagem ou observações <span class="text-xs font-normal text-gray-500">(opcional)</span></label>
+                  <textarea
+                    v-model="formData.mensagem"
+                    rows="3"
+                    maxlength="1500"
+                    placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas, portas, sacadas ou outras informações que possam ajudar no orçamento."
+                    class="w-full px-4 py-3 border-2 border-[#E5EDF8] rounded-xl focus:border-[#F49A1A] focus:outline-none transition-colors resize-y text-sm"
+                  ></textarea>
+                </div>
+                <MediaUploader ref="mediaUploaderRef" :max-photos="4" :max-videos="2" />
                 <button type="submit" :disabled="isSubmitting" class="w-full px-6 py-4 bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                   <Icon v-if="!isSubmitting" name="lucide:send" class="w-5 h-5" />
                   <svg v-else class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">

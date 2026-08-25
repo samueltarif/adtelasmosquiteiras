@@ -1,9 +1,13 @@
 import { fetchAllPaginated } from '../../../utils/adminAnalytics'
+import { requireActiveAdmin, sanitizeMediaMetadata } from '../../../utils/adminAuth'
 
 export default defineEventHandler(async (event) => {
+  // 1. Exige Administrador Ativo
+  await requireActiveAdmin(event)
+
   const config = useRuntimeConfig()
   const query = getQuery(event)
-  const leadId = query.leadId as string
+  const leadId = (query.lead_id || query.leadId) as string
 
   if (!leadId) {
     throw createError({ statusCode: 400, message: 'leadId é obrigatório' })
@@ -86,6 +90,23 @@ export default defineEventHandler(async (event) => {
     // Ordenar cronologicamente
     timeline.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
+    // 5. Buscar mídias vinculadas (somente metadados; LEAD_JOURNEY_RETURNS_SIGNED_URLS = NO)
+    // Se a autenticação administrativa estiver ativa, expõe os metadados; caso contrário, array vazio protegido
+    let mediaList: any[] = []
+    const adminSession = event.context?.auth?.adminSession || event.context?.user?.isAdmin
+
+    if (adminSession) {
+      try {
+        const mediaRes: any[] = await $fetch(
+          `${config.supabaseUrl}/rest/v1/lead_media?lead_id=eq.${leadId}&upload_status=eq.uploaded&select=id,safe_filename,media_type,mime_type,file_size_bytes,upload_status,created_at&order=created_at.asc`,
+          { headers }
+        )
+        mediaList = mediaRes || []
+      } catch (mediaErr) {
+        console.warn('[lead-journey] Erro ao buscar metadados de mídia:', mediaErr)
+      }
+    }
+
     // Extrair atribuição
     const attribution = {
       first_touch: {
@@ -128,7 +149,8 @@ export default defineEventHandler(async (event) => {
         session_id: lead.session_id
       },
       attribution,
-      timeline
+      timeline,
+      media: mediaList
     }
   } catch (error: any) {
     if (error.statusCode) throw error

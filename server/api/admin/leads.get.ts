@@ -3,8 +3,10 @@ import {
   fetchAllPaginated, 
   classifyLeadRecord 
 } from '../../utils/adminAnalytics'
+import { requireActiveAdmin } from '../../utils/adminAuth'
 
 export default defineEventHandler(async (event) => {
+  await requireActiveAdmin(event)
   const config = useRuntimeConfig()
   const query = getQuery(event)
 

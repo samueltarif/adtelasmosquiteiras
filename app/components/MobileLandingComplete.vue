@@ -58,28 +58,17 @@ const formData = ref({
 
 // ========== METHODS ==========
 const handleFormSubmit = () => {
-  // ⚠️ IMPLEMENTAR: Lógica de envio do formulário
-  console.log('Form submitted:', formData.value)
-  
-  // Exemplo: Enviar para API
-  // await $fetch('/api/leads', { method: 'POST', body: formData.value })
-  
-  // Fechar modal
   showFormModal.value = false
-  
-  // Redirecionar para WhatsApp (opcional)
   window.open(whatsappLink.value, '_blank')
 }
 
 const trackEvent = (eventName) => {
-  // ⚠️ IMPLEMENTAR: Tracking GA4/GTM
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: eventName,
       timestamp: new Date().toISOString()
     })
   }
-  console.log('Event tracked:', eventName)
 }
 </script>
 

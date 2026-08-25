@@ -6,7 +6,8 @@ let activeSubmissionId = null
 
 /**
  * Composable reutilizável para submit de formulários comerciais
- * Envia lead via API /api/send-lead com idempotência, atribuição e telemetria completa.
+ * Envia lead via API /api/send-lead com idempotência, atribuição,
+ * e aciona upload direto assíncrono de mídias para o Cloudflare R2.
  */
 export function useFormSubmit() {
   const isSubmitting = ref(false)
@@ -30,10 +31,17 @@ export function useFormSubmit() {
     }
   }
 
-  const redirectToThankYou = async (fields) => {
-    // Evita submissões simultâneas duplicadas client-side
+  /**
+   * Envia o lead comercial e orquestra o upload direto de mídias vinculadas.
+   *
+   * @param {Object} fields Dados do formulário
+   * @param {Object} mediaUploaderRef Referência opcional ao componente MediaUploader
+   */
+  const redirectToThankYou = async (fields, mediaUploaderRef = null) => {
     if (isSubmitting.value) return
     isSubmitting.value = true
+
+    const t_submitStart = performance.now()
 
     try {
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
@@ -43,7 +51,7 @@ export function useFormSubmit() {
       const attr = attribution.getOrInitAttribution()
       const ftContext = identity.getFirstTouchContext()
 
-      // Reutiliza o mesmo submission_id em caso de retries da mesma tentativa de submissão
+      // Reutiliza o mesmo submission_id em caso de retries
       if (!activeSubmissionId) {
         activeSubmissionId = identity.generateUUID()
       }
@@ -92,17 +100,50 @@ export function useFormSubmit() {
         origem: fields?.origem || ('formulario_' + currentPath)
       }
 
-      console.log('[useFormSubmit] Disparando POST /api/send-lead com payload e atribuição completa:', payload)
+      // Adiciona contagem não-sensível das mídias selecionadas para o template de e-mail
+      if (mediaUploaderRef?.value) {
+        const uploader = mediaUploaderRef.value
+        const items = uploader.mediaItems || []
+        const pCount = typeof uploader.photoCount === 'number' ? uploader.photoCount : (uploader.photoCount?.value ?? items.filter(m => m.type === 'photo').length)
+        const vCount = typeof uploader.videoCount === 'number' ? uploader.videoCount : (uploader.videoCount?.value ?? items.filter(m => m.type === 'video').length)
+        
+        if (pCount > 0 || vCount > 0) {
+          payload.media_selection_summary = {
+            photoCount: Number(pCount) || 0,
+            videoCount: Number(vCount) || 0
+          }
+        }
+      }
 
+      // 1. Salvar Lead e disparar E-mail DATA-ONLY (LEAD_CREATION_ORDER = FIRST)
       const response = await $fetch('/api/send-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload
       })
 
-      console.log('[useFormSubmit] Resposta de /api/send-lead:', response)
+      const t_sendLeadResponse = performance.now()
+      const preMediaWaitMs = (t_sendLeadResponse - t_submitStart).toFixed(1)
 
-      // Registrar conversão
+      if (import.meta.dev) {
+        console.log(`[useFormSubmit Timing] PRE_MEDIA_WAIT_MS: ${preMediaWaitMs}ms (LeadId: ${response?.leadId})`)
+      }
+
+      // 2. Se o cliente selecionou fotos ou vídeos e o servidor retornou uploadToken, executa upload direto
+      if (mediaUploaderRef?.value?.hasFiles && response?.uploadToken) {
+        try {
+          const t_mediaStart = performance.now()
+          if (import.meta.dev) {
+            console.log(`[useFormSubmit] Iniciando upload de mídias em ${t_mediaStart - t_submitStart}ms após o clique`)
+          }
+          await mediaUploaderRef.value.uploadAllMedia(response.uploadToken)
+        } catch (mediaErr) {
+          console.warn('[useFormSubmit] Erro parcial no upload de mídias:', mediaErr)
+          // O lead já está salvo; prossegue para /obrigado sem interromper
+        }
+      }
+
+      // Registrar conversão Google Ads
       reportConversion()
 
       // Reset do submissionId após sucesso

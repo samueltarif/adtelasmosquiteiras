@@ -1,251 +1,316 @@
-# IMPLEMENTATION PLAN — LEAD EMAIL DELIVERY HARDENING & DURABILITY
+# Implementation Plan (DEFINITIVO) — LEAD MEDIA STORAGE + ADMIN MEDIA GALLERY + DATA-ONLY EMAIL
 
 **Projeto:** AD Telas e Redes (`https://www.adtelasmosquiteiras.com.br`)  
-**Data:** 2026-08-24  
-**Fase:** Lead Email Delivery Hardening & Durability  
-**Status:** `READY_FOR_HUMAN_SQL_REVIEW`  
-**Ação Manual no Supabase:** `MANUAL_SUPABASE_ACTION_REQUIRED = YES`  
-**Execução de SQL:** `SQL_006_EXECUTED = NO` | `SUPABASE_MCP_WRITES = 0`  
+**Fase:** Lead Media Storage + Admin Media Gallery + Data-Only Email (Ajustes Finais de Continuidade, Recuperação e Isolamento)  
+**Status:** `READY_FOR_HUMAN_REVIEW` (Nenhuma implementação iniciada, nenhum SQL executado, nenhuma alteração em Cloudflare e nenhum deploy realizado).  
 
 ---
 
-## 1. Revisão Forense de Durabilidade (`EMAIL_DELIVERY_DURABILITY_REVIEW`)
+## User Review Required
 
-### 1.1. Contexto de Execução Serverless (Vercel)
-Em ambientes serverless como a Vercel, o ciclo de vida das instâncias do runtime Nitro/Node é efêmero. Mecanismos em memória local (`Map`, `Set`, LRU cache ou variáveis globais de processo) **não são autoritativos** entre invocações concorrentes ou após cold starts.
+> [!IMPORTANT]
+> **AÇÃO MANUAL NECESSÁRIA NO SUPABASE (`007_lead_media_storage.sql`)**:
+> - O script [`supabase/manual/007_lead_media_storage.sql`](file:///d:/sicons/ADT/supabase/manual/007_lead_media_storage.sql) estrutura a tabela `public.lead_media` com a máquina de estados completa (`pending`, `finalizing`, `uploaded`, `failed`, `deleted`), coluna `finalizing_at` para recuperação de stale locks, constraints `UNIQUE(storage_key)`, `UNIQUE(lead_id, client_media_id)` e bloqueio absoluto de acesso anônimo (`ANON_LEAD_MEDIA_ACCESS = DENIED`).
+> - **NÃO será executado automaticamente via MCP**. Permanece estático aguardando sua auditoria e execução manual no SQL Editor do Supabase oficial.
+> - `SUPABASE_MCP_WRITES = 0`.
 
-A **única fonte durável e autoritativa da verdade** para o estado do lead e da entrega de e-mail é a base de dados **PostgreSQL (Supabase)**.
-
----
-
-### 1.2. Semântica Formal de Entrega: `SINGLE_ATTEMPT_WITH_DURABLE_FAILURE_STATE`
-- **Definição da Fase Atual:** Como **não** será implementado nenhum worker, fila ou cron de retry automático nesta fase, a semântica formal do envio de e-mail é estritamente:
-  `EMAIL_DELIVERY_SEMANTICS = SINGLE_ATTEMPT_WITH_DURABLE_FAILURE_STATE`
-- **Ciclo de Vida da Notificação:**
-  1. Cada novo lead submetido dispara exatamente **uma tentativa síncrona de envio SMTP**.
-  2. **Sucesso SMTP** ➔ `notification_email_status` é atualizado para `'sent'` com `notification_email_sent_at = now()`.
-  3. **Falha SMTP** ➔ `notification_email_status` é atualizado para `'failed'` com `notification_email_attempts = 1`, `notification_email_last_attempt_at = now()` e mensagem sanitizada em `notification_email_last_error`.
-  4. **Queda do processo antes do SMTP** ➔ O registro permanece no banco com `notification_email_status = 'pending'`.
-  5. **Queda durante o envio** ➔ O status permanece `'pending'` ou `'sending'`.
-  6. **Evolução Futura:** Quando futuramente for implementado um reprocessador controlado para registros `pending`/`failed`, a semântica poderá evoluir para `AT_LEAST_ONCE_WITH_DUPLICATE_MITIGATION`.
+> [!IMPORTANT]
+> **AÇÕES MANUAIS NECESSÁRIAS NO CLOUDFLARE R2 (`MANUAL_CLOUDFLARE_ACTION_REQUIRED = YES`)**:
+> 1. **Bucket Privado Dedicado:** Bucket `adtelas-leads-private` com `LEAD_MEDIA_BUCKET_PUBLIC_ACCESS = DISABLED` (zero `r2.dev` e zero custom domain público).
+> 2. **Configuração de CORS:** CORS restrito às origens de produção (`https://www.adtelasmosquiteiras.com.br`) ou origens locais em desenvolvimento, método `PUT`, headers `Content-Type` e `x-amz-*`.
+> 3. **Lifecycle Rule Restrita a Temporários:** Regra de expiração de 24 horas configurada **estritamente para o prefixo `tmp/leads/`**.
 
 ---
 
-### 1.3. Modelo de Estado Durável no Banco de Dados (`public.leads`)
+## 1. Decisões de Segurança e Resiliência (`SECURITY_AND_RESILIENCE_DECISIONS`)
 
-Para persistir o ciclo de vida da entrega com integridade estrita, são adicionadas as seguintes colunas e CHECK constraints em `public.leads` via [`supabase/manual/006_lead_email_delivery_state.sql`](file:///d:/sicons/ADT/supabase/manual/006_lead_email_delivery_state.sql):
+```
+LEAD_CREATION_ORDER:                           FIRST (O lead é criado e persistido antes de qualquer upload ou objeto R2)
+EMAIL_DELIVERY_DEPENDS_ON_MEDIA:               NO (Notificação por e-mail DATA-ONLY é disparada imediatamente na criação do lead)
 
-| Coluna | Tipo | Constraint / Default | Descrição |
-|---|---|---|---|
-| `notification_email_status` | `VARCHAR(20)` | `NOT NULL DEFAULT 'pending'` + `CHECK (status IN ('pending', 'sending', 'sent', 'failed'))` | Estado estrito do ciclo de vida |
-| `notification_email_sent_at` | `TIMESTAMPTZ` | `NULL` | Data/hora exata em que o Gmail SMTP aceitou a mensagem |
-| `notification_email_attempts` | `INT` | `NOT NULL DEFAULT 0` + `CHECK (attempts >= 0)` | Contador de tentativas de entrega realizadas |
-| `notification_email_last_attempt_at` | `TIMESTAMPTZ` | `NULL` | Data/hora da última tentativa executada |
-| `notification_email_last_error` | `TEXT` | `NULL` | Mensagem de erro sanitizada (sem credenciais ou secrets) |
+DUPLICATE_SEND_LEAD_MEDIA_CONTINUATION:        SUPPORTED (Retry com mesmo submission_id permite continuar uploads)
+IDEMPOTENT_RESPONSE_RETURNS_LEAD_ID:          YES (Localiza lead existente e retorna leadId)
+IDEMPOTENT_RESPONSE_RETURNS_FRESH_UPLOAD_TOKEN: YES (Gera novo uploadToken de 15 min para o browser continuar)
+DUPLICATE_RESPONSE_RESENDS_EMAIL:              NO (Zero reenvio de e-mail em retry idempotente)
 
----
+MEDIA_UPLOAD_AUTH_METHOD:                      SIGNED_UPLOAD_TOKEN_HMAC_SHA256 (Token assinado após salvar o lead)
+MEDIA_UPLOAD_TOKEN_TTL:                        15_MINUTES
+MEDIA_UPLOAD_RATE_LIMIT:                       10_REQUESTS_PER_MINUTE_PER_IP (Proteção de camada de aplicação)
+MEDIA_UPLOAD_QUOTA_METHOD:                     SERVER_LEAD_MEDIA_COUNT_AND_SIZE_VALIDATION (Max 4 fotos, 2 vídeos, 50MB total)
 
-### 1.4. Análise Rigorosa de Concorrência e Falhas
+MEDIA_UPLOAD_SIGNING_SECRET_METHOD:            DEDICATED_SERVER_SECRET (Variável MEDIA_UPLOAD_SIGNING_SECRET exclusiva server-side)
+SUPABASE_KEY_REUSED_FOR_MEDIA_HMAC:            NO (Chave do Supabase NÃO é reutilizada para assinar tokens de upload)
 
-| Cenário de Concorrência / Falha | Comportamento do Sistema | Garantia de Integridade |
-|---|---|---|
-| **A. Dois POST simultâneos com mesmo `submission_id`** | O primeiro request executa `INSERT` com sucesso no Supabase. O segundo request recebe violação da restrição `unq_leads_submission_id` (código Postgres 23505 / HTTP 409). | **Apenas 1 lead é criado no banco.** |
-| **B. Execução do envio de e-mail** | Apenas a requisição que obteve sucesso na criação do registro no banco prossegue para o bloco de envio SMTP. O request concorrente recebe resposta idempotente `{ success: true, idempotent: true }` e **NÃO dispara e-mail**. | **Double-click não gera e-mails duplicados.** |
-| **C. Falha de rede / erro do SMTP Gmail** | O `INSERT` do lead já foi confirmado no banco. O bloco `catch` do envio captura o erro, sanitiza a mensagem e atualiza o lead para `notification_email_status = 'failed'`, incrementando `attempts = 1`. A API responde `{ success: true, leadSaved: true, emailSent: false }`. | **O lead NUNCA é perdido.** O visitante navega com sucesso para `/obrigado`. |
-| **D. Queda do processo antes do SMTP** | O lead foi gravado com `notification_email_status = 'pending'`. O registro permanece identificável no banco para auditoria. | **Lead preservado.** |
-| **E. Queda do processo durante / após aceitação pelo Gmail antes do `UPDATE sent`** | O Gmail entrega a mensagem ao destinatário, mas a instância serverless é terminada antes de persistir `'sent'`. O status permanece `'pending'` ou `'sending'`. | **Lead preservado no banco e notificação entregue.** |
+CURRENT_R2_BUCKET_PUBLIC:                      SEPARATE_FROM_LEAD_STORAGE (Mídia pública do site não se mistura com leads)
+LEAD_MEDIA_BUCKET:                             adtelas-leads-private
+LEAD_MEDIA_BUCKET_PUBLIC_ACCESS:               DISABLED (Zero r2.dev, zero custom domain público)
+R2_CORS_REQUIRED:                              YES
+R2_CORS_ENVIRONMENT_STRATEGY:                  STRICT_ENV_DRIVEN_ORIGINS
+R2_PRODUCTION_ALLOWED_ORIGINS:                 ["https://www.adtelasmosquiteiras.com.br"]
+R2_DEVELOPMENT_ALLOWED_ORIGINS:                ["http://localhost:*", "http://127.0.0.1:*"]
+CSP_R2_HOST_STRATEGY:                          SPECIFIC_ACCOUNT_R2_HOSTNAME_WHEN_AVAILABLE
 
----
+MEDIA_TEMP_PREFIX:                             tmp/leads/{leadId}/{uuid}.{ext}
+MEDIA_FINAL_PREFIX:                            leads/{leadId}/{uuid}.{ext}
+MEDIA_PROMOTION_METHOD:                        COPY_OBJECT_THEN_DELETE_TEMP (Promove objeto válido e remove temporário)
+R2_LIFECYCLE_PREFIX:                           tmp/leads/ (Atua EXCLUSIVAMENTE sobre uploads temporários abandonados)
+VALID_MEDIA_RETENTION:                         PENDING_BUSINESS_RETENTION_POLICY (Nunca expirar automaticamente leads/)
 
-## 2. Script SQL de Migração (`supabase/manual/006_lead_email_delivery_state.sql`)
+MEDIA_DB_STATE_MACHINE:                        PENDING_FINALIZING_UPLOADED_FAILED_DELETED
+FINALIZING_TIMESTAMP_FIELD:                    finalizing_at (TIMESTAMPTZ NULL em public.lead_media)
+FINALIZING_STALE_TIMEOUT:                      10_MINUTES (Threshold determinístico para recuperação de crashes)
+FINALIZE_CONCURRENCY_CONTROL:                  ATOMIC_UPDATE_PENDING_TO_FINALIZING_RETURNING_ROW
+STALE_FINALIZING_RECOVERY_METHOD:              R2_STATE_AUDIT_BEFORE_RECLAIM (Audita R2 tmp/final antes de reprocessar)
 
-```sql
--- ======================================================================
--- AÇÃO MANUAL NECESSÁRIA NO SUPABASE (NÃO EXECUTAR AUTOMATICAMENTE VIA MCP)
--- ======================================================================
--- Projeto: AD Telas e Redes — https://www.adtelasmosquiteiras.com.br
--- Arquivo: supabase/manual/006_lead_email_delivery_state.sql
--- Fase: Lead Email Delivery Hardening — Estado Durável de Notificação
--- Finalidade: Adicionar colunas duráveis e CHECK constraints para rastreamento de envio de e-mail na tabela public.leads.
---
--- REGRAS E SEGURANÇA:
--- 1. Cria colunas com tipos rígidos e CHECK constraints (status válidos e tentativas >= 0).
--- 2. Preserva 100% dos dados existentes, constraints, RLS policies, triggers e índices.
--- 3. Não afeta auth.users, storage, páginas públicas ou analytics.
--- 4. Status de execução: FINAL_REVIEW_NOT_EXECUTED (Aguardando execução manual do operador).
--- ======================================================================
+MEDIA_PROMOTION_TRANSACTION_STRATEGY:          VERIFY_TEMP_COPY_TO_FINAL_CONFIRM_DB_THEN_DELETE_TEMP
+DB_UPDATE_FAILURE_COMPENSATION:                DELETE_PROMOTED_FINAL_OBJECT_AND_SET_FAILED
+TEMP_DELETE_FAILURE_BEHAVIOR:                  SAFE_FALLTHROUGH_HANDLED_BY_TMP_LIFECYCLE_24H
 
--- ======================================================================
--- 1. PRE-CHECK — VERIFICAÇÃO DE SEGURANÇA DAS COLUNAS ATUAIS
--- ======================================================================
-SELECT 
-    table_name, 
-    column_name, 
-    data_type, 
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_schema = 'public' 
-  AND table_name = 'leads'
-ORDER BY ordinal_position;
+MEDIA_IDEMPOTENCY_METHOD:                      UNIQUE_LEAD_ID_CLIENT_MEDIA_ID (Constraint unq_lead_media_lead_client_media_id)
+MEDIA_STORAGE_KEY_UNIQUENESS:                  UUID_V4_STORAGE_KEY_UNIQUE_CONSTRAINT (unq_lead_media_storage_key)
+POST_UPLOAD_VERIFICATION:                      HEAD_OBJECT_AND_RANGE_MAGIC_BYTES_VERIFICATION (HeadObject + Magic Bytes check)
+INVALID_OBJECT_CLEANUP:                        IMMEDIATE_DELETE (Delete imediato do R2 temporário se falhar na verificação)
 
+AUTHORIZE_UPLOAD_IDEMPOTENCY:                  REUSE_EXISTING_PENDING_STORAGE_KEY_FOR_SAME_CLIENT_MEDIA_ID
+FINALIZE_UPLOAD_IDEMPOTENCY:                   IDEMPOTENT_SUCCESS_IF_ALREADY_UPLOADED
 
--- ======================================================================
--- 2. MIGRATION TRANSACTIONAL (BEGIN ... COMMIT)
--- ======================================================================
-BEGIN;
+AUTHORITATIVE_UPLOAD_QUOTA:                    DATABASE_AND_SIGNED_TOKEN (Contagem autoritativa em public.lead_media)
+IP_RATE_LIMIT_STORAGE_METHOD:                  BEST_EFFORT (Sem dependência de Redis adicional nesta fase)
 
--- A. Status do envio da notificação por e-mail (NOT NULL, padrão 'pending')
-ALTER TABLE public.leads 
-ADD COLUMN IF NOT EXISTS notification_email_status VARCHAR(20) NOT NULL DEFAULT 'pending';
+EXISTING_LEAD_STATUS_TAXONOMY:                 Novo, Em Atendimento, Orçado, Fechado, Perdido
+NEW_LEAD_DEFAULT_COMMERCIAL_STATUS:            Novo (Preserva exatamente o padrão atual de public.leads.status)
 
--- B. Timestamp de entrega confirmada pelo servidor SMTP
-ALTER TABLE public.leads 
-ADD COLUMN IF NOT EXISTS notification_email_sent_at TIMESTAMP WITH TIME ZONE;
+ADMIN_AUTH_IMPLEMENTATION:                     DEFERRED_BY_USER (Implementação de login/sessão admin adiada pelo usuário)
+MEDIA_STORAGE_BEFORE_ADMIN_AUTH:               ALLOWED (Uploads e metadados funcionam normalmente em background)
+MEDIA_PRIVATE_VIEWING_BEFORE_ADMIN_AUTH:       DENIED (Endpoints retornam 401/403 até autenticação real existir)
+MEDIA_PRIVATE_DOWNLOAD_BEFORE_ADMIN_AUTH:      DENIED (Endpoints retornam 401/403 até autenticação real existir)
+ADMIN_SECRET_BYPASS:                           NONE (Zero bypass por secret estático ou token de query)
+ADMIN_MEDIA_METADATA_AUTH_REQUIRED:            YES
+UNAUTHENTICATED_MEDIA_METADATA_ACCESS:         DENIED
+UNAUTHENTICATED_MEDIA_BINARY_ACCESS:           DENIED
 
--- C. Contador de tentativas de envio executadas (NOT NULL, padrão 0)
-ALTER TABLE public.leads 
-ADD COLUMN IF NOT EXISTS notification_email_attempts INT NOT NULL DEFAULT 0;
+SIGNED_URL_AUTHORITY:                          /api/admin/media/signed-url (Único ponto gerador de signed GET)
+LEAD_JOURNEY_RETURNS_SIGNED_URLS:              NO (Retorna apenas metadados técnicos sob autenticação)
+SIGNED_GET_URL_TTL:                            300_SECONDS (5 minutos, gerada sob demanda no Admin)
 
--- D. Timestamp da última tentativa realizada
-ALTER TABLE public.leads 
-ADD COLUMN IF NOT EXISTS notification_email_last_attempt_at TIMESTAMP WITH TIME ZONE;
+CSP_CONNECT_SRC:                               https://*.r2.cloudflarestorage.com
+CSP_IMG_SRC:                                   https://*.r2.cloudflarestorage.com blob: data:
+CSP_MEDIA_SRC:                                 https://*.r2.cloudflarestorage.com blob:
 
--- E. Mensagem sanitizada do último erro de entrega (sem credenciais ou secrets)
-ALTER TABLE public.leads 
-ADD COLUMN IF NOT EXISTS notification_email_last_error TEXT;
+ORPHAN_MEDIA_CLEANUP_METHOD:                   R2_LIFECYCLE_RULE_ON_TMP_PREFIX_AND_SERVER_SCHEDULED_PURGE
+ABANDONED_UPLOAD_RETENTION:                    24_HOURS (Somente para tmp/leads/)
+DELETED_LEAD_MEDIA_BEHAVIOR:                   DELETE_OBJECTS_FROM_R2_VIA_SERVER_THEN_DB
 
--- F. CHECK constraint garantindo exclusivamente os 4 estados permitidos
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 
-        FROM pg_constraint 
-        WHERE conname = 'chk_leads_notification_email_status'
-          AND conrelid = 'public.leads'::regclass
-    ) THEN
-        ALTER TABLE public.leads 
-        ADD CONSTRAINT chk_leads_notification_email_status 
-        CHECK (notification_email_status IN ('pending', 'sending', 'sent', 'failed'));
-    END IF;
-END $$;
+LEAD_MEDIA_RLS:                                ENABLED (Revogado acesso anon e authenticated; exclusivo service_role server-side)
+ANON_LEAD_MEDIA_ACCESS:                        DENIED
+CLIENT_DIRECT_SUPABASE_MEDIA_ACCESS:           NO
 
--- G. CHECK constraint impedindo valores negativos no contador de tentativas
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 
-        FROM pg_constraint 
-        WHERE conname = 'chk_leads_notification_email_attempts'
-          AND conrelid = 'public.leads'::regclass
-    ) THEN
-        ALTER TABLE public.leads 
-        ADD CONSTRAINT chk_leads_notification_email_attempts 
-        CHECK (notification_email_attempts >= 0);
-    END IF;
-END $$;
+PRIVACY_POLICY_UPDATE_REQUIRED:                YES (Documentar finalidade de orçamento, armazenamento seguro e direitos do titular)
+PRIVACY_RETENTION_DECISION_REQUIRED:           YES (Decisão humana para política de retenção de orçamentos)
 
--- H. Índice para consultas eficientes de status de notificação e auditoria
-CREATE INDEX IF NOT EXISTS idx_leads_notification_email_status 
-ON public.leads(notification_email_status);
+SMTP_PRODUCTION_READINESS:                     PENDING_MANUAL_VALIDATION_BLOCKER (Requer 1 teste manual real pelo operador antes do deploy)
 
-COMMIT;
+NAME_REQUIRED:                                 YES (trim, min 2 chars, client e server 400)
+PHONE_REQUIRED:                                YES (normalizado, 10-11 dígitos, client e server 400)
+EMAIL_REQUIRED:                                NO (opcional, validado se preenchido)
 
+EMAIL_MEDIA_CLAIM:                             NONE (Zero alegação de mídia disponível no e-mail)
+CUSTOMER_MEDIA_EMAIL_ATTACHMENTS:              NONE (Zero fotos, zero vídeos, zero Base64, zero URLs privadas no e-mail)
 
--- ======================================================================
--- 3. POST-CHECK — VERIFICAÇÃO DE INTEGRIDADE PÓS-MIGRATION
--- ======================================================================
-SELECT 
-    table_name, 
-    column_name, 
-    data_type, 
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_schema = 'public' 
-  AND table_name = 'leads'
-  AND column_name LIKE 'notification_email_%'
-ORDER BY ordinal_position;
+MOV_UPLOAD_SUPPORT:                            ALLOWED_WITH_FALLBACK
+MOV_BROWSER_PLAYBACK_GUARANTEE:                NO_HTML5_GUARANTEE_FALLBACK_TO_DOWNLOAD
 
-SELECT 
-    conname AS constraint_name,
-    pg_get_constraintdef(c.oid) AS constraint_definition
-FROM pg_constraint c
-JOIN pg_namespace n ON n.oid = c.connamespace
-WHERE n.nspname = 'public'
-  AND c.conrelid = 'public.leads'::regclass
-  AND c.conname IN ('chk_leads_notification_email_status', 'chk_leads_notification_email_attempts')
-ORDER BY c.conname;
+SQL_007_READY_FOR_HUMAN_REVIEW:                YES
+SQL_007_EXECUTED:                              NO
 
-SELECT 
-    tablename, 
-    indexname, 
-    indexdef
-FROM pg_indexes
-WHERE schemaname = 'public' 
-  AND tablename = 'leads'
-  AND indexname = 'idx_leads_notification_email_status';
+MANUAL_SUPABASE_ACTION_REQUIRED:               YES (Execução manual do SQL 007 pelo operador)
+MANUAL_CLOUDFLARE_ACTION_REQUIRED:             YES (CORS e Lifecycle em tmp/leads/ no bucket privado R2)
+SUPABASE_MCP_WRITES:                           0
 
-
--- ======================================================================
--- 4. ROLLBACK SIMÉTRICO COMPLETO (EXECUTAR APENAS SE NECESSÁRIO)
--- ======================================================================
-/*
-BEGIN;
-
-DROP INDEX IF EXISTS public.idx_leads_notification_email_status;
-
-ALTER TABLE public.leads 
-DROP CONSTRAINT IF EXISTS chk_leads_notification_email_status;
-
-ALTER TABLE public.leads 
-DROP CONSTRAINT IF EXISTS chk_leads_notification_email_attempts;
-
-ALTER TABLE public.leads 
-  DROP COLUMN IF EXISTS notification_email_status,
-  DROP COLUMN IF EXISTS notification_email_sent_at,
-  DROP COLUMN IF EXISTS notification_email_attempts,
-  DROP COLUMN IF EXISTS notification_email_last_attempt_at,
-  DROP COLUMN IF EXISTS notification_email_last_error;
-
-COMMIT;
-*/
+PRODUCTION_CHANGED:                            NO (Nenhum deploy realizado)
+DATABASE_CHANGED:                              NO (Nenhum SQL executado)
 ```
 
 ---
 
-## 3. Formato do E-mail e Sanitização de Erros
+## 2. Máquina de Estados e Recuperação de Stale Locks
 
-### 3.1. Assunto e Corpo
-- **Assunto:** `Novo orçamento pelo site — {servico}` (ou `Novo lead pelo site — AD Telas e Redes`)
-- **Corpo HTML & Texto:**
-  - Dados completos do lead (Nome, Telefone, E-mail, Cidade, Bairro, Serviço, Mensagem, Origem, Data/Hora em SP).
-  - Link/Botão de atendimento rápido via WhatsApp: `https://wa.me/55{telefone_limpo}`.
-  - Atribuição comercial (Canal de sessão, First Touch, Landing Page, Conversion Page, UTMs).
-  - Identificadores técnicos discretos (`submission_id`, `visitor_id`, `session_id`).
+### 2.1. Sequência Atômica com Recuperação de Crash
+```
+1. ATOMIC ACQUISITION NO POSTGRESQL:
+   UPDATE public.lead_media
+   SET upload_status = 'finalizing', finalizing_at = now()
+   WHERE lead_id = $1 AND client_media_id = $2
+     AND (
+       upload_status = 'pending'
+       OR (upload_status = 'finalizing' AND finalizing_at < now() - INTERVAL '10 minutes')
+     )
+   RETURNING *;
 
-### 3.2. Função de Sanitização de Erros (`sanitizeEmailError`)
-Garante que qualquer erro capturado pelo Nodemailer remova credenciais, senhas ou tokens antes de ser registrado no banco:
-```typescript
-export function sanitizeEmailError(err: any): string {
-  if (!err) return 'Erro desconhecido'
-  let msg = typeof err === 'string' ? err : (err.message || String(err))
-  // Remove potenciais senhas de app, tokens e secrets
-  msg = msg.replace(/[a-z]{16}/gi, '***')
-  msg = msg.replace(/(password|pass|secret|key)=([^&\s]+)/gi, '$1=***')
-  return msg.slice(0, 500)
-}
+   ├── Se 0 linhas retornadas:
+   │   ├── Se status é 'uploaded' ➔ Retorna { success: true, idempotent: true } imediato.
+   │   ├── Se status é 'finalizing' (< 10 min) ➔ Retorna 202 Accepted (processamento em andamento).
+   │   └── Se status é 'failed' ➔ Retorna erro correspondente.
+   └── Se 1 linha retornada ➔ Obteve lock com sucesso, prossegue para auditoria de R2.
+
+2. AUDITORIA DETERMINÍSTICA DO ESTADO DO R2 (Recuperação de Crash):
+   ├── Cenário A (Crash antes do CopyObject):
+   │   Objeto temporário existe em tmp/leads/ e destino final NÃO existe em leads/
+   │   ➔ Executa validação de Magic Bytes e prossegue com a cópia normal.
+   ├── Cenário B (Crash após CopyObject, antes do UPDATE no banco):
+   │   Objeto final já existe íntegro em leads/
+   │   ➔ Valida objeto final, atualiza banco para 'uploaded' e deleta temporário.
+   └── Cenário C (Crash após UPDATE no banco, antes do Delete temp):
+   │   Banco já estaria como 'uploaded', tratado na verificação de 0 linhas acima.
+
+3. PROMOÇÃO NO R2 (tmp/ ➔ leads/):
+   CopyObjectCommand: tmp/leads/{leadId}/{uuid}.{ext} ➔ leads/{leadId}/{uuid}.{ext}
+   HeadObjectCommand no destino final para confirmação.
+
+4. PERSISTÊNCIA NO BANCO:
+   UPDATE public.lead_media
+   SET storage_key = finalKey, upload_status = 'uploaded', verified_at = now()
+   WHERE lead_id = $1 AND client_media_id = $2;
+   ├── Se o UPDATE no banco falhar:
+   │   ├── COMPENSAÇÃO: DeleteObjectCommand no objeto promovido leads/{leadId}/{uuid}.{ext}
+   │   └── UPDATE public.lead_media SET upload_status = 'failed'
+   └── Se o UPDATE no banco tiver sucesso ➔ Prossegue.
+
+5. LIMPEZA DO TEMPORÁRIO:
+   DeleteObjectCommand em tmp/leads/{leadId}/{uuid}.{ext}
+   (Se falhar, o arquivo final já é válido e o temporário será expurgado pelo Lifecycle 24h).
 ```
 
 ---
 
-## 4. Plano de Testes & Validação Automatizada (`test-lead-email.mjs`)
+## 3. Detalhamento dos Componentes a Serem Implementados
 
-Serão executados testes unitários isolados com mocks locais:
-1. **Formulário Válido:** 1 lead salvo (`notification_email_status = 'sent'`), 1 envio SMTP.
-2. **Double Click / Concorrência:** 2 POSTs com mesmo `submission_id` ➔ 1 lead salvo, 1 e-mail disparado, 1 resposta idempotente sem envio duplicado.
-3. **Falha de SMTP:** Supabase grava lead com sucesso ➔ SMTP lança erro ➔ status atualizado para `'failed'` com mensagem sanitizada ➔ resposta da API retorna `{ success: true, leadSaved: true, emailSent: false }` sem perda de dados.
-4. **Campos Nulos / Opcionais:** E-mail e mensagem opcionais tratados sem erros.
-5. **Formatação de Telefone:** Link `wa.me/55...` gerado perfeitamente.
-6. **Caracteres UTF-8:** Acentuação (`São Paulo`, `Orçamento`, `Telas Mosquiteiras Removíveis`) preservada.
-7. **Regressão de Build & Testes:** `npx nuxi build`, `test-admin-v2.mjs`, `test-phase-a.mjs`, `seo-validate-03c.mjs`.
+### Componente 1: Segurança, Tokens e Storage R2 Privado
+
+#### [NEW] [server/utils/mediaAuth.ts](file:///d:/sicons/ADT/server/utils/mediaAuth.ts)
+- Funções puras e seguras:
+  - `createMediaUploadToken({ leadId, submissionId, maxFiles, maxBytes })`: gera token HMAC-SHA256 utilizando estritamente a variável de ambiente `MEDIA_UPLOAD_SIGNING_SECRET` com expiração de 15 minutos.
+  - `verifyMediaUploadToken(token)`: valida assinatura, integridade e expiração do token.
+
+#### [NEW] [server/utils/r2Storage.ts](file:///d:/sicons/ADT/server/utils/r2Storage.ts)
+- Utilitário S3 para o bucket privado `adtelas-leads-private`:
+  - `generatePresignedUploadUrl(tempStorageKey, mimeType, expiresInSeconds)`: gera Presigned PUT URL.
+  - `generatePresignedDownloadUrl(finalStorageKey, expiresInSeconds)`: gera Presigned GET URL (TTL 300s).
+  - `verifyAndPromoteObject({ tempKey, finalKey, expectedMime, maxBytes })`: executa verificação de `HeadObject` + Magic Bytes, promove o arquivo com `CopyObjectCommand` e deleta o temporário.
+  - `deleteObjectImmediately(key)`: limpeza imediata de arquivos inválidos ou compensação de falhas no banco.
+  - `deleteLeadObjectsFromR2(storageKeys)`: limpeza em lote para exclusão de leads.
+
+#### [NEW] [server/api/media/authorize-upload.post.ts](file:///d:/sicons/ADT/server/api/media/authorize-upload.post.ts)
+- Exige `Authorization: Bearer <uploadToken>`.
+- Valida tipo MIME permitido e limites por lead (`maxFiles: 6`, `maxBytes: 50MB`).
+- Idempotente: se `(lead_id, client_media_id)` já existir como `pending`, reutiliza a chave temporária.
+- Registra status `pending` sob chave temporária `tmp/leads/...`.
+- Retorna URL assinada para upload direto.
+
+#### [NEW] [server/api/media/finalize-upload.post.ts](file:///d:/sicons/ADT/server/api/media/finalize-upload.post.ts)
+- Exige `Authorization: Bearer <uploadToken>`.
+- Executa a transição atômica `pending` ➔ `finalizing` com `finalizing_at`, auditoria de recuperação de stale locks, compensação em falha de banco e idempotência garantida.
+
+---
+
+### Componente 2: E-mail Data-Only e Orquestração
+
+#### [MODIFY] [server/shared/leadEmailCore.mjs](file:///d:/sicons/ADT/server/shared/leadEmailCore.mjs)
+- Validação estrita de campos obrigatórios:
+  - `Nome`: trim, length >= 2 caracteres.
+  - `Telefone`: normalizado, 10 ou 11 dígitos.
+- E-mail estritamente **DATA-ONLY**:
+  - `CUSTOMER_MEDIA_EMAIL_ATTACHMENTS = NONE`.
+  - `EMAIL_MEDIA_CLAIM = NONE` (zero afirmações sobre existência ou disponibilidade de mídia no template).
+  - Logotipo oficial mantido exclusivamente via CID (`cid:adtelas-icon`).
+  - Zero URLs privadas ou assinadas no corpo do e-mail.
+
+#### [MODIFY] [server/utils/emailService.ts](file:///d:/sicons/ADT/server/utils/emailService.ts)
+- Atualização para envio exclusivo de dados e branding CID (sem anexos de clientes).
+
+#### [MODIFY] [server/api/send-lead.post.ts](file:///d:/sicons/ADT/server/api/send-lead.post.ts)
+- Cria lead no banco com `status = 'Novo'` (`NEW_LEAD_DEFAULT_COMMERCIAL_STATUS`).
+- Dispara a notificação de e-mail DATA-ONLY imediatamente.
+- **Tratamento de Idempotência e Continuidade de Upload (`DUPLICATE_SEND_LEAD_MEDIA_CONTINUATION`):**
+  - Se `submission_id` já existir: localiza o lead existente, **NÃO reenvia e-mail**, gera um novo `uploadToken` válido de 15 minutos e retorna `{ success: true, idempotent: true, leadSaved: true, leadId, submissionId, uploadToken }`, permitindo que o browser prossiga com uploads interrompidos.
+
+---
+
+### Componente 3: Painel Admin e Galeria Privada
+
+#### [NEW] [server/api/admin/media/signed-url.get.ts](file:///d:/sicons/ADT/server/api/admin/media/signed-url.get.ts)
+- **Autoridade Centralizada de URLs Assinadas (`SIGNED_URL_AUTHORITY`).**
+- Como a autenticação administrativa está adiada (`ADMIN_AUTH_IMPLEMENTATION = DEFERRED_BY_USER`), retorna estritamente `401 Unauthorized` (`MEDIA_PRIVATE_VIEWING_BEFORE_ADMIN_AUTH = DENIED`).
+- Zero bypass por admin secret ou token de query.
+
+#### [MODIFY] [server/api/admin/analytics/lead-journey.get.ts](file:///d:/sicons/ADT/server/api/admin/analytics/lead-journey.get.ts)
+- Como a autenticação administrativa está adiada (`ADMIN_MEDIA_METADATA_AUTH_REQUIRED = YES`), não expõe metadados de mídia para requisições não autenticadas (`UNAUTHENTICATED_MEDIA_METADATA_ACCESS = DENIED`).
+
+#### [MODIFY] [app/components/admin/LeadJourneyDrawer.vue](file:///d:/sicons/ADT/app/components/admin/LeadJourneyDrawer.vue)
+- Seção **ARQUIVOS DO CLIENTE**:
+  - Preparada com estrutura completa de galeria, lightbox e player HTML5, que permanecerá em estado seguro até a ativação da autenticação administrativa futura.
+
+---
+
+### Componente 4: Frontend e Formulários Comerciais
+
+#### [MODIFY] [app/components/MediaUploader.vue](file:///d:/sicons/ADT/app/components/MediaUploader.vue)
+- Suporte a fotos (JPEG, PNG, WebP) e vídeos (MP4, WebM, MOV).
+- Compressão client-side de fotos via Canvas (JPEG max 1280px, q=0.8).
+- Validação client-side de vídeos (max 25MB cada, max 50MB total).
+- Orquestrador de upload com estados visuais claros: `selected` ➔ `uploading` (com progresso) ➔ `uploaded` / `failed`.
+
+#### [MODIFY] [app/pages/orcamento.vue](file:///d:/sicons/ADT/app/pages/orcamento.vue), [app/pages/contato.vue](file:///d:/sicons/ADT/app/pages/contato.vue) e [app/components/LeadForm.vue](file:///d:/sicons/ADT/app/components/LeadForm.vue)
+- Validação estrita de Nome e Telefone no client (botão desabilitado se inválido).
+- Fluxo: envia lead primeiro ➔ recebe `uploadToken` ➔ envia mídias diretamente ao R2 com feedback de progresso na tela ➔ redireciona para `/obrigado`.
+
+#### [MODIFY] [nuxt.config.ts](file:///d:/sicons/ADT/nuxt.config.ts)
+- Ajustes de CSP restritos ao endpoint do R2 derivado de variáveis de ambiente.
+
+---
+
+## 4. Matriz de Testes Isolados Planejada (`test-lead-email.mjs`)
+
+Suite de testes 100% mockada em memória (sem chamadas reais a Gmail, Supabase ou Cloudflare R2):
+
+1. `Nome ausente ➔ 400`
+2. `Nome apenas com espaços em branco ➔ 400`
+3. `Nome com menos de 2 caracteres ➔ 400`
+4. `Telefone ausente ➔ 400`
+5. `Telefone com menos de 10 dígitos ➔ 400`
+6. `Nome e Telefone válidos ➔ Aceito (200) com status inicial 'Novo'`
+7. `E-mail opcional vazio ➔ Aceito`
+8. `Mensagem opcional vazia ➔ Aceito`
+9. `Lead sem mídia ➔ Lead salvo com prioridade máxima + E-mail data-only disparado`
+10. `Geração de uploadToken com HMAC e secret dedicado (TTL 15 min)`
+11. `Upload com token inválido ou assinatura forjada ➔ 401/403 Denied`
+12. `Upload com token expirado ➔ 401 Denied`
+13. `Upload com submission_id inventado sem token ➔ Denied`
+14. `Autorização de foto (JPEG/PNG/WebP) ➔ Presigned PUT em tmp/leads/ + status pending`
+15. `Autorização de vídeo (MP4/WebM) ➔ Presigned PUT em tmp/leads/ + status pending`
+16. `Autorização de tipo proibido (SVG, EXE, PDF, HTML) ➔ 400 Rejeitado`
+17. `Autorização excedendo contagem (> 4 fotos ou > 2 vídeos) ➔ 400 Rejeitado`
+18. `Autorização excedendo tamanho (> 25MB vídeo ou > 50MB total) ➔ 400 Rejeitado`
+19. `Authorize idempotente: retry com mesmo (lead_id, client_media_id) ➔ Reutiliza chave pendente sem duplicar`
+20. `Finalize atômico: adquire estado 'finalizing' com timestamp finalizing_at`
+21. `Finalize concorrente: segunda requisição simultânea retorna 202 sem duplicar CopyObject`
+22. `Recuperação de stale finalizing (> 10 min): audita R2 e recupera promoção pendente`
+23. `Finalize com objeto válido no R2 ➔ Promove de tmp/leads/ para leads/, confirma banco e deleta temp`
+24. `Finalize com falha no banco pós-cópia ➔ Executa compensação deletando objeto em leads/`
+25. `Finalize com falha na deleção de temp ➔ Mantém arquivo final válido (resolvido por lifecycle tmp)`
+26. `Finalize com objeto inexistente no R2 ➔ Deleta temp imediato e marca 'failed'`
+27. `Finalize com Magic Bytes divergentes do MIME declarado ➔ Deleta temp imediato e marca 'failed'`
+28. `Finalize com tamanho no R2 maior que o autorizado ➔ Deleta temp imediato e marca 'failed'`
+29. `Finalize idempotente: se já estiver 'uploaded', retorna sucesso imediato`
+30. `Retry de /api/send-lead com mesmo submission_id ➔ Não duplica lead, não reenvia e-mail e retorna novo uploadToken`
+31. `Falha ou cancelamento no upload de mídia ➔ Lead comercial e e-mail permanecem 100% preservados`
+32. `Abandono do browser durante upload de vídeo ➔ Lead salvo no banco e notificação comercial já enviada`
+33. `Isolamento entre leads: Lead A não acessa e não lista mídias do Lead B`
+34. `E-mail SMTP enviado com ZERO anexos de clientes (CUSTOMER_MEDIA_EMAIL_ATTACHMENTS = NONE)`
+35. `E-mail SMTP não contém alegações sobre mídia disponível (EMAIL_MEDIA_CLAIM = NONE)`
+36. `E-mail SMTP mantém anexo inline de branding CID (cid:adtelas-icon)`
+37. `E-mail SMTP não contém Base64, URLs privadas ou assinadas do R2`
+38. `Admin media metadata sem sessão administrativa ➔ 401/403 Denied`
+39. `Admin media signed-url sem sessão administrativa ➔ 401/403 Denied`
+40. `Exclusão de lead aciona remoção dos objetos correspondentes no R2`
+41. `Página /obrigado não dispara novo e-mail nem repete uploads`

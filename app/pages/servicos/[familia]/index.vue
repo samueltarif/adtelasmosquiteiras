@@ -52,10 +52,7 @@ const trackCategoriaClick = (categoriaSlug) => {
 const showFormModal = ref(false)
 
 const openFormModal = () => {
-  console.log('🟢 [FAMILIA] openFormModal() chamado')
-  console.log('🟢 [FAMILIA] showFormModal antes:', showFormModal.value)
   showFormModal.value = true
-  console.log('🟢 [FAMILIA] showFormModal depois:', showFormModal.value)
 }
 </script>
 

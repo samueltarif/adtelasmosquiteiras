@@ -357,10 +357,10 @@ async function runAllTests() {
   // 24. PISO DE IDENTIDADE REAL (PHASE_B_START_ISO = 2026-08-24T11:27:35.488Z)
   await test('24. PHASE_B_START_ISO é derivado do primeiro evento com visitor_id (2026-08-24T11:27:35.488Z)', () => {
     assert.strictEqual(PHASE_B_START_ISO, '2026-08-24T11:27:35.488Z')
-    const rangeToday = getSaoPauloDateRange('today')
-    // Hoje começa às 03:00Z, que é ANTERIOR a 11:27:35Z ➔ isLegacyOverlap = true
-    assert.strictEqual(rangeToday.isLegacyOverlap, true)
-    assert.strictEqual(rangeToday.identityStartUtc, PHASE_B_START_ISO)
+    const rangeOverlap = getSaoPauloDateRange('custom', '2026-08-24', '2026-08-24')
+    // 24/08 começa às 03:00Z, que é ANTERIOR a 11:27:35Z ➔ isLegacyOverlap = true
+    assert.strictEqual(rangeOverlap.isLegacyOverlap, true)
+    assert.strictEqual(rangeOverlap.identityStartUtc, PHASE_B_START_ISO)
   })
 
   // 25. INTERVALO FUTURO SEM OVERLAP

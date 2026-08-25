@@ -41,10 +41,7 @@ onMounted(() => {
 const showFormModal = ref(false)
 
 const openFormModal = () => {
-  console.log('🟢 [CATEGORIA] openFormModal() chamado')
-  console.log('🟢 [CATEGORIA] showFormModal antes:', showFormModal.value)
   showFormModal.value = true
-  console.log('🟢 [CATEGORIA] showFormModal depois:', showFormModal.value)
 }
 </script>
 

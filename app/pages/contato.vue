@@ -24,20 +24,33 @@ const formData = ref({
   mensagem: ''
 })
 
+const mediaUploaderRef = ref(null)
 const isSubmitting = ref(false)
 const isSubmitted = ref(false)
 const { redirectToThankYou } = useFormSubmit()
 
-// Enviar para WhatsApp
+// Enviar para WhatsApp / Formulário
 const sendToWhatsApp = async () => {
-  if (!formData.value.nome || !formData.value.telefone) {
-    alert('Por favor, preencha pelo menos nome e telefone.')
+  const cleanNome = (formData.value.nome || '').trim()
+  if (cleanNome.length < 2) {
+    alert('Por favor, informe seu nome completo (mínimo 2 caracteres).')
     return
   }
+
+  const digits = (formData.value.telefone || '').replace(/\D/g, '')
+  const cleanDigits = digits.startsWith('55') && digits.length >= 12 ? digits.slice(2) : (digits.startsWith('0') ? digits.slice(1) : digits)
+  if (cleanDigits.length < 10 || cleanDigits.length > 11) {
+    alert('Por favor, informe um telefone/WhatsApp válido com DDD (10 ou 11 dígitos).')
+    return
+  }
+
+  isSubmitting.value = true
   try {
-    await redirectToThankYou(formData.value)
+    await redirectToThankYou(formData.value, mediaUploaderRef)
   } catch (e) {
     console.error('Erro ao enviar contato:', e)
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -235,10 +248,14 @@ const emailLink = `mailto:${EMAIL}`
                   <textarea
                     v-model="formData.mensagem"
                     rows="4"
-                    placeholder="Conte-nos sobre seu projeto ou dúvida..."
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all resize-none"
+                    maxlength="1500"
+                    placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas, portas, sacadas ou outras informações que possam ajudar no orçamento."
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all resize-none text-sm"
                   ></textarea>
                 </div>
+
+                <!-- Fotos e Vídeos do Local -->
+                <MediaUploader ref="mediaUploaderRef" :max-photos="4" :max-videos="2" />
 
                 <!-- Botão Enviar -->
                 <button

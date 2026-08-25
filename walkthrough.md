@@ -1,146 +1,103 @@
-# WALKTHROUGH — LEAD EMAIL DELIVERY HARDENING & TEST ISOLATION
+# WALKTHROUGH — LEAD FORM ENRICHMENT, PHOTO ATTACHMENTS & BRANDED EMAIL
 
 **Projeto:** AD Telas e Redes (`https://www.adtelasmosquiteiras.com.br`)  
 **Data:** 2026-08-24  
-**Status:** `READY FOR REVIEW`  
+**Status:** `READY FOR REVIEW (NO DEPLOY)`  
 
 ---
 
-## 1. Resumo das Mudanças
+## 1. Resumo das Implementações
 
-### Arquivos Novos
-| Arquivo | Descrição |
-|---|---|
-| [`server/shared/leadEmailCore.mjs`](file:///d:/sicons/ADT/server/shared/leadEmailCore.mjs) | Módulo central compartilhado contendo regras puras, normalização de telefone para WhatsApp, sanitização de erros SMTP, templates HTML e texto plano, e fluxo de submissão |
-| [`server/utils/emailService.ts`](file:///d:/sicons/ADT/server/utils/emailService.ts) | Serviço de envio SMTP via Nodemailer/Gmail no runtime Nitro, re-exportando o core compartilhado |
-| [`test-lead-email.mjs`](file:///d:/sicons/ADT/test-lead-email.mjs) | Suíte de testes 100% isolada em memória com `MockSmtpMailer` e `MockLeadsRepository` (14 testes) |
-| [`docs/LEAD_EMAIL_DELIVERY_IMPLEMENTATION.md`](file:///d:/sicons/ADT/docs/LEAD_EMAIL_DELIVERY_IMPLEMENTATION.md) | Documentação técnica completa |
-| [`supabase/manual/006_lead_email_delivery_state.sql`](file:///d:/sicons/ADT/supabase/manual/006_lead_email_delivery_state.sql) | Migration de colunas de estado durável e CHECK constraints (já executada) |
+### Formulários Comerciais Enriquecidos
+- **Campo de E-mail (`email`):** Adicionado como campo opcional (`type="email"`, placeholder `seuemail@exemplo.com`). Validado e normalizado (trimmed, lowercase) no envio.
+- **Campo de Mensagem / Observações (`mensagem`):** Adicionado textarea com limite de 1500 caracteres e placeholder orientativo.
+- **Componente de Upload de Fotos (`PhotoUploader.vue`):** Área visual para até 4 fotos do local, com compressão client-side (`useImageCompressor.js`) para JPEG (max 1280px, qualidade 0.8), previews em miniatura com botão de remoção individual (X), indicador de progresso e suporte a câmera no mobile.
 
-### Arquivos Modificados
-| Arquivo | Mudança |
-|---|---|
-| [`server/api/send-lead.post.ts`](file:///d:/sicons/ADT/server/api/send-lead.post.ts) | Removida chamada à Edge Function quebrada. Integrado Nodemailer SMTP com estado durável em PostgreSQL |
-| [`nuxt.config.ts`](file:///d:/sicons/ADT/nuxt.config.ts) | Adicionado `leadNotificationEmail` no `runtimeConfig` |
-| [`package.json`](file:///d:/sicons/ADT/package.json) | `nodemailer` adicionado em `dependencies` |
-| [`.env.example`](file:///d:/sicons/ADT/.env.example) | Documentação de variáveis SMTP e `LEAD_NOTIFICATION_EMAIL` |
+### Templates Corporativos de E-mail & Branding
+- **Remoção Total de Emojis:** Removidos emojis informais (🔔, 📋, 📊, 💬) do HTML e texto plano.
+- **Branding Inline via CID:** Anexo inline `{ cid: 'adtelas-icon' }` exibindo o logotipo da AD Telas e Redes no cabeçalho corporativo azul.
+- **Seção de Fotos:** Indicação clara da quantidade de fotos anexadas (`X fotos anexadas a este e-mail`) e fotos enviadas como anexos reais (`foto-local-1.jpg`, etc.) no Nodemailer.
+- **Botão WhatsApp:** Botão verde corporativo `RESPONDER VIA WHATSAPP` mantendo o link direto `https://wa.me/55...`.
+
+### Arquivos Criados / Modificados
+| Arquivo | Ação | Descrição |
+|---|---|---|
+| [`app/composables/useImageCompressor.js`](file:///d:/sicons/ADT/app/composables/useImageCompressor.js) | **NOVO** | Composable client-side de compressão Canvas |
+| [`app/components/PhotoUploader.vue`](file:///d:/sicons/ADT/app/components/PhotoUploader.vue) | **NOVO** | Componente visual de upload de fotos com preview |
+| [`app/pages/orcamento.vue`](file:///d:/sicons/ADT/app/pages/orcamento.vue) | **MODIFICADO** | Adicionados campos email, mensagem e PhotoUploader |
+| [`app/pages/contato.vue`](file:///d:/sicons/ADT/app/pages/contato.vue) | **MODIFICADO** | Adicionado PhotoUploader e mensagem otimizada |
+| [`app/components/LeadForm.vue`](file:///d:/sicons/ADT/app/components/LeadForm.vue) | **MODIFICADO** | Adicionados email, mensagem e PhotoUploader no Passo 2 |
+| [`app/composables/useFormSubmit.js`](file:///d:/sicons/ADT/app/composables/useFormSubmit.js) | **MODIFICADO** | Repasse do payload de fotos |
+| [`server/shared/leadEmailCore.mjs`](file:///d:/sicons/ADT/server/shared/leadEmailCore.mjs) | **MODIFICADO** | Validação de fotos (magic bytes, MIME, tamanho), templates corporativos sem emojis |
+| [`server/utils/emailService.ts`](file:///d:/sicons/ADT/server/utils/emailService.ts) | **MODIFICADO** | Anexos reais de fotos e ícone CID no Nodemailer |
+| [`server/api/send-lead.post.ts`](file:///d:/sicons/ADT/server/api/send-lead.post.ts) | **MODIFICADO** | Validação de e-mail e fotos no endpoint |
+| [`test-lead-email.mjs`](file:///d:/sicons/ADT/test-lead-email.mjs) | **MODIFICADO** | 21 testes isolados em memória |
 
 ---
 
-## 2. Resultados dos Testes Automatizados Atuais (100% Isolados)
+## 2. Resultados das Validações
 
-### Email Isolation Tests (`test-lead-email.mjs`)
 ```
 ======================================================================
---- TEST MATRIX: LEAD EMAIL DELIVERY ISOLATION (FASE LEAD EMAIL HARDENING) ---
+--- TEST MATRIX: LEAD EMAIL ENRICHMENT & PHOTO ATTACHMENTS ---
 ======================================================================
-TOTAL:   14
-PASSED:  14
+TOTAL:   21
+PASSED:  21
 FAILED:  0
 ----------------------------------------------------------------------
 REAL_EMAIL_SENT_DURING_TESTS:      NO (100% Mockado em memória)
 PRODUCTION_DB_WRITES_DURING_TESTS: NO (100% Mockado em memória)
+PRODUCTION_R2_WRITES_DURING_TESTS: NO (100% Mockado em memória)
 PRODUCTION_TEST_BYPASS:            NONE
 EMAIL_DELIVERY_SEMANTICS:          SINGLE_ATTEMPT_WITH_DURABLE_FAILURE_STATE
 ======================================================================
 ```
 
-### Admin V2 Tests (`test-admin-v2.mjs`)
-```
-======================================================================
---- TEST MATRIX DO PAINEL ADMIN V2 (FASE C.1.2.2 FINAL VERIFICATION) ---
-======================================================================
-TOTAL:   26
-PASSED:  26
-FAILED:  0
-======================================================================
-```
-
-### Build (`npx nuxi build`)
-```
-✨ Build complete!
-Σ Total size: 5.19 MB (1.21 MB gzip)
-```
-
-### Testes Legados
-- `CAPTURE_TESTS`: `NOT_AVAILABLE_IN_CURRENT_REPOSITORY`
-- `SEO_TESTS`: `NOT_AVAILABLE_IN_CURRENT_REPOSITORY`
+- **Admin V2 Tests (`node test-admin-v2.mjs`):** 26/26 PASS
+- **Nuxt Build (`npx nuxi build`):** PASS (Exit code 0, 5.22 MB)
 
 ---
 
-## 3. LEAD_EMAIL_TEST_ISOLATION_REPORT
+## 3. LEAD_FORM_PHOTO_EMAIL_ENRICHMENT_REPORT
 
 | Campo | Valor |
 |---|---|
-| **DOCUMENTATION_CONSISTENT** | YES |
-| **REAL_EMAIL_SENT_DURING_CURRENT_TESTS** | NO (100% Mockado em memória) |
-| **PRODUCTION_DB_WRITES_DURING_CURRENT_TESTS** | NO (100% Mockado em memória) |
-| **OLD_TEST_ROWS_EXPECTED** | 10 (gerados historicamente na rodada inicial antes do isolamento) |
-| **OLD_REAL_EMAILS_HISTORICALLY_SENT** | 8 (disparados historicamente na rodada inicial antes do isolamento) |
-| **PRODUCTION_TEST_BYPASS** | NONE (nenhum `isTest`, `testMode`, `x-test-mode` ou mock no caminho de produção) |
-| **PRODUCTION_USES_SHARED_CORE** | YES (`server/utils/emailService.ts` importa de `server/shared/leadEmailCore.mjs`) |
-| **OLD_EDGE_FUNCTION_REFERENCE_ACTIVE** | NO (chamada à Edge Function removida) |
-| **DATABASE_IDEMPOTENCY** | POSTGRES_UNIQUE_SUBMISSION_ID (`unq_leads_submission_id` no PostgreSQL) |
-| **CONCURRENT_DUPLICATE_BEHAVIOR** | 1 INSERT bem-sucedido (criação + 1 envio SMTP); 2º colide em UNIQUE (retorna `idempotent: true` e 0 envios SMTP) |
-| **EMAIL_TESTS** | 14/14 PASS |
-| **ADMIN_V2_TESTS** | 26/26 PASS |
-| **BUILD** | PASS (`npx nuxi build` exit 0, 5.19 MB) |
-| **PRODUCTION_CHANGED** | NO |
-| **DATABASE_CHANGED_DURING_THIS_REVIEW** | NO |
+| **FORM_EMAIL_FIELD** | IMPLEMENTED (opcional, type="email", normalizado) |
+| **FORM_MESSAGE_FIELD** | IMPLEMENTED (opcional, textarea até 1500 chars) |
+| **FORM_PHOTO_FIELD** | IMPLEMENTED (opcional, PhotoUploader com preview) |
+| | |
+| **PHOTO_UPLOAD_ARCHITECTURE** | CLIENT_CANVAS_COMPRESSION_TO_EPHEMERAL_SMTP_ATTACHMENTS |
+| **PHOTO_STORAGE_METHOD** | DIRECT_EMAIL_ATTACHMENTS (sem custo de storage persistente) |
+| **PHOTO_MAX_COUNT** | 4 fotos |
+| **PHOTO_MAX_SIZE_EACH** | 1.5 MB (após compressão client-side para ~200-300 KB) |
+| **PHOTO_MAX_TOTAL_SIZE** | 4.0 MB |
+| **PHOTO_COMPRESSION** | HTML5 Canvas (JPEG, max 1280px, quality 0.8) |
+| **VERCEL_BODY_LIMIT_CONSIDERED** | YES (Payload ~1.0 MB, limite Vercel é 4.5 MB) |
+| | |
+| **SERVER_FILE_VALIDATION** | MIME whitelist + Magic Bytes + Tamanho + Contagem + Nome seguro |
+| **ALLOWED_MIME_TYPES** | `image/jpeg`, `image/png`, `image/webp` |
+| | |
+| **EMAIL_PHOTO_ATTACHMENT_METHOD** | Nodemailer real attachments array (`attachments: [...]`) |
+| **EMAIL_INLINE_BRAND_ICON_METHOD** | Inline CID attachment (`cid: 'adtelas-icon'`) |
+| **AUTHORITATIVE_FAVICON_FILE** | `public/images/logo_adt_telas_nova.png` / `public/favicon.ico` |
+| **OLD_EMAIL_EMOJIS_REMOVED** | YES (removidos 🔔, 📋, 📊, 💬) |
+| | |
+| **LEAD_SAVED_BEFORE_SMTP** | YES |
+| **EMAIL_IDEMPOTENCY** | POSTGRES_UNIQUE_SUBMISSION_ID |
+| **EMAIL_DELIVERY_STATE_PRESERVED** | YES (`pending` ➔ `sending` ➔ `sent` / `failed`) |
+| **ANALYTICS_ATTRIBUTION_PRESERVED** | YES (`visitor_id`, `session_id`, `first_touch_*`, `utm_*`, `gclid`) |
+| | |
+| **REAL_EMAIL_SENT_DURING_TESTS** | NO |
+| **PRODUCTION_DB_WRITES_DURING_TESTS** | NO |
+| **PRODUCTION_R2_WRITES_DURING_TESTS** | NO |
+| **PRODUCTION_TEST_BYPASS** | NONE |
+| | |
 | **MANUAL_SUPABASE_ACTION_REQUIRED** | NO |
 | **SUPABASE_MCP_WRITES** | 0 |
-
----
-
-## 4. Auditoria dos Registros Anteriores no Supabase (Query Somente Leitura)
-
-```sql
--- Contagem total dos registros de teste criados historicamente
-SELECT
-  COUNT(*) AS total_test_leads
-FROM public.leads
-WHERE origem = 'test-lead-email.mjs';
-
--- Detalhamento dos registros
-SELECT
-  id,
-  created_at,
-  nome,
-  origem,
-  submission_id,
-  notification_email_status,
-  notification_email_attempts
-FROM public.leads
-WHERE origem = 'test-lead-email.mjs'
-ORDER BY created_at ASC;
-```
-
----
-
-## 5. Procedimento de Teste Manual Pós-Deploy
-
-1. **Consulta inicial de leads:**
-   ```sql
-   SELECT COUNT(*) AS total_leads FROM public.leads;
-   ```
-2. **Envio via formulário:**
-   Acessar `/orcamento` ou `/contato` e preencher:
-   - Nome: `Teste Manual Email`
-   - Telefone: `(11) 98358-6611`
-   - Serviço: `Telas Mosquiteiras Removíveis`
-3. **Confirmar redirecionamento para `/obrigado`.**
-4. **Verificar registro no Supabase:**
-   ```sql
-   SELECT 
-     id, created_at, nome, telefone, servico, submission_id,
-     notification_email_status, notification_email_sent_at,
-     notification_email_attempts, notification_email_last_error
-   FROM public.leads 
-   WHERE nome = 'Teste Manual Email' 
-   ORDER BY created_at DESC 
-   LIMIT 1;
-   ```
-5. **Verificar caixa de entrada `vendas.adtelaseredes@gmail.com`:**
-   Confirmar recebimento de exatamente 1 e-mail formatado com botão WhatsApp `https://wa.me/5511983586611`.
-6. **Testar idempotência na página `/obrigado`:**
-   Atualizar (F5) a página `/obrigado` ou acessá-la diretamente e confirmar que NENHUM segundo e-mail foi disparado.
+| | |
+| **EMAIL_TESTS** | 21/21 PASS |
+| **ADMIN_V2_TESTS** | 26/26 PASS |
+| **BUILD** | PASS (Exit code 0, 5.22 MB) |
+| | |
+| **PRODUCTION_CHANGED** | NO (Nenhum deploy realizado) |
+| **DATABASE_CHANGED** | NO |

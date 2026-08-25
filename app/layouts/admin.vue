@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue'
+import { useAdminAuth } from '../composables/useAdminAuth'
 
 const route = useRoute()
+const { user, logout } = useAdminAuth()
 const isMobileMenuOpen = ref(false)
 
 useHead({
@@ -12,6 +14,10 @@ useHead({
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const handleLogout = async () => {
+  await logout()
 }
 </script>
 
@@ -50,13 +56,13 @@ const toggleMobileMenu = () => {
       </nav>
       
       <div class="mt-auto border-t border-admin-outline-variant/20 pt-4">
-        <NuxtLink 
-          to="/" 
-          class="flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+        <button 
+          @click="handleLogout" 
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
         >
           <Icon name="lucide:log-out" class="w-5 h-5" />
           <span class="text-sm font-medium">Sair</span>
-        </NuxtLink>
+        </button>
       </div>
     </aside>
 
@@ -110,13 +116,13 @@ const toggleMobileMenu = () => {
       </nav>
       
       <div class="mt-auto border-t border-admin-outline-variant/20 pt-4">
-        <NuxtLink 
-          to="/" 
-          class="flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 transition-all duration-200"
+        <button 
+          @click="handleLogout" 
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-admin-on-surface-variant hover:text-red-600 hover:bg-red-500/10 transition-all duration-200 cursor-pointer"
         >
           <Icon name="lucide:log-out" class="w-5 h-5" />
           <span class="text-sm font-medium">Sair</span>
-        </NuxtLink>
+        </button>
       </div>
     </aside>
 

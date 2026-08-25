@@ -18,17 +18,11 @@ const formData = ref({
   tipoServico: ''
 })
 
-// Watch para debug
-watch(() => formData.value.tipoServico, (newValue) => {
-  console.log('Tipo de serviço alterado para:', newValue)
-})
-
 // Método para atualizar o serviço
 const updateTipoServico = async (event) => {
   const value = event.target.value
   formData.value.tipoServico = value
   await nextTick()
-  console.log('Valor atualizado:', formData.value.tipoServico)
 }
 
 // Validação do formulário

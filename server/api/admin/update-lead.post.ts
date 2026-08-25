@@ -1,4 +1,7 @@
+import { requireActiveAdmin } from '../../utils/adminAuth'
+
 export default defineEventHandler(async (event) => {
+  await requireActiveAdmin(event)
   const config = useRuntimeConfig()
   const body = await readBody(event)
   
