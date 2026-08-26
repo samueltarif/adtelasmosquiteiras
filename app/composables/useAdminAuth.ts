@@ -15,13 +15,14 @@ export function useAdminAuth() {
   const isAuthenticated = computed(() => !!user.value)
 
   /**
-   * Verifica a sessão ativa no servidor.
+   * Verifica a sessão ativa no servidor (SSR e Client).
    */
   const checkSession = async () => {
     isChecking.value = true
     authError.value = null
     try {
-      const res = await $fetch<{ authenticated: boolean; user: AdminUser | null }>('/api/admin/auth/session')
+      const fetcher = useRequestFetch()
+      const res = await fetcher<{ authenticated: boolean; user: AdminUser | null }>('/api/admin/auth/session')
       if (res?.authenticated && res?.user) {
         user.value = res.user
       } else {

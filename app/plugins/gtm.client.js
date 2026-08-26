@@ -5,10 +5,13 @@ export default defineNuxtPlugin(() => {
   window.dataLayer = window.dataLayer || []
 
   // Define gtag globalmente antes de injetar o script GTM
-  // Assim qualquer chamada gtag() feita antes do script carregar
-  // cai no dataLayer e é processada quando o GTM inicializar
   window.gtag = function gtag() {
     window.dataLayer.push(arguments)
+  }
+
+  // Não injeta scripts de marketing/ads em páginas administrativas
+  if (window.location.pathname.startsWith('/admin')) {
+    return
   }
 
   // Sinaliza início do GTM

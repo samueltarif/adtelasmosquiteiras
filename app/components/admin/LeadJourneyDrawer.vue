@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import MediaLightbox from './MediaLightbox.vue'
+import LeadConversionModal from './crm/LeadConversionModal.vue'
 
 const props = defineProps<{
   leadId: string | null
@@ -12,11 +14,17 @@ const emit = defineEmits<{
   (e: 'updated'): void
 }>()
 
+const router = useRouter()
 const isLoading = ref(false)
 const isSaving = ref(false)
 const drawerError = ref<string | null>(null)
 const drawerErrorCode = ref<number | null>(null)
 const journeyData = ref<any>(null)
+
+// Status CRM do Lead
+const isLeadConverted = ref(false)
+const convertedClientId = ref<string | null>(null)
+const isConversionModalOpen = ref(false)
 
 // Form fields de edição comercial
 const editStatus = ref('Novo')
@@ -54,6 +62,19 @@ async function fetchJourney(id: string) {
       editStatus.value = data.lead.status || data.lead.status_comercial || 'Novo'
       editValor.value = data.lead.valor_orcamento != null ? String(data.lead.valor_orcamento) : ''
       editObs.value = data.lead.observacoes || data.lead.observacoes_internas || ''
+    }
+
+    // Verifica status de conversão CRM
+    isLeadConverted.value = false
+    convertedClientId.value = null
+    try {
+      const statusRes = await $fetch<any>(`/api/admin/crm/leads/${encodeURIComponent(id)}/client-status`)
+      if (statusRes?.success && statusRes.isConverted && statusRes.client) {
+        isLeadConverted.value = true
+        convertedClientId.value = statusRes.client.id
+      }
+    } catch (statusErr) {
+      console.warn('[LeadJourneyDrawer] Falha ao checar status CRM:', statusErr)
     }
 
     // Carrega thumbnails automaticamente para todas as fotos da galeria com isolamento
@@ -293,6 +314,48 @@ function closeLightbox() {
           </button>
         </div>
 
+        <!-- Card de Integração CRM (Conversão / Abrir Cliente) -->
+        <div class="p-3.5 sm:p-4 rounded-2xl border transition-all flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+          :class="isLeadConverted ? 'bg-indigo-950/40 border-indigo-500/30' : 'bg-gradient-to-r from-indigo-950/30 to-slate-900/40 border-indigo-500/20'"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              :class="isLeadConverted ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'"
+            >
+              <Icon :name="isLeadConverted ? 'lucide:user-check' : 'lucide:sparkles'" class="w-5 h-5" />
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold tracking-wider"
+                :class="isLeadConverted ? 'text-indigo-400' : 'text-amber-400'"
+              >
+                {{ isLeadConverted ? 'Lead Convertido no CRM' : 'Oportunidade Comercial' }}
+              </span>
+              <p class="text-xs font-semibold text-white">
+                {{ isLeadConverted ? 'Este lead possui cadastro oficial de cliente.' : 'Transforme este lead em um cliente cadastrado com OS.' }}
+              </p>
+            </div>
+          </div>
+
+          <NuxtLink
+            v-if="isLeadConverted && convertedClientId"
+            :to="`/admin/clientes/${convertedClientId}`"
+            class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors min-h-[44px] shrink-0 shadow-md shadow-indigo-600/20"
+          >
+            <Icon name="lucide:user" class="w-4 h-4" />
+            <span>Abrir Cliente</span>
+          </NuxtLink>
+
+          <button
+            v-else
+            type="button"
+            @click="isConversionModalOpen = true"
+            class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer min-h-[44px] shrink-0 shadow-md shadow-indigo-600/20"
+          >
+            <Icon name="lucide:sparkles" class="w-4 h-4" />
+            <span>Converter em Cliente</span>
+          </button>
+        </div>
+
         <!-- Origem & Atribuição -->
         <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
           <div class="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
@@ -486,6 +549,14 @@ function closeLightbox() {
       :lead-id="leadId || ''"
       :request-signed-url="requestSignedUrl"
       @close="closeLightbox"
+    />
+
+    <!-- Modal de Conversão Lead -> Cliente -->
+    <LeadConversionModal
+      :is-open="isConversionModalOpen"
+      :lead="journeyData?.lead || null"
+      @close="isConversionModalOpen = false"
+      @converted="() => { emit('updated'); fetchJourney(leadId || ''); }"
     />
   </div>
 </template>

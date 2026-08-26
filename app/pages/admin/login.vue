@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import { useAdminAuth } from '../../composables/useAdminAuth'
 
+definePageMeta({
+  layout: false
+})
+
 useHead({
   title: 'Login Administrativo - AD Telas e Redes',
   meta: [{ name: 'robots', content: 'noindex, nofollow' }]

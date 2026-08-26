@@ -48,7 +48,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen w-full max-w-full overflow-x-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-3 sm:p-6 lg:p-8">
+  <div class="min-h-screen w-full max-w-full min-w-0 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-3 sm:p-6 lg:p-8">
     <div class="max-w-7xl mx-auto w-full flex flex-col gap-6">
 
       <!-- TOP BAR: Header & Global Date Filter -->
@@ -97,23 +97,23 @@ onMounted(() => {
 
       <!-- RADIX/SHADCN TABS NAVIGATION (2x2 Grid on Mobile, Flex on Desktop) -->
       <Tabs v-model="activeTab" class="w-full">
-        <TabsList class="grid grid-cols-2 sm:flex sm:w-auto h-auto p-1.5 gap-1.5 w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl">
-          <TabsTrigger value="overview" class="gap-2 justify-center py-2 text-xs">
+        <TabsList class="!grid !grid-cols-2 lg:!flex lg:!w-auto h-auto p-1.5 gap-1.5 w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl">
+          <TabsTrigger value="overview" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:layout-grid" class="w-4 h-4 shrink-0" />
             <span>Visão Geral</span>
           </TabsTrigger>
 
-          <TabsTrigger value="acquisition" class="gap-2 justify-center py-2 text-xs">
+          <TabsTrigger value="acquisition" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:share-2" class="w-4 h-4 shrink-0" />
             <span>Aquisição & Canais</span>
           </TabsTrigger>
 
-          <TabsTrigger value="services" class="gap-2 justify-center py-2 text-xs">
+          <TabsTrigger value="services" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:layers" class="w-4 h-4 shrink-0" />
             <span>Serviços & CTAs</span>
           </TabsTrigger>
 
-          <TabsTrigger value="funnel" class="gap-2 justify-center py-2 text-xs">
+          <TabsTrigger value="funnel" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:filter" class="w-4 h-4 shrink-0" />
             <span>Funil Comercial</span>
           </TabsTrigger>

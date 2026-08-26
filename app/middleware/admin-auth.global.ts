@@ -26,4 +26,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const redirectPath = (to.query.redirect as string) || '/admin/dashboard'
     return navigateTo(redirectPath)
   }
+
+  // Caso 3: Rota raiz /admin ou /admin/ -> redireciona para /admin/dashboard
+  if (isAuthenticated.value && (to.path === '/admin' || to.path === '/admin/')) {
+    return navigateTo('/admin/dashboard')
+  }
 })

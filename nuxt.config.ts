@@ -12,8 +12,12 @@ export default defineNuxtConfig({
     }
   ],
   icon: {
+    provider: 'server',
     serverBundle: {
       collections: ['lucide']
+    },
+    clientBundle: {
+      scan: true
     }
   },
   css: ['~/assets/css/tailwind.css'],

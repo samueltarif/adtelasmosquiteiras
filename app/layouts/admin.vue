@@ -32,7 +32,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen min-h-[100dvh] w-full max-w-full bg-slate-950 font-sans text-slate-100 antialiased overflow-x-hidden">
+  <div class="flex min-h-screen min-h-[100dvh] w-full max-w-full bg-slate-950 font-sans text-slate-100 antialiased">
     <!-- Sidebar Desktop (>= 768px) -->
     <aside class="hidden md:flex flex-col h-full py-6 px-4 bg-slate-900/95 fixed h-full w-[260px] lg:w-[280px] left-0 top-0 border-r border-white/10 z-40">
       <div class="flex items-center gap-3 mb-8 px-2">
@@ -40,7 +40,7 @@ const handleLogout = async () => {
           <Icon name="lucide:shield" class="w-6 h-6" />
         </div>
         <div>
-          <h1 class="text-base font-bold text-white leading-tight tracking-tight">AD Telas e Redes</h1>
+          <div class="text-base font-bold text-white leading-tight tracking-tight">AD Telas e Redes</div>
           <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Painel Admin</p>
         </div>
       </div>
@@ -60,8 +60,17 @@ const handleLogout = async () => {
           class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
           :class="route.path === '/admin/leads' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
         >
-          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <Icon name="lucide:message-square" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Leads</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/clientes" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/clientes') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Clientes</span>
         </NuxtLink>
 
         <NuxtLink 
@@ -71,6 +80,15 @@ const handleLogout = async () => {
         >
           <Icon name="lucide:images" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Galeria</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/configuracoes/empresa" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/configuracoes') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:building-2" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Perfil da Empresa</span>
         </NuxtLink>
       </nav>
       
@@ -133,8 +151,18 @@ const handleLogout = async () => {
           class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
           :class="route.path === '/admin/leads' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
         >
-          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <Icon name="lucide:message-square" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Leads</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/clientes" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/clientes') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Clientes</span>
         </NuxtLink>
 
         <NuxtLink 
@@ -145,6 +173,16 @@ const handleLogout = async () => {
         >
           <Icon name="lucide:images" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Galeria</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/configuracoes/empresa" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/configuracoes') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:building-2" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Perfil da Empresa</span>
         </NuxtLink>
       </nav>
       
@@ -160,7 +198,7 @@ const handleLogout = async () => {
     </aside>
 
     <!-- Main Content Area -->
-    <div class="flex-1 md:ml-[260px] lg:ml-[280px] flex flex-col min-h-screen min-h-[100dvh] w-full max-w-full overflow-x-hidden">
+    <div class="flex-1 min-w-0 md:ml-[260px] lg:ml-[280px] flex flex-col min-h-screen min-h-[100dvh]">
       <!-- TopNavBar -->
       <header class="flex justify-between items-center h-16 px-4 sm:px-6 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-white/10 shadow-sm w-full">
         <div class="flex items-center gap-3">
@@ -173,7 +211,14 @@ const handleLogout = async () => {
           </button>
           <div class="text-xs sm:text-sm text-slate-400 truncate">
             Administração <span class="mx-1 text-slate-600">/</span> 
-            <span class="text-white font-semibold">{{ route.path.startsWith('/admin/galeria') ? 'Galeria de Serviços' : route.path === '/admin/leads' ? 'Leads' : 'Dashboard' }}</span>
+            <span class="text-white font-semibold">
+              {{ 
+                route.path.startsWith('/admin/clientes') ? 'Clientes' : 
+                route.path.startsWith('/admin/configuracoes') ? 'Perfil da Empresa' : 
+                route.path.startsWith('/admin/galeria') ? 'Galeria de Serviços' : 
+                route.path === '/admin/leads' ? 'Leads' : 'Dashboard' 
+              }}
+            </span>
           </div>
         </div>
         
@@ -198,7 +243,7 @@ const handleLogout = async () => {
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 bg-slate-950 w-full max-w-full overflow-x-hidden">
+      <main class="flex-1 bg-slate-950 w-full max-w-full min-w-0">
         <slot />
       </main>
     </div>

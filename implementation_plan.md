@@ -1,316 +1,164 @@
-# Implementation Plan (DEFINITIVO) — LEAD MEDIA STORAGE + ADMIN MEDIA GALLERY + DATA-ONLY EMAIL
+# Plano de Implementação Revisado — Patch 3.0.1: CRM Operacional (Clientes + Conversão de Leads + Perfil da Empresa)
 
-**Projeto:** AD Telas e Redes (`https://www.adtelasmosquiteiras.com.br`)  
-**Fase:** Lead Media Storage + Admin Media Gallery + Data-Only Email (Ajustes Finais de Continuidade, Recuperação e Isolamento)  
-**Status:** `READY_FOR_HUMAN_REVIEW` (Nenhuma implementação iniciada, nenhum SQL executado, nenhuma alteração em Cloudflare e nenhum deploy realizado).  
+Este plano consolida todos os refinamentos de engenharia, proteções de segurança, contratos defensivos e casos de teste para a implementação da Fase 3.0.
 
 ---
 
-## User Review Required
+## 1. Decisões Arquiteturais e de Segurança
 
-> [!IMPORTANT]
-> **AÇÃO MANUAL NECESSÁRIA NO SUPABASE (`007_lead_media_storage.sql`)**:
-> - O script [`supabase/manual/007_lead_media_storage.sql`](file:///d:/sicons/ADT/supabase/manual/007_lead_media_storage.sql) estrutura a tabela `public.lead_media` com a máquina de estados completa (`pending`, `finalizing`, `uploaded`, `failed`, `deleted`), coluna `finalizing_at` para recuperação de stale locks, constraints `UNIQUE(storage_key)`, `UNIQUE(lead_id, client_media_id)` e bloqueio absoluto de acesso anônimo (`ANON_LEAD_MEDIA_ACCESS = DENIED`).
-> - **NÃO será executado automaticamente via MCP**. Permanece estático aguardando sua auditoria e execução manual no SQL Editor do Supabase oficial.
-> - `SUPABASE_MCP_WRITES = 0`.
-
-> [!IMPORTANT]
-> **AÇÕES MANUAIS NECESSÁRIAS NO CLOUDFLARE R2 (`MANUAL_CLOUDFLARE_ACTION_REQUIRED = YES`)**:
-> 1. **Bucket Privado Dedicado:** Bucket `adtelas-leads-private` com `LEAD_MEDIA_BUCKET_PUBLIC_ACCESS = DISABLED` (zero `r2.dev` e zero custom domain público).
-> 2. **Configuração de CORS:** CORS restrito às origens de produção (`https://www.adtelasmosquiteiras.com.br`) ou origens locais em desenvolvimento, método `PUT`, headers `Content-Type` e `x-amz-*`.
-> 3. **Lifecycle Rule Restrita a Temporários:** Regra de expiração de 24 horas configurada **estritamente para o prefixo `tmp/leads/`**.
+1. **Proteção de PII na Busca de Clientes:** `CLIENT_PII_SEARCH_TRANSPORT=POST_BODY`. O endpoint `POST /api/admin/crm/clients/search` recebe parâmetros de busca (incluindo telefone, e-mail e documento) no body JSON, impedindo exposição de dados sensíveis na URL. Listagens genéricas não sensíveis utilizam `GET /api/admin/crm/clients`.
+2. **Server-Side Warning Gate na Deduplicação Manual:** `MANUAL_CLIENT_DUPLICATE_ENFORCEMENT=SERVER_SIDE_WARNING_GATE`. `POST /api/admin/crm/clients` normaliza os dados e busca duplicatas no servidor. Se encontrar possíveis clientes e não houver `confirmPossibleDuplicate: true`, retorna `HTTP 409 POSSIBLE_DUPLICATE`.
+3. **Server-Side Warning Gate na Conversão de Leads:** `LEAD_CONVERSION_DUPLICATE_GATE=SERVER_SIDE_BEFORE_RPC`. `POST /api/admin/crm/leads/:id/convert` executa busca de duplicatas no servidor ANTES de chamar a RPC `convert_lead_to_client_atomic`. Se encontrar e não houver confirmação explícita, retorna `HTTP 409 POSSIBLE_DUPLICATE`.
+   - Se o admin escolher `[ Abrir cliente existente ]`: o frontend apenas navega para a ficha do cliente sem mutações no lead e sem chamar a RPC.
+   - Se escolher `[ Criar novo cliente mesmo assim ]`: o frontend reenvia a requisição com `confirmPossibleDuplicate: true`, permitindo a chamada à RPC.
+4. **Estratégia de Compensação para Endereço Principal:** `PRIMARY_ADDRESS_ATOMIC_SWAP_SUPPORTED=NO`, `PRIMARY_ADDRESS_SWAP_STRATEGY=COMPENSATING_WORKFLOW`. Ao trocar de principal (A -> B), o servidor desmarca A (`is_principal = false`) e depois marca B (`is_principal = true`). Se a etapa B falhar, tenta restaurar A para principal.
+5. **Deleção e Arquivamento de Endereço:** `ADDRESS_DELETE_BEHAVIOR=STRICT_RESTRICT_WITH_EXPLICIT_ARCHIVE_OPTION`. Tentativa de deleção física de endereço com histórico responderá com `409 ADDRESS_HAS_HISTORY`, exibindo na UI a opção de arquivamento explícito via `PATCH` (`is_archived: true`).
+6. **Auditoria Não-ACID e Minimização de PII:** `CRM_NON_RPC_AUDIT_ATOMICITY=NOT_SUPPORTED_WITH_CURRENT_SCHEMA`, `PHASE_3_ACTIVITY_LOG_PII=MINIMIZED`. O payload do `crm_activity_log` armazena apenas identificadores e campos alterados (`{ changed_fields: ['email', 'telefone_principal'] }`, `{ address_id }`, `{ note_id, categoria }`), sem duplicar conteúdo completo sensível.
+7. **Confirmação Explícita de Endereço e Tipo na Conversão:** `LEAD_ADDRESS_CREATION=EXPLICIT_ADMIN_CONFIRMATION`, `LEAD_CLIENT_TYPE_SELECTION=EXPLICIT_ADMIN_CONFIRMATION`. O endereço inicial só é criado se o checkbox correspondente for explicitamente marcado. O tipo de cliente (`pessoa_fisica`, `empresa`, `condominio`) é enviado explicitamente.
+8. **Contrato Estrito da 1ª OS:** `RPC_OS_PAYLOAD_CONTRACT=AUDITED_EXACT_SHAPE`. O payload enviado à RPC corresponde exatamente a `{ categoria_operacional, descricao, valor_orcamento, data_prevista }`.
+9. **Upload de Logo via Presigned Direct R2:** `COMPANY_LOGO_UPLOAD_TRANSPORT=PRESIGNED_DIRECT_R2`, `COMPANY_LOGO_CROSS_SYSTEM_CONSISTENCY=COMPENSATING_WORKFLOW`. Segue o padrão do projeto: `authorize` (valida extensão/MIME e gera `storage_key` sob `branding/company/`) -> upload direto do browser ao R2 com URL pré-assinada -> `finalize` (valida magic bytes, tamanho <= 5MB e atualiza `company_profile`). Se o banco falhar, compensa deletando o novo objeto R2. A logo estática `/images/logo_adt_telas_nova.png` nunca é deletada.
+10. **Autoridade de Timestamp no Servidor:** `CLIENT_ARCHIVE_TIMESTAMP_AUTHORITY=SERVER`. O timestamp `archived_at` é gerado exclusivamente no servidor.
+11. **CSRF Confirmado:** `ADMIN_CSRF_PROTECTION=CONFIRMED` em todos os endpoints mutáveis.
+12. **Zero Mutações em Produção:** `PRODUCTION_TEST_MUTATIONS=0`.
 
 ---
 
-## 1. Decisões de Segurança e Resiliência (`SECURITY_AND_RESILIENCE_DECISIONS`)
+## 2. Mapa Completo de Endpoints Server-Side
 
-```
-LEAD_CREATION_ORDER:                           FIRST (O lead é criado e persistido antes de qualquer upload ou objeto R2)
-EMAIL_DELIVERY_DEPENDS_ON_MEDIA:               NO (Notificação por e-mail DATA-ONLY é disparada imediatamente na criação do lead)
+### Clientes
+- `POST /api/admin/crm/clients/search`: Busca geral paginada por nome, telefone, email ou documento via POST body.
+- `GET /api/admin/crm/clients`: Listagem paginada padrão com sort allowlist (`nome`, `created_at`, `updated_at`, `tipo_cliente`, `status`).
+- `POST /api/admin/crm/clients/search-duplicates`: Verificação rápida de duplicatas por telefone/email/CPF.
+- `POST /api/admin/crm/clients`: Criação manual com verificação defensiva de duplicatas (Warning Gate).
+- `GET /api/admin/crm/clients/:id`: Ficha cadastral e endereços do cliente.
+- `PATCH /api/admin/crm/clients/:id`: Edição e arquivamento com autoridade de timestamp server-side.
+- `GET /api/admin/crm/clients/:id/activity`: Histórico de atividades paginado (max pageSize 100).
+- `GET /api/admin/crm/clients/:id/notes`: Notas paginadas.
+- `POST /api/admin/crm/clients/:id/notes`: Criação de nota com log minimizado.
+- `GET /api/admin/crm/clients/:id/work-orders`: Listagem paginada de ordens de serviço.
 
-DUPLICATE_SEND_LEAD_MEDIA_CONTINUATION:        SUPPORTED (Retry com mesmo submission_id permite continuar uploads)
-IDEMPOTENT_RESPONSE_RETURNS_LEAD_ID:          YES (Localiza lead existente e retorna leadId)
-IDEMPOTENT_RESPONSE_RETURNS_FRESH_UPLOAD_TOKEN: YES (Gera novo uploadToken de 15 min para o browser continuar)
-DUPLICATE_RESPONSE_RESENDS_EMAIL:              NO (Zero reenvio de e-mail em retry idempotente)
+### Endereços
+- `POST /api/admin/crm/clients/:id/addresses`: Criação de endereço com swap de principal.
+- `PATCH /api/admin/crm/clients/:id/addresses/:addressId`: Edição ou arquivamento explícito.
+- `DELETE /api/admin/crm/clients/:id/addresses/:addressId`: Deleção física ou 409 se houver histórico.
 
-MEDIA_UPLOAD_AUTH_METHOD:                      SIGNED_UPLOAD_TOKEN_HMAC_SHA256 (Token assinado após salvar o lead)
-MEDIA_UPLOAD_TOKEN_TTL:                        15_MINUTES
-MEDIA_UPLOAD_RATE_LIMIT:                       10_REQUESTS_PER_MINUTE_PER_IP (Proteção de camada de aplicação)
-MEDIA_UPLOAD_QUOTA_METHOD:                     SERVER_LEAD_MEDIA_COUNT_AND_SIZE_VALIDATION (Max 4 fotos, 2 vídeos, 50MB total)
+### Conversão de Leads
+- `POST /api/admin/crm/leads/:id/convert`: Validação de duplicatas antes da RPC, chamada de `convert_lead_to_client_atomic` e retorno de identificadores gerados.
 
-MEDIA_UPLOAD_SIGNING_SECRET_METHOD:            DEDICATED_SERVER_SECRET (Variável MEDIA_UPLOAD_SIGNING_SECRET exclusiva server-side)
-SUPABASE_KEY_REUSED_FOR_MEDIA_HMAC:            NO (Chave do Supabase NÃO é reutilizada para assinar tokens de upload)
+### Perfil da Empresa
+- `GET /api/admin/configuracoes/empresa`: Leitura do singleton com resolução de `logo_url`.
+- `PATCH /api/admin/configuracoes/empresa`: Atualização com allowlist estrita e normalização de strings vazias para `NULL`.
+- `POST /api/admin/configuracoes/empresa/logo/authorize`: Gera URL pré-assinada de upload direto para R2.
+- `POST /api/admin/configuracoes/empresa/logo/finalize`: Validação de magic bytes e atualização no banco com compensação.
+- `POST /api/admin/configuracoes/empresa/logo/restore-default`: Restauração da logo estática padrão.
 
-CURRENT_R2_BUCKET_PUBLIC:                      SEPARATE_FROM_LEAD_STORAGE (Mídia pública do site não se mistura com leads)
-LEAD_MEDIA_BUCKET:                             adtelas-leads-private
-LEAD_MEDIA_BUCKET_PUBLIC_ACCESS:               DISABLED (Zero r2.dev, zero custom domain público)
-R2_CORS_REQUIRED:                              YES
-R2_CORS_ENVIRONMENT_STRATEGY:                  STRICT_ENV_DRIVEN_ORIGINS
-R2_PRODUCTION_ALLOWED_ORIGINS:                 ["https://www.adtelasmosquiteiras.com.br"]
-R2_DEVELOPMENT_ALLOWED_ORIGINS:                ["http://localhost:*", "http://127.0.0.1:*"]
-CSP_R2_HOST_STRATEGY:                          SPECIFIC_ACCOUNT_R2_HOSTNAME_WHEN_AVAILABLE
+---
 
-MEDIA_TEMP_PREFIX:                             tmp/leads/{leadId}/{uuid}.{ext}
-MEDIA_FINAL_PREFIX:                            leads/{leadId}/{uuid}.{ext}
-MEDIA_PROMOTION_METHOD:                        COPY_OBJECT_THEN_DELETE_TEMP (Promove objeto válido e remove temporário)
-R2_LIFECYCLE_PREFIX:                           tmp/leads/ (Atua EXCLUSIVAMENTE sobre uploads temporários abandonados)
-VALID_MEDIA_RETENTION:                         PENDING_BUSINESS_RETENTION_POLICY (Nunca expirar automaticamente leads/)
+## 3. Componentes e Telas
 
-MEDIA_DB_STATE_MACHINE:                        PENDING_FINALIZING_UPLOADED_FAILED_DELETED
-FINALIZING_TIMESTAMP_FIELD:                    finalizing_at (TIMESTAMPTZ NULL em public.lead_media)
-FINALIZING_STALE_TIMEOUT:                      10_MINUTES (Threshold determinístico para recuperação de crashes)
-FINALIZE_CONCURRENCY_CONTROL:                  ATOMIC_UPDATE_PENDING_TO_FINALIZING_RETURNING_ROW
-STALE_FINALIZING_RECOVERY_METHOD:              R2_STATE_AUDIT_BEFORE_RECLAIM (Audita R2 tmp/final antes de reprocessar)
-
-MEDIA_PROMOTION_TRANSACTION_STRATEGY:          VERIFY_TEMP_COPY_TO_FINAL_CONFIRM_DB_THEN_DELETE_TEMP
-DB_UPDATE_FAILURE_COMPENSATION:                DELETE_PROMOTED_FINAL_OBJECT_AND_SET_FAILED
-TEMP_DELETE_FAILURE_BEHAVIOR:                  SAFE_FALLTHROUGH_HANDLED_BY_TMP_LIFECYCLE_24H
-
-MEDIA_IDEMPOTENCY_METHOD:                      UNIQUE_LEAD_ID_CLIENT_MEDIA_ID (Constraint unq_lead_media_lead_client_media_id)
-MEDIA_STORAGE_KEY_UNIQUENESS:                  UUID_V4_STORAGE_KEY_UNIQUE_CONSTRAINT (unq_lead_media_storage_key)
-POST_UPLOAD_VERIFICATION:                      HEAD_OBJECT_AND_RANGE_MAGIC_BYTES_VERIFICATION (HeadObject + Magic Bytes check)
-INVALID_OBJECT_CLEANUP:                        IMMEDIATE_DELETE (Delete imediato do R2 temporário se falhar na verificação)
-
-AUTHORIZE_UPLOAD_IDEMPOTENCY:                  REUSE_EXISTING_PENDING_STORAGE_KEY_FOR_SAME_CLIENT_MEDIA_ID
-FINALIZE_UPLOAD_IDEMPOTENCY:                   IDEMPOTENT_SUCCESS_IF_ALREADY_UPLOADED
-
-AUTHORITATIVE_UPLOAD_QUOTA:                    DATABASE_AND_SIGNED_TOKEN (Contagem autoritativa em public.lead_media)
-IP_RATE_LIMIT_STORAGE_METHOD:                  BEST_EFFORT (Sem dependência de Redis adicional nesta fase)
-
-EXISTING_LEAD_STATUS_TAXONOMY:                 Novo, Em Atendimento, Orçado, Fechado, Perdido
-NEW_LEAD_DEFAULT_COMMERCIAL_STATUS:            Novo (Preserva exatamente o padrão atual de public.leads.status)
-
-ADMIN_AUTH_IMPLEMENTATION:                     DEFERRED_BY_USER (Implementação de login/sessão admin adiada pelo usuário)
-MEDIA_STORAGE_BEFORE_ADMIN_AUTH:               ALLOWED (Uploads e metadados funcionam normalmente em background)
-MEDIA_PRIVATE_VIEWING_BEFORE_ADMIN_AUTH:       DENIED (Endpoints retornam 401/403 até autenticação real existir)
-MEDIA_PRIVATE_DOWNLOAD_BEFORE_ADMIN_AUTH:      DENIED (Endpoints retornam 401/403 até autenticação real existir)
-ADMIN_SECRET_BYPASS:                           NONE (Zero bypass por secret estático ou token de query)
-ADMIN_MEDIA_METADATA_AUTH_REQUIRED:            YES
-UNAUTHENTICATED_MEDIA_METADATA_ACCESS:         DENIED
-UNAUTHENTICATED_MEDIA_BINARY_ACCESS:           DENIED
-
-SIGNED_URL_AUTHORITY:                          /api/admin/media/signed-url (Único ponto gerador de signed GET)
-LEAD_JOURNEY_RETURNS_SIGNED_URLS:              NO (Retorna apenas metadados técnicos sob autenticação)
-SIGNED_GET_URL_TTL:                            300_SECONDS (5 minutos, gerada sob demanda no Admin)
-
-CSP_CONNECT_SRC:                               https://*.r2.cloudflarestorage.com
-CSP_IMG_SRC:                                   https://*.r2.cloudflarestorage.com blob: data:
-CSP_MEDIA_SRC:                                 https://*.r2.cloudflarestorage.com blob:
-
-ORPHAN_MEDIA_CLEANUP_METHOD:                   R2_LIFECYCLE_RULE_ON_TMP_PREFIX_AND_SERVER_SCHEDULED_PURGE
-ABANDONED_UPLOAD_RETENTION:                    24_HOURS (Somente para tmp/leads/)
-DELETED_LEAD_MEDIA_BEHAVIOR:                   DELETE_OBJECTS_FROM_R2_VIA_SERVER_THEN_DB
-
-LEAD_MEDIA_RLS:                                ENABLED (Revogado acesso anon e authenticated; exclusivo service_role server-side)
-ANON_LEAD_MEDIA_ACCESS:                        DENIED
-CLIENT_DIRECT_SUPABASE_MEDIA_ACCESS:           NO
-
-PRIVACY_POLICY_UPDATE_REQUIRED:                YES (Documentar finalidade de orçamento, armazenamento seguro e direitos do titular)
-PRIVACY_RETENTION_DECISION_REQUIRED:           YES (Decisão humana para política de retenção de orçamentos)
-
-SMTP_PRODUCTION_READINESS:                     PENDING_MANUAL_VALIDATION_BLOCKER (Requer 1 teste manual real pelo operador antes do deploy)
-
-NAME_REQUIRED:                                 YES (trim, min 2 chars, client e server 400)
-PHONE_REQUIRED:                                YES (normalizado, 10-11 dígitos, client e server 400)
-EMAIL_REQUIRED:                                NO (opcional, validado se preenchido)
-
-EMAIL_MEDIA_CLAIM:                             NONE (Zero alegação de mídia disponível no e-mail)
-CUSTOMER_MEDIA_EMAIL_ATTACHMENTS:              NONE (Zero fotos, zero vídeos, zero Base64, zero URLs privadas no e-mail)
-
-MOV_UPLOAD_SUPPORT:                            ALLOWED_WITH_FALLBACK
-MOV_BROWSER_PLAYBACK_GUARANTEE:                NO_HTML5_GUARANTEE_FALLBACK_TO_DOWNLOAD
-
-SQL_007_READY_FOR_HUMAN_REVIEW:                YES
-SQL_007_EXECUTED:                              NO
-
-MANUAL_SUPABASE_ACTION_REQUIRED:               YES (Execução manual do SQL 007 pelo operador)
-MANUAL_CLOUDFLARE_ACTION_REQUIRED:             YES (CORS e Lifecycle em tmp/leads/ no bucket privado R2)
-SUPABASE_MCP_WRITES:                           0
-
-PRODUCTION_CHANGED:                            NO (Nenhum deploy realizado)
-DATABASE_CHANGED:                              NO (Nenhum SQL executado)
+```text
+app/
+├── layouts/
+│   └── admin.vue                                 [MODIFY: Menus Clientes e Configurações]
+├── pages/
+│   └── admin/
+│       ├── clientes/
+│       │   ├── index.vue                         [NEW: Listagem de Clientes com busca POST]
+│       │   ├── novo.vue                          [NEW: Cadastro Manual Rápido com Duplicate Warning]
+│       │   └── [id].vue                          [NEW: Ficha do Cliente com Sub-recursos Paginados]
+│       └── configuracoes/
+│           └── empresa.vue                       [NEW: Perfil da Empresa, Logo e Live Preview]
+└── components/
+    └── admin/
+        ├── LeadJourneyDrawer.vue                 [MODIFY: Botão Converter/Abrir Cliente]
+        ├── crm/
+        │   ├── ClientListTable.vue               [NEW: Tabela Desktop com Sort Allowlist]
+        │   ├── ClientListCards.vue               [NEW: Cards Responsivos Mobile]
+        │   ├── ClientEditModal.vue               [NEW: Modal/Sheet de Edição]
+        │   ├── ClientArchiveModal.vue            [NEW: Confirmação de Arquivamento]
+        │   ├── ClientAddressManager.vue          [NEW: Gerenciador de Endereços com Swap e 409 Handling]
+        │   ├── ClientNotesManager.vue            [NEW: Gerenciador Paginado de Notas]
+        │   ├── ClientActivityTimeline.vue        [NEW: Timeline Paginada com PII Minimizada]
+        │   ├── ClientWorkOrdersReadOnly.vue      [NEW: Lista Paginada de OSs]
+        │   ├── LeadConversionModal.vue           [NEW: Wizard de Conversão com Duplicate Gate]
+        │   └── ClientDuplicateAlert.vue          [NEW: Alerta de Clientes Parecidos]
+        └── company/
+            ├── CompanyLogoUploader.vue           [NEW: Upload Presigned Direct R2 + Compensação]
+            └── CompanyDocumentPreview.vue        [NEW: Live Preview do Cabeçalho]
 ```
 
 ---
 
-## 2. Máquina de Estados e Recuperação de Stale Locks
+## 4. Plano de Testes Locais Obrigatórios (51 Casos)
 
-### 2.1. Sequência Atômica com Recuperação de Crash
-```
-1. ATOMIC ACQUISITION NO POSTGRESQL:
-   UPDATE public.lead_media
-   SET upload_status = 'finalizing', finalizing_at = now()
-   WHERE lead_id = $1 AND client_media_id = $2
-     AND (
-       upload_status = 'pending'
-       OR (upload_status = 'finalizing' AND finalizing_at < now() - INTERVAL '10 minutes')
-     )
-   RETURNING *;
+Todos os testes de mutação serão executados no ambiente **PostgreSQL Docker Local**:
 
-   ├── Se 0 linhas retornadas:
-   │   ├── Se status é 'uploaded' ➔ Retorna { success: true, idempotent: true } imediato.
-   │   ├── Se status é 'finalizing' (< 10 min) ➔ Retorna 202 Accepted (processamento em andamento).
-   │   └── Se status é 'failed' ➔ Retorna erro correspondente.
-   └── Se 1 linha retornada ➔ Obteve lock com sucesso, prossegue para auditoria de R2.
+### Clientes (Testes 1 a 9)
+1. Criação de cliente normal.
+2. Nome inválido (< 2 chars) -> 400.
+3. Telefone inválido -> 400.
+4. Duplicata sem flag de confirmação -> 409 `POSSIBLE_DUPLICATE`.
+5. Duplicata com `confirmPossibleDuplicate: true` -> Sucesso.
+6. Edição de dados cadastrais.
+7. Arquivamento de cliente com `archived_at` gerado no servidor.
+8. Reativação de cliente (`is_archived: false`, `archived_at: null`).
+9. Registro de atividade `client_created` gravado.
 
-2. AUDITORIA DETERMINÍSTICA DO ESTADO DO R2 (Recuperação de Crash):
-   ├── Cenário A (Crash antes do CopyObject):
-   │   Objeto temporário existe em tmp/leads/ e destino final NÃO existe em leads/
-   │   ➔ Executa validação de Magic Bytes e prossegue com a cópia normal.
-   ├── Cenário B (Crash após CopyObject, antes do UPDATE no banco):
-   │   Objeto final já existe íntegro em leads/
-   │   ➔ Valida objeto final, atualiza banco para 'uploaded' e deleta temporário.
-   └── Cenário C (Crash após UPDATE no banco, antes do Delete temp):
-   │   Banco já estaria como 'uploaded', tratado na verificação de 0 linhas acima.
+### Endereços (Testes 10 a 17)
+10. Criação de endereço secundário.
+11. Criação de primeiro endereço marcado como principal.
+12. Troca de endereço principal com sucesso.
+13. Falha induzida na troca de principal.
+14. Compensação restaura o endereço principal anterior.
+15. Deleção física de endereço sem histórico.
+16. Deleção de endereço vinculado a OS -> 409 `ADDRESS_HAS_HISTORY`.
+17. Arquivamento explícito de endereço com histórico via PATCH.
 
-3. PROMOÇÃO NO R2 (tmp/ ➔ leads/):
-   CopyObjectCommand: tmp/leads/{leadId}/{uuid}.{ext} ➔ leads/{leadId}/{uuid}.{ext}
-   HeadObjectCommand no destino final para confirmação.
+### Notas & Atividade (Testes 18 a 21)
+18. Criação de anotação de atendimento.
+19. Categoria inválida de nota rejeitada pelo schema.
+20. Carregamento paginado de notas.
+21. Atividade `note_added` gravada sem duplicar o texto completo no payload JSON.
 
-4. PERSISTÊNCIA NO BANCO:
-   UPDATE public.lead_media
-   SET storage_key = finalKey, upload_status = 'uploaded', verified_at = now()
-   WHERE lead_id = $1 AND client_media_id = $2;
-   ├── Se o UPDATE no banco falhar:
-   │   ├── COMPENSAÇÃO: DeleteObjectCommand no objeto promovido leads/{leadId}/{uuid}.{ext}
-   │   └── UPDATE public.lead_media SET upload_status = 'failed'
-   └── Se o UPDATE no banco tiver sucesso ➔ Prossegue.
+### Conversão de Leads (Testes 22 a 31)
+22. Conversão normal de lead sem OS.
+23. Conversão de lead com 1ª OS criada e valores vinculados.
+24. Conversão sem OS desmarcando o checkbox.
+25. Possível duplicata detectada antes da chamada RPC -> 409.
+26. Confirmação explícita de duplicata -> RPC invocada.
+27. Ação de abrir cliente existente -> zero mutação no lead e zero RPC.
+28. Prevenção de clique duplo (idempotência).
+29. Tentativa de conversão de lead já convertido -> rejeição clara.
+30. Mapeamento de erros de domínio da RPC.
+31. Endereço não criado quando o lead possui apenas cidade/bairro a menos que o admin confirme.
 
-5. LIMPEZA DO TEMPORÁRIO:
-   DeleteObjectCommand em tmp/leads/{leadId}/{uuid}.{ext}
-   (Se falhar, o arquivo final já é válido e o temporário será expurgado pelo Lifecycle 24h).
-```
+### Perfil da Empresa (Testes 32 a 37)
+32. Leitura GET do perfil da empresa com `logo_url` resolvida.
+33. Edição PATCH de campos corporativos com allowlist.
+34. Campos opcionais vazios convertidos para `NULL`.
+35. CNPJ inválido rejeitado.
+36. E-mail inválido rejeitado.
+37. Website com formato inválido rejeitado.
 
----
+### Logo & R2 (Testes 38 a 46)
+38. Exibição da logo estática padrão.
+39. Upload válido via URL pré-assinada e finalização.
+40. Rejeição de arquivo com MIME inválido.
+41. Rejeição de arquivo com magic bytes divergentes da extensão.
+42. Rejeição de arquivo maior que 5 MB.
+43. Falha de upload no R2 tratada defensivamente.
+44. Falha no DB após upload no R2 aciona compensação (deleção do objeto R2).
+45. Restauração da logo estática padrão com limpeza do objeto R2 anterior.
+46. Falha na limpeza de logo R2 antiga não impede o salvamento do perfil.
 
-## 3. Detalhamento dos Componentes a Serem Implementados
-
-### Componente 1: Segurança, Tokens e Storage R2 Privado
-
-#### [NEW] [server/utils/mediaAuth.ts](file:///d:/sicons/ADT/server/utils/mediaAuth.ts)
-- Funções puras e seguras:
-  - `createMediaUploadToken({ leadId, submissionId, maxFiles, maxBytes })`: gera token HMAC-SHA256 utilizando estritamente a variável de ambiente `MEDIA_UPLOAD_SIGNING_SECRET` com expiração de 15 minutos.
-  - `verifyMediaUploadToken(token)`: valida assinatura, integridade e expiração do token.
-
-#### [NEW] [server/utils/r2Storage.ts](file:///d:/sicons/ADT/server/utils/r2Storage.ts)
-- Utilitário S3 para o bucket privado `adtelas-leads-private`:
-  - `generatePresignedUploadUrl(tempStorageKey, mimeType, expiresInSeconds)`: gera Presigned PUT URL.
-  - `generatePresignedDownloadUrl(finalStorageKey, expiresInSeconds)`: gera Presigned GET URL (TTL 300s).
-  - `verifyAndPromoteObject({ tempKey, finalKey, expectedMime, maxBytes })`: executa verificação de `HeadObject` + Magic Bytes, promove o arquivo com `CopyObjectCommand` e deleta o temporário.
-  - `deleteObjectImmediately(key)`: limpeza imediata de arquivos inválidos ou compensação de falhas no banco.
-  - `deleteLeadObjectsFromR2(storageKeys)`: limpeza em lote para exclusão de leads.
-
-#### [NEW] [server/api/media/authorize-upload.post.ts](file:///d:/sicons/ADT/server/api/media/authorize-upload.post.ts)
-- Exige `Authorization: Bearer <uploadToken>`.
-- Valida tipo MIME permitido e limites por lead (`maxFiles: 6`, `maxBytes: 50MB`).
-- Idempotente: se `(lead_id, client_media_id)` já existir como `pending`, reutiliza a chave temporária.
-- Registra status `pending` sob chave temporária `tmp/leads/...`.
-- Retorna URL assinada para upload direto.
-
-#### [NEW] [server/api/media/finalize-upload.post.ts](file:///d:/sicons/ADT/server/api/media/finalize-upload.post.ts)
-- Exige `Authorization: Bearer <uploadToken>`.
-- Executa a transição atômica `pending` ➔ `finalizing` com `finalizing_at`, auditoria de recuperação de stale locks, compensação em falha de banco e idempotência garantida.
+### Segurança & Acessibilidade (Testes 47 a 51)
+47. Requisição sem token -> 401.
+48. Usuário inativo ou não-admin -> 403.
+49. Falha de validação CSRF Same-Origin -> 403.
+50. Tentativa de mutação direta do navegador ao Supabase bloqueada por RLS.
+51. Ausência de PII em logs de console e eventos de telemetria.
 
 ---
 
-### Componente 2: E-mail Data-Only e Orquestração
-
-#### [MODIFY] [server/shared/leadEmailCore.mjs](file:///d:/sicons/ADT/server/shared/leadEmailCore.mjs)
-- Validação estrita de campos obrigatórios:
-  - `Nome`: trim, length >= 2 caracteres.
-  - `Telefone`: normalizado, 10 ou 11 dígitos.
-- E-mail estritamente **DATA-ONLY**:
-  - `CUSTOMER_MEDIA_EMAIL_ATTACHMENTS = NONE`.
-  - `EMAIL_MEDIA_CLAIM = NONE` (zero afirmações sobre existência ou disponibilidade de mídia no template).
-  - Logotipo oficial mantido exclusivamente via CID (`cid:adtelas-icon`).
-  - Zero URLs privadas ou assinadas no corpo do e-mail.
-
-#### [MODIFY] [server/utils/emailService.ts](file:///d:/sicons/ADT/server/utils/emailService.ts)
-- Atualização para envio exclusivo de dados e branding CID (sem anexos de clientes).
-
-#### [MODIFY] [server/api/send-lead.post.ts](file:///d:/sicons/ADT/server/api/send-lead.post.ts)
-- Cria lead no banco com `status = 'Novo'` (`NEW_LEAD_DEFAULT_COMMERCIAL_STATUS`).
-- Dispara a notificação de e-mail DATA-ONLY imediatamente.
-- **Tratamento de Idempotência e Continuidade de Upload (`DUPLICATE_SEND_LEAD_MEDIA_CONTINUATION`):**
-  - Se `submission_id` já existir: localiza o lead existente, **NÃO reenvia e-mail**, gera um novo `uploadToken` válido de 15 minutos e retorna `{ success: true, idempotent: true, leadSaved: true, leadId, submissionId, uploadToken }`, permitindo que o browser prossiga com uploads interrompidos.
-
----
-
-### Componente 3: Painel Admin e Galeria Privada
-
-#### [NEW] [server/api/admin/media/signed-url.get.ts](file:///d:/sicons/ADT/server/api/admin/media/signed-url.get.ts)
-- **Autoridade Centralizada de URLs Assinadas (`SIGNED_URL_AUTHORITY`).**
-- Como a autenticação administrativa está adiada (`ADMIN_AUTH_IMPLEMENTATION = DEFERRED_BY_USER`), retorna estritamente `401 Unauthorized` (`MEDIA_PRIVATE_VIEWING_BEFORE_ADMIN_AUTH = DENIED`).
-- Zero bypass por admin secret ou token de query.
-
-#### [MODIFY] [server/api/admin/analytics/lead-journey.get.ts](file:///d:/sicons/ADT/server/api/admin/analytics/lead-journey.get.ts)
-- Como a autenticação administrativa está adiada (`ADMIN_MEDIA_METADATA_AUTH_REQUIRED = YES`), não expõe metadados de mídia para requisições não autenticadas (`UNAUTHENTICATED_MEDIA_METADATA_ACCESS = DENIED`).
-
-#### [MODIFY] [app/components/admin/LeadJourneyDrawer.vue](file:///d:/sicons/ADT/app/components/admin/LeadJourneyDrawer.vue)
-- Seção **ARQUIVOS DO CLIENTE**:
-  - Preparada com estrutura completa de galeria, lightbox e player HTML5, que permanecerá em estado seguro até a ativação da autenticação administrativa futura.
-
----
-
-### Componente 4: Frontend e Formulários Comerciais
-
-#### [MODIFY] [app/components/MediaUploader.vue](file:///d:/sicons/ADT/app/components/MediaUploader.vue)
-- Suporte a fotos (JPEG, PNG, WebP) e vídeos (MP4, WebM, MOV).
-- Compressão client-side de fotos via Canvas (JPEG max 1280px, q=0.8).
-- Validação client-side de vídeos (max 25MB cada, max 50MB total).
-- Orquestrador de upload com estados visuais claros: `selected` ➔ `uploading` (com progresso) ➔ `uploaded` / `failed`.
-
-#### [MODIFY] [app/pages/orcamento.vue](file:///d:/sicons/ADT/app/pages/orcamento.vue), [app/pages/contato.vue](file:///d:/sicons/ADT/app/pages/contato.vue) e [app/components/LeadForm.vue](file:///d:/sicons/ADT/app/components/LeadForm.vue)
-- Validação estrita de Nome e Telefone no client (botão desabilitado se inválido).
-- Fluxo: envia lead primeiro ➔ recebe `uploadToken` ➔ envia mídias diretamente ao R2 com feedback de progresso na tela ➔ redireciona para `/obrigado`.
-
-#### [MODIFY] [nuxt.config.ts](file:///d:/sicons/ADT/nuxt.config.ts)
-- Ajustes de CSP restritos ao endpoint do R2 derivado de variáveis de ambiente.
-
----
-
-## 4. Matriz de Testes Isolados Planejada (`test-lead-email.mjs`)
-
-Suite de testes 100% mockada em memória (sem chamadas reais a Gmail, Supabase ou Cloudflare R2):
-
-1. `Nome ausente ➔ 400`
-2. `Nome apenas com espaços em branco ➔ 400`
-3. `Nome com menos de 2 caracteres ➔ 400`
-4. `Telefone ausente ➔ 400`
-5. `Telefone com menos de 10 dígitos ➔ 400`
-6. `Nome e Telefone válidos ➔ Aceito (200) com status inicial 'Novo'`
-7. `E-mail opcional vazio ➔ Aceito`
-8. `Mensagem opcional vazia ➔ Aceito`
-9. `Lead sem mídia ➔ Lead salvo com prioridade máxima + E-mail data-only disparado`
-10. `Geração de uploadToken com HMAC e secret dedicado (TTL 15 min)`
-11. `Upload com token inválido ou assinatura forjada ➔ 401/403 Denied`
-12. `Upload com token expirado ➔ 401 Denied`
-13. `Upload com submission_id inventado sem token ➔ Denied`
-14. `Autorização de foto (JPEG/PNG/WebP) ➔ Presigned PUT em tmp/leads/ + status pending`
-15. `Autorização de vídeo (MP4/WebM) ➔ Presigned PUT em tmp/leads/ + status pending`
-16. `Autorização de tipo proibido (SVG, EXE, PDF, HTML) ➔ 400 Rejeitado`
-17. `Autorização excedendo contagem (> 4 fotos ou > 2 vídeos) ➔ 400 Rejeitado`
-18. `Autorização excedendo tamanho (> 25MB vídeo ou > 50MB total) ➔ 400 Rejeitado`
-19. `Authorize idempotente: retry com mesmo (lead_id, client_media_id) ➔ Reutiliza chave pendente sem duplicar`
-20. `Finalize atômico: adquire estado 'finalizing' com timestamp finalizing_at`
-21. `Finalize concorrente: segunda requisição simultânea retorna 202 sem duplicar CopyObject`
-22. `Recuperação de stale finalizing (> 10 min): audita R2 e recupera promoção pendente`
-23. `Finalize com objeto válido no R2 ➔ Promove de tmp/leads/ para leads/, confirma banco e deleta temp`
-24. `Finalize com falha no banco pós-cópia ➔ Executa compensação deletando objeto em leads/`
-25. `Finalize com falha na deleção de temp ➔ Mantém arquivo final válido (resolvido por lifecycle tmp)`
-26. `Finalize com objeto inexistente no R2 ➔ Deleta temp imediato e marca 'failed'`
-27. `Finalize com Magic Bytes divergentes do MIME declarado ➔ Deleta temp imediato e marca 'failed'`
-28. `Finalize com tamanho no R2 maior que o autorizado ➔ Deleta temp imediato e marca 'failed'`
-29. `Finalize idempotente: se já estiver 'uploaded', retorna sucesso imediato`
-30. `Retry de /api/send-lead com mesmo submission_id ➔ Não duplica lead, não reenvia e-mail e retorna novo uploadToken`
-31. `Falha ou cancelamento no upload de mídia ➔ Lead comercial e e-mail permanecem 100% preservados`
-32. `Abandono do browser durante upload de vídeo ➔ Lead salvo no banco e notificação comercial já enviada`
-33. `Isolamento entre leads: Lead A não acessa e não lista mídias do Lead B`
-34. `E-mail SMTP enviado com ZERO anexos de clientes (CUSTOMER_MEDIA_EMAIL_ATTACHMENTS = NONE)`
-35. `E-mail SMTP não contém alegações sobre mídia disponível (EMAIL_MEDIA_CLAIM = NONE)`
-36. `E-mail SMTP mantém anexo inline de branding CID (cid:adtelas-icon)`
-37. `E-mail SMTP não contém Base64, URLs privadas ou assinadas do R2`
-38. `Admin media metadata sem sessão administrativa ➔ 401/403 Denied`
-39. `Admin media signed-url sem sessão administrativa ➔ 401/403 Denied`
-40. `Exclusão de lead aciona remoção dos objetos correspondentes no R2`
-41. `Página /obrigado não dispara novo e-mail nem repete uploads`
+## 5. Documentação Centralizada
+- Produção de um único arquivo ao final: [`docs/CRM_PHASE_3_IMPLEMENTATION.md`](file:///d:/sicons/ADT/docs/CRM_PHASE_3_IMPLEMENTATION.md) cobrindo as 19 partes numeradas (Parte 0 a Parte 18).

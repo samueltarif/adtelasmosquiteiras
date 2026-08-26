@@ -57,6 +57,7 @@ export default defineNuxtPlugin(() => {
     const text = (target.textContent || '').toLowerCase().trim()
     const gtm = target.getAttribute('data-gtm') || ''
     const path = window.location.pathname
+    if (path.startsWith('/admin')) return
 
     let tipo = ''
 

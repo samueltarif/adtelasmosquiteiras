@@ -6,6 +6,11 @@ export default defineNuxtPlugin(() => {
     function gtag() { window.dataLayer.push(arguments) }
     window.gtag = gtag
 
+    // Não injeta scripts de marketing/ads em páginas administrativas
+    if (window.location.pathname.startsWith('/admin')) {
+      return
+    }
+
     // Carregar gtag.js uma única vez (suporta múltiplos IDs)
     const script = document.createElement('script')
     script.async = true
