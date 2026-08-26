@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
 
 const showFormModal = ref(false)
 
@@ -132,6 +133,11 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
         </div>
       </div>
     </section>
+
+    <!-- Galeria Pública de Mídias Reais do Serviço -->
+    <Suspense>
+      <ServicePublicGallery service-key="redes_criancas" />
+    </Suspense>
 
     <section class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 md:px-6">

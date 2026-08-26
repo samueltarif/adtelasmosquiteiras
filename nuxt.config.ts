@@ -5,6 +5,12 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@nuxt/icon'],
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false
+    }
+  ],
   icon: {
     serverBundle: {
       collections: ['lucide']
@@ -26,9 +32,24 @@ export default defineNuxtConfig({
     mediastackApiKey: process.env.MEDIASTACK_API_KEY,
     newsdataApiKey: process.env.NEWSDATA_API_KEY,
     
+    // Cloudflare R2 - Lead Media Privado
+    r2AccountId: process.env.R2_ACCOUNT_ID,
+    r2AccessKeyId: process.env.R2_ACCESS_KEY_ID,
+    r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    r2LeadsBucketName: process.env.R2_LEADS_BUCKET_NAME,
+    mediaUploadSigningSecret: process.env.MEDIA_UPLOAD_SIGNING_SECRET,
+
+    // Cloudflare R2 - Mídias do Site / Galerias Públicas
+    r2SiteMediaAccountId: process.env.R2_SITE_MEDIA_ACCOUNT_ID,
+    r2SiteMediaAccessKeyId: process.env.R2_SITE_MEDIA_ACCESS_KEY_ID,
+    r2SiteMediaSecretAccessKey: process.env.R2_SITE_MEDIA_SECRET_ACCESS_KEY,
+    r2SiteMediaBucketName: process.env.R2_SITE_MEDIA_BUCKET_NAME,
+    r2SiteMediaEndpoint: process.env.R2_SITE_MEDIA_ENDPOINT,
+    
     // Público (cliente e servidor)
     public: {
-      gaMeasurementId: process.env.GA_MEASUREMENT_ID || 'G-S0038L1Q6R'
+      gaMeasurementId: process.env.GA_MEASUREMENT_ID || 'G-S0038L1Q6R',
+      r2SiteMediaPublicBaseUrl: process.env.R2_SITE_MEDIA_PUBLIC_BASE_URL || 'https://media.adtelasmosquiteiras.com.br'
     }
   },
   
@@ -55,13 +76,13 @@ export default defineNuxtConfig({
             "style-src 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com",
             "style-src-elem 'self' 'unsafe-inline' https://googletagmanager.com https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com",
             // Imagens
-            "img-src 'self' data: blob: https: https://*.google-analytics.com https://*.googletagmanager.com https://googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com https://*.g.doubleclick.net https://*.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://ade.googlesyndication.com https://adservice.google.com https://*.r2.cloudflarestorage.com",
+            "img-src 'self' data: blob: https: https://*.google-analytics.com https://*.googletagmanager.com https://googletagmanager.com https://ssl.gstatic.com https://www.gstatic.com https://*.g.doubleclick.net https://*.google.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://pagead2.googlesyndication.com https://ad.doubleclick.net https://ade.googlesyndication.com https://adservice.google.com https://*.r2.cloudflarestorage.com https://media.adtelasmosquiteiras.com.br",
             // Fontes
             "font-src 'self' data: https://fonts.gstatic.com",
             // Conexões (GA4 + GTM + Google Ads + WhatsApp + R2 Direct Upload)
-            "connect-src 'self' https://google.com https://*.google.com https://www.google.com https://www.google.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://*.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://region1.google-analytics.com https://region1.analytics.google.com https://stats.g.doubleclick.net https://*.whatsapp.com https://api.whatsapp.com https://viacep.com.br https://servicodados.ibge.gov.br https://cloudflareinsights.com https://*.r2.cloudflarestorage.com",
+            "connect-src 'self' https://google.com https://*.google.com https://www.google.com https://www.google.com.br https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://*.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://ad.doubleclick.net https://region1.google-analytics.com https://region1.analytics.google.com https://stats.g.doubleclick.net https://*.whatsapp.com https://api.whatsapp.com https://viacep.com.br https://servicodados.ibge.gov.br https://cloudflareinsights.com https://*.r2.cloudflarestorage.com https://media.adtelasmosquiteiras.com.br",
             // Mídia (Vídeos HTML5 R2)
-            "media-src 'self' blob: data: https://*.r2.cloudflarestorage.com",
+            "media-src 'self' blob: data: https://*.r2.cloudflarestorage.com https://media.adtelasmosquiteiras.com.br",
             // Frames
             "frame-src https://www.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://bid.g.doubleclick.net https://vercel.live",
             "frame-ancestors 'none'"

@@ -63,6 +63,15 @@ const handleLogout = async () => {
           <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Leads</span>
         </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/galeria" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/galeria') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:images" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Galeria</span>
+        </NuxtLink>
       </nav>
       
       <div class="mt-auto border-t border-white/10 pt-4">
@@ -127,6 +136,16 @@ const handleLogout = async () => {
           <Icon name="lucide:users" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Leads</span>
         </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/galeria" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/galeria') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:images" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Galeria</span>
+        </NuxtLink>
       </nav>
       
       <div class="mt-auto border-t border-white/10 pt-4">
@@ -154,7 +173,7 @@ const handleLogout = async () => {
           </button>
           <div class="text-xs sm:text-sm text-slate-400 truncate">
             Administração <span class="mx-1 text-slate-600">/</span> 
-            <span class="text-white font-semibold">{{ route.path === '/admin/leads' ? 'Leads' : 'Dashboard' }}</span>
+            <span class="text-white font-semibold">{{ route.path.startsWith('/admin/galeria') ? 'Galeria de Serviços' : route.path === '/admin/leads' ? 'Leads' : 'Dashboard' }}</span>
           </div>
         </div>
         

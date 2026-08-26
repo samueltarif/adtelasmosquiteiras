@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
 
 const WHATSAPP_NUMBER = '5511983586611'
 const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6&zx=1768571227913&no_sw_cr=1#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,'
@@ -199,6 +200,11 @@ const openFormModal = () => { showFormModal.value = true }
       </div>
     </section>
 
+    <!-- Galeria Pública de Mídias Reais do Serviço -->
+    <Suspense>
+      <ServicePublicGallery service-key="vidracaria" />
+    </Suspense>
+
     <!-- SEÇÃO PRINCIPAL: SERVIÇOS DE VIDRAÇARIA (LAYOUT ADAPTADO AO PROJETO) -->
     <section id="catalogo-vidros" class="py-16 md:py-24 bg-[#0B1528] text-white">
       <div class="container mx-auto px-4 md:px-6 max-w-7xl">
@@ -215,55 +221,77 @@ const openFormModal = () => { showFormModal.value = true }
 
         <!-- Grid dos 4 Cards de Vidraçaria -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-          <a
+          <div
             v-for="produto in produtosVidracaria"
             :key="produto.titulo"
-            :href="getWhatsappItemUrl(produto.titulo)"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-cta-location="service_card"
-            data-service-key="vidracaria"
-            data-service-name="Serviços de Vidraçaria"
-            class="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#38BDF8] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col bg-white/5 backdrop-blur-sm cursor-pointer"
+            class="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#38BDF8] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col bg-white/5 backdrop-blur-sm justify-between"
           >
-            <!-- Imagem do Card com Overlay Gradient -->
-            <div class="relative h-64 md:h-72 overflow-hidden bg-gray-900">
-              <img
-                :src="produto.imagem"
-                :alt="produto.titulo"
-                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                loading="lazy"
-              />
-              
-              <!-- Gradient Overlay de Leitura -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+            <!-- Área clicável do Card (Foto + Título + Descrição -> Abre Modal de Contato) -->
+            <button
+              type="button"
+              @click="openFormModal"
+              :aria-label="`Pedir orçamento para ${produto.titulo}`"
+              class="text-left w-full flex flex-col flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded-t-2xl"
+            >
+              <!-- Imagem do Card com Overlay Gradient -->
+              <div class="relative h-64 md:h-72 overflow-hidden bg-gray-900 w-full">
+                <img
+                  :src="produto.imagem"
+                  :alt="produto.titulo"
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
+                />
+                
+                <!-- Gradient Overlay de Leitura -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
-              <!-- Badge do Destaque -->
-              <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                {{ produto.destaque }}
-              </div>
+                <!-- Badge do Destaque -->
+                <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                  {{ produto.destaque }}
+                </div>
 
-              <!-- Conteúdo sobreposto na imagem (Estilo Card Dark Premium) -->
-              <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
-                <h3 class="text-lg md:text-xl font-bold text-white mb-2 leading-tight group-hover:text-[#38BDF8] transition-colors">
-                  {{ produto.titulo }}
-                </h3>
-                <p class="text-xs md:text-sm text-gray-200 line-clamp-3 leading-relaxed mb-3">
-                  {{ produto.descricao }}
-                </p>
+                <!-- Conteúdo sobreposto na imagem (Estilo Card Dark Premium) -->
+                <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                  <h3 class="text-lg md:text-xl font-bold text-white mb-2 leading-tight group-hover:text-[#38BDF8] transition-colors">
+                    {{ produto.titulo }}
+                  </h3>
+                  <p class="text-xs md:text-sm text-gray-200 line-clamp-3 leading-relaxed mb-3">
+                    {{ produto.descricao }}
+                  </p>
 
-                <!-- Botão WhatsApp sobreposto -->
-                <div class="flex items-center justify-between pt-2 border-t border-white/20">
-                  <span class="text-xs text-gray-300 flex items-center gap-1">
+                  <div class="flex items-center gap-1 text-xs text-gray-300">
                     <Icon name="lucide:clock" class="w-3.5 h-3.5 text-[#F49A1A]" /> Instalação 24h
-                  </span>
-                  <span class="inline-flex items-center gap-1.5 text-[#25D366] text-xs font-bold group-hover:translate-x-1 transition-transform">
-                    <Icon name="lucide:message-circle" class="w-4 h-4" /> WhatsApp
-                  </span>
+                  </div>
                 </div>
               </div>
+            </button>
+
+            <!-- Barra de Ações (WhatsApp CTA Isolado) -->
+            <div class="p-4 bg-white/5 border-t border-white/10 flex items-center justify-between gap-2 mt-auto">
+              <button
+                type="button"
+                @click="openFormModal"
+                class="text-xs font-semibold text-[#38BDF8] hover:text-white transition-colors"
+              >
+                Pedir Contato &rarr;
+              </button>
+
+              <a
+                :href="getWhatsappItemUrl(produto.titulo)"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-cta-location="service_card"
+                data-service-key="vidracaria"
+                data-service-name="Serviços de Vidraçaria"
+                :aria-label="`Solicitar orçamento de ${produto.titulo} pelo WhatsApp`"
+                class="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1fb854] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]"
+                @click.stop
+              >
+                <Icon name="lucide:message-circle" class="w-3.5 h-3.5" />
+                WhatsApp
+              </a>
             </div>
-          </a>
+          </div>
         </div>
 
       </div>

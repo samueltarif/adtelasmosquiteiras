@@ -101,6 +101,30 @@ const getTelasServiceKey = (slug) => {
   return map[slug] || (slug.startsWith('telas') ? slug : 'telas_' + slug)
 }
 
+const getTelasDetailPath = (slug) => {
+  const map = {
+    janelas: '/servicos/telas/janelas',
+    portas: '/servicos/telas/portas',
+    varandas: '/servicos/telas/sacadas-e-varandas',
+    sacadas: '/servicos/telas/sacadas-e-varandas',
+    apartamentos: '/servicos/telas/janelas',
+    banheiro: '/servicos/telas/janelas',
+    correr: '/servicos/telas/janelas',
+    removivel: '/servicos/telas/removivel',
+    aluminio: '/servicos/telas/removivel',
+    basculante: '/servicos/telas/janelas',
+    pivotante: '/servicos/telas/janelas',
+    acoinox: '/servicos/telas/removivel',
+    pets: '/servicos/telas/pet-screen',
+    pernilongos: '/servicos/telas/janelas',
+    fachadas: '/servicos/telas/restaurantes',
+    coberturas: '/servicos/telas/sacadas-e-varandas',
+    restaurantes: '/servicos/telas/restaurantes',
+    industrias: '/servicos/telas/restaurantes'
+  }
+  return map[slug] || null
+}
+
 // Hero carousel & Card image indices
 const heroImages = [
   { src: '/images/tela_mosquiteira.png',        alt: 'Tela mosquiteira para janela' },
@@ -232,57 +256,106 @@ onUnmounted(() => {
 
           <!-- Grid de serviços -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <a
+            <div
               v-for="servico in categoria.servicos"
               :key="servico.slug"
-              :href="getWhatsappUrl(servico.titulo)"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-cta-location="service_card"
-              :data-service-key="getTelasServiceKey(servico.slug)"
-              :data-service-name="servico.titulo"
-              class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col cursor-pointer"
+              class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
             >
-              <!-- Imagem -->
-              <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
-                <img
-                  v-for="(imgSrc, imgIdx) in (servico.imagens || [servico.imagem])"
-                  :key="imgSrc"
-                  :src="imgSrc"
-                  :alt="servico.titulo"
-                  class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-105"
-                  :class="cardImageIndex % (servico.imagens?.length || 1) === imgIdx ? 'opacity-100' : 'opacity-0'"
-                  loading="lazy"
-                />
-                <!-- Badge destaque -->
-                <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
-                  {{ servico.destaque }}
+              <!-- Área clicável do Serviço (Foto + Título + Descrição) -->
+              <NuxtLink
+                v-if="getTelasDetailPath(servico.slug)"
+                :to="getTelasDetailPath(servico.slug)"
+                :aria-label="`Ver detalhes sobre ${servico.titulo}`"
+                class="flex flex-col flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F49A1A] rounded-t-2xl"
+              >
+                <!-- Imagem com hover interativo -->
+                <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
+                  <img
+                    v-for="(imgSrc, imgIdx) in (servico.imagens || [servico.imagem])"
+                    :key="imgSrc"
+                    :src="imgSrc"
+                    :alt="servico.titulo"
+                    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-105"
+                    :class="cardImageIndex % (servico.imagens?.length || 1) === imgIdx ? 'opacity-100' : 'opacity-0'"
+                    loading="lazy"
+                  />
+                  <!-- Badge destaque -->
+                  <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
+                    {{ servico.destaque }}
+                  </div>
+                  <!-- Overlay hover "Ver Detalhes" -->
+                  <div class="absolute inset-0 bg-[#22345F]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div class="flex items-center gap-2 bg-[#22345F] text-white font-bold px-4 py-2 rounded-xl shadow-lg text-sm">
+                      <Icon name="lucide:arrow-right" class="w-4 h-4 text-[#F49A1A]" />
+                      Ver Detalhes
+                    </div>
+                  </div>
                 </div>
-                <!-- Overlay hover -->
-                <div class="absolute inset-0 bg-[#22345F]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <div class="flex items-center gap-2 bg-[#25D366] text-white font-bold px-4 py-2 rounded-xl shadow-lg text-sm">
-                    <Icon name="lucide:message-circle" class="w-4 h-4" />
-                    Pedir Orçamento
+
+                <!-- Conteúdo textual -->
+                <div class="p-4 flex flex-col flex-1">
+                  <h3 class="text-[15px] font-bold text-[#22345F] group-hover:text-[#F49A1A] transition-colors mb-1 leading-snug flex items-center justify-between">
+                    <span>{{ servico.titulo }}</span>
+                    <Icon name="lucide:chevron-right" class="w-4 h-4 text-[#F49A1A] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </h3>
+                  <p class="text-xs text-[#4B5563] mb-3 flex-1">{{ servico.descricaoCurta }}</p>
+                  <div class="flex items-center text-[11px] text-[#4B5563] gap-1 mt-auto">
+                    <Icon name="lucide:check-circle" class="w-3 h-3 text-[#F49A1A]" /> Sob Medida
+                  </div>
+                </div>
+              </NuxtLink>
+
+              <!-- Fallback quando card não possui detailPath -->
+              <div v-else class="flex flex-col flex-1">
+                <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
+                  <img
+                    :src="servico.imagem"
+                    :alt="servico.titulo"
+                    class="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
+                    {{ servico.destaque }}
+                  </div>
+                </div>
+                <div class="p-4 flex flex-col flex-1">
+                  <h3 class="text-[15px] font-bold text-[#22345F] mb-1 leading-snug">{{ servico.titulo }}</h3>
+                  <p class="text-xs text-[#4B5563] mb-3 flex-1">{{ servico.descricaoCurta }}</p>
+                  <div class="flex items-center text-[11px] text-[#4B5563] gap-1 mt-auto">
+                    <Icon name="lucide:check-circle" class="w-3 h-3 text-[#F49A1A]" /> Sob Medida
                   </div>
                 </div>
               </div>
 
-              <!-- Conteúdo -->
-              <div class="p-4 flex flex-col flex-1">
-                <h3 class="text-[15px] font-bold text-[#22345F] mb-1 leading-snug">{{ servico.titulo }}</h3>
-                <p class="text-xs text-[#4B5563] mb-3 flex-1">{{ servico.descricaoCurta }}</p>
-                <div class="flex items-center justify-between mt-auto">
-                  <span class="text-[11px] text-[#4B5563] flex items-center gap-1">
-                    <Icon name="lucide:check-circle" class="w-3 h-3 text-[#F49A1A]" /> Sob Medida
-                  </span>
-                  <span class="flex items-center gap-1 text-[#25D366] text-xs font-semibold">
-                    <Icon name="lucide:message-circle" class="w-4 h-4" /> WhatsApp
-                  </span>
-                </div>
-              </div>
-            </a>
-          </div>
+              <!-- Barra de Ações (WhatsApp CTA Isolado) -->
+              <div class="px-4 pb-4 pt-2 border-t border-[#E5EDF8]/60 bg-gray-50/50 mt-auto flex items-center justify-between gap-2">
+                <NuxtLink
+                  v-if="getTelasDetailPath(servico.slug)"
+                  :to="getTelasDetailPath(servico.slug)"
+                  class="text-xs font-semibold text-[#22345F] hover:text-[#F49A1A] flex items-center gap-1 transition-colors focus:outline-none focus-visible:underline"
+                  :aria-label="`Saiba mais sobre ${servico.titulo}`"
+                >
+                  Saiba mais &rarr;
+                </NuxtLink>
+                <span v-else class="text-xs text-gray-500">Instalação SP</span>
 
+                <a
+                  :href="getWhatsappUrl(servico.titulo)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cta-location="service_card"
+                  :data-service-key="getTelasServiceKey(servico.slug)"
+                  :data-service-name="servico.titulo"
+                  :aria-label="`Solicitar orçamento de ${servico.titulo} pelo WhatsApp`"
+                  class="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1fb854] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]"
+                  @click.stop
+                >
+                  <Icon name="lucide:message-circle" class="w-3.5 h-3.5" />
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </template>

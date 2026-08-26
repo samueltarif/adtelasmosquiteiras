@@ -37,8 +37,10 @@ export function useImageCompressor() {
 
       const maxDim = options.maxWidth || MAX_DIMENSION
       const quality = options.quality || JPEG_QUALITY
+      const targetMime = options.format || 'image/webp'
+      const ext = targetMime === 'image/webp' ? 'webp' : 'jpg'
       const baseName = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_')
-      const safeName = `${baseName || 'foto'}.jpg`
+      const safeName = `${baseName || 'foto'}.${ext}`
 
       const objectUrl = URL.createObjectURL(file)
       const img = new Image()
@@ -59,10 +61,10 @@ export function useImageCompressor() {
           const width = img.naturalWidth || img.width
           const height = img.naturalHeight || img.height
 
-          // 1. Fast-Path: se já for JPEG/WebP pequeno (< 120 KB) e com dimensões <= 1280px, não re-comprime
+          // 1. Fast-Path: se já for WebP/JPEG pequeno (< 120 KB) e com dimensões <= maxDim
           if (
             file.size <= SKIP_COMPRESSION_THRESHOLD_BYTES &&
-            (mime === 'image/jpeg' || mime === 'image/jpg' || mime === 'image/webp') &&
+            (mime === targetMime || (targetMime === 'image/jpeg' && (mime === 'image/jpeg' || mime === 'image/jpg'))) &&
             width <= maxDim &&
             height <= maxDim
           ) {
@@ -72,6 +74,8 @@ export function useImageCompressor() {
               name: safeName,
               type: file.type,
               size: file.size,
+              width,
+              height,
               dataUrl: previewDataUrl,
               blob: file,
               skippedCompression: true
@@ -95,22 +99,43 @@ export function useImageCompressor() {
           const canvas = document.createElement('canvas')
           canvas.width = targetWidth
           canvas.height = targetHeight
-          const ctx = canvas.getContext('2d', { alpha: false })
+          const ctx = canvas.getContext('2d', { alpha: targetMime === 'image/webp' })
 
           if (!ctx) {
             cleanup()
             return reject(new Error('Canvas 2D context indisponível.'))
           }
 
-          // Fundo branco sólido para conversão limpa em JPEG
-          ctx.fillStyle = '#FFFFFF'
-          ctx.fillRect(0, 0, targetWidth, targetHeight)
+          if (targetMime !== 'image/webp') {
+            ctx.fillStyle = '#FFFFFF'
+            ctx.fillRect(0, 0, targetWidth, targetHeight)
+          }
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
 
           cleanup()
 
           canvas.toBlob((blob) => {
             if (!blob || blob.size === 0) {
+              // Fallback para JPEG se WebP toBlob falhar
+              if (targetMime === 'image/webp') {
+                canvas.toBlob((jpegBlob) => {
+                  if (!jpegBlob || jpegBlob.size === 0) {
+                    return reject(new Error(`Falha na compressão da imagem "${file.name}".`))
+                  }
+                  const previewUrl = URL.createObjectURL(jpegBlob)
+                  resolve({
+                    name: `${baseName || 'foto'}.jpg`,
+                    type: 'image/jpeg',
+                    size: jpegBlob.size,
+                    width: targetWidth,
+                    height: targetHeight,
+                    dataUrl: previewUrl,
+                    blob: jpegBlob,
+                    skippedCompression: false
+                  })
+                }, 'image/jpeg', quality)
+                return
+              }
               return reject(new Error(`Falha na compressão da imagem "${file.name}" (0 bytes gerados).`))
             }
 
@@ -118,13 +143,15 @@ export function useImageCompressor() {
 
             resolve({
               name: safeName,
-              type: 'image/jpeg',
+              type: targetMime,
               size: blob.size,
+              width: targetWidth,
+              height: targetHeight,
               dataUrl: previewUrl,
               blob: blob,
               skippedCompression: false
             })
-          }, 'image/jpeg', quality)
+          }, targetMime, quality)
 
         } catch (canvasErr) {
           cleanup()

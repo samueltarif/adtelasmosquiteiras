@@ -2,6 +2,70 @@ import { ref } from 'vue'
 import { useAnalyticsIdentity } from './useAnalyticsIdentity'
 import { useAttribution } from './useAttribution'
 
+const CONVERSION_STORAGE_PREFIX = 'google_ads_form_conversion:'
+
+/**
+ * Verifica se esta submissão já teve conversão reportada nesta sessão
+ * @param {string} submissionId
+ * @returns {boolean}
+ */
+export function hasConversionBeenReported(submissionId) {
+  if (!submissionId || typeof window === 'undefined') return false
+  try {
+    return !!window.sessionStorage.getItem(`${CONVERSION_STORAGE_PREFIX}${submissionId}`)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Marca uma submissão como reportada na sessionStorage (sem PII)
+ * @param {string} submissionId
+ */
+export function markConversionAsReported(submissionId) {
+  if (!submissionId || typeof window === 'undefined') return
+  try {
+    window.sessionStorage.setItem(`${CONVERSION_STORAGE_PREFIX}${submissionId}`, String(Date.now()))
+  } catch {}
+}
+
+/**
+ * Dispara conversão do Google Ads e evento canônico no dataLayer
+ * garantindo idempotência estrita por submission_id (Single Source of Truth).
+ *
+ * @param {string} submissionId UUID da submissão
+ * @returns {boolean} true se disparou, false se já havia sido reportada
+ */
+export function reportFormConversion(submissionId) {
+  if (!submissionId) return false
+  if (hasConversionBeenReported(submissionId)) {
+    if (import.meta.dev) {
+      console.log(`[useFormSubmit] Conversão ignorada (já reportada para ${submissionId})`)
+    }
+    return false
+  }
+
+  // 1. Google Ads Conversion
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', 'conversion', {
+      'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C'
+    })
+  }
+
+  // 2. dataLayer Canonical Event
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || []
+    window.dataLayer.push({
+      event: 'lead_form_success',
+      submission_id: submissionId
+    })
+  }
+
+  // 3. Registrar na sessionStorage (sem PII)
+  markConversionAsReported(submissionId)
+  return true
+}
+
 let activeSubmissionId = null
 
 /**
@@ -13,23 +77,6 @@ export function useFormSubmit() {
   const isSubmitting = ref(false)
   const identity = useAnalyticsIdentity()
   const attribution = useAttribution()
-
-  // Função de conversão Google Ads & GTM
-  const reportConversion = () => {
-    if (typeof window !== 'undefined') {
-      if (window.gtag) {
-        window.gtag('event', 'conversion', {
-          'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C'
-        })
-      }
-      window.dataLayer = window.dataLayer || []
-      window.dataLayer.push({
-        event: 'form_submission',
-        event_category: 'lead',
-        event_label: 'formulario_contato'
-      })
-    }
-  }
 
   /**
    * Envia o lead comercial e orquestra o upload direto de mídias vinculadas.
@@ -143,13 +190,14 @@ export function useFormSubmit() {
         }
       }
 
-      // Registrar conversão Google Ads
-      reportConversion()
+      // 3. Registrar conversão Google Ads (Single Source of Truth: APÓS confirmação real de sucesso da API)
+      const submittedId = payload.submission_id
+      reportFormConversion(submittedId)
 
       // Reset do submissionId após sucesso
       activeSubmissionId = null
 
-      // Redirecionar para página de obrigado
+      // Redirecionar para página de obrigado (pura UI)
       await navigateTo('/obrigado')
     } catch (e) {
       console.error('[useFormSubmit] Erro ao enviar formulário:', e)

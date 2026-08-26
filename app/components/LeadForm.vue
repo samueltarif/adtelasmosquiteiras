@@ -1,19 +1,28 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useAnalyticsIdentity } from '~/composables/useAnalyticsIdentity'
-import { useAttribution } from '~/composables/useAttribution'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useFormSubmit } from '~/composables/useFormSubmit'
+import { getServiceFromPath } from '~/utils/ctaTaxonomy'
+import MediaUploader from '~/components/MediaUploader.vue'
 
 const props = defineProps({
   variant: {
     type: String,
     default: 'desktop' // 'desktop' ou 'modal'
+  },
+  serviceName: {
+    type: String,
+    default: ''
+  },
+  serviceKey: {
+    type: String,
+    default: ''
   }
 })
 
-const identity = useAnalyticsIdentity()
-const attribution = useAttribution()
-let activeSubmissionId = null
-
+const route = useRoute()
+const { isSubmitting, redirectToThankYou } = useFormSubmit()
+const submitError = ref(false)
 const mediaUploaderRef = ref(null)
 
 // Estado do formulário em 2 passos
@@ -21,8 +30,8 @@ const currentStep = ref(1)
 const formData = ref({
   // Passo 1 - Obrigatórios
   nome: '',
-  cidade: '',
   telefone: '',
+  cidade: 'São Paulo',
   // Passo 2 - Opcionais
   bairro: '',
   servico: '',
@@ -30,14 +39,37 @@ const formData = ref({
   mensagem: ''
 })
 
-const isSubmitting = ref(false)
-const isSubmitted = ref(false)
+// Auto-detectar serviço a partir de props ou rota atual
+function initializeService() {
+  if (props.serviceName) {
+    formData.value.servico = props.serviceName
+    return
+  }
+  const detected = getServiceFromPath(route.path)
+  if (detected?.name) {
+    formData.value.servico = detected.name
+  }
+}
+
+onMounted(() => {
+  initializeService()
+})
+
+watch(() => props.serviceName, (newVal) => {
+  if (newVal) formData.value.servico = newVal
+})
+
+watch(() => route.path, () => {
+  initializeService()
+})
 
 // Validação estrita do passo 1 (Nome >= 2 chars e Telefone 10-11 dígitos)
 const canContinue = computed(() => {
   const cleanNome = (formData.value.nome || '').trim()
   const rawDigits = (formData.value.telefone || '').replace(/\D/g, '')
-  const cleanDigits = rawDigits.startsWith('55') && rawDigits.length >= 12 ? rawDigits.slice(2) : (rawDigits.startsWith('0') ? rawDigits.slice(1) : rawDigits)
+  const cleanDigits = rawDigits.startsWith('55') && rawDigits.length >= 12 
+    ? rawDigits.slice(2) 
+    : (rawDigits.startsWith('0') ? rawDigits.slice(1) : rawDigits)
   return cleanNome.length >= 2 && cleanDigits.length >= 10 && cleanDigits.length <= 11
 })
 
@@ -46,7 +78,7 @@ const goToStep2 = () => {
   if (canContinue.value) {
     currentStep.value = 2
   } else {
-    alert('Por favor, preencha seu nome e um WhatsApp/telefone válido com DDD.')
+    alert('Por favor, informe seu nome e um WhatsApp/telefone válido com DDD (10 ou 11 dígitos).')
   }
 }
 
@@ -55,101 +87,45 @@ const goToStep1 = () => {
   currentStep.value = 1
 }
 
-// Enviar formulário (envia lead, aciona upload de mídias e redireciona para obrigado)
+// Enviar formulário através do pipeline canônico de useFormSubmit
 const submitLead = async () => {
-  if (!canContinue.value || isSubmitting.value) {
-    if (!canContinue.value) alert('Por favor, preencha nome e telefone com DDD.')
+  submitError.value = false
+
+  const cleanNome = (formData.value.nome || '').trim()
+  if (cleanNome.length < 2) {
+    alert('Por favor, informe seu nome completo (mínimo 2 caracteres).')
     return
   }
 
-  isSubmitting.value = true
-  
+  const digits = (formData.value.telefone || '').replace(/\D/g, '')
+  const cleanDigits = digits.startsWith('55') && digits.length >= 12 
+    ? digits.slice(2) 
+    : (digits.startsWith('0') ? digits.slice(1) : digits)
+  if (cleanDigits.length < 10 || cleanDigits.length > 11) {
+    alert('Por favor, informe um WhatsApp/telefone válido com DDD (10 ou 11 dígitos).')
+    return
+  }
+
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/'
+  const detected = getServiceFromPath(currentPath)
+  const effectiveServico = formData.value.servico || detected?.name || 'Não especificado'
+
+  const payload = {
+    nome: cleanNome,
+    telefone: cleanDigits,
+    cidade: formData.value.cidade || 'São Paulo',
+    bairro: formData.value.bairro || '',
+    servico: effectiveServico,
+    email: formData.value.email || '',
+    mensagem: formData.value.mensagem || '',
+    origem: (props.variant === 'modal' ? 'formulario_modal_' : 'formulario_servico_') + currentPath
+  }
+
   try {
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname : 'home'
-    const visitorId = identity.getOrCreateVisitorId()
-    const { sessionId } = identity.getOrCreateSessionId(currentPath)
-    const landingPath = identity.getSessionLandingPath(currentPath)
-    const attr = attribution.getOrInitAttribution()
-    const firstTouch = identity.getFirstTouchChannel()
-
-    if (!activeSubmissionId) {
-      activeSubmissionId = identity.generateUUID()
-    }
-
-    // 1. Enviar lead comercial para API (/api/send-lead)
-    const response = await $fetch('/api/send-lead', {
-      method: 'POST',
-      body: {
-        submission_id: activeSubmissionId,
-        visitor_id: visitorId,
-        session_id: sessionId,
-        landing_path: landingPath,
-        conversion_path: currentPath,
-        channel: attr.channel,
-        first_touch_channel: firstTouch,
-        utm_source: attr.utm_source,
-        utm_medium: attr.utm_medium,
-        utm_campaign: attr.utm_campaign,
-        utm_content: attr.utm_content,
-        utm_term: attr.utm_term,
-        gclid: attr.gclid,
-        nome: formData.value.nome,
-        cidade: formData.value.cidade || 'São Paulo',
-        bairro: formData.value.bairro || '',
-        servico: formData.value.servico || 'Não especificado',
-        telefone: formData.value.telefone || '',
-        email: formData.value.email || '',
-        mensagem: formData.value.mensagem || '',
-        origem: 'formulario_hero_' + currentPath,
-        media_selection_summary: (mediaUploaderRef.value?.photos?.length || mediaUploaderRef.value?.videos?.length)
-          ? {
-              photoCount: mediaUploaderRef.value.photos?.length || 0,
-              videoCount: mediaUploaderRef.value.videos?.length || 0
-            }
-          : null
-      }
-    })
-
-    // 2. Se houver fotos/vídeos selecionados e uploadToken retornado, envia diretamente ao R2
-    if (response?.success) {
-      if (mediaUploaderRef.value?.hasFiles && response.uploadToken) {
-        try {
-          await mediaUploaderRef.value.uploadAllMedia(response.uploadToken)
-        } catch (mediaErr) {
-          console.warn('[LeadForm] Erro no upload de mídias:', mediaErr)
-        }
-      }
-
-      activeSubmissionId = null
-      await navigateTo('/obrigado')
-    }
+    await redirectToThankYou(payload, mediaUploaderRef)
   } catch (error) {
-    console.error('Erro ao enviar lead:', error)
-    
-    // Fallback: abrir WhatsApp se a requisição falhar
-    let message = `Olá! Meu nome é ${formData.value.nome}, moro em ${formData.value.cidade}`
-    
-    if (formData.value.bairro) {
-      message += `, região ${formData.value.bairro}`
-    }
-    
-    message += `.`
-    
-    if (formData.value.servico) {
-      message += ` Gostaria de um orçamento para: ${formData.value.servico}.`
-    } else {
-      message += ` Gostaria de um orçamento para telas mosquiteiras. Vim pelo site: https://www.adtelasmosquiteiras.com.br`
-    }
-    
-    const whatsappUrl = `https://wa.me/5511983586611?text=${encodeURIComponent(message)}`
-    
-    if (typeof window !== 'undefined') {
-      window.open(whatsappUrl, '_blank')
-    }
-    
-    alert('Não foi possível enviar pelo formulário, mas você pode continuar pelo WhatsApp.')
-  } finally {
-    isSubmitting.value = false
+    console.error('[LeadForm] Erro ao enviar formulário:', error)
+    submitError.value = true
   }
 }
 </script>
@@ -159,46 +135,47 @@ const submitLead = async () => {
     data-cta-location="quote_form"
     :class="[
       'bg-white rounded-xl shadow-lg border border-gray-200',
-      variant === 'desktop' ? 'p-6' : 'p-5'
+      variant === 'desktop' ? 'p-6' : 'p-4 sm:p-5'
     ]"
   >
-    <!-- Header -->
-    <div class="text-center mb-5">
-      <h3 :class="[
-        'font-bold text-gray-800 mb-2',
-        variant === 'desktop' ? 'text-xl' : 'text-lg'
-      ]">
+    <!-- Header (Exibido apenas na variante desktop para evitar duplicação no modal) -->
+    <div v-if="variant === 'desktop'" class="text-center mb-5">
+      <h3 class="font-bold text-gray-800 mb-2 text-xl">
         Orçamento Grátis
       </h3>
-      <p :class="[
-        'text-gray-600',
-        variant === 'desktop' ? 'text-sm' : 'text-xs'
-      ]">
+      <p class="text-gray-600 text-sm">
         Resposta em alguns minutos
       </p>
-      
-      <!-- Indicador de Passos -->
-      <div class="flex items-center justify-center gap-2 mt-3">
+    </div>
+
+    <!-- Indicador de Passos -->
+    <div class="mb-5">
+      <div class="flex items-center justify-center gap-2">
         <div :class="[
           'flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all',
-          currentStep === 1 ? 'bg-[#25D366] text-white' : 'bg-green-100 text-green-600'
+          currentStep === 1 ? 'bg-[#25D366] text-white ring-2 ring-[#25D366]/30' : 'bg-green-100 text-green-700'
         ]">
           <svg v-if="currentStep === 2" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
           </svg>
           <span v-else>1</span>
         </div>
-        <div class="w-8 h-0.5 bg-gray-200"></div>
+        <div class="w-10 h-0.5 bg-gray-200"></div>
         <div :class="[
           'flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-all',
-          currentStep === 2 ? 'bg-[#25D366] text-white' : 'bg-gray-200 text-gray-600'
+          currentStep === 2 ? 'bg-[#25D366] text-white ring-2 ring-[#25D366]/30' : 'bg-gray-100 text-gray-500'
         ]">
           2
         </div>
       </div>
-      <p class="text-xs text-gray-500 mt-2">
-        {{ currentStep === 1 ? 'Passo 1 - Dados Rápidos' : 'Passo 2 - Detalhes e Fotos (Opcional)' }}
+      <p class="text-xs text-center text-gray-500 mt-2 font-medium">
+        {{ currentStep === 1 ? 'Passo 1 — Dados Rápidos' : 'Passo 2 — Detalhes e Fotos (Opcional)' }}
       </p>
+    </div>
+
+    <!-- Feedback de Erro -->
+    <div v-if="submitError" class="mb-4 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs sm:text-sm">
+      Ocorreu um erro ao enviar seu formulário. Por favor, tente novamente ou fale conosco diretamente pelo WhatsApp.
     </div>
 
     <!-- Form -->
@@ -214,24 +191,23 @@ const submitLead = async () => {
           <input
             v-model="formData.nome"
             type="text"
-            placeholder="Digite seu nome"
+            placeholder="Digite seu nome completo"
             required
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
-            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />
         </div>
 
-        <!-- Telefone -->
+        <!-- Telefone / WhatsApp -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            WhatsApp / Telefone <span class="text-xs font-normal text-gray-500">(opcional)</span>
+            WhatsApp / Telefone <span class="text-red-500">*</span>
           </label>
           <input
             v-model="formData.telefone"
             type="tel"
             placeholder="(11) 98765-4321"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
-            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+            required
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />
         </div>
 
@@ -243,41 +219,31 @@ const submitLead = async () => {
           <input
             v-model="formData.cidade"
             type="text"
-            placeholder="Ex: São Paulo"
+            placeholder="Ex: São Paulo, Santo André, Campinas..."
             required
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300"
-            :class="variant === 'desktop' ? 'text-base' : 'text-sm'"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />
         </div>
 
-        <!-- Botão Continuar / Enviar -->
+        <!-- Botão Enviar Rápido -->
         <button
           type="submit"
-          :disabled="!canContinue || isSubmitting || isSubmitted"
+          :disabled="!canContinue || isSubmitting"
           :class="[
-            'w-full font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2',
-            variant === 'desktop' ? 'py-4 text-lg' : 'py-3 text-base',
-            isSubmitted
-              ? 'bg-green-500 text-white cursor-default'
-              : canContinue
-                ? 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg hover:scale-105 active:scale-95'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            'w-full font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-md min-h-[48px]',
+            variant === 'desktop' ? 'py-4 text-lg' : 'py-3.5 text-base',
+            canContinue && !isSubmitting
+              ? 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg active:scale-[0.98]'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           ]"
         >
           <svg v-if="isSubmitting" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          
-          <svg v-else-if="isSubmitted" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-          </svg>
-          
           <Icon v-else name="lucide:send" class="w-5 h-5" />
 
-          <span v-if="isSubmitting">Enviando...</span>
-          <span v-else-if="isSubmitted">Enviado!</span>
-          <span v-else>Solicitar Orçamento</span>
+          <span>{{ isSubmitting ? 'Enviando Orçamento...' : 'Solicitar Orçamento Grátis' }}</span>
         </button>
 
         <!-- Link para passo 2 (opcional) -->
@@ -285,18 +251,18 @@ const submitLead = async () => {
           type="button"
           @click="goToStep2"
           :disabled="!canContinue"
-          class="w-full text-sm text-gray-600 hover:text-primary underline transition-colors"
+          class="w-full text-xs sm:text-sm text-gray-600 hover:text-[#22345F] underline transition-colors pt-1 text-center font-medium disabled:opacity-50 disabled:no-underline"
         >
-          Ou adicionar fotos e detalhes para orçamento mais preciso
+          Ou adicionar fotos e detalhes para orçamento mais preciso &rarr;
         </button>
       </div>
 
       <!-- ========== PASSO 2: DETALHES OPCIONAIS ========== -->
       <div v-show="currentStep === 2" class="space-y-4">
         <!-- Aviso de Opcional -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p class="text-xs text-blue-800 text-center">
-            <strong>Opcional</strong> — Ajuda a enviar um orçamento mais rápido e preciso
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+          <p class="text-xs text-blue-900 text-center">
+            <strong>Opcional</strong> — Ajuda nossa equipe a enviar um orçamento exato e rápido.
           </p>
         </div>
 
@@ -309,20 +275,20 @@ const submitLead = async () => {
             v-model="formData.email"
             type="email"
             placeholder="seuemail@exemplo.com"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />
         </div>
 
-        <!-- Região / Endereço -->
+        <!-- Região / Endereço / Bairro -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
-            Região / Endereço <span class="text-gray-400 text-xs">(opcional)</span>
+            Bairro ou Região <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <input
             v-model="formData.bairro"
             type="text"
-            placeholder="Ex: Zona Sul, Moema, Centro"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
+            placeholder="Ex: Moema, Pinheiros, Centro..."
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />
         </div>
 
@@ -333,15 +299,22 @@ const submitLead = async () => {
           </label>
           <select
             v-model="formData.servico"
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base bg-white"
           >
             <option value="">Selecione um serviço</option>
             <option value="Telas Mosquiteiras">Telas Mosquiteiras</option>
+            <option value="Telas Mosquiteiras para Janelas">Telas Mosquiteiras para Janelas</option>
+            <option value="Telas Mosquiteiras para Portas">Telas Mosquiteiras para Portas</option>
+            <option value="Telas Mosquiteiras Pet Screen">Telas Mosquiteiras Pet Screen</option>
+            <option value="Telas Mosquiteiras Removíveis">Telas Mosquiteiras Removíveis</option>
+            <option value="Telas Mosquiteiras para Sacadas">Telas Mosquiteiras para Sacadas</option>
             <option value="Redes de Proteção">Redes de Proteção</option>
-            <option value="Telas Pet Screen">Telas Pet Screen</option>
-            <option value="Redes para Crianças">Redes para Crianças</option>
-            <option value="Redes para Pets">Redes para Pets</option>
-            <option value="Telas Removíveis">Telas Removíveis</option>
+            <option value="Redes de Proteção para Janelas">Redes de Proteção para Janelas</option>
+            <option value="Redes de Proteção para Sacadas e Varandas">Redes de Proteção para Sacadas e Varandas</option>
+            <option value="Redes de Proteção para Gatos e Pets">Redes de Proteção para Gatos e Pets</option>
+            <option value="Redes de Proteção para Crianças">Redes de Proteção para Crianças</option>
+            <option value="Redes de Proteção para Escadas e Mezaninos">Redes de Proteção para Escadas e Mezaninos</option>
+            <option value="Serviços de Vidraçaria">Serviços de Vidraçaria</option>
             <option value="Outro">Outro serviço</option>
           </select>
         </div>
@@ -356,50 +329,44 @@ const submitLead = async () => {
             rows="3"
             maxlength="1500"
             placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas..."
-            class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-sm resize-y"
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base resize-y"
           ></textarea>
         </div>
 
-        <!-- Uploader de Fotos e Vídeos -->
+        <!-- Uploader de Fotos e Vídeos (Cloudflare R2 Privado) -->
         <MediaUploader ref="mediaUploaderRef" :max-photos="4" :max-videos="2" />
 
-        <!-- Botões -->
-        <div class="flex gap-2 pt-2">
-          <!-- Voltar -->
+        <!-- Botões de Ação do Passo 2 -->
+        <div class="flex gap-2.5 pt-2">
+          <!-- Voltar ao Passo 1 -->
           <button
             type="button"
             @click="goToStep1"
-            class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-1 text-sm"
+            :disabled="isSubmitting"
+            class="flex-1 py-3 px-4 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all flex items-center justify-center gap-1 text-sm min-h-[48px]"
           >
             <Icon name="lucide:arrow-left" class="w-4 h-4" />
             <span>Voltar</span>
           </button>
 
-          <!-- Enviar -->
+          <!-- Enviar Completo -->
           <button
             type="submit"
-            :disabled="isSubmitting || isSubmitted"
+            :disabled="isSubmitting"
             :class="[
-              'flex-[2] font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 py-3 text-base',
-              isSubmitted 
-                ? 'bg-green-500 text-white cursor-default' 
-                : 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg hover:scale-105 active:scale-95'
+              'flex-[2] font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 py-3.5 text-base shadow-md min-h-[48px]',
+              !isSubmitting
+                ? 'bg-[#25D366] hover:bg-[#1fb854] text-white hover:shadow-lg active:scale-[0.98]'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             ]"
           >
             <svg v-if="isSubmitting" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            
-            <svg v-else-if="isSubmitted" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-            </svg>
-            
             <Icon v-else name="lucide:send" class="w-5 h-5" />
 
-            <span v-if="isSubmitting">Enviando...</span>
-            <span v-else-if="isSubmitted">Enviado!</span>
-            <span v-else>Enviar Solicitação</span>
+            <span>{{ isSubmitting ? 'Enviando...' : 'Enviar Solicitação Completa' }}</span>
           </button>
         </div>
       </div>
@@ -411,11 +378,11 @@ const submitLead = async () => {
       <div class="flex items-center justify-center gap-4 text-xs text-gray-500">
         <div class="flex items-center gap-1">
           <Icon name="lucide:shield-check" class="w-3.5 h-3.5 text-green-500" />
-          <span>Mais Segurança</span>
+          <span>Atendimento Rápido</span>
         </div>
         <div class="flex items-center gap-1">
           <Icon name="lucide:lock" class="w-3.5 h-3.5 text-blue-500" />
-          <span>Sem Spam</span>
+          <span>Privacidade Garantida</span>
         </div>
       </div>
     </div>
@@ -423,32 +390,19 @@ const submitLead = async () => {
 </template>
 
 <style scoped>
-@media (min-width: 1024px) {
-  .form-input {
-    color: #1f2937 !important;
-    background-color: #ffffff !important;
-    -webkit-text-fill-color: #1f2937 !important;
-  }
-  
-  .form-input::placeholder {
-    color: #9ca3af !important;
-    opacity: 1 !important;
-  }
-  
-  .form-input:focus {
-    color: #1f2937 !important;
-    -webkit-text-fill-color: #1f2937 !important;
-  }
+.form-input {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #1f2937 !important;
 }
 
-@media (max-width: 1023px) {
-  .form-input {
-    color: #1f2937;
-    background-color: #ffffff;
-  }
-  
-  .form-input::placeholder {
-    color: #9ca3af;
-  }
+.form-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+.form-input:focus {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
 }
 </style>

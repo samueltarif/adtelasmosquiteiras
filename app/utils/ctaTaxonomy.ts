@@ -62,3 +62,42 @@ export function getServiceMetadata(key: string | null | undefined): { key: strin
   if (!key) return null
   return SERVICE_TAXONOMY[key] || null
 }
+
+export function getServiceFromPath(path: string | null | undefined): { key: string; name: string } | null {
+  if (!path) return null
+  const clean = path.replace(/\/$/, '').toLowerCase()
+
+  // Telas Mosquiteiras específicas
+  if (clean.includes('/telas/pet-screen')) return SERVICE_TAXONOMY.pet_screen
+  if (clean.includes('/telas/janelas')) return SERVICE_TAXONOMY.telas_janelas
+  if (clean.includes('/telas/portas')) return SERVICE_TAXONOMY.telas_portas
+  if (clean.includes('/telas/varandas')) return SERVICE_TAXONOMY.telas_varandas
+  if (clean.includes('/telas/sacadas')) return SERVICE_TAXONOMY.telas_sacadas
+  if (clean.includes('/telas/apartamentos')) return SERVICE_TAXONOMY.telas_apartamentos
+  if (clean.includes('/telas/banheiro')) return SERVICE_TAXONOMY.telas_banheiro
+  if (clean.includes('/telas/correr')) return SERVICE_TAXONOMY.telas_correr
+  if (clean.includes('/telas/removivel') || clean.includes('/telas/removiveis')) return SERVICE_TAXONOMY.telas_removiveis
+  if (clean.includes('/telas/perfis')) return SERVICE_TAXONOMY.telas_perfis
+  if (clean.includes('/telas/basculantes')) return SERVICE_TAXONOMY.telas_basculantes
+  if (clean.includes('/telas/pivotantes')) return SERVICE_TAXONOMY.telas_pivotantes
+  if (clean.includes('/telas/especiais')) return SERVICE_TAXONOMY.telas_especiais
+  if (clean.includes('/telas/anti-pernilongos')) return SERVICE_TAXONOMY.telas_anti_pernilongos
+  if (clean.includes('/telas/fachadas')) return SERVICE_TAXONOMY.telas_fachadas
+  if (clean.includes('/telas/coberturas')) return SERVICE_TAXONOMY.telas_coberturas
+  if (clean.includes('/telas/restaurantes')) return SERVICE_TAXONOMY.telas_restaurantes
+  if (clean.includes('/telas/industrias')) return SERVICE_TAXONOMY.telas_industrias
+  if (clean.includes('/servicos/telas')) return { key: 'telas_mosquiteiras', name: 'Telas Mosquiteiras' }
+
+  // Redes de Proteção específicas
+  if (clean.includes('/redes/gatos') || clean.includes('/redes/pets')) return SERVICE_TAXONOMY.redes_pets
+  if (clean.includes('/redes/janelas')) return SERVICE_TAXONOMY.redes_janelas
+  if (clean.includes('/redes/sacadas')) return SERVICE_TAXONOMY.redes_sacadas
+  if (clean.includes('/redes/criancas')) return SERVICE_TAXONOMY.redes_criancas
+  if (clean.includes('/redes/escadas') || clean.includes('/redes/mezaninos')) return SERVICE_TAXONOMY.redes_escadas
+  if (clean.includes('/servicos/redes')) return { key: 'redes_protecao', name: 'Redes de Proteção' }
+
+  // Vidraçaria
+  if (clean.includes('/vidracaria')) return SERVICE_TAXONOMY.vidracaria
+
+  return null
+}

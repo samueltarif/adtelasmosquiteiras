@@ -5,13 +5,6 @@ useHead({
     { name: 'robots', content: 'noindex, nofollow' }
   ]
 })
-
-// Fire conversion on page load — gtag sempre disponível via plugin GTM
-onMounted(() => {
-  window.gtag('event', 'conversion', { 'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C' })
-  window.gtag('event', 'generate_lead', { event_category: 'lead', event_label: 'obrigado_page' })
-  window.dataLayer.push({ event: 'form_submission', event_category: 'lead', event_label: 'obrigado_page' })
-})
 </script>
 
 <template>
