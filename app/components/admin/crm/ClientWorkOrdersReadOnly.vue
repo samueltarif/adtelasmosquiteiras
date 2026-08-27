@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   clientId: string
 }>()
 
+const router = useRouter()
 const workOrders = ref<any[]>([])
 const isLoading = ref(false)
 const total = ref(0)
@@ -24,16 +26,24 @@ const statusLabels: Record<string, { label: string, color: string }> = {
 async function fetchWorkOrders() {
   isLoading.value = true
   try {
-    const res = await $fetch<any>(`/api/admin/crm/clients/${props.clientId}/work-orders?page=${page.value}&pageSize=${pageSize.value}`)
-    if (res?.success) {
+    const res = await $fetch<any>(`/api/admin/crm/work-orders?clientId=${props.clientId}&page=${page.value}&limit=${pageSize.value}`)
+    if (res?.workOrders) {
       workOrders.value = res.workOrders || []
-      total.value = res.total || 0
+      total.value = res.pagination?.total || 0
     }
   } catch (err: any) {
-    console.error('[ClientWorkOrdersReadOnly] Erro ao carregar OSs:', err)
+    console.error('[ClientWorkOrders] Erro ao carregar OSs:', err)
   } finally {
     isLoading.value = false
   }
+}
+
+function navigateToNewWorkOrder() {
+  router.push(`/admin/ordens-servico/nova?clientId=${props.clientId}`)
+}
+
+function navigateToWorkOrder(woId: string) {
+  router.push(`/admin/ordens-servico/${woId}`)
 }
 
 function formatCurrency(val: number | string | null) {
@@ -53,9 +63,19 @@ onMounted(() => {
 
 <template>
   <div class="space-y-4">
-    <div>
-      <h3 class="text-sm font-bold text-white uppercase tracking-wider">Ordens de Serviço do Cliente</h3>
-      <p class="text-xs text-slate-400">Histórico de orçamentos e serviços contratados</p>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Ordens de Serviço do Cliente</h3>
+        <p class="text-xs text-slate-400">Histórico de orçamentos e serviços contratados</p>
+      </div>
+
+      <button
+        @click="navigateToNewWorkOrder"
+        class="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer min-h-[44px]"
+      >
+        <Icon name="lucide:plus" class="w-4 h-4" />
+        <span>Nova Ordem de Serviço</span>
+      </button>
     </div>
 
     <div v-if="isLoading" class="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
@@ -67,18 +87,26 @@ onMounted(() => {
       <div class="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2">
         <Icon name="lucide:file-text" class="w-5 h-5" />
       </div>
-      <p class="text-xs text-slate-400">Nenhuma Ordem de Serviço cadastrada para este cliente ainda.</p>
+      <p class="text-xs text-slate-400 mb-3">Nenhuma Ordem de Serviço cadastrada para este cliente ainda.</p>
+      <button
+        @click="navigateToNewWorkOrder"
+        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer min-h-[38px]"
+      >
+        <Icon name="lucide:plus" class="w-3.5 h-3.5" />
+        <span>Criar Primeira OS</span>
+      </button>
     </div>
 
     <div v-else class="space-y-3">
       <div
         v-for="wo in workOrders"
         :key="wo.id"
-        class="rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3"
+        @click="navigateToWorkOrder(wo.id)"
+        class="rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-sm hover:border-indigo-500/40 hover:bg-slate-900/80 transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-3 group"
       >
         <div class="space-y-1">
           <div class="flex items-center gap-2">
-            <span class="font-mono text-sm font-bold text-indigo-400">{{ wo.numero_os }}</span>
+            <span class="font-mono text-sm font-bold text-indigo-400 group-hover:text-indigo-300 transition-colors">{{ wo.numero_os }}</span>
             <span 
               class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border"
               :class="statusLabels[wo.status_os]?.color || 'bg-slate-800 text-slate-300'"
@@ -88,8 +116,8 @@ onMounted(() => {
           </div>
 
           <p class="text-xs text-slate-300">
-            <span v-if="wo.client_addresses">
-              Local: {{ wo.client_addresses.logradouro || wo.client_addresses.rotulo || 'Imóvel' }}, {{ wo.client_addresses.cidade }}
+            <span v-if="wo.address">
+              Local: {{ wo.address.logradouro || wo.address.rotulo || 'Imóvel' }}, {{ wo.address.cidade }}
             </span>
             <span v-else>Local não vinculado</span>
           </p>
@@ -102,8 +130,12 @@ onMounted(() => {
 
         <div class="flex items-center justify-between md:justify-end gap-4 pt-2 md:pt-0 border-t md:border-t-0 border-white/5">
           <div class="text-left md:text-right">
-            <span class="text-[10px] uppercase text-slate-500 font-semibold block">Valor Total</span>
+            <span class="text-[10px] uppercase text-slate-500 font-semibold block">Valor Final</span>
             <span class="text-sm font-bold text-emerald-400">{{ formatCurrency(wo.valor_final) }}</span>
+          </div>
+
+          <div class="text-slate-400 group-hover:text-white transition-colors">
+            <Icon name="lucide:chevron-right" class="w-5 h-5" />
           </div>
         </div>
       </div>
@@ -114,16 +146,16 @@ onMounted(() => {
         <div class="flex items-center gap-2">
           <button 
             :disabled="page <= 1" 
-            @click="page--; fetchWorkOrders()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            @click.stop="page--; fetchWorkOrders()"
+            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px] cursor-pointer"
           >
             Anterior
           </button>
           <span>Página {{ page }}</span>
           <button 
             :disabled="page * pageSize >= total" 
-            @click="page++; fetchWorkOrders()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            @click.stop="page++; fetchWorkOrders()"
+            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px] cursor-pointer"
           >
             Próxima
           </button>

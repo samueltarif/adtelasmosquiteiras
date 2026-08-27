@@ -74,6 +74,15 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <NuxtLink 
+          to="/admin/ordens-servico" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/ordens-servico') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:clipboard-list" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Ordens de Serviço</span>
+        </NuxtLink>
+
+        <NuxtLink 
           to="/admin/galeria" 
           class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
           :class="route.path.startsWith('/admin/galeria') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
@@ -166,6 +175,16 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <NuxtLink 
+          to="/admin/ordens-servico" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/ordens-servico') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:clipboard-list" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Ordens de Serviço</span>
+        </NuxtLink>
+
+        <NuxtLink 
           to="/admin/galeria" 
           @click="closeMobileMenu"
           class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
@@ -214,6 +233,7 @@ const handleLogout = async () => {
             <span class="text-white font-semibold">
               {{ 
                 route.path.startsWith('/admin/clientes') ? 'Clientes' : 
+                route.path.startsWith('/admin/ordens-servico') ? 'Ordens de Serviço' :
                 route.path.startsWith('/admin/configuracoes') ? 'Perfil da Empresa' : 
                 route.path.startsWith('/admin/galeria') ? 'Galeria de Serviços' : 
                 route.path === '/admin/leads' ? 'Leads' : 'Dashboard' 

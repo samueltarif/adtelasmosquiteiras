@@ -181,16 +181,18 @@ export function validateMediaMagicBytes(buffer, mimeType) {
     return isRiff && isWebp
   }
 
-  // MP4 / QuickTime (MOV): ftyp box (bytes 4-7: 66 74 79 70) ou moov/mdat
+  // MP4 / QuickTime (MOV): ftyp box (bytes 4-7: 66 74 79 70) ou moov/mdat/wide/free/skip
   if (mime === 'video/mp4' || mime === 'video/quicktime') {
     if (buffer.length >= 8) {
       const isFtyp = buffer[4] === 0x66 && buffer[5] === 0x74 && buffer[6] === 0x79 && buffer[7] === 0x70
       const isMoov = buffer[4] === 0x6D && buffer[5] === 0x6F && buffer[6] === 0x6F && buffer[7] === 0x76
       const isMdat = buffer[4] === 0x6D && buffer[5] === 0x64 && buffer[6] === 0x61 && buffer[7] === 0x74
-      if (isFtyp || isMoov || isMdat) return true
+      const isWide = buffer[4] === 0x77 && buffer[5] === 0x69 && buffer[6] === 0x64 && buffer[7] === 0x65
+      const isFree = buffer[4] === 0x66 && buffer[5] === 0x72 && buffer[6] === 0x65 && buffer[7] === 0x65
+      const isSkip = buffer[4] === 0x73 && buffer[5] === 0x6B && buffer[6] === 0x69 && buffer[7] === 0x70
+      if (isFtyp || isMoov || isMdat || isWide || isFree || isSkip) return true
     }
-    // Formato QuickTime antigo pode iniciar com 00 00 00
-    if (mime === 'video/quicktime' && buffer.length >= 8) return true
+    return false
   }
 
   // WebM: EBML Header (1A 45 DF A3)

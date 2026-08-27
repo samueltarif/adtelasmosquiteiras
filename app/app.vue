@@ -7,6 +7,8 @@ const canonicalUrl = computed(() => {
   return `https://www.adtelasmosquiteiras.com.br${cleanPath || '/'}`
 })
 
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
+
 useHead({
   link: [
     {
@@ -45,7 +47,7 @@ useHead({
       })
     }
   ],
-  noscript: [
+  noscript: () => isAdminRoute.value ? [] : [
     {
       innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KZTR2DHT" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
       body: true

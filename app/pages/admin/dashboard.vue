@@ -97,7 +97,7 @@ onMounted(() => {
 
       <!-- RADIX/SHADCN TABS NAVIGATION (2x2 Grid on Mobile, Flex on Desktop) -->
       <Tabs v-model="activeTab" class="w-full">
-        <TabsList class="!grid !grid-cols-2 lg:!flex lg:!w-auto h-auto p-1.5 gap-1.5 w-full bg-white/[0.03] border border-white/[0.06] rounded-2xl">
+        <TabsList class="grid grid-cols-2 lg:flex lg:w-auto h-auto p-1.5 gap-1.5 w-full">
           <TabsTrigger value="overview" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:layout-grid" class="w-4 h-4 shrink-0" />
             <span>Visão Geral</span>
