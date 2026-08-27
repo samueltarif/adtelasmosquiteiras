@@ -102,7 +102,7 @@ export async function orchestrateProposalIssue(
     p_work_order_id: workOrderId,
     p_expected_wo_updated_at: params.expectedUpdatedAt || null,
     p_idempotency_key: idempotencyKey,
-    p_input_hash: hashHex,
+    p_idempotency_request_sha256: hashHex,
     p_commercial_terms: sanitizedTerms,
     p_valid_until: params.validUntil ? params.validUntil.slice(0, 10) : null,
     p_actor_id: actorId || null

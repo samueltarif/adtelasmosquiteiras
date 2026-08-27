@@ -115,3 +115,20 @@ A **Fase 4.1** do CRM da AD Telas e Redes de Proteção implementa o ciclo comer
 2. **Zero Exposição de Chaves de Serviço**: A chave `supabaseServiceRoleKey` permanece estritamente no backend.
 3. **Privacidade e Minimização de Dados**: Snapshots e logs de auditoria não contêm anotações internas confidenciais ou rastreamento excessivo.
 4. **Isolamento de Produção**: Zero mutações de teste executadas em banco de dados ou buckets R2 de produção durante os gates de teste.
+
+---
+
+## 6. Hotfix 4.1C.1 — Correção do Argumento da RPC e Diagnóstico Local
+
+### 6.1. Correção de Nome de Argumento da RPC (`p_input_hash` -> `p_idempotency_request_sha256`)
+- **Problema Identificado**: Em produção, a chamada para `reserve_work_order_proposal_atomic` retornava erro `PGRST202 (Could not find the function public.reserve_work_order_proposal_atomic with the specified parameter names)`.
+- **Causa Raiz**: O orquestrador em `server/utils/proposalOrchestrator.ts` enviava o campo `p_input_hash: hashHex`, enquanto a assinatura real instalada pela Migration 011 em PostgreSQL 17 é `p_idempotency_request_sha256 VARCHAR(64)`.
+- **Arquivo Corrigido**: [server/utils/proposalOrchestrator.ts](file:///d:/sicons/ADT/server/utils/proposalOrchestrator.ts#L105).
+- **Auditoria**: Busca em todo o repositório confirmou **0 referências restantes a `p_input_hash`**.
+
+### 6.2. Diagnóstico Local de `GET /work-orders/:id` e `POST /preview`
+- **Reprodução Local**:
+  - `GET /api/admin/crm/work-orders/:id` → **HTTP 200 (331ms)**.
+  - `POST /api/admin/crm/work-orders/:id/proposals/preview` → **HTTP 200 (3239ms, Content-Type: application/pdf)**.
+- **Causa Raiz dos Erros Observados (524 / 500)**: As rotas dependem de requisições server-side `$fetch` para o Supabase REST. No ambiente anterior (Node 20 sem System CA), ocorria falha/travamento de TLS (`SELF_SIGNED_CERT_IN_CHAIN`), gerando timeout HTTP 524 na borda do Cloudflare. Com Node 24 + `NODE_USE_SYSTEM_CA=1` e a correção do parâmetro da RPC, as requisições fluem normalmente com validação TLS ativa.
+
