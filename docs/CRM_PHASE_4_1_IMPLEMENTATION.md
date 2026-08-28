@@ -132,3 +132,70 @@ A **Fase 4.1** do CRM da AD Telas e Redes de Proteção implementa o ciclo comer
   - `POST /api/admin/crm/work-orders/:id/proposals/preview` → **HTTP 200 (3239ms, Content-Type: application/pdf)**.
 - **Causa Raiz dos Erros Observados (524 / 500)**: As rotas dependem de requisições server-side `$fetch` para o Supabase REST. No ambiente anterior (Node 20 sem System CA), ocorria falha/travamento de TLS (`SELF_SIGNED_CERT_IN_CHAIN`), gerando timeout HTTP 524 na borda do Cloudflare. Com Node 24 + `NODE_USE_SYSTEM_CA=1` e a correção do parâmetro da RPC, as requisições fluem normalmente com validação TLS ativa.
 
+---
+
+## 7. Hotfix 4.1C.2 — Correção Estrutural do Layout PDF e Paginação
+
+### 7.1. Diagnóstico e Causas Raiz
+1. **Causa Raiz da Criação de Páginas Extras (Bug das 3 Páginas)**:
+   - No motor anterior do PDFKit, o rodapé desenhava textos na coordenada `footerY = doc.page.height - 36`. Como o `margin.bottom` do documento estava configurado em `40`, essa coordenada caía abaixo do limite inferior seguro da página.
+   - Cada chamada a `doc.text()` abaixo da margem inferior ativava o gatilho automático de quebra de página do PDFKit (`doc.addPage()`). Como o loop de rodapé continha duas chamadas (`footerText` e `Página X de Y`), eram geradas **duas páginas fantasmas adicionais**, deslocando o texto do rodapé para a página 2 e o número de página para a página 3.
+2. **Causa Raiz da Sobreposição da Logo no Cabeçalho**:
+   - A imagem era inserida com largura fixa (`width: 110`) sem limitar a altura máxima com `fit: [maxWidth, maxHeight]`. Imagens com proporção mais alta ultrapassavam a linha divisória inferior.
+3. **Causa Raiz do Clipping de Texto nas Condições Comerciais e Itens**:
+   - As condições de pagamento usavam `{ continued: true }` com altura estática (`80pt`), sem pré-cálculo com `doc.heightOfString(...)`. Textos com mais de 2 linhas transbordavam e cortavam o conteúdo.
+   - As linhas da tabela de itens e medições usavam alturas fixas (`22pt` e `16pt`) com `ellipsis: true`.
+
+### 7.2. Soluções Estruturais Implementadas
+1. **Constantes Centrais de Geometria e Grade (`PDF_LAYOUT`)**:
+   - Centralizadas constantes estritas: `PAGE_WIDTH (595.28)`, `PAGE_HEIGHT (841.89)`, `MARGIN_LEFT (36)`, `MARGIN_RIGHT (36)`, `MARGIN_TOP (32)`, `MARGIN_BOTTOM (36)`, `CONTENT_WIDTH (523.28)`, `FOOTER_RESERVED_HEIGHT (44)` e `CONTENT_BOTTOM (761.89)`.
+2. **Caixa Delimitadora da Logo (`fit: [105, 52]`)**:
+   - A logo é contida estritamente dentro da caixa de 105x52 pt, com alinhamento vertical e sem distorção. A área institucional da empresa inicia obrigatoriamente à direita (`textStartX = MARGIN_LEFT + LOGO_BOX_WIDTH + 14`), e o divisor horizontal é desenhado abaixo da maior altura entre a logo e o texto.
+3. **Altura Dinâmica em Todas as Áreas Textuais**:
+   - Implementado pré-cálculo via `doc.heightOfString(...)` para: dados do cliente, endereço, categorias, descrições dos itens, linhas de medição técnica e condições comerciais (pagamento, prazo e observações).
+   - O card de condições comerciais e o card de resumo financeiro alinham suas alturas dinamicamente através de `Math.max(termsNeededH, totalsNeededH)`.
+4. **Helper de Paginação Preventiva (`ensureSpace`)**:
+   - Verifica `if (doc.y + requiredHeight > CONTENT_BOTTOM)` antes de renderizar qualquer bloco indivisível.
+   - Em caso de quebra de página, renderiza cabeçalho compacto de identificação nas páginas 2..N e reinicia o cabeçalho da tabela se necessário.
+5. **Rodapé e Numeração em Dois Passos com Margem Protegida**:
+   - Durante a iteração `doc.switchToPage(i)`, o `doc.page.margins.bottom` é temporariamente definido como `0`, impedindo qualquer auto-adição acidental de páginas pelo PDFKit.
+   - Textos de rodapé utilizam `lineBreak: false` e coordenadas absolutas seguras.
+   - A autoridade de contagem de páginas é `doc.bufferedPageRange().count`.
+
+### 7.3. Resultados dos Testes Visuais e Estruturais (`scripts/test_pdf_layout_visual.mjs`)
+- **Total de Asserts**: 13/13 PASS (0 FAIL).
+- **Amostra Real Atual**: EXATAMENTE **1 página física**, zero páginas em branco, zero sobreposição de logo, zero corte textual.
+- **Documento Multipágina (12 Itens)**: 2 páginas físicas, com cabeçalho compacto na página 2 e paginação correta `Página 1 de 2` e `Página 2 de 2`.
+- **Prévia HTTP Real (`POST /api/admin/crm/work-orders/:id/proposals/preview`)**: HTTP 200, Content-Type `application/pdf`, tamanho de 1 página física.
+
+---
+
+## 8. Hotfix 4.1C.3 — Correção de Overflow das Condições Comerciais e Restauração de Rodapé
+
+### 8.1. Diagnóstico e Causa Raiz do Overflow
+1. **Incompatibilidade do `{ continued: true }` com Larguras Explícitas no PDFKit**:
+   - Ao desenhar `doc.text('Forma de Pagamento: ', startX, y, { continued: true })` e em seguida `doc.text(paymentText, { width: leftInnerWidth })`, o cursor horizontal já estava deslocado pela largura do label (~85pt).
+   - O PDFKit interpretava a largura máxima de quebra (`leftInnerWidth`) a partir do ponto atual do cursor (`startX + 85`), fazendo com que as linhas quebrassem 85pt além da margem direita do card esquerdo, invadindo a área do quadro de totais.
+2. **Helper `drawLabelValueBlock` e `measureLabelValueHeight`**:
+   - Eliminado o uso de `{ continued: true }` em campos comerciais variáveis.
+   - Textos de linha única são renderizados com posicionamento inline absoluto `(startX, startY)` e `(startX + labelW, startY)`.
+   - Textos multi-linha renderizam o rótulo no topo e o conteúdo com quebra de linha estritamente contida em `width: leftInnerWidth` (`325.28 pt`).
+   - Margem de segurança de 20pt garantida entre o texto das condições comerciais e o quadro de totais (`totalsGap = 12 pt`).
+
+### 8.2. Restauração Confiável do Rodapé e Numeração
+- Proteção da margem inferior do PDFKit (`doc.page.margins.bottom = 0`) durante o segundo passo de numeração com restauração ao final.
+- Linha divisória em `PAGE_HEIGHT - 42` e textos em `PAGE_HEIGHT - 36` com `lineBreak: false`.
+
+### 8.3. Matriz de Testes Visuais e Renderização PNG (`scripts/test_pdf_layout_visual.mjs`)
+- **Total de Asserts**: 13/13 PASS (0 FAIL).
+- **Testes Validados**:
+  1. `SHORT_PAYMENT_TEST` (~30 caracteres): 1 página física (PASS).
+  2. `NORMAL_PAYMENT_TEST` (~120 caracteres): 1 página física (PASS).
+  3. `LONG_PAYMENT_500_CHAR_TEST` (~500 caracteres): 1 página física, expansão vertical dinâmica, zero colisão com totais (PASS).
+  4. `LONG_DESCRIPTION_300_CHAR_TEST` (~300 caracteres): 1 página física, quebra de linha dinâmica na tabela (PASS).
+  5. `LONG_NOTES_1000_CHAR_TEST` (~1000 caracteres): encapsulamento com wrapping seguro (PASS).
+  6. `MULTIPAGE_12_ITEMS_TEST`: 2 páginas físicas, rodapé institucional presente, numerações `Página 1 de 2` e `Página 2 de 2` (PASS).
+  7. `VISUAL_PNG_AUDIT`: Renderização fiel de todos os casos em imagens PNG de alta resolução via PDF.js + Playwright (PASS).
+
+
+

@@ -26,3 +26,8 @@ logs
 # Supabase temp
 supabase/.temp
 
+# Local Backups
+backups/
+
+# Local Scratch
+scratch/

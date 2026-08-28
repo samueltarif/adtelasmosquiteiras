@@ -7,24 +7,19 @@ import {
   TERMINAL_WORK_ORDER_STATUSES,
   ALLOWED_WORK_ORDER_STATUSES
 } from '../../../../../utils/crm'
+import { hasActiveInstallation } from '../../../../../utils/crmAppointmentHelpers'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
   const config = useRuntimeConfig()
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Supabase não configurado no servidor'
-    })
+    throw createError({ statusCode: 500, statusMessage: 'Supabase não configurado no servidor' })
   }
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'ID da ordem de serviço é obrigatório'
-    })
+    throw createError({ statusCode: 400, statusMessage: 'ID da ordem de serviço é obrigatório' })
   }
 
   const body = await readBody(event).catch(() => ({}))
@@ -37,25 +32,41 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const headers = getSupabaseHeaders(config.supabaseServiceRoleKey)
-
-  // 1. Busca estado atual da OS
-  const currentList = await $fetch<any[]>(
-    `${config.supabaseUrl}/rest/v1/work_orders?id=eq.${id}&select=*`,
-    { headers }
-  ).catch(() => [])
-
-  if (!Array.isArray(currentList) || currentList.length === 0) {
+  if (newStatus === 'agendada') {
     throw createError({
-      statusCode: 404,
-      statusMessage: 'Ordem de serviço não encontrada'
+      statusCode: 400,
+      statusMessage: 'ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED: Para agendar uma OS, crie um agendamento do tipo instalação na Agenda.',
+      data: {
+        error: {
+          code: 'ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED',
+          message: 'Para agendar uma OS, crie um agendamento do tipo instalação na Agenda.'
+        }
+      }
     })
+  }
+
+  if (body.dataPrevista !== undefined || body.data_prevista !== undefined) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'ERR_DATA_PREVISTA_MANAGED_BY_AGENDA: A data prevista de instalação é gerenciada automaticamente pela Agenda através de agendamentos.',
+      data: {
+        error: {
+          code: 'ERR_DATA_PREVISTA_MANAGED_BY_AGENDA',
+          message: 'A data prevista de instalação é gerenciada automaticamente pela Agenda através de agendamentos.'
+        }
+      }
+    })
+  }
+
+  const headers = getSupabaseHeaders(config.supabaseServiceRoleKey)
+  const currentList = await $fetch<any[]>(`${config.supabaseUrl}/rest/v1/work_orders?id=eq.${id}&select=*`, { headers }).catch(() => [])
+  if (!Array.isArray(currentList) || currentList.length === 0) {
+    throw createError({ statusCode: 404, statusMessage: 'Ordem de serviço não encontrada' })
   }
 
   const currentWo = currentList[0]
   const currentStatus = currentWo.status_os
 
-  // 2. Concorrência Otimista
   if (body.expectedUpdatedAt && typeof body.expectedUpdatedAt === 'string') {
     const currentTs = new Date(currentWo.updated_at).getTime()
     const expectedTs = new Date(body.expectedUpdatedAt).getTime()
@@ -67,7 +78,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 3. Validação de Terminalidade
   if (TERMINAL_WORK_ORDER_STATUSES.includes(currentStatus)) {
     throw createError({
       statusCode: 400,
@@ -75,7 +85,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // 4. Validação da Máquina de Estados
+  if (currentStatus === 'agendada' && newStatus === 'aguardando_agendamento') {
+    const activeInst = await hasActiveInstallation({ url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey }, id)
+    if (activeInst) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'ERR_ACTIVE_INSTALLATION_EXISTS: Não é possível regredir manualmente o status para aguardando_agendamento enquanto houver um agendamento de instalação ativo.',
+        data: {
+          error: {
+            code: 'ERR_ACTIVE_INSTALLATION_EXISTS',
+            message: 'Não é possível regredir manualmente o status para aguardando_agendamento enquanto houver um agendamento de instalação ativo. Cancele ou reagende o compromisso na Agenda.'
+          }
+        }
+      })
+    }
+  }
+
   if (!isValidStatusTransition(currentStatus, newStatus)) {
     throw createError({
       statusCode: 400,
@@ -83,41 +108,21 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const updates: Record<string, any> = {
-    status_os: newStatus
-  }
-
-  // 4b. Reabertura (aprovada -> orcamento): limpa accepted_proposal_id da OS preservando a proposta histórica
+  const updates: Record<string, any> = { status_os: newStatus }
   if (currentStatus === 'aprovada' && newStatus === 'orcamento') {
     updates.accepted_proposal_id = null
   }
 
-  // 5. Regra para status 'agendada': data_prevista obrigatória
-  if (newStatus === 'agendada') {
-    const dataPrevista = body.dataPrevista ? String(body.dataPrevista).trim() : currentWo.data_prevista
-    if (!dataPrevista) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Para definir o status como Agendada, a data prevista da instalação deve ser informada.'
-      })
-    }
-    if (body.dataPrevista) {
-      updates.data_prevista = dataPrevista
-    }
-  }
-
-  // 6. Regra para status 'concluida': data_conclusao automática no timezone de São Paulo
   if (newStatus === 'concluida') {
     const nowSp = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'America/Sao_Paulo',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
-    }).format(new Date()) // Retorna YYYY-MM-DD
+    }).format(new Date())
     updates.data_conclusao = nowSp
   }
 
-  // 7. Regra para status 'cancelada': Justificativa obrigatória em crm_notes
   let reasonNoteId: string | null = null
   if (newStatus === 'cancelada') {
     const reason = body.reason ? String(body.reason).trim() : ''
@@ -129,96 +134,52 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
-      const notePayload = {
-        client_id: currentWo.client_id,
-        work_order_id: currentWo.id,
-        categoria: 'atendimento',
-        conteudo: `Cancelamento da OS: ${reason}`,
-        author_id: admin.userId || null
-      }
-
       const noteRes = await $fetch<any[]>(`${config.supabaseUrl}/rest/v1/crm_notes`, {
         method: 'POST',
-        headers: {
-          ...headers,
-          'Prefer': 'return=representation'
-        },
-        body: notePayload
+        headers: { ...headers, 'Prefer': 'return=representation' },
+        body: {
+          client_id: currentWo.client_id,
+          work_order_id: currentWo.id,
+          categoria: 'atendimento',
+          conteudo: `Cancelamento da OS: ${reason}`,
+          author_id: admin.userId || null
+        }
       })
-
       if (Array.isArray(noteRes) && noteRes.length > 0) {
         reasonNoteId = noteRes[0].id
       }
     } catch (noteErr: any) {
-      console.warn('[StatusMutation] Falha ao registrar nota de cancelamento:', noteErr?.message || noteErr)
-      // Prossegue mantendo auditoria
+      console.warn('[WorkOrderStatus] Falha ao registrar justificativa em crm_notes:', noteErr?.message || noteErr)
     }
   }
 
-  // 8. Executa a mutação do status no banco
-  let updatedWo: any = null
   try {
-    const patched = await $fetch<any[]>(
-      `${config.supabaseUrl}/rest/v1/work_orders?id=eq.${id}`,
+    const patched = await $fetch<any[]>(`${config.supabaseUrl}/rest/v1/work_orders?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...headers, 'Prefer': 'return=representation' },
+      body: updates
+    })
+    const updatedWo = patched && patched[0] ? patched[0] : currentWo
+
+    await logCrmActivity(
+      { url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey },
       {
-        method: 'PATCH',
-        headers: {
-          ...headers,
-          'Prefer': 'return=representation'
-        },
-        body: updates
+        clientId: currentWo.client_id,
+        workOrderId: currentWo.id,
+        entityType: 'work_order',
+        entityId: currentWo.id,
+        acao: newStatus === 'cancelada' ? 'work_order_cancelled' : newStatus === 'concluida' ? 'work_order_completed' : 'work_order_status_changed',
+        descricaoHumana: `Status da OS ${currentWo.numero_os} alterado de '${currentStatus}' para '${newStatus}'`,
+        dadosAnteriores: { status_anterior: currentStatus },
+        dadosNovos: { status_novo: newStatus, reason_note_id: reasonNoteId, reason_recorded: Boolean(reasonNoteId) },
+        actorId: admin.userId
       }
     )
 
-    updatedWo = patched && patched[0] ? patched[0] : { ...currentWo, ...updates }
+    return { success: true, workOrder: updatedWo }
   } catch (err: any) {
-    console.error('[StatusMutation] Erro ao atualizar status da OS:', err?.message || err)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Falha ao atualizar status da ordem de serviço'
-    })
-  }
-
-  // 9. Registro de Auditoria no Activity Log
-  try {
-    let actionName = 'work_order_status_changed'
-    let humanDesc = `Status da OS ${currentWo.numero_os} alterado de '${currentStatus}' para '${newStatus}'`
-
-    if (newStatus === 'concluida') {
-      actionName = 'work_order_completed'
-      humanDesc = `Ordem de Serviço ${currentWo.numero_os} concluída com sucesso`
-    } else if (newStatus === 'cancelada') {
-      actionName = 'work_order_cancelled'
-      humanDesc = `Ordem de Serviço ${currentWo.numero_os} cancelada`
-    }
-
-    const activityPayload: Record<string, any> = {
-      status_anterior: currentStatus,
-      status_novo: newStatus
-    }
-
-    if (reasonNoteId) {
-      activityPayload.reason_note_id = reasonNoteId
-      activityPayload.reason_recorded = true
-    }
-
-    await logCrmActivity(config, {
-      clientId: currentWo.client_id,
-      workOrderId: currentWo.id,
-      entityType: 'work_order',
-      entityId: currentWo.id,
-      acao: actionName,
-      descricaoHumana: humanDesc,
-      dadosAnteriores: { status_os: currentStatus },
-      dadosNovos: activityPayload,
-      actorId: admin.userId
-    })
-  } catch (logErr: any) {
-    console.error('[StatusMutation] AUDIT_LOG_WRITE_FAILED_AFTER_MUTATION:', logErr?.message || logErr)
-  }
-
-  return {
-    success: true,
-    workOrder: updatedWo
+    if (err?.statusCode) throw err
+    console.error('[WorkOrderStatus] Erro ao atualizar status:', err?.message || err)
+    throw createError({ statusCode: 500, statusMessage: 'Falha ao atualizar status da ordem de serviço' })
   }
 })

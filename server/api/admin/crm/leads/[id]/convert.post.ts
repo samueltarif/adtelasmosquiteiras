@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: 'Serviço de banco de dados indisponível.' })
   }
 
-  // 1. Validações básicas do cliente
   const nome = typeof body.nome === 'string' ? body.nome.trim() : ''
   if (!nome || nome.length < 2) {
     throw createError({ statusCode: 400, message: 'O nome do cliente deve ter pelo menos 2 caracteres.' })
@@ -39,7 +38,6 @@ export default defineEventHandler(async (event) => {
   const email = body.email ? normalizeEmail(body.email) : null
   const cpfCnpj = body.cpf_cnpj ? normalizeCpfCnpj(body.cpf_cnpj) : null
 
-  // 2. Server-side duplicate warning gate ANTES de chamar a RPC
   const confirmPossibleDuplicate = body.confirmPossibleDuplicate === true || body.confirmPossibleDuplicate === 'true'
   if (!confirmPossibleDuplicate) {
     const duplicates = await findDuplicateClients(
@@ -60,7 +58,6 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 3. Endereço opcional (somente com confirmação explícita do admin)
   let enderecoData: Record<string, any> | null = null
   if (body.criar_endereco === true && body.endereco_data && typeof body.endereco_data === 'object') {
     enderecoData = {
@@ -76,26 +73,36 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // 4. Criação da primeira Ordem de Serviço (opcional)
   const criarOs = Boolean(body.criar_os)
   let osData: Record<string, any> | null = null
   if (criarOs) {
+    if (body.os_data?.data_prevista !== undefined || body.os_data?.dataPrevista !== undefined) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'ERR_DATA_PREVISTA_MANAGED_BY_AGENDA: A data prevista de instalação é gerenciada automaticamente pela Agenda através de agendamentos.',
+        data: {
+          error: {
+            code: 'ERR_DATA_PREVISTA_MANAGED_BY_AGENDA',
+            message: 'A data prevista de instalação é gerenciada automaticamente pela Agenda através de agendamentos.'
+          }
+        }
+      })
+    }
+
     const categoriaOperacional = ALLOWED_OS_CATEGORIAS.includes(body.os_data?.categoria_operacional)
       ? body.os_data.categoria_operacional
       : 'outro'
     const descricao = body.os_data?.descricao ? String(body.os_data.descricao).trim() : 'Serviço Inicial'
     const valorOrcamento = body.os_data?.valor_orcamento != null ? parseFloat(body.os_data.valor_orcamento) : 0.00
-    const dataPrevista = body.os_data?.data_prevista ? String(body.os_data.data_prevista).trim() : null
 
     osData = {
       categoria_operacional: categoriaOperacional,
       descricao,
       valor_orcamento: isNaN(valorOrcamento) ? 0.00 : valorOrcamento,
-      data_prevista: dataPrevista || null
+      data_prevista: null
     }
   }
 
-  // 5. Chamada à RPC convert_lead_to_client_atomic
   const headers = getSupabaseHeaders(config.supabaseServiceRoleKey)
   const rpcPayload = {
     p_lead_id: id,
@@ -117,10 +124,7 @@ export default defineEventHandler(async (event) => {
       body: rpcPayload
     })
 
-    return {
-      success: true,
-      result: rpcResult
-    }
+    return { success: true, result: rpcResult }
   } catch (rpcErr: any) {
     console.error('[leads/convert] Erro na RPC de conversão:', rpcErr)
     const errMessage = rpcErr?.data?.message || rpcErr?.message || ''
