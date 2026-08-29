@@ -3,10 +3,11 @@
  * Histórico cronológico completo de agendamentos vinculados a uma Ordem de Serviço.
  */
 
-import { defineEventHandler, getRouterParam, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../../utils/crm'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers'
+import { defineEventHandler, getRouterParam, getQuery, createError } from 'h3'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
+import { isValidUUID } from '../../../../../shared/appointmentValidation.mjs'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)
@@ -17,15 +18,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const id = getRouterParam(event, 'id')
-  if (!id) {
-    throw createError({ statusCode: 400, statusMessage: 'ID da ordem de serviço é obrigatório.' })
+  if (!id || !isValidUUID(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'ID da ordem de serviço deve ser um UUID válido.' })
   }
+
+  const query = getQuery(event)
+  const limit = Math.min(Math.max(parseInt(String(query.limit || '50'), 10) || 50, 1), 100)
+  const offset = Math.max(parseInt(String(query.offset || '0'), 10) || 0, 0)
 
   const headers = getSupabaseHeaders(config.supabaseServiceRoleKey)
 
   try {
     const appointments = await $fetch<any[]>(
-      `${config.supabaseUrl}/rest/v1/appointments?work_order_id=eq.${id}&select=${APPOINTMENT_DETAIL_SELECT}&order=data_hora_inicio.asc,created_at.asc,id.asc`,
+      `${config.supabaseUrl}/rest/v1/appointments?work_order_id=eq.${id}&select=${APPOINTMENT_DETAIL_SELECT}&limit=${limit}&offset=${offset}&order=data_hora_inicio.asc,created_at.asc,id.asc`,
       { headers }
     )
 

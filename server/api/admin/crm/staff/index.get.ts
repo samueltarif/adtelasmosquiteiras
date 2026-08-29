@@ -4,8 +4,8 @@
  */
 
 import { defineEventHandler, getQuery, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../utils/crm'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../utils/crm.ts'
 import { isValidStaffRole } from '../../../../shared/appointmentValidation.mjs'
 
 export default defineEventHandler(async (event) => {
@@ -21,11 +21,16 @@ export default defineEventHandler(async (event) => {
   const params: string[] = [`select=${selectFields}`, 'order=nome.asc,id.asc']
 
   if (query.isActive !== undefined && query.isActive !== '') {
-    const isActive = String(query.isActive) === 'true'
-    params.push(`is_active=eq.${isActive}`)
+    if (query.isActive !== 'true' && query.isActive !== 'false') {
+      throw createError({ statusCode: 400, statusMessage: 'isActive deve ser "true" ou "false".' })
+    }
+    params.push(`is_active=eq.${query.isActive}`)
   }
 
-  if (query.funcao && typeof query.funcao === 'string' && isValidStaffRole(query.funcao.trim())) {
+  if (query.funcao !== undefined && query.funcao !== '') {
+    if (typeof query.funcao !== 'string' || !isValidStaffRole(query.funcao.trim())) {
+      throw createError({ statusCode: 400, statusMessage: 'funcao inválida.' })
+    }
     params.push(`funcao=eq.${encodeURIComponent(query.funcao.trim())}`)
   }
 

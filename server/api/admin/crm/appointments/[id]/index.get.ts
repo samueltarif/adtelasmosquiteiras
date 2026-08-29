@@ -4,9 +4,9 @@
  */
 
 import { defineEventHandler, getRouterParam, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../../utils/crm'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)

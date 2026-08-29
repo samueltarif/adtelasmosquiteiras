@@ -143,7 +143,7 @@ export async function requireActiveAdmin(
   }
 
   // Bypass seguro para ambiente de desenvolvimento / testes locais
-  if ((process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEST_AUTH === 'true') && (accessToken === 'dev_mock_admin_token' || refreshToken === 'dev_mock_refresh_token')) {
+  if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_TEST_AUTH === 'true' && (accessToken === 'dev_mock_admin_token' || refreshToken === 'dev_mock_refresh_token')) {
     const devAdmin: AdminIdentity = {
       adminId: '00000000-0000-0000-0000-000000000001',
       userId: '00000000-0000-0000-0000-000000000001',

@@ -4,11 +4,11 @@
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../../utils/crm'
-import { isValidIsoDateTime } from '../../../../../shared/appointmentValidation.mjs'
-import { handleRpcError } from '../../../../../utils/crmAppointmentErrors'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
+import { isValidIsoDateTime, isValidUUID, isValidRfc3339 } from '../../../../../shared/appointmentValidation.mjs'
+import { handleRpcError } from '../../../../../utils/crmAppointmentErrors.ts'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const id = getRouterParam(event, 'id')
-  if (!id) {
-    throw createError({ statusCode: 400, statusMessage: 'ID do agendamento é obrigatório.' })
+  if (!id || !isValidUUID(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'ID do agendamento deve ser um UUID válido.' })
   }
 
   const body = await readBody(event).catch(() => ({}))
 
-  if (!isValidIsoDateTime(body.new_data_hora_inicio) || !isValidIsoDateTime(body.new_data_hora_fim)) {
-    throw createError({ statusCode: 400, statusMessage: 'Novas datas de início e fim devem ser timestamps ISO válidos.' })
+  if (!isValidRfc3339(body.new_data_hora_inicio) || !isValidRfc3339(body.new_data_hora_fim)) {
+    throw createError({ statusCode: 400, statusMessage: 'Novas datas de início e fim devem ser timestamps RFC3339 válidos com timezone explícito.' })
   }
 
   const motivo = typeof body.motivo === 'string' ? body.motivo.trim() : ''
@@ -40,6 +40,10 @@ export default defineEventHandler(async (event) => {
 
   if (!body.expected_appointment_updated_at || typeof body.expected_appointment_updated_at !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'O campo "expected_appointment_updated_at" é obrigatório.' })
+  }
+
+  if (!isValidRfc3339(body.expected_appointment_updated_at)) {
+    throw createError({ statusCode: 400, statusMessage: 'expected_appointment_updated_at deve ser um timestamp RFC3339 válido com timezone explícito.' })
   }
 
   const rpcPayload = {

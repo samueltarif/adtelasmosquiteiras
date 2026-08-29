@@ -5,10 +5,10 @@
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm'
-import { isValidStaffRole } from '../../../../shared/appointmentValidation.mjs'
-import { handleRpcError } from '../../../../utils/crmAppointmentErrors'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm.ts'
+import { isValidStaffRole, isStrictBoolean } from '../../../../shared/appointmentValidation.mjs'
+import { handleRpcError } from '../../../../utils/crmAppointmentErrors.ts'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)
@@ -50,7 +50,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (body.is_active !== undefined) {
-    updates.is_active = Boolean(body.is_active)
+    if (!isStrictBoolean(body.is_active)) {
+      throw createError({ statusCode: 400, statusMessage: 'O campo is_active deve ser um booleano estrito (true ou false).' })
+    }
+    updates.is_active = body.is_active
   }
 
   if (Object.keys(updates).length === 0) {

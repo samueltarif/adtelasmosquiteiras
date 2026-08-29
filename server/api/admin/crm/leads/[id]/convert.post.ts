@@ -1,4 +1,5 @@
-import { requireActiveAdmin } from '../../../../../utils/adminAuth'
+import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
 import {
   ALLOWED_CLIENT_TIPOS,
   ALLOWED_OS_CATEGORIAS,
@@ -7,7 +8,7 @@ import {
   normalizeCpfCnpj,
   findDuplicateClients,
   getSupabaseHeaders
-} from '../../../../../utils/crm'
+} from '../../../../../utils/crm.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)

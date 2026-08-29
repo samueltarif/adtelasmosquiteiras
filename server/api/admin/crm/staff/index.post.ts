@@ -4,8 +4,8 @@
  */
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm.ts'
 import { isValidStaffRole } from '../../../../shared/appointmentValidation.mjs'
 
 export default defineEventHandler(async (event) => {
@@ -23,7 +23,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Nome do membro da equipe deve ter no mínimo 2 caracteres.' })
   }
 
-  const funcao = body.funcao && isValidStaffRole(body.funcao) ? body.funcao : 'instalador'
+  if (body.funcao !== undefined && !isValidStaffRole(body.funcao)) {
+    throw createError({ statusCode: 400, statusMessage: 'Função do membro da equipe inválida.' })
+  }
+  const funcao = body.funcao || 'instalador'
   const telefone = body.telefone ? normalizePhone(body.telefone) || null : null
   const email = body.email ? normalizeEmail(body.email) || null : null
 

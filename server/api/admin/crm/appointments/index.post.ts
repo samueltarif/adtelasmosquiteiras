@@ -4,11 +4,11 @@
  */
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../utils/crm'
-import { isValidAppointmentType, isValidIsoDateTime } from '../../../../shared/appointmentValidation.mjs'
-import { handleRpcError } from '../../../../utils/crmAppointmentErrors'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../utils/crm.ts'
+import { isValidAppointmentType, isValidIsoDateTime, isValidUUID, isValidRfc3339 } from '../../../../shared/appointmentValidation.mjs'
+import { handleRpcError } from '../../../../utils/crmAppointmentErrors.ts'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
@@ -20,16 +20,24 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event).catch(() => ({}))
 
-  if (!body.work_order_id || typeof body.work_order_id !== 'string') {
-    throw createError({ statusCode: 400, statusMessage: 'O campo "work_order_id" é obrigatório.' })
+  if (!body.work_order_id || !isValidUUID(body.work_order_id)) {
+    throw createError({ statusCode: 400, statusMessage: 'O campo "work_order_id" deve ser um UUID válido.' })
+  }
+
+  if (body.staff_id && !isValidUUID(body.staff_id)) {
+    throw createError({ statusCode: 400, statusMessage: 'staff_id deve ser um UUID válido.' })
+  }
+
+  if (body.address_id && !isValidUUID(body.address_id)) {
+    throw createError({ statusCode: 400, statusMessage: 'address_id deve ser um UUID válido.' })
   }
 
   if (!isValidAppointmentType(body.tipo_agendamento)) {
     throw createError({ statusCode: 400, statusMessage: 'Tipo de agendamento inválido.' })
   }
 
-  if (!isValidIsoDateTime(body.data_hora_inicio) || !isValidIsoDateTime(body.data_hora_fim)) {
-    throw createError({ statusCode: 400, statusMessage: 'Datas de início e fim devem ser timestamps ISO válidos.' })
+  if (!isValidRfc3339(body.data_hora_inicio) || !isValidRfc3339(body.data_hora_fim)) {
+    throw createError({ statusCode: 400, statusMessage: 'Datas de início e fim devem ser timestamps RFC3339 válidos com timezone explícito.' })
   }
 
   const rpcPayload = {

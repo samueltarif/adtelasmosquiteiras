@@ -5,10 +5,10 @@
  */
 
 import { defineEventHandler, getQuery, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../utils/crm'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../utils/crm.ts'
 import { isValidAppointmentDateRange, isValidAppointmentStatus, isValidAppointmentType } from '../../../../shared/appointmentValidation.mjs'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)
@@ -38,13 +38,14 @@ export default defineEventHandler(async (event) => {
 
   const params: string[] = [
     `select=${APPOINTMENT_DETAIL_SELECT}`,
-    `data_hora_fim=gte.${encodeURIComponent(startStr)}`,
-    `data_hora_inicio=lte.${encodeURIComponent(endStr)}`,
+    `data_hora_fim=gt.${encodeURIComponent(startStr)}`,
+    `data_hora_inicio=lt.${encodeURIComponent(endStr)}`,
     'order=data_hora_inicio.asc'
   ]
 
-  if (query.staff_id && typeof query.staff_id === 'string' && query.staff_id.trim() !== '') {
-    params.push(`staff_id=eq.${encodeURIComponent(query.staff_id.trim())}`)
+  const rawStaffId = (query.staff_id || query.staffId) as string | undefined
+  if (rawStaffId && typeof rawStaffId === 'string' && rawStaffId.trim() !== '') {
+    params.push(`staff_id=eq.${encodeURIComponent(rawStaffId.trim())}`)
   }
 
   if (query.status && typeof query.status === 'string' && isValidAppointmentStatus(query.status.trim())) {

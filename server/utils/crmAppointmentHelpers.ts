@@ -3,7 +3,12 @@
  * Arquivo: server/utils/crmAppointmentHelpers.ts
  */
 
-import { SupabaseConfig, getSupabaseHeaders } from './crm'
+import { getSupabaseHeaders } from './crm.ts'
+
+export interface SupabaseConfig {
+  url: string
+  serviceRoleKey: string
+}
 
 export const APPOINTMENT_DETAIL_SELECT = [
   'id',
@@ -27,9 +32,12 @@ export const APPOINTMENT_DETAIL_SELECT = [
   'staff:crm_staff(id,nome,funcao,telefone)'
 ].join(',')
 
+import { createError } from 'h3'
+
 /**
  * Consulta se uma Ordem de Serviço possui agendamento de instalação ativo
  * (status: agendado, confirmado, em_deslocamento).
+ * FAIL-CLOSED: Re-throw como 503 em falhas upstream.
  */
 export async function hasActiveInstallation(
   config: SupabaseConfig,
@@ -46,8 +54,9 @@ export async function hasActiveInstallation(
     )
     return Array.isArray(res) && res.length > 0
   } catch (err: any) {
-    console.error('[hasActiveInstallation] Erro ao consultar instalação ativa:', err?.message || err)
-    return false
+    if (err?.statusCode) throw err
+    console.error('[hasActiveInstallation] Upstream failure:', err?.message || err)
+    throw createError({ statusCode: 503, statusMessage: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
   }
 }
 
@@ -69,7 +78,8 @@ export async function getActiveInstallation(
     )
     return Array.isArray(res) && res.length > 0 ? res[0] : null
   } catch (err: any) {
-    console.error('[getActiveInstallation] Erro ao consultar instalação ativa:', err?.message || err)
-    return null
+    if (err?.statusCode) throw err
+    console.error('[getActiveInstallation] Upstream failure:', err?.message || err)
+    throw createError({ statusCode: 503, statusMessage: 'Falha ao consultar agendamento ativo da ordem de serviço' })
   }
 }

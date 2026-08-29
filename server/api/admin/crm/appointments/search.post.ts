@@ -4,10 +4,10 @@
  */
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth'
-import { getSupabaseHeaders } from '../../../../utils/crm'
+import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
+import { getSupabaseHeaders } from '../../../../utils/crm.ts'
 import { isValidAppointmentStatus, isValidAppointmentType } from '../../../../shared/appointmentValidation.mjs'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)
@@ -18,7 +18,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event).catch(() => ({}))
-  const q = typeof body.q === 'string' ? body.q.trim() : ''
+  if (body.q !== undefined) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Busca textual "q" não é suportada em appointments. Utilize filtros estruturados (status, tipo, staff_id, client_id).'
+    })
+  }
   const limit = Math.min(Math.max(parseInt(String(body.limit || '20'), 10) || 20, 1), 100)
   const offset = Math.max(parseInt(String(body.offset || '0'), 10) || 0, 0)
 
@@ -44,13 +49,6 @@ export default defineEventHandler(async (event) => {
 
   if (body.client_id && typeof body.client_id === 'string' && body.client_id.trim() !== '') {
     params.push(`client_id=eq.${encodeURIComponent(body.client_id.trim())}`)
-  }
-
-  // Se houver busca textual, faz busca correlacionada
-  if (q.length >= 2) {
-    const sanitized = q.replace(/[%*]/g, '').slice(0, 100)
-    // Busca em observações do agendamento ou mot_reagendamento
-    params.push(`or=(observacoes.ilike.*${encodeURIComponent(sanitized)}*,motivo_reagendamento_cancelamento.ilike.*${encodeURIComponent(sanitized)}*)`)
   }
 
   try {
