@@ -1,0 +1,2 @@
+# Line endings configuration
+*.sql text eol=lf
