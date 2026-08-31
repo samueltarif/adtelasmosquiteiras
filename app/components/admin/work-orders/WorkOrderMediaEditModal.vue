@@ -57,7 +57,7 @@ async function handleSave() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[WorkOrderMediaEditModal] Erro ao editar mídia:', err)
+    console.error('[WorkOrderMediaEditModal] Falha ao editar mídia')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao atualizar metadados da mídia'
   } finally {
     isSubmitting.value = false

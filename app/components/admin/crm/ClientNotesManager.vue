@@ -33,8 +33,8 @@ async function fetchNotes() {
       notes.value = res.notes || []
       total.value = res.total || 0
     }
-  } catch (err: any) {
-    console.error('[ClientNotesManager] Erro ao carregar notas:', err)
+  } catch {
+    console.error('[ClientNotesManager] Erro ao carregar notas')
     errorMessage.value = 'Erro ao buscar anotações.'
   } finally {
     isLoading.value = false
@@ -63,7 +63,7 @@ async function handleAddNote() {
       await fetchNotes()
     }
   } catch (err: any) {
-    console.error('[ClientNotesManager] Erro ao salvar nota:', err)
+    console.error('[ClientNotesManager] Erro ao salvar nota')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao adicionar anotação.'
   } finally {
     isSaving.value = false
@@ -103,7 +103,7 @@ onMounted(() => {
             :key="cat.value"
             type="button"
             @click="newNoteCategory = cat.value"
-            class="px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer min-h-[32px]"
+            class="px-2.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer min-h-[44px] flex items-center justify-center"
             :class="newNoteCategory === cat.value ? 'bg-indigo-600 text-white shadow-xs font-bold' : 'bg-slate-800 text-slate-400 hover:text-white'"
           >
             {{ cat.label }}
@@ -126,7 +126,7 @@ onMounted(() => {
           type="button"
           :disabled="isSaving || !newNoteContent.trim() || newNoteContent.trim().length < 2"
           @click="handleAddNote"
-          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-colors flex items-center gap-1.5 min-h-[40px] cursor-pointer shadow-md"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-colors flex items-center gap-1.5 min-h-[44px] cursor-pointer shadow-md"
         >
           <Icon v-if="isSaving" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
           <span>{{ isSaving ? 'Salvando...' : 'Adicionar Nota' }}</span>
@@ -175,7 +175,7 @@ onMounted(() => {
           <button 
             :disabled="page <= 1" 
             @click="page--; fetchNotes()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px]"
           >
             Anterior
           </button>
@@ -183,7 +183,7 @@ onMounted(() => {
           <button 
             :disabled="page * pageSize >= total" 
             @click="page++; fetchNotes()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px]"
           >
             Próxima
           </button>

@@ -1,4 +1,6 @@
-import { setAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuth'
+import { defineEventHandler, readBody, createError } from 'h3'
+import { setAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuthCookies.ts'
+import { verifyActiveAdmin } from '../../../shared/adminAuthCore.mjs'
 
 export default defineEventHandler(async (event) => {
   // 1. Proteção CSRF / Same-Origin para criação de sessão
@@ -17,33 +19,19 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Suporte a autenticação em ambiente de desenvolvimento/testes locais
-  if ((process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEST_AUTH === 'true') && email === 'admin@adt.local' && password === 'dev-admin-pass-2026') {
-    setAdminAuthCookies(event, {
-      accessToken: 'dev_mock_admin_token',
-      refreshToken: 'dev_mock_refresh_token',
-      expiresIn: 86400
-    })
-    return {
-      success: true,
-      user: {
-        id: '00000000-0000-0000-0000-000000000001',
-        email: 'admin@adt.local',
-        role: 'admin'
-      }
-    }
-  }
-
-  if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
+  // AUTH_PASSWORD_GRANT_LOW_PRIVILEGE_ONLY=YES
+  // AUTH_GRANT_SERVICE_ROLE_FALLBACK=REMOVED
+  // Password Grant deve utilizar EXCLUSIVAMENTE publishable ou anon key.
+  const grantKey = config.supabasePublishableKey || config.supabaseAnonKey
+  if (!config.supabaseUrl || !grantKey || !config.supabaseServiceRoleKey) {
     throw createError({
-      statusCode: 500,
+      statusCode: 503,
       message: 'Serviço de autenticação temporariamente indisponível.'
     })
   }
-
+  let tokenRes: { access_token: string; refresh_token: string; expires_in: number; user: { id: string; email?: string } } | null = null
   try {
-    // Autentica via Supabase Auth Password Grant
-    const tokenRes = await $fetch<{
+    tokenRes = await $fetch<{
       access_token: string
       refresh_token: string
       expires_in: number
@@ -51,85 +39,83 @@ export default defineEventHandler(async (event) => {
     }>(`${config.supabaseUrl}/auth/v1/token?grant_type=password`, {
       method: 'POST',
       headers: {
-        'apikey': config.supabaseServiceRoleKey,
+        'apikey': grantKey,
         'Content-Type': 'application/json'
       },
-      body: {
-        email,
-        password
-      }
+      body: { email, password },
+      timeout: 8000
     })
-
-    if (!tokenRes?.access_token || !tokenRes?.user?.id) {
+  } catch (authErr: any) {
+    const authStatus = authErr?.statusCode || authErr?.status || (authErr?.response && authErr.response.status)
+    if (authStatus === 400 || authStatus === 401 || authStatus === 422) {
       throw createError({
         statusCode: 401,
-        message: 'E-mail ou senha inválidos.'
+        message: 'E-mail ou senha incorretos.'
       })
     }
-
-    // Verifica autorização de admin
-    let adminRecords: any[] = []
-    try {
-      adminRecords = await $fetch<any[]>(
-        `${config.supabaseUrl}/rest/v1/admin_users?user_id=eq.${tokenRes.user.id}&select=*`,
-        {
-          headers: {
-            'apikey': config.supabaseServiceRoleKey,
-            'Authorization': `Bearer ${config.supabaseServiceRoleKey}`
-          }
-        }
-      )
-    } catch {}
-
-    // Fallback inicial se a tabela ainda não existir no banco
-    if (!adminRecords || adminRecords.length === 0) {
-      if (email.endsWith('@adtelasmosquiteiras.com.br') || email === 'vendas.adtelaseredes@gmail.com' || email === 'samuel.tarif@gmail.com') {
-        adminRecords = [{
-          user_id: tokenRes.user.id,
-          email,
-          role: 'admin',
-          is_active: true
-        }]
-      }
-    }
-
-    const verifyResult = verifyActiveAdmin(tokenRes.user, adminRecords)
-    if (!verifyResult.authorized || !verifyResult.admin) {
-      if (verifyResult.reason === 'UNAUTHORIZED_ROLE') {
-        throw createError({
-          statusCode: 403,
-          message: 'Acesso restrito a administradores com privilégios completos.'
-        })
-      }
-      throw createError({
-        statusCode: 403,
-        message: 'Acesso restrito. Esta conta não possui privilégios de administrador ativo.'
-      })
-    }
-
-    const admin = verifyResult.admin
-
-    // Define cookies seguros HTTP-only
-    setAdminAuthCookies(event, {
-      accessToken: tokenRes.access_token,
-      refreshToken: tokenRes.refresh_token,
-      expiresIn: tokenRes.expires_in
+    throw createError({
+      statusCode: 503,
+      message: 'Serviço de autenticação temporariamente indisponível.'
     })
+  }
 
-    return {
-      success: true,
-      user: {
-        id: tokenRes.user.id,
-        email: tokenRes.user.email,
-        role: admin.role || 'admin'
-      }
-    }
-  } catch (err: any) {
-    if (err.statusCode === 403) throw err
-    // Mensagem genérica para qualquer erro de credencial (prevenção de enumeração)
+  if (!tokenRes?.access_token || !tokenRes?.user?.id) {
     throw createError({
       statusCode: 401,
-      message: 'E-mail ou senha inválidos.'
+      message: 'E-mail ou senha incorretos.'
     })
+  }
+
+  // 3. Consulta estrita em public.admin_users (ADMIN_AUTHORIZATION_AUTHORITY = PUBLIC_ADMIN_USERS)
+  let adminRecords: any[] = []
+  try {
+    adminRecords = await $fetch<any[]>(
+      `${config.supabaseUrl}/rest/v1/admin_users?user_id=eq.${tokenRes.user.id}&select=*`,
+      {
+        headers: {
+          'apikey': config.supabaseServiceRoleKey,
+          'Authorization': `Bearer ${config.supabaseServiceRoleKey}`
+        },
+        timeout: 7000
+      }
+    )
+  } catch {
+    console.error('[login] ADMIN_USERS_LOOKUP_FAILED')
+    throw createError({
+      statusCode: 503,
+      message: 'Serviço de autorização temporariamente indisponível.'
+    })
+  }
+
+  const verifyResult = verifyActiveAdmin(tokenRes.user, adminRecords)
+  if (!verifyResult.authorized || !verifyResult.admin) {
+    if (verifyResult.reason === 'INACTIVE_ADMIN') {
+      throw createError({ statusCode: 403, message: 'Acesso negado: a conta administrativa está inativa.' })
+    }
+    if (verifyResult.reason === 'UNAUTHORIZED_ROLE') {
+      throw createError({ statusCode: 403, message: 'Acesso restrito a administradores com privilégios completos.' })
+    }
+    throw createError({ statusCode: 403, message: 'Acesso restrito. Esta conta não possui privilégios de administrador ativo.' })
+  }
+
+  const admin = verifyResult.admin
+
+  // 4. Define cookies HTTP-only de sessão administrativa
+  setAdminAuthCookies(event, {
+    accessToken: tokenRes.access_token,
+    refreshToken: tokenRes.refresh_token,
+    expiresIn: tokenRes.expires_in
+  })
+
+  // LOGIN_RESPONSE_CONTRACT: { success, user: { id, userId, email, role } }
+  // Alinhado com GET /api/admin/auth/session que retorna "user"
+  return {
+    success: true,
+    user: {
+      id: admin.adminId,
+      userId: admin.userId,
+      email: admin.email,
+      role: admin.role
+    }
   }
 })

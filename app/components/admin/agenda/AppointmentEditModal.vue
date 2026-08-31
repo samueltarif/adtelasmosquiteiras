@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import type { CrmAppointmentDetail } from '~/types/crmAppointments'
 import type { CrmStaffMember } from '~/composables/useCrmStaff'
+import { extractAppointmentErrorMessage } from '~/utils/crmAgendaErrors'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -14,6 +16,8 @@ const emit = defineEmits<{
   (e: 'appointmentUpdated', appt: any): void
 }>()
 
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
+
 const selectedStaffId = ref<string>('')
 const selectedAddressId = ref<string>('')
 const observacoes = ref<string>('')
@@ -22,6 +26,10 @@ const clientAddresses = ref<any[]>([])
 const isSubmitting = ref(false)
 const errorMessage = ref<string | null>(null)
 
+const activeStaffList = computed(() => {
+  return (props.staffList || []).filter(st => st.is_active !== false || st.id === props.appointment?.staff_id)
+})
+
 watch(() => props.isOpen, async (open) => {
   if (open && props.appointment) {
     errorMessage.value = null
@@ -29,9 +37,10 @@ watch(() => props.isOpen, async (open) => {
     selectedAddressId.value = props.appointment.address_id || ''
     observacoes.value = props.appointment.observacoes || ''
 
-    if (props.appointment.work_order?.client_id) {
+    const clientId = props.appointment.client_id || props.appointment.client?.id
+    if (clientId) {
       try {
-        const res = await $fetch<any>(`/api/admin/crm/clients/${props.appointment.work_order.client_id}`)
+        const res = await $fetch<any>(`/api/admin/crm/clients/${clientId}`)
         clientAddresses.value = res?.addresses || []
       } catch {
         clientAddresses.value = []
@@ -64,12 +73,8 @@ async function handleSave() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[AppointmentEditModal] Erro ao editar:', err)
-    if (err?.statusCode === 409) {
-      errorMessage.value = 'Os dados foram alterados por outro usuário. Recarregue os dados antes de continuar.'
-    } else {
-      errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao atualizar dados do agendamento.'
-    }
+    console.error('[AppointmentEditModal] Falha ao editar')
+    errorMessage.value = extractAppointmentErrorMessage(err)
   } finally {
     isSubmitting.value = false
   }
@@ -111,7 +116,7 @@ async function handleSave() {
             class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
           >
             <option value="">Nenhum técnico atribuído</option>
-            <option v-for="st in staffList" :key="st.id" :value="st.id">
+            <option v-for="st in activeStaffList" :key="st.id" :value="st.id">
               {{ st.nome }} ({{ st.funcao }})
             </option>
           </select>

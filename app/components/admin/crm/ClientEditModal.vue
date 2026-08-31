@@ -94,7 +94,7 @@ async function handleSave() {
       errorMessage.value = res?.message || 'Erro ao salvar alterações.'
     }
   } catch (err: any) {
-    console.error('[ClientEditModal] Erro ao salvar:', err)
+    console.error('[ClientEditModal] Erro ao salvar')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao salvar dados do cliente.'
   } finally {
     isSaving.value = false

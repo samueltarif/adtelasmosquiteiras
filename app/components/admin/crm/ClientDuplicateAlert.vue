@@ -58,7 +58,7 @@ function formatDate(iso?: string) {
               v-if="showOpenExisting !== false"
               type="button"
               @click="emit('open-client', dup.id)"
-              class="px-2.5 py-1.5 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors cursor-pointer shrink-0 min-h-[36px] flex items-center gap-1"
+              class="px-3 py-2 rounded-md bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors cursor-pointer shrink-0 min-h-[44px] flex items-center gap-1"
             >
               <Icon name="lucide:external-link" class="w-3.5 h-3.5" />
               <span>Abrir existente</span>

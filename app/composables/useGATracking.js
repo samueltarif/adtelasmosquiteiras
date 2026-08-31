@@ -31,8 +31,8 @@ export const useGATracking = () => {
           clientId
         }
       })
-    } catch (error) {
-      console.error('Erro ao enviar evento server-side:', error)
+    } catch {
+      console.error('[GATracking] Erro ao enviar evento server-side')
     }
   }
   

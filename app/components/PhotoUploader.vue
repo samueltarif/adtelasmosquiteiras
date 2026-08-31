@@ -168,9 +168,12 @@ const removePhoto = (index) => {
           type="button"
           @click.stop="removePhoto(idx)"
           aria-label="Remover foto"
-          class="absolute top-1 right-1 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors shadow-md"
+          class="absolute top-0 right-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer group/rm z-10"
+          title="Remover foto"
         >
-          <Icon name="lucide:x" class="w-3.5 h-3.5" />
+          <span class="w-6 h-6 bg-red-600 group-hover/rm:bg-red-700 text-white rounded-full flex items-center justify-center transition-colors shadow-md">
+            <Icon name="lucide:x" class="w-3.5 h-3.5" />
+          </span>
         </button>
       </div>
     </div>

@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY,
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY,
     newsApiKey: process.env.NEWS_API_KEY,
     mediastackApiKey: process.env.MEDIASTACK_API_KEY,
     newsdataApiKey: process.env.NEWSDATA_API_KEY,

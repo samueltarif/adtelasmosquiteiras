@@ -113,7 +113,7 @@ async function handleSaveAddress() {
     isModalOpen.value = false
     emit('refresh')
   } catch (err: any) {
-    console.error('[ClientAddressManager] Erro ao salvar endereço:', err)
+    console.error('[ClientAddressManager] Erro ao salvar endereço')
     formError.value = err?.data?.message || err?.message || 'Erro ao salvar endereço.'
   } finally {
     isSaving.value = false
@@ -130,7 +130,7 @@ async function handleDeleteAddress(addrId: string) {
     })
     emit('refresh')
   } catch (err: any) {
-    console.error('[ClientAddressManager] Erro ao excluir endereço:', err)
+    console.error('[ClientAddressManager] Erro ao excluir endereço')
     const errData = err?.data?.data || err?.data || {}
     if (err?.statusCode === 409 || errData.code === 'ADDRESS_HAS_HISTORY') {
       conflictHistoryModal.value = {
@@ -266,7 +266,7 @@ async function handleReactivateAddress(addrId: string) {
             v-if="addr.is_archived"
             type="button"
             @click="handleReactivateAddress(addr.id)"
-            class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-medium transition-colors min-h-[36px] flex items-center gap-1 cursor-pointer"
+            class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-medium transition-colors min-h-[44px] flex items-center gap-1 cursor-pointer"
           >
             <Icon name="lucide:archive-restore" class="w-3.5 h-3.5" />
             <span>Reativar</span>
@@ -276,7 +276,7 @@ async function handleReactivateAddress(addrId: string) {
             v-else
             type="button"
             @click="openEditAddressModal(addr)"
-            class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors min-h-[36px] flex items-center gap-1 cursor-pointer"
+            class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors min-h-[44px] flex items-center gap-1 cursor-pointer"
           >
             <Icon name="lucide:pencil" class="w-3.5 h-3.5" />
             <span>Editar</span>
@@ -285,7 +285,7 @@ async function handleReactivateAddress(addrId: string) {
           <button
             type="button"
             @click="handleDeleteAddress(addr.id)"
-            class="px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors min-h-[36px] flex items-center gap-1 cursor-pointer"
+            class="px-2.5 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors min-h-[44px] flex items-center gap-1 cursor-pointer"
             title="Excluir"
           >
             <Icon name="lucide:trash-2" class="w-3.5 h-3.5" />
@@ -303,7 +303,13 @@ async function handleReactivateAddress(addrId: string) {
           <h3 class="text-base font-bold text-white">
             {{ editingAddress ? 'Editar Endereço' : 'Novo Endereço' }}
           </h3>
-          <button type="button" @click="isModalOpen = false" class="p-2 text-slate-400 hover:text-white">
+          <button
+            type="button"
+            @click="isModalOpen = false"
+            class="p-2 text-slate-400 hover:text-white min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center cursor-pointer"
+            aria-label="Fechar modal de endereço"
+            title="Fechar (Esc)"
+          >
             <Icon name="lucide:x" class="w-5 h-5" />
           </button>
         </div>
@@ -316,11 +322,11 @@ async function handleReactivateAddress(addrId: string) {
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Rótulo / Identificação</label>
-              <input v-model="form.rotulo" type="text" required class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="Ex: Casa, Apto Praia" />
+              <input v-model="form.rotulo" type="text" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Ex: Casa, Apto Praia" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Tipo de Imóvel</label>
-              <select v-model="form.tipo_imovel" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]">
+              <select v-model="form.tipo_imovel" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]">
                 <option value="apartamento">Apartamento</option>
                 <option value="casa">Casa</option>
                 <option value="condominio">Condomínio</option>
@@ -333,60 +339,60 @@ async function handleReactivateAddress(addrId: string) {
           <div class="grid grid-cols-3 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">CEP</label>
-              <input v-model="form.cep" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="00000-000" />
+              <input v-model="form.cep" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="00000-000" />
             </div>
             <div class="col-span-2">
               <label class="block text-xs font-semibold text-slate-300 mb-1">Logradouro / Rua</label>
-              <input v-model="form.logradouro" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="Av. Paulista" />
+              <input v-model="form.logradouro" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Av. Paulista" />
             </div>
           </div>
 
           <div class="grid grid-cols-3 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Número</label>
-              <input v-model="form.numero" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="1000" />
+              <input v-model="form.numero" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="1000" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Complemento / Bloco</label>
-              <input v-model="form.complemento" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="Apto 42" />
+              <input v-model="form.complemento" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Apto 42" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">Bairro</label>
-              <input v-model="form.bairro" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="Bela Vista" />
+              <input v-model="form.bairro" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Bela Vista" />
             </div>
           </div>
 
           <div class="grid grid-cols-3 gap-3">
             <div class="col-span-2">
               <label class="block text-xs font-semibold text-slate-300 mb-1">Cidade</label>
-              <input v-model="form.cidade" type="text" required class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" />
+              <input v-model="form.cidade" type="text" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-300 mb-1">UF</label>
-              <input v-model="form.uf" type="text" maxlength="2" required class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px] uppercase font-bold text-center" />
+              <input v-model="form.uf" type="text" maxlength="2" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px] uppercase font-bold text-center" />
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Ponto de Referência</label>
-            <input v-model="form.referencia" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[40px]" placeholder="Próximo ao metrô" />
+            <input v-model="form.referencia" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Próximo ao metrô" />
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Observações de Acesso / Portaria</label>
-            <textarea v-model="form.observacoes_acesso" rows="2" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-white text-xs resize-none" placeholder="Avisar portaria com antecedência"></textarea>
+            <textarea v-model="form.observacoes_acesso" rows="2" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-white text-xs resize-none" placeholder="Avisar portaria com antecedência"></textarea>
           </div>
 
           <div class="pt-2">
-            <label class="flex items-center gap-2.5 cursor-pointer">
+            <label class="flex items-center gap-2.5 cursor-pointer min-h-[44px]">
               <input v-model="form.is_principal" type="checkbox" class="w-4 h-4 rounded text-indigo-600 bg-slate-950 border-white/20" />
               <span class="text-xs text-slate-200 font-medium">Definir como Endereço Principal de Atendimento</span>
             </label>
           </div>
 
           <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
-            <button type="button" @click="isModalOpen = false" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold min-h-[40px]">Cancelar</button>
-            <button type="submit" :disabled="isSaving" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold min-h-[40px] flex items-center gap-1.5">
+            <button type="button" @click="isModalOpen = false" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold min-h-[44px] cursor-pointer">Cancelar</button>
+            <button type="submit" :disabled="isSaving" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold min-h-[44px] flex items-center gap-1.5 cursor-pointer">
               <Icon v-if="isSaving" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
               <span>{{ isSaving ? 'Salvando...' : 'Salvar Endereço' }}</span>
             </button>

@@ -57,7 +57,7 @@ const timeInterval = computed(() => {
   <div
     tabindex="0"
     role="button"
-    :aria-label="`Compromisso ${tipoLabels[appointment.tipo_agendamento] || appointment.tipo_agendamento}, ${appointment.work_order?.numero_os || 'OS'}, ${timeInterval}`"
+    :aria-label="`Compromisso ${tipoLabels[appointment.tipo_agendamento] || appointment.tipo_agendamento}, ${appointment.client?.nome || 'Cliente'}, ${appointment.work_order?.numero_os || 'OS'}, ${timeInterval}`"
     @click="emit('click', appointment)"
     @keydown.enter="emit('click', appointment)"
     @keydown.space.prevent="emit('click', appointment)"
@@ -80,7 +80,7 @@ const timeInterval = computed(() => {
     <div class="space-y-1">
       <div class="flex items-center justify-between gap-2">
         <span class="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
-          {{ appointment.work_order?.client?.nome || 'Cliente' }}
+          {{ appointment.client?.nome || 'Cliente' }}
         </span>
         <span v-if="appointment.work_order?.numero_os" class="text-[10px] font-mono text-slate-400 shrink-0">
           {{ appointment.work_order.numero_os }}

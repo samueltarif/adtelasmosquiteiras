@@ -1,6 +1,6 @@
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
-import { useImageCompressor } from '~/composables/useImageCompressor'
+import { ref, onUnmounted } from 'vue'
+import { useLeadMediaUploadQueue } from '~/composables/useLeadMediaUploadQueue'
 
 const props = defineProps({
   maxPhotos: {
@@ -23,22 +23,24 @@ const props = defineProps({
 
 const emit = defineEmits(['update:count'])
 
-const { compressImage } = useImageCompressor()
-
-// Lista de arquivos selecionados no client
-const mediaItems = ref([])
-const isProcessing = ref(false)
-const isUploading = ref(false)
-const uploadProgressText = ref('')
-const uploadErrorMessage = ref('')
-
-// AbortController para cancelamento seguro
-let uploadAbortController = null
-
-const photoCount = computed(() => mediaItems.value.filter(m => m.type === 'photo').length)
-const videoCount = computed(() => mediaItems.value.filter(m => m.type === 'video').length)
-const totalCount = computed(() => mediaItems.value.length)
-const hasFiles = computed(() => mediaItems.value.length > 0)
+const {
+  mediaItems,
+  isProcessing,
+  isUploading,
+  uploadProgressText,
+  uploadErrorMessage,
+  photoCount,
+  videoCount,
+  totalCount,
+  hasFiles,
+  handlePhotoSelect: onPhotoSelect,
+  handleVideoSelect: onVideoSelect,
+  removeItem: onRemoveItem,
+  formatSize,
+  uploadAllMedia,
+  retryItem,
+  cleanup
+} = useLeadMediaUploadQueue(props)
 
 const photoInputRef = ref(null)
 const videoInputRef = ref(null)
@@ -57,371 +59,12 @@ const triggerVideoPicker = () => {
   }
 }
 
-// Processa fotos selecionadas (comprimindo client-side com medição de timing)
-const handlePhotoSelect = async (event) => {
-  const files = Array.from(event.target.files || [])
-  if (!files.length) return
-
-  const remainingPhotos = props.maxPhotos - photoCount.value
-  if (remainingPhotos <= 0) {
-    alert(`Você já atingiu o limite de ${props.maxPhotos} fotos.`)
-    return
-  }
-
-  const allowedFiles = files.slice(0, remainingPhotos)
-  isProcessing.value = true
-  uploadErrorMessage.value = ''
-
-  for (const file of allowedFiles) {
-    if (!file.type.startsWith('image/')) {
-      alert(`O arquivo "${file.name}" não é uma imagem válida.`)
-      continue
-    }
-
-    const t0 = performance.now()
-    try {
-      const compressed = await compressImage(file, {
-        maxWidth: 1280,
-        maxHeight: 1280,
-        quality: 0.8
-      })
-      const t1 = performance.now()
-
-      if (import.meta.dev) {
-        console.log(`[MediaTiming] Foto "${file.name}": compressão em ${(t1 - t0).toFixed(1)}ms (${Math.round(file.size / 1024)}KB ➔ ${Math.round(compressed.size / 1024)}KB)`)
-      }
-
-      const clientMediaId = crypto.randomUUID()
-      mediaItems.value.push({
-        id: clientMediaId,
-        type: 'photo',
-        name: compressed.name || (file.name.replace(/\.[^/.]+$/, '') + '.jpg'),
-        mime: 'image/jpeg',
-        size: compressed.size || file.size,
-        blob: compressed.blob || file,
-        previewUrl: compressed.dataUrl,
-        status: 'selected', // 'selected' | 'waiting' | 'preparing' | 'uploading' | 'finalizing' | 'uploaded' | 'failed'
-        progress: 0,
-        retryCount: 0,
-        errorMessage: ''
-      })
-    } catch (err) {
-      console.error('Erro ao comprimir imagem:', err)
-      alert(`Não foi possível processar a foto "${file.name}": ${err.message}`)
-    }
-  }
-
-  isProcessing.value = false
-  emit('update:count', totalCount.value)
-}
-
-// Processa vídeos selecionados (MP4, WebM, MOV)
-const handleVideoSelect = async (event) => {
-  const files = Array.from(event.target.files || [])
-  if (!files.length) return
-
-  const remainingVideos = props.maxVideos - videoCount.value
-  if (remainingVideos <= 0) {
-    alert(`Você já atingiu o limite de ${props.maxVideos} vídeos.`)
-    return
-  }
-
-  const allowedFiles = files.slice(0, remainingVideos)
-  const allowedMimes = ['video/mp4', 'video/webm', 'video/quicktime']
-
-  for (const file of allowedFiles) {
-    const mime = (file.type || '').toLowerCase()
-    const isAllowed = allowedMimes.includes(mime) || file.name.endsWith('.mp4') || file.name.endsWith('.webm') || file.name.endsWith('.mov')
-
-    if (!isAllowed) {
-      alert(`O arquivo "${file.name}" não é um vídeo suportado (MP4, WebM ou MOV).`)
-      continue
-    }
-
-    // Limite de 25 MB por vídeo
-    if (file.size > 25 * 1024 * 1024) {
-      alert(`O vídeo "${file.name}" tem ${Math.round(file.size / (1024 * 1024))} MB. O tamanho máximo permitido é 25 MB.`)
-      continue
-    }
-
-    const clientMediaId = crypto.randomUUID()
-    const previewUrl = URL.createObjectURL(file)
-
-    let effectiveMime = mime
-    if (!effectiveMime) {
-      if (file.name.endsWith('.mp4')) effectiveMime = 'video/mp4'
-      else if (file.name.endsWith('.webm')) effectiveMime = 'video/webm'
-      else if (file.name.endsWith('.mov')) effectiveMime = 'video/quicktime'
-      else effectiveMime = 'video/mp4'
-    }
-
-    mediaItems.value.push({
-      id: clientMediaId,
-      type: 'video',
-      name: file.name,
-      mime: effectiveMime,
-      size: file.size,
-      blob: file,
-      previewUrl,
-      status: 'selected',
-      progress: 0,
-      retryCount: 0,
-      errorMessage: ''
-    })
-  }
-
-  emit('update:count', totalCount.value)
-}
-
-// Remove um arquivo selecionado
-const removeItem = (id) => {
-  const idx = mediaItems.value.findIndex(m => m.id === id)
-  if (idx !== -1) {
-    const item = mediaItems.value[idx]
-    if (item.previewUrl) {
-      try { URL.revokeObjectURL(item.previewUrl) } catch {}
-    }
-    mediaItems.value.splice(idx, 1)
-    emit('update:count', totalCount.value)
-  }
-}
-
-// Formata tamanho em KB/MB
-const formatSize = (bytes) => {
-  if (!bytes) return '0 B'
-  if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)} KB`
-  }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-/**
- * Executa o pipeline completo de upload de UM arquivo com métricas de timing e retry automático.
- */
-const uploadSingleItem = async (item, uploadToken, signal) => {
-  const MAX_AUTO_RETRIES = 1
-  let attempt = 0
-
-  while (attempt <= MAX_AUTO_RETRIES) {
-    attempt++
-    const tStart = performance.now()
-    try {
-      // 1. Autorização (T2 -> T3)
-      item.status = 'preparing'
-      const t2 = performance.now()
-
-      const authRes = await $fetch('/api/media/authorize-upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${uploadToken}`
-        },
-        body: {
-          client_media_id: item.id,
-          media_type: item.type,
-          mime_type: item.mime,
-          file_size_bytes: item.size,
-          original_filename: item.name
-        },
-        signal
-      })
-
-      const t3 = performance.now()
-
-      if (authRes?.alreadyUploaded) {
-        item.status = 'uploaded'
-        return { success: true, alreadyUploaded: true }
-      }
-
-      if (!authRes?.presignedUrl) {
-        throw new Error('Servidor não retornou URL de upload')
-      }
-
-      // 2. Upload DIRETO do Browser ao Cloudflare R2 (T4 -> T5)
-      item.status = 'uploading'
-      const t4 = performance.now()
-
-      const uploadResponse = await fetch(authRes.presignedUrl, {
-        method: 'PUT',
-        body: item.blob,
-        headers: {
-          'Content-Type': item.mime
-        },
-        signal
-      })
-
-      const t5 = performance.now()
-
-      if (!uploadResponse.ok) {
-        throw new Error(`Falha no storage R2 (HTTP ${uploadResponse.status})`)
-      }
-
-      // 3. Finalização e Verificação Server-Side (T6 -> T7)
-      item.status = 'finalizing'
-      const t6 = performance.now()
-
-      const finalizeRes = await $fetch('/api/media/finalize-upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${uploadToken}`
-        },
-        body: {
-          client_media_id: item.id
-        },
-        signal
-      })
-
-      const t7 = performance.now()
-
-      if (finalizeRes?.success) {
-        item.status = 'uploaded'
-        item.errorMessage = ''
-
-        if (import.meta.dev) {
-          const authMs = (t3 - t2).toFixed(1)
-          const putMs = (t5 - t4).toFixed(1)
-          const finMs = (t7 - t6).toFixed(1)
-          const totalMs = (t7 - tStart).toFixed(1)
-          console.log(`[MediaTiming] "${item.name}" CONCLUÍDO em ${totalMs}ms (Auth: ${authMs}ms | R2 PUT: ${putMs}ms | Fin: ${finMs}ms)`)
-        }
-
-        return { success: true }
-      } else {
-        throw new Error('Falha na verificação de integridade')
-      }
-
-    } catch (err) {
-      if (signal?.aborted) {
-        item.status = 'failed'
-        item.errorMessage = 'Upload cancelado'
-        return { success: false, aborted: true }
-      }
-
-      if (attempt <= MAX_AUTO_RETRIES) {
-        if (import.meta.dev) {
-          console.warn(`[MediaUploader] Tentativa ${attempt} falhou para "${item.name}". Tentando novamente...`, err?.message)
-        }
-        await new Promise(r => setTimeout(r, 800))
-        continue
-      }
-
-      console.error(`[MediaUploader] Erro definitivo ao enviar "${item.name}":`, err)
-      item.status = 'failed'
-      item.errorMessage = err?.message || 'Falha no envio'
-      return { success: false, error: err }
-    }
-  }
-
-  return { success: false }
-}
-
-/**
- * Worker Pool com Concorrência Limitada (MEDIA_UPLOAD_CONCURRENCY = 2)
- */
-const runConcurrentUploads = async (itemsToUpload, uploadToken, concurrency = 2) => {
-  let currentIndex = 0
-  const results = []
-  const executing = []
-
-  const enqueue = () => {
-    if (currentIndex >= itemsToUpload.length) return Promise.resolve()
-    const item = itemsToUpload[currentIndex++]
-    
-    item.status = 'waiting'
-    const p = uploadSingleItem(item, uploadToken, uploadAbortController?.signal)
-      .then(res => {
-        results.push(res)
-      })
-      .finally(() => {
-        executing.splice(executing.indexOf(p), 1)
-        updateOverallProgress()
-      })
-
-    executing.push(p)
-
-    let r = Promise.resolve()
-    if (executing.length >= concurrency) {
-      r = Promise.race(executing)
-    }
-    return r.then(() => enqueue())
-  }
-
-  await enqueue().then(() => Promise.all(executing))
-  return results
-}
-
-const updateOverallProgress = () => {
-  const uploaded = mediaItems.value.filter(m => m.status === 'uploaded').length
-  const total = mediaItems.value.length
-  uploadProgressText.value = `Enviando arquivos (${uploaded}/${total} concluídos)...`
-}
-
-/**
- * Orquestrador de Uploads com Concorrência Limitada
- */
-const uploadAllMedia = async (uploadToken) => {
-  if (!mediaItems.value.length || !uploadToken) {
-    return { total: 0, uploaded: 0, failed: 0 }
-  }
-
-  isUploading.value = true
-  uploadErrorMessage.value = ''
-  uploadAbortController = new AbortController()
-
-  const tTotalStart = performance.now()
-
-  // Filtra itens que ainda não foram enviados com sucesso
-  const pendingItems = mediaItems.value.filter(m => m.status !== 'uploaded')
-  
-  if (pendingItems.length === 0) {
-    isUploading.value = false
-    return { total: mediaItems.value.length, uploaded: mediaItems.value.length, failed: 0 }
-  }
-
-  uploadProgressText.value = `Iniciando envio de ${pendingItems.length} arquivo(s)...`
-
-  await runConcurrentUploads(pendingItems, uploadToken, props.uploadConcurrency)
-
-  const tTotalEnd = performance.now()
-  const uploadedCount = mediaItems.value.filter(m => m.status === 'uploaded').length
-  const failedCount = mediaItems.value.filter(m => m.status === 'failed').length
-
-  if (import.meta.dev) {
-    console.log(`[MediaTiming] TOTAL (${mediaItems.value.length} arquivos): ${(tTotalEnd - tTotalStart).toFixed(1)}ms | Sucesso: ${uploadedCount} | Falha: ${failedCount}`)
-  }
-
-  isUploading.value = false
-  uploadProgressText.value = ''
-
-  if (failedCount > 0) {
-    uploadErrorMessage.value = `${failedCount} arquivo(s) não puderam ser enviados, mas seu pedido de orçamento foi registrado com sucesso!`
-  }
-
-  return {
-    total: mediaItems.value.length,
-    uploaded: uploadedCount,
-    failed: failedCount
-  }
-}
-
-/**
- * Retry Manual de um Item Específico
- */
-const retryItem = async (item, uploadToken) => {
-  if (isUploading.value || !uploadToken) return
-  isUploading.value = true
-  await uploadSingleItem(item, uploadToken, uploadAbortController?.signal)
-  isUploading.value = false
-}
+const handlePhotoSelect = (e) => onPhotoSelect(e, (c) => emit('update:count', c))
+const handleVideoSelect = (e) => onVideoSelect(e, (c) => emit('update:count', c))
+const removeItem = (id) => onRemoveItem(id, (c) => emit('update:count', c))
 
 onUnmounted(() => {
-  if (uploadAbortController) {
-    uploadAbortController.abort()
-  }
-  mediaItems.value.forEach(item => {
-    if (item.previewUrl) {
-      try { URL.revokeObjectURL(item.previewUrl) } catch {}
-    }
-  })
+  cleanup()
 })
 
 // Expõe métodos e estado para o componente pai
@@ -585,10 +228,13 @@ defineExpose({
           v-if="!isUploading && item.status !== 'uploaded'"
           type="button"
           @click.stop="removeItem(item.id)"
-          class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white hover:bg-red-600 flex items-center justify-center transition-colors cursor-pointer shadow-md"
+          class="absolute top-0 right-0 p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer group/rm z-10"
           title="Remover arquivo"
+          aria-label="Remover arquivo"
         >
-          <Icon name="lucide:x" class="w-3.5 h-3.5" />
+          <span class="w-6 h-6 rounded-full bg-black/70 text-white group-hover/rm:bg-red-600 flex items-center justify-center transition-colors shadow-md">
+            <Icon name="lucide:x" class="w-3.5 h-3.5" />
+          </span>
         </button>
       </div>
     </div>

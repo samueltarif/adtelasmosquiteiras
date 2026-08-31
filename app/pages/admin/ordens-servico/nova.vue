@@ -26,7 +26,6 @@ const isLoadingStaff = ref(false)
 // Campos do Formulário
 const selectedAddressId = ref<string>('')
 const selectedStaffId = ref<string>('')
-const dataPrevista = ref<string>('')
 const proposalValidUntil = ref<string>('')
 const observacoesGerais = ref<string>('')
 const valorDesconto = ref<number>(0)
@@ -49,7 +48,7 @@ const categoriasOperacionais = [
   { value: 'outro', label: 'Outro Serviço' }
 ]
 
-async function loadClientById(clientId: string) {
+async function fetchClientAndAddresses(clientId: string) {
   if (!clientId) return
   isLoadingAddresses.value = true
   errorMessage.value = null
@@ -59,13 +58,7 @@ async function loadClientById(clientId: string) {
       selectedClient.value = res.client
       clientAddresses.value = res.addresses || []
       const principal = clientAddresses.value.find((a: any) => a.is_principal || a.is_padrao)
-      if (principal) {
-        selectedAddressId.value = principal.id
-      } else if (clientAddresses.value.length > 0) {
-        selectedAddressId.value = clientAddresses.value[0].id
-      } else {
-        selectedAddressId.value = ''
-      }
+      selectedAddressId.value = principal ? principal.id : (clientAddresses.value[0]?.id || '')
     } else {
       selectedClient.value = null
       clientAddresses.value = []
@@ -73,17 +66,11 @@ async function loadClientById(clientId: string) {
       errorMessage.value = 'Cliente não encontrado.'
     }
   } catch (err: any) {
-    console.error('[NovaOS] Erro ao carregar cliente:', err)
+    console.error('[NovaOS] Falha ao carregar cliente')
     selectedClient.value = null
     clientAddresses.value = []
     selectedAddressId.value = ''
-    if (err?.statusCode === 404) {
-      errorMessage.value = 'Cliente não encontrado.'
-    } else if (err?.statusCode === 401 || err?.statusCode === 403) {
-      errorMessage.value = 'Sessão inválida ou sem permissão para acessar este cliente.'
-    } else {
-      errorMessage.value = err?.data?.message || err?.message || 'Erro ao carregar dados do cliente.'
-    }
+    errorMessage.value = err?.statusCode === 404 ? 'Cliente não encontrado.' : (err?.data?.message || err?.message || 'Erro ao carregar dados do cliente.')
   } finally {
     isLoadingAddresses.value = false
   }
@@ -99,21 +86,17 @@ async function searchClients() {
   try {
     const res = await $fetch<any>('/api/admin/crm/clients/search', {
       method: 'POST',
-      body: {
-        search: clientSearchTerm.value.trim(),
-        limit: 5
-      }
+      body: { search: clientSearchTerm.value.trim(), limit: 5 }
     })
     clientSearchResults.value = res?.clients || []
   } catch (err) {
-    console.error('[NovaOS] Erro na busca de clientes:', err)
+    console.error('[NovaOS] Falha na busca de clientes')
   } finally {
     isSearchingClients.value = false
   }
 }
 
 async function selectClient(client: any) {
-  // Limpar endereços e seleção anterior antes de carregar novo cliente
   selectedAddressId.value = ''
   clientAddresses.value = []
   clientSearchResults.value = []
@@ -121,8 +104,7 @@ async function selectClient(client: any) {
   selectedClient.value = client
   errorMessage.value = null
 
-  if (!client?.id) return
-  await loadAddressesForClient(client.id)
+  if (client?.id) await fetchClientAndAddresses(client.id)
 }
 
 function clearSelectedClient() {
@@ -134,46 +116,13 @@ function clearSelectedClient() {
   errorMessage.value = null
 }
 
-async function loadAddressesForClient(clientId: string) {
-  isLoadingAddresses.value = true
-  try {
-    const res = await $fetch<any>(`/api/admin/crm/clients/${clientId}`)
-    if (res?.client) {
-      selectedClient.value = res.client
-    }
-    clientAddresses.value = res?.addresses || []
-    const principal = clientAddresses.value.find((a: any) => a.is_principal || a.is_padrao)
-    if (principal) {
-      selectedAddressId.value = principal.id
-    } else if (clientAddresses.value.length > 0) {
-      selectedAddressId.value = clientAddresses.value[0].id
-    } else {
-      selectedAddressId.value = ''
-    }
-  } catch (err: any) {
-    console.error('[NovaOS] Erro ao carregar dados e endereços do cliente:', err)
-    selectedAddressId.value = ''
-    clientAddresses.value = []
-    if (err?.statusCode === 404) {
-      errorMessage.value = 'Cliente selecionado não foi encontrado no sistema.'
-      selectedClient.value = null
-    } else if (err?.statusCode === 401 || err?.statusCode === 403) {
-      errorMessage.value = 'Sessão inválida ou sem permissão.'
-    } else {
-      errorMessage.value = err?.data?.message || err?.message || 'Erro ao carregar endereços do cliente.'
-    }
-  } finally {
-    isLoadingAddresses.value = false
-  }
-}
-
 async function loadActiveStaff() {
   isLoadingStaff.value = true
   try {
-    const res = await $fetch<any>('/api/admin/crm/staff')
+    const res = await $fetch<any>('/api/admin/crm/staff?isActive=true')
     activeStaff.value = res?.staff || []
   } catch (err) {
-    console.error('[NovaOS] Erro ao carregar equipe técnica:', err)
+    // Sanitized
   } finally {
     isLoadingStaff.value = false
   }
@@ -197,7 +146,6 @@ async function handleSubmit() {
     clientId: selectedClient.value.id,
     addressId: selectedAddressId.value || null,
     responsibleStaffId: selectedStaffId.value || null,
-    dataPrevista: dataPrevista.value || null,
     proposalValidUntil: proposalValidUntil.value || null,
     observacoesGerais: observacoesGerais.value || null,
     valorDesconto: valorDesconto.value || 0,
@@ -222,7 +170,6 @@ async function handleSubmit() {
       errorMessage.value = 'Ordem de serviço criada, mas resposta inválida do servidor.'
     }
   } catch (err: any) {
-    console.error('[NovaOS] Erro ao salvar OS:', err)
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao criar ordem de serviço.'
   } finally {
     isSubmitting.value = false
@@ -232,7 +179,7 @@ async function handleSubmit() {
 onMounted(() => {
   loadActiveStaff()
   if (queryClientId) {
-    loadClientById(queryClientId)
+    fetchClientAndAddresses(queryClientId)
   }
 })
 </script>
@@ -285,7 +232,7 @@ onMounted(() => {
           <button
             type="button"
             @click="clearSelectedClient"
-            class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all cursor-pointer min-h-[38px] self-start sm:self-center"
+            class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all cursor-pointer min-h-[44px] self-start sm:self-center flex items-center justify-center"
           >
             Trocar Cliente
           </button>
@@ -365,14 +312,13 @@ onMounted(() => {
             </select>
           </div>
 
-          <!-- Data Prevista -->
+          <!-- Data Prevista (Informativo Agenda) -->
           <div class="space-y-1.5">
             <label class="text-xs text-slate-300 font-medium">Data Prevista para Instalação</label>
-            <input
-              v-model="dataPrevista"
-              type="date"
-              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px]"
-            />
+            <div class="px-3.5 py-2.5 rounded-xl bg-slate-950/40 border border-white/5 text-slate-400 text-xs min-h-[44px] flex items-center gap-2">
+              <Icon name="lucide:calendar-clock" class="w-4 h-4 text-indigo-400 shrink-0" />
+              <span>A data prevista de instalação será definida pelo agendamento na Agenda.</span>
+            </div>
           </div>
 
           <!-- Validade da Proposta -->

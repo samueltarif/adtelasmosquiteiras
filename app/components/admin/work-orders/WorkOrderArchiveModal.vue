@@ -33,7 +33,7 @@ async function handleToggleArchive() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[WorkOrderArchiveModal] Erro ao arquivar/desarquivar OS:', err)
+    console.error('[WorkOrderArchiveModal] Falha ao alterar arquivamento da OS')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao alterar arquivamento da OS'
   } finally {
     isSubmitting.value = false

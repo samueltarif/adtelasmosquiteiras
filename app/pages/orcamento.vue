@@ -111,8 +111,8 @@ const submitForm = async () => {
 
   try {
     await redirectToThankYou(formData.value, mediaUploaderRef)
-  } catch (error) {
-    console.error('Erro no formulário de orçamento:', error)
+  } catch {
+    console.error('[OrcamentoPage] Erro no formulário de orçamento')
     submitError.value = true
   }
 }
@@ -140,7 +140,7 @@ const callPhone = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 md:pt-24 overflow-x-hidden">
+  <div class="min-h-screen bg-gradient-to-b from-gray-50 to-white pt-16 md:pt-24">
     
     <!-- Breadcrumb -->
     <Breadcrumb />
@@ -302,7 +302,7 @@ const callPhone = () => {
 
                 <p class="text-[11px] text-[#4B5563] text-center pt-1">
                   Ao enviar, você concorda com nossa 
-                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline font-medium">Política de Privacidade</NuxtLink>
+                  <NuxtLink to="/politica-de-privacidade" class="text-[#F49A1A] hover:underline font-medium min-h-[44px] inline-flex items-center px-1">Política de Privacidade</NuxtLink>
                 </p>
               </form>
             </div>

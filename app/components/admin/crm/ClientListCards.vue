@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatWhatsAppLink } from '~/utils/phone'
+
 defineProps<{
   clients: Array<{
     id: string
@@ -28,12 +30,6 @@ function formatPhone(phone: string) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
   }
   return phone
-}
-
-function formatWhatsAppLink(phone: string) {
-  const digits = phone.replace(/\D/g, '')
-  const full = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${full}`
 }
 
 function getTipoLabel(tipo: string) {

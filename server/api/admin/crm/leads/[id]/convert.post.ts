@@ -74,7 +74,10 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const criarOs = Boolean(body.criar_os)
+  if (body.criar_os !== undefined && typeof body.criar_os !== 'boolean') {
+    throw createError({ statusCode: 400, message: 'O campo criar_os deve ser um booleano estrito (true ou false).' })
+  }
+  const criarOs = body.criar_os === true
   let osData: Record<string, any> | null = null
   if (criarOs) {
     if (body.os_data?.data_prevista !== undefined || body.os_data?.dataPrevista !== undefined) {
@@ -127,7 +130,9 @@ export default defineEventHandler(async (event) => {
 
     return { success: true, result: rpcResult }
   } catch (rpcErr: any) {
-    console.error('[leads/convert] Erro na RPC de conversão:', rpcErr)
+    // LEAD_CONVERT_RAW_ERROR_LOGGING=REMOVED — zero telefone, email, CPF, nome ou payload nos logs
+    const rpcStatus = rpcErr?.statusCode || rpcErr?.status || (rpcErr?.response && rpcErr.response.status) || 'unknown'
+    console.error('[leads/convert] RPC failure. Status:', rpcStatus)
     const errMessage = rpcErr?.data?.message || rpcErr?.message || ''
 
     if (errMessage.includes('ERR_LEAD_ALREADY_CONVERTED')) {

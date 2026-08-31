@@ -27,7 +27,7 @@ async function fetchNotes() {
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${props.workOrderId}/notes`)
     notes.value = res?.notes || []
   } catch (err) {
-    console.error('[WorkOrderNotesManager] Erro ao carregar notas:', err)
+    console.error('[WorkOrderNotesManager] Falha ao carregar notas')
   } finally {
     isLoading.value = false
   }
@@ -57,7 +57,7 @@ async function handleAddNote() {
       await fetchNotes()
     }
   } catch (err: any) {
-    console.error('[WorkOrderNotesManager] Erro ao criar nota:', err)
+    console.error('[WorkOrderNotesManager] Falha ao criar nota')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao salvar anotação'
   } finally {
     isSubmitting.value = false
@@ -92,7 +92,7 @@ onMounted(() => {
           <label class="text-xs text-slate-300 font-medium">Categoria:</label>
           <select
             v-model="newCategoria"
-            class="px-3 py-1.5 rounded-lg bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 cursor-pointer min-h-[36px]"
+            class="px-3 py-1.5 rounded-lg bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 cursor-pointer min-h-[44px]"
           >
             <option v-for="cat in ALLOWED_NOTE_CATEGORIAS" :key="cat" :value="cat">
               {{ categoryLabels[cat]?.label || cat }}
@@ -113,7 +113,7 @@ onMounted(() => {
           type="button"
           :disabled="isSubmitting || !newContent.trim()"
           @click="handleAddNote"
-          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold shadow-md transition-all flex items-center gap-2 min-h-[40px] cursor-pointer"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold shadow-md transition-all flex items-center gap-2 min-h-[44px] cursor-pointer"
         >
           <Icon v-if="isSubmitting" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
           <span>Adicionar Nota</span>

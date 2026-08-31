@@ -6,7 +6,7 @@
  */
 
 import type { H3Event } from 'h3'
-import { getHeader, setCookie, deleteCookie, createError } from 'h3'
+import { getHeader, getCookie, setCookie, deleteCookie, createError } from 'h3'
 import {
   ADMIN_AUTH_COOKIE_NAME,
   ADMIN_REFRESH_COOKIE_NAME,
@@ -60,9 +60,20 @@ export function enforceMutationCsrf(event: H3Event) {
     const origin = getHeader(event, 'origin')
     const referer = getHeader(event, 'referer')
     const host = getHeader(event, 'host')
+    const authorization = getHeader(event, 'authorization')
+    const cookieHeader = getHeader(event, 'cookie') || ''
+    const cookieToken = getCookie(event, ADMIN_AUTH_COOKIE_NAME)
+    const cookieRefreshToken = getCookie(event, ADMIN_REFRESH_COOKIE_NAME)
+    const hasAdminCookies = Boolean(
+      cookieToken ||
+      cookieRefreshToken ||
+      cookieHeader.includes(ADMIN_AUTH_COOKIE_NAME) ||
+      cookieHeader.includes(ADMIN_REFRESH_COOKIE_NAME)
+    )
     const isDev = process.env.NODE_ENV !== 'production'
+    const protocol = getHeader(event, 'x-forwarded-proto') || (isDev ? 'http' : 'https')
 
-    const check = validateMutationOrigin(origin, referer, host, isDev)
+    const check = validateMutationOrigin(origin, referer, host, isDev, authorization, hasAdminCookies, protocol)
     if (!check.allowed) {
       throw createError({
         statusCode: check.statusCode,

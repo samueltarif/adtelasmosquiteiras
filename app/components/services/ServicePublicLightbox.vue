@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useLightboxZoom } from '~/composables/useLightboxZoom'
 
 export interface PublicMediaItem {
   id: string
@@ -29,103 +30,52 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
-// Índice atual no visualizador
 const currentIndex = ref(props.initialIndex || 0)
-
-watch(
-  () => props.initialIndex,
-  (newIdx) => {
-    currentIndex.value = Math.max(0, Math.min(newIdx || 0, (props.mediaList || []).length - 1))
-    resetTransform()
-  }
-)
-
-watch(
-  () => props.isOpen,
-  (open) => {
-    if (open) {
-      currentIndex.value = Math.max(0, Math.min(props.initialIndex || 0, (props.mediaList || []).length - 1))
-      resetTransform()
-      savePreviousFocus()
-      nextTick(() => {
-        setupFocusTrap()
-      })
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = 'hidden'
-      }
-    } else {
-      pauseCurrentVideo()
-      restorePreviousFocus()
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = ''
-      }
-    }
-  }
-)
-
-const currentMedia = computed<PublicMediaItem | null>(() => {
-  return props.mediaList[currentIndex.value] || null
-})
-
+const currentMedia = computed<PublicMediaItem | null>(() => props.mediaList[currentIndex.value] || null)
 const isPhoto = computed(() => currentMedia.value?.media_type === 'photo')
 const isVideo = computed(() => currentMedia.value?.media_type === 'video')
 
-// Estado de transformação (Zoom & Pan)
-const scale = ref(1)
-const translateX = ref(0)
-const translateY = ref(0)
-const isDragging = ref(false)
-const isPinching = ref(false)
-const MIN_ZOOM = 1
-const MAX_ZOOM = 5
-
-// Rastreamento de ponteiros (Pointer Events)
-const activePointers = new Map<number, { x: number; y: number }>()
-let initialPinchDistance = 0
-let initialPinchScale = 1
-let lastPointerPos = { x: 0, y: 0 }
-let touchStartPos = { x: 0, y: 0, time: 0 }
-let lastTapTime = 0
-
-// Elementos DOM
 const viewportRef = ref<HTMLElement | null>(null)
 const imageRef = ref<HTMLImageElement | null>(null)
 const videoRef = ref<HTMLVideoElement | null>(null)
 const lightboxRef = ref<HTMLElement | null>(null)
 let previousActiveElement: HTMLElement | null = null
 
-// Rótulo de porcentagem de zoom
-const zoomPercent = computed(() => `${Math.round(scale.value * 100)}%`)
+const {
+  scale,
+  translateX,
+  translateY,
+  isDragging,
+  zoomPercent,
+  resetZoom,
+  zoomIn,
+  zoomOut,
+  handleWheel,
+  handlePointerDown,
+  handlePointerMove,
+  handlePointerUp
+} = useLightboxZoom(viewportRef, imageRef)
 
-// Contador de fotos
+const MIN_ZOOM = 1
+const MAX_ZOOM = 5
+
 const counterText = computed(() => {
   if (!props.mediaList || props.mediaList.length <= 1) return ''
   return `${currentIndex.value + 1} / ${props.mediaList.length}`
 })
 
-// Permissões de navegação
 const hasPrev = computed(() => currentIndex.value > 0)
 const hasNext = computed(() => currentIndex.value < (props.mediaList || []).length - 1)
 
-function resetTransform() {
-  scale.value = 1
-  translateX.value = 0
-  translateY.value = 0
-  isDragging.value = false
-  isPinching.value = false
-}
-
 function pauseCurrentVideo() {
   if (videoRef.value) {
-    try {
-      videoRef.value.pause()
-    } catch {}
+    try { videoRef.value.pause() } catch {}
   }
 }
 
 function handleClose() {
   pauseCurrentVideo()
-  resetTransform()
+  resetZoom()
   emit('close')
 }
 
@@ -133,7 +83,7 @@ function prevMedia() {
   if (hasPrev.value) {
     pauseCurrentVideo()
     currentIndex.value--
-    resetTransform()
+    resetZoom()
   }
 }
 
@@ -141,243 +91,66 @@ function nextMedia() {
   if (hasNext.value) {
     pauseCurrentVideo()
     currentIndex.value++
-    resetTransform()
+    resetZoom()
   }
 }
 
-function zoomIn() {
-  if (scale.value < MAX_ZOOM) {
-    scale.value = Math.min(MAX_ZOOM, +(scale.value + 0.5).toFixed(2))
-    clampTranslate()
-  }
-}
-
-function zoomOut() {
-  if (scale.value > MIN_ZOOM) {
-    scale.value = Math.max(MIN_ZOOM, +(scale.value - 0.5).toFixed(2))
-    if (scale.value === 1) {
-      translateX.value = 0
-      translateY.value = 0
-    } else {
-      clampTranslate()
-    }
-  }
-}
-
-function resetZoom() {
-  resetTransform()
-}
-
-function clampTranslate() {
-  if (!viewportRef.value || !imageRef.value) return
-  const vw = viewportRef.value.clientWidth
-  const vh = viewportRef.value.clientHeight
-  const iw = (imageRef.value.clientWidth || vw) * scale.value
-  const ih = (imageRef.value.clientHeight || vh) * scale.value
-
-  const maxTx = Math.max(0, (iw - vw) / 2)
-  const maxTy = Math.max(0, (ih - vh) / 2)
-
-  translateX.value = Math.max(-maxTx, Math.min(maxTx, translateX.value))
-  translateY.value = Math.max(-maxTy, Math.min(maxTy, translateY.value))
-}
-
-// ----------------------------------------------------
-// Gestos de Mouse e Toque (Pointer Events)
-// ----------------------------------------------------
-function handlePointerDown(e: PointerEvent) {
-  if (isVideo.value) return
-  const target = e.target as HTMLElement
-  if (target.closest('button') || target.closest('video')) return
-
-  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
-
-  if (activePointers.size === 1) {
-    lastPointerPos = { x: e.clientX, y: e.clientY }
-    touchStartPos = { x: e.clientX, y: e.clientY, time: Date.now() }
-
-    // Double tap para zoom
-    const now = Date.now()
-    if (now - lastTapTime < 300) {
-      if (scale.value > 1) {
-        resetTransform()
-      } else {
-        scale.value = 2.5
-        clampTranslate()
-      }
-      lastTapTime = 0
-      return
-    }
-    lastTapTime = now
-
-    if (scale.value > 1) {
-      isDragging.value = true
-    }
-  } else if (activePointers.size === 2) {
-    isDragging.value = false
-    isPinching.value = true
-    const points = Array.from(activePointers.values())
-    initialPinchDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
-    initialPinchScale = scale.value
-  }
-}
-
-function handlePointerMove(e: PointerEvent) {
-  if (!activePointers.has(e.pointerId)) return
-  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
-
-  if (isPinching.value && activePointers.size === 2) {
-    const points = Array.from(activePointers.values())
-    const currentDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
-    if (initialPinchDistance > 0) {
-      const pinchDelta = currentDistance / initialPinchDistance
-      const newScale = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, +(initialPinchScale * pinchDelta).toFixed(2)))
-      scale.value = newScale
-      clampTranslate()
-    }
-  } else if (isDragging.value && scale.value > 1) {
-    const dx = e.clientX - lastPointerPos.x
-    const dy = e.clientY - lastPointerPos.y
-    translateX.value += dx
-    translateY.value += dy
-    lastPointerPos = { x: e.clientX, y: e.clientY }
-    clampTranslate()
-  }
-}
-
-function handlePointerUp(e: PointerEvent) {
-  activePointers.delete(e.pointerId)
-
-  if (activePointers.size === 0) {
-    if (isPinching.value) {
-      isPinching.value = false
-      if (scale.value <= 1.05) {
-        resetTransform()
-      } else {
-        clampTranslate()
-      }
-    }
-
-    // Swipe horizontal em 1x zoom
-    if (!isDragging.value && scale.value === 1 && touchStartPos.time > 0) {
-      const dx = e.clientX - touchStartPos.x
-      const dy = e.clientY - touchStartPos.y
-      const dt = Date.now() - touchStartPos.time
-
-      if (dt < 400 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-        if (dx < 0 && hasNext.value) {
-          nextMedia()
-        } else if (dx > 0 && hasPrev.value) {
-          prevMedia()
-        }
-      }
-    }
-
-    isDragging.value = false
-    touchStartPos = { x: 0, y: 0, time: 0 }
-  } else if (activePointers.size === 1) {
-    isPinching.value = false
-    const remaining = Array.from(activePointers.values())[0]
-    lastPointerPos = { x: remaining.x, y: remaining.y }
-    if (scale.value > 1) {
-      isDragging.value = true
-    }
-  }
-}
-
-function handleWheel(e: WheelEvent) {
-  if (isVideo.value) return
-  e.preventDefault()
-  if (e.deltaY < 0) {
-    zoomIn()
-  } else {
-    zoomOut()
-  }
-}
-
-// ----------------------------------------------------
-// Acessibilidade por Teclado e Focus Trap
-// ----------------------------------------------------
 function handleKeydown(e: KeyboardEvent) {
   if (!props.isOpen) return
-
   switch (e.key) {
     case 'Escape':
       e.preventDefault()
       handleClose()
       break
     case 'ArrowLeft':
-      e.preventDefault()
-      prevMedia()
+      if (scale.value <= 1) prevMedia()
       break
     case 'ArrowRight':
-      e.preventDefault()
-      nextMedia()
+      if (scale.value <= 1) nextMedia()
       break
     case '+':
     case '=':
-      e.preventDefault()
       zoomIn()
       break
     case '-':
     case '_':
-      e.preventDefault()
       zoomOut()
       break
     case '0':
-      e.preventDefault()
       resetZoom()
       break
-    case 'Tab':
-      handleTabTrap(e)
-      break
   }
 }
 
-function handleTabTrap(e: KeyboardEvent) {
-  if (!lightboxRef.value) return
-  const focusable = lightboxRef.value.querySelectorAll<HTMLElement>(
-    'button:not([disabled]), [tabindex]:not([tabindex="-1"]), video[controls]'
-  )
-  if (focusable.length === 0) return
+watch(() => props.initialIndex, (newIdx) => {
+  currentIndex.value = Math.max(0, Math.min(newIdx || 0, (props.mediaList || []).length - 1))
+  resetZoom()
+})
 
-  const first = focusable[0]
-  const last = focusable[focusable.length - 1]
-
-  if (e.shiftKey && document.activeElement === first) {
-    e.preventDefault()
-    last.focus()
-  } else if (!e.shiftKey && document.activeElement === last) {
-    e.preventDefault()
-    first.focus()
+watch(() => props.isOpen, (open) => {
+  if (open) {
+    currentIndex.value = Math.max(0, Math.min(props.initialIndex || 0, (props.mediaList || []).length - 1))
+    resetZoom()
+    if (typeof document !== 'undefined') {
+      previousActiveElement = document.activeElement as HTMLElement
+      document.body.style.overflow = 'hidden'
+    }
+    nextTick(() => {
+      const closeBtn = lightboxRef.value?.querySelector<HTMLElement>('#public-lightbox-close')
+      closeBtn?.focus()
+    })
+  } else {
+    pauseCurrentVideo()
+    resetZoom()
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = ''
+      if (previousActiveElement?.focus) previousActiveElement.focus()
+    }
   }
-}
-
-function savePreviousFocus() {
-  if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
-    previousActiveElement = document.activeElement
-  }
-}
-
-function setupFocusTrap() {
-  if (!lightboxRef.value) return
-  const closeBtn = lightboxRef.value.querySelector<HTMLElement>('#public-lightbox-close')
-  if (closeBtn) {
-    closeBtn.focus()
-  }
-}
-
-function restorePreviousFocus() {
-  if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
-    previousActiveElement.focus()
-  }
-  previousActiveElement = null
-}
+})
 
 onMounted(() => {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('keydown', handleKeydown)
-  }
+  if (typeof window !== 'undefined') window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
@@ -404,29 +177,18 @@ onUnmounted(() => {
       @pointercancel="handlePointerUp"
       @wheel="handleWheel"
     >
-      <!-- HEADER DO LIGHTBOX -->
+      <!-- Header do Lightbox -->
       <div class="relative z-30 flex items-center justify-between p-3 sm:p-4 bg-gradient-to-b from-black/80 to-transparent pt-[calc(0.75rem+env(safe-area-inset-top,0px))]">
-        <!-- Contador e Metadados -->
         <div class="flex items-center gap-3">
-          <span
-            v-if="counterText"
-            class="text-xs sm:text-sm font-semibold tracking-wider bg-white/10 px-3 py-1.5 rounded-full border border-white/10"
-            aria-live="polite"
-          >
+          <span v-if="counterText" class="text-xs sm:text-sm font-semibold tracking-wider bg-white/10 px-3 py-1.5 rounded-full border border-white/10" aria-live="polite">
             {{ counterText }}
           </span>
-
-          <span
-            v-if="scale > 1 && isPhoto"
-            class="text-xs text-indigo-300 font-mono hidden sm:inline-block bg-indigo-950/60 px-2.5 py-1 rounded-md border border-indigo-500/30"
-          >
+          <span v-if="scale > 1 && isPhoto" class="text-xs text-indigo-300 font-mono hidden sm:inline-block bg-indigo-950/60 px-2.5 py-1 rounded-md border border-indigo-500/30">
             Zoom: {{ zoomPercent }}
           </span>
         </div>
 
-        <!-- Controles de Zoom & Fechar -->
         <div class="flex items-center gap-1 sm:gap-2">
-          <!-- Controles de Zoom no Desktop -->
           <div v-if="isPhoto" class="hidden sm:flex items-center gap-1 bg-white/10 rounded-xl p-1 border border-white/10">
             <button
               @click.stop="zoomOut"
@@ -437,7 +199,6 @@ onUnmounted(() => {
             >
               <Icon name="lucide:zoom-out" class="w-5 h-5" />
             </button>
-
             <button
               @click.stop="resetZoom"
               :disabled="scale === 1"
@@ -447,7 +208,6 @@ onUnmounted(() => {
             >
               1x
             </button>
-
             <button
               @click.stop="zoomIn"
               :disabled="scale >= MAX_ZOOM"
@@ -459,7 +219,6 @@ onUnmounted(() => {
             </button>
           </div>
 
-          <!-- Botão Fechar -->
           <button
             id="public-lightbox-close"
             @click.stop="handleClose"
@@ -472,12 +231,8 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- VIEWPORT CENTRAL DA MÍDIA -->
-      <div
-        ref="viewportRef"
-        class="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden p-2 sm:p-6"
-      >
-        <!-- NAVEGAÇÃO: Botão Anterior -->
+      <!-- Viewport Central -->
+      <div ref="viewportRef" class="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden p-2 sm:p-6">
         <button
           v-if="hasPrev"
           @click.stop="prevMedia"
@@ -488,17 +243,13 @@ onUnmounted(() => {
           <Icon name="lucide:chevron-left" class="w-6 h-6" />
         </button>
 
-        <!-- Container de Renderização Visual -->
         <div
           class="relative max-w-full max-h-full flex items-center justify-center transition-transform duration-75 ease-out"
           :style="{
-            transform: isPhoto
-              ? `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`
-              : 'none',
+            transform: isPhoto ? `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})` : 'none',
             cursor: isPhoto && scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'
           }"
         >
-          <!-- Foto com Alt Text e Dimensões -->
           <img
             v-if="isPhoto"
             ref="imageRef"
@@ -507,8 +258,6 @@ onUnmounted(() => {
             class="max-w-[92vw] max-h-[75vh] sm:max-h-[82vh] object-contain rounded-lg shadow-2xl pointer-events-none"
             draggable="false"
           />
-
-          <!-- Vídeo com controles e sem autoplay com áudio -->
           <div v-else-if="isVideo" class="max-w-[92vw] max-h-[75vh] sm:max-h-[82vh] flex items-center justify-center">
             <video
               ref="videoRef"
@@ -521,7 +270,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- NAVEGAÇÃO: Botão Próximo -->
         <button
           v-if="hasNext"
           @click.stop="nextMedia"
@@ -533,7 +281,7 @@ onUnmounted(() => {
         </button>
       </div>
 
-      <!-- FOOTER DO LIGHTBOX: Legenda e Título -->
+      <!-- Footer do Lightbox -->
       <div
         v-if="currentMedia.title || currentMedia.caption || currentMedia.alt_text"
         class="relative z-30 p-3 sm:p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] flex flex-col items-center text-center max-w-3xl mx-auto w-full"

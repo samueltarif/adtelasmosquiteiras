@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, toRef } from 'vue'
 import type { CrmAppointmentDetail } from '~/types/crmAppointments'
+import { extractAppointmentErrorMessage } from '~/utils/crmAgendaErrors'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -11,6 +13,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'cancelled', appt: any): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const motivo = ref('')
 const isSubmitting = ref(false)
@@ -49,8 +53,8 @@ async function handleCancel() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[AppointmentCancelDialog] Erro ao cancelar:', err)
-    errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao cancelar agendamento.'
+    console.error('[AppointmentCancelDialog] Falha ao cancelar')
+    errorMessage.value = extractAppointmentErrorMessage(err)
   } finally {
     isSubmitting.value = false
   }
@@ -81,7 +85,7 @@ async function handleCancel() {
 
       <div class="space-y-4">
         <p class="text-xs text-slate-300 leading-relaxed">
-          Tem certeza de que deseja cancelar este agendamento? Caso seja um compromisso de instalação, a OS retornará automaticamente para <strong>Aguardando Agendamento</strong>.
+          Tem certeza de que deseja cancelar este agendamento? O cancelamento pode atualizar automaticamente a programação e a data prevista da Ordem de Serviço conforme o estado operacional atual.
         </p>
 
         <div class="space-y-1.5">

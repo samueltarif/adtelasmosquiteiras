@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, toRef } from 'vue'
 import type { CrmStaffMember } from '~/composables/useCrmStaff'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -11,6 +12,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'statusChanged', member: CrmStaffMember): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const isDeactivating = computed(() => Boolean(props.member?.is_active))
 const isSubmitting = ref(false)
@@ -40,8 +43,7 @@ async function handleConfirm() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[StaffDeactivateDialog] Erro ao alterar status do membro:', err)
-    if (err?.statusCode === 409 && err?.data?.statusMessage?.includes('ERR_STAFF_HAS_ACTIVE_APPOINTMENTS')) {
+    if (err?.statusCode === 409 && (err?.data?.statusMessage?.includes('ERR_STAFF_HAS_ACTIVE_APPOINTMENTS') || err?.data?.error?.code === 'ERR_STAFF_HAS_ACTIVE_APPOINTMENTS')) {
       errorMessage.value = 'Não é possível desativar este membro da equipe pois ele possui agendamentos ativos na Agenda. Reatribua ou conclua os compromissos antes de desativar.'
     } else {
       errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao alterar status do membro.'
@@ -58,7 +60,7 @@ async function handleConfirm() {
       class="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 shadow-2xl p-6 space-y-5"
       role="alertdialog"
       aria-modal="true"
-      aria-labelledby="staff-status-title"
+      aria-labelledby="staff-deactivate-title"
     >
       <div class="flex items-center gap-3 border-b border-white/10 pb-4">
         <div
@@ -68,7 +70,7 @@ async function handleConfirm() {
           <Icon :name="isDeactivating ? 'lucide:user-x' : 'lucide:user-check'" class="w-5 h-5" />
         </div>
         <div>
-          <h3 id="staff-status-title" class="text-base font-bold text-white">
+          <h3 id="staff-deactivate-title" class="text-base font-bold text-white">
             {{ isDeactivating ? 'Desativar Membro da Equipe' : 'Ativar Membro da Equipe' }}
           </h3>
           <p class="text-xs text-slate-400">{{ member?.nome }} ({{ member?.funcao }})</p>

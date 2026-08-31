@@ -62,14 +62,24 @@ const funcaoColors: Record<string, string> = {
         </span>
       </div>
 
-      <div class="space-y-1 text-xs text-slate-300 pt-1 border-t border-white/5">
-        <div v-if="st.telefone" class="flex items-center gap-2">
-          <Icon name="lucide:phone" class="w-3.5 h-3.5 text-slate-500 shrink-0" />
-          <a :href="`tel:${st.telefone}`" class="hover:text-indigo-400 transition-colors">{{ st.telefone }}</a>
+      <div class="space-y-0.5 text-xs text-slate-300 pt-1 border-t border-white/5">
+        <div v-if="st.telefone">
+          <a
+            :href="`tel:${st.telefone}`"
+            class="inline-flex items-center gap-2 min-h-[44px] px-1 hover:text-indigo-400 transition-colors w-full"
+          >
+            <Icon name="lucide:phone" class="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <span>{{ st.telefone }}</span>
+          </a>
         </div>
-        <div v-if="st.email" class="flex items-center gap-2">
-          <Icon name="lucide:mail" class="w-3.5 h-3.5 text-slate-500 shrink-0" />
-          <a :href="`mailto:${st.email}`" class="hover:text-indigo-400 transition-colors truncate">{{ st.email }}</a>
+        <div v-if="st.email">
+          <a
+            :href="`mailto:${st.email}`"
+            class="inline-flex items-center gap-2 min-h-[44px] px-1 hover:text-indigo-400 transition-colors w-full min-w-0"
+          >
+            <Icon name="lucide:mail" class="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <span class="truncate">{{ st.email }}</span>
+          </a>
         </div>
       </div>
 

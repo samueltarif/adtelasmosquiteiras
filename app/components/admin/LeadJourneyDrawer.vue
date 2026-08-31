@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaLightbox from './MediaLightbox.vue'
 import LeadConversionModal from './crm/LeadConversionModal.vue'
+import { useLeadJourneyMedia } from '~/composables/useLeadJourneyMedia'
+import { formatWhatsAppLink } from '~/utils/phone'
 
 const props = defineProps<{
   leadId: string | null
@@ -31,20 +33,15 @@ const editStatus = ref('Novo')
 const editValor = ref('')
 const editObs = ref('')
 
-// Estado de visualização de mídia & Lightbox
-const isMediaLoading = ref(false)
-const selectedPreviewUrl = ref<string | null>(null)
-const selectedPreviewName = ref<string | null>(null)
-const selectedPreviewType = ref<'photo' | 'video'>('photo')
+// Lightbox & Mídia
+const isLightboxOpen = ref(false)
+const activeMediaId = ref<string | null>(null)
 
-// Cache em memória de signed URLs por mediaId com TTL
-interface ThumbnailCacheItem {
-  url: string
-  loading: boolean
-  error: boolean
-  expiresAt: number
-}
-const thumbnailCache = ref<Record<string, ThumbnailCacheItem>>({})
+const {
+  thumbnailCache,
+  loadPhotoThumbnails,
+  retryPhotoThumbnail
+} = useLeadJourneyMedia(toRef(props, 'leadId'))
 
 async function fetchJourney(id: string) {
   if (!id) return
@@ -73,16 +70,15 @@ async function fetchJourney(id: string) {
         isLeadConverted.value = true
         convertedClientId.value = statusRes.client.id
       }
-    } catch (statusErr) {
-      console.warn('[LeadJourneyDrawer] Falha ao checar status CRM:', statusErr)
+    } catch {
+      console.warn('[LeadJourneyDrawer] Falha ao checar status CRM')
     }
 
-    // Carrega thumbnails automaticamente para todas as fotos da galeria com isolamento
     if (data?.media && Array.isArray(data.media)) {
       loadPhotoThumbnails(data.media)
     }
   } catch (err: any) {
-    console.error('[LeadJourneyDrawer] Erro ao buscar jornada do lead:', err)
+    console.error('[LeadJourneyDrawer] Falha ao buscar jornada do lead')
     drawerErrorCode.value = err?.statusCode || (err?.response?.status) || 500
     if (drawerErrorCode.value === 403) {
       drawerError.value = 'Sua conta não possui permissão para visualizar este lead.'
@@ -125,8 +121,8 @@ async function saveChanges() {
       emit('updated')
       emit('close')
     }
-  } catch (err) {
-    console.error('Erro ao salvar lead:', err)
+  } catch {
+    console.error('[LeadJourneyDrawer] Erro ao salvar lead')
   } finally {
     isSaving.value = false
   }
@@ -134,10 +130,9 @@ async function saveChanges() {
 
 function startWhatsapp() {
   if (!journeyData.value?.lead) return
-  const rawPhone = (journeyData.value.lead.telefone || '').replace(/\D/g, '')
-  const fullPhone = rawPhone.startsWith('55') ? rawPhone : '55' + rawPhone
   const msg = `Olá ${journeyData.value.lead.nome || ''}, tudo bem? Sou da AD Telas e Redes, referente ao seu pedido de orçamento no site.`
-  window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`, '_blank')
+  const url = formatWhatsAppLink(journeyData.value.lead.telefone, msg)
+  if (url) window.open(url, '_blank')
 }
 
 function formatDate(iso: string) {
@@ -151,90 +146,6 @@ function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
-
-/**
- * Obtém signed URL com cache em memória e renovação segura antes de expirar.
- */
-async function requestSignedUrl(mediaId: string): Promise<string | null> {
-  const cached = thumbnailCache.value[mediaId]
-  const now = Date.now()
-
-  // Retorna do cache se ainda for válido por pelo menos 20 segundos
-  if (cached && cached.url && cached.expiresAt > now + 20000) {
-    return cached.url
-  }
-
-  try {
-    const data = await $fetch<{ success: boolean; signedUrl: string; expiresInSeconds?: number }>(
-      `/api/admin/media/signed-url?media_id=${encodeURIComponent(mediaId)}&lead_id=${encodeURIComponent(props.leadId || '')}`
-    )
-    if (data?.success && data.signedUrl) {
-      const ttlMs = (data.expiresInSeconds || 300) * 1000
-      thumbnailCache.value[mediaId] = {
-        url: data.signedUrl,
-        loading: false,
-        error: false,
-        expiresAt: now + ttlMs
-      }
-      return data.signedUrl
-    }
-  } catch (err: any) {
-    console.warn('[LeadJourneyDrawer] Erro ao obter signed URL:', err?.message || err)
-    if (thumbnailCache.value[mediaId]) {
-      thumbnailCache.value[mediaId].error = true
-      thumbnailCache.value[mediaId].loading = false
-    }
-  }
-  return null
-}
-
-/**
- * Carrega thumbnails de fotos em paralelo com Promise.allSettled (isolamento total de falhas).
- */
-async function loadPhotoThumbnails(mediaList: any[]) {
-  const photos = mediaList.filter(m => m.media_type === 'photo' && m.upload_status === 'uploaded')
-  
-  for (const photo of photos) {
-    const cached = thumbnailCache.value[photo.id]
-    if (!cached || cached.expiresAt <= Date.now() + 20000) {
-      thumbnailCache.value[photo.id] = {
-        url: '',
-        loading: true,
-        error: false,
-        expiresAt: 0
-      }
-    }
-  }
-
-  // Promise.allSettled garante que o erro de uma mídia NUNCA derruba o resto da galeria
-  await Promise.allSettled(
-    photos.map(async (photo) => {
-      const url = await requestSignedUrl(photo.id)
-      if (url && thumbnailCache.value[photo.id]) {
-        thumbnailCache.value[photo.id].url = url
-        thumbnailCache.value[photo.id].loading = false
-        thumbnailCache.value[photo.id].error = false
-      }
-    })
-  )
-}
-
-async function retryPhotoThumbnail(photoId: string) {
-  if (thumbnailCache.value[photoId]) {
-    thumbnailCache.value[photoId].loading = true
-    thumbnailCache.value[photoId].error = false
-  }
-  const url = await requestSignedUrl(photoId)
-  if (url && thumbnailCache.value[photoId]) {
-    thumbnailCache.value[photoId].url = url
-    thumbnailCache.value[photoId].loading = false
-    thumbnailCache.value[photoId].error = false
-  }
-}
-
-// Estado do Fullscreen Lightbox
-const isLightboxOpen = ref(false)
-const activeMediaId = ref<string | null>(null)
 
 async function openMediaPreview(media: any) {
   activeMediaId.value = media.id
@@ -423,7 +334,7 @@ function closeLightbox() {
                     <button
                       type="button"
                       @click.stop="retryPhotoThumbnail(m.id)"
-                      class="text-[9px] text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer min-h-[30px]"
+                      class="text-[9px] text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer min-h-[44px] px-1"
                     >
                       <Icon name="lucide:refresh-cw" class="w-2.5 h-2.5" /> Recarregar
                     </button>
@@ -453,7 +364,7 @@ function closeLightbox() {
                   <button
                     type="button"
                     @click="openMediaPreview(m)"
-                    class="text-purple-400 font-bold hover:underline cursor-pointer flex items-center gap-0.5 min-h-[30px]"
+                    class="text-purple-400 font-bold hover:underline cursor-pointer flex items-center gap-0.5 min-h-[44px] px-1"
                   >
                     <Icon name="lucide:play" class="w-3 h-3" /> Ver Vídeo
                   </button>
@@ -542,21 +453,23 @@ function closeLightbox() {
     </div>
 
     <!-- Fullscreen Media Lightbox com Suporte Completo a Touch / Pinch Zoom / Pan / Wheel -->
-    <MediaLightbox
-      :is-open="isLightboxOpen"
-      :media-list="journeyData?.media || []"
-      :initial-media-id="activeMediaId"
-      :lead-id="leadId || ''"
-      :request-signed-url="requestSignedUrl"
-      @close="closeLightbox"
-    />
+    <Teleport to="body">
+      <MediaLightbox
+        :is-open="isLightboxOpen"
+        :media-list="journeyData?.media || []"
+        :initial-media-id="activeMediaId"
+        :lead-id="leadId || ''"
+        :request-signed-url="requestSignedUrl"
+        @close="closeLightbox"
+      />
 
-    <!-- Modal de Conversão Lead -> Cliente -->
-    <LeadConversionModal
-      :is-open="isConversionModalOpen"
-      :lead="journeyData?.lead || null"
-      @close="isConversionModalOpen = false"
-      @converted="() => { emit('updated'); fetchJourney(leadId || ''); }"
-    />
+      <!-- Modal de Conversão Lead -> Cliente -->
+      <LeadConversionModal
+        :is-open="isConversionModalOpen"
+        :lead="journeyData?.lead || null"
+        @close="isConversionModalOpen = false"
+        @converted="() => { emit('updated'); fetchJourney(leadId || ''); }"
+      />
+    </Teleport>
   </div>
 </template>

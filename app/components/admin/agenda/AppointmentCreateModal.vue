@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import type { CrmStaffMember } from '~/composables/useCrmStaff'
 import { toSaoPauloIso, getSaoPauloDateString } from '~/utils/crmDateTime'
+import { extractAppointmentErrorMessage } from '~/utils/crmAgendaErrors'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -13,6 +15,10 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'appointmentCreated', appt: any): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
+
+const activeStaffList = computed(() => (props.staffList || []).filter(st => st.is_active !== false))
 
 // Search & Work Order Selection
 const searchQuery = ref('')
@@ -64,8 +70,13 @@ watch(() => props.isOpen, async (open) => {
     searchResults.value = []
     selectedWorkOrder.value = null
     selectedAddressId.value = ''
+    selectedStaffId.value = ''
     clientAddresses.value = []
     observacoes.value = ''
+    tipoAgendamento.value = 'instalacao'
+    appointmentDate.value = getSaoPauloDateString()
+    horaInicio.value = '09:00'
+    horaFim.value = '11:00'
 
     if (props.preselectedWorkOrderId) {
       await loadPreselectedWorkOrder(props.preselectedWorkOrderId)
@@ -81,7 +92,7 @@ async function loadPreselectedWorkOrder(woId: string) {
       selectWorkOrder(res.workOrder)
     }
   } catch (err) {
-    console.error('[AppointmentCreateModal] Erro ao carregar OS pré-selecionada:', err)
+    console.error('[AppointmentCreateModal] Falha ao carregar OS pré-selecionada')
   } finally {
     isSearching.value = false
   }
@@ -102,7 +113,7 @@ async function handleSearchWorkOrders() {
     })
     searchResults.value = res?.workOrders || []
   } catch (err) {
-    console.error('[AppointmentCreateModal] Erro na busca de OS:', err)
+    console.error('[AppointmentCreateModal] Falha na busca de OS')
   } finally {
     isSearching.value = false
   }
@@ -116,6 +127,8 @@ async function selectWorkOrder(wo: any) {
   selectedAddressId.value = wo.address_id || ''
   if (wo.responsible_staff_id) {
     selectedStaffId.value = wo.responsible_staff_id
+  } else {
+    selectedStaffId.value = ''
   }
 
   // Load all client addresses (Emenda 6)
@@ -175,8 +188,8 @@ async function handleSubmit() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[AppointmentCreateModal] Erro ao criar agendamento:', err)
-    errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao criar agendamento.'
+    console.error('[AppointmentCreateModal] Falha ao criar agendamento')
+    errorMessage.value = extractAppointmentErrorMessage(err)
   } finally {
     isSubmitting.value = false
   }
@@ -314,7 +327,7 @@ async function handleSubmit() {
             class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
           >
             <option value="">Nenhum técnico atribuído</option>
-            <option v-for="st in staffList" :key="st.id" :value="st.id">
+            <option v-for="st in activeStaffList" :key="st.id" :value="st.id">
               {{ st.nome }} ({{ st.funcao }})
             </option>
           </select>

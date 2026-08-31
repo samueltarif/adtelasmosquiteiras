@@ -31,3 +31,7 @@ backups/
 
 # Local Scratch
 scratch/
+
+# Local Review Packages
+*.zip
+*.sha256

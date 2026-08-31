@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { formatDateOnly } from '~/utils/crmDateTime'
 
 const props = defineProps<{
   workOrders: any[]
@@ -102,7 +103,7 @@ function navigateToDetail(id: string) {
             </td>
 
             <td class="py-3.5 px-4 text-slate-300">
-              {{ formatDate(wo.data_prevista) }}
+              {{ wo.data_prevista ? formatDateOnly(wo.data_prevista) : '-' }}
             </td>
 
             <td class="py-3.5 px-4 font-bold text-emerald-400">
@@ -116,7 +117,7 @@ function navigateToDetail(id: string) {
             <td class="py-3.5 px-4 text-right" @click.stop>
               <button
                 @click="navigateToDetail(wo.id)"
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-semibold transition-all cursor-pointer min-h-[36px]"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-semibold transition-all cursor-pointer min-h-[44px]"
               >
                 <span>Ver OS</span>
                 <Icon name="lucide:chevron-right" class="w-3.5 h-3.5" />

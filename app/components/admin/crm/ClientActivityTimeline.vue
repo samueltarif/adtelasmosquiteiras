@@ -33,8 +33,8 @@ async function fetchActivities() {
       activities.value = res.activities || []
       total.value = res.total || 0
     }
-  } catch (err: any) {
-    console.error('[ClientActivityTimeline] Erro ao carregar histórico:', err)
+  } catch {
+    console.error('[ClientActivityTimeline] Falha ao carregar histórico')
   } finally {
     isLoading.value = false
   }
@@ -110,7 +110,7 @@ onMounted(() => {
           <button 
             :disabled="page <= 1" 
             @click="page--; fetchActivities()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            class="px-3 py-2 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px] cursor-pointer"
           >
             Anterior
           </button>
@@ -118,7 +118,7 @@ onMounted(() => {
           <button 
             :disabled="page * pageSize >= total" 
             @click="page++; fetchActivities()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px]"
+            class="px-3 py-2 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px] cursor-pointer"
           >
             Próxima
           </button>

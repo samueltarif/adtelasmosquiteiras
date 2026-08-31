@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import {
   ALLOWED_STATUS_TRANSITIONS,
   TERMINAL_WORK_ORDER_STATUSES
 } from '../../../../server/shared/crmValidation.mjs'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -13,10 +14,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'statusUpdated', updatedWo: any): void
+  (e: 'openSchedule'): void
 }>()
 
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
+
 const newStatus = ref('')
-const dataPrevista = ref('')
 const cancelReason = ref('')
 const isSubmitting = ref(false)
 const errorMessage = ref<string | null>(null)
@@ -35,31 +38,34 @@ const currentStatus = computed(() => props.workOrder?.status_os || 'orcamento')
 
 const isTerminal = computed(() => TERMINAL_WORK_ORDER_STATUSES.includes(currentStatus.value))
 
+// WORK_ORDER_DATA_PREVISTA_AUTHORITY=APPOINTMENT_INSTALLATION_SCHEDULE
+// "agendada" não pode ser selecionada manualmente; é gerenciada via Agenda
 const availableTransitions = computed(() => {
   const allowed = (ALLOWED_STATUS_TRANSITIONS as any)[currentStatus.value] || []
-  return allowed.map((st: string) => ({
-    value: st,
-    label: statusLabels[st] || st
-  }))
+  return allowed
+    .filter((st: string) => st !== 'agendada')
+    .map((st: string) => ({
+      value: st,
+      label: statusLabels[st] || st
+    }))
 })
 
 watch(() => props.isOpen, (open) => {
   if (open) {
     newStatus.value = availableTransitions.value[0]?.value || ''
-    dataPrevista.value = props.workOrder?.data_prevista || ''
     cancelReason.value = ''
     errorMessage.value = null
   }
 })
 
+function handleGoToSchedule() {
+  emit('openSchedule')
+  emit('close')
+}
+
 async function handleSave() {
   if (!newStatus.value) {
     errorMessage.value = 'Selecione o novo status.'
-    return
-  }
-
-  if (newStatus.value === 'agendada' && !dataPrevista.value) {
-    errorMessage.value = 'Para definir como Agendada, informe a data prevista.'
     return
   }
 
@@ -77,7 +83,6 @@ async function handleSave() {
       body: {
         newStatus: newStatus.value,
         expectedUpdatedAt: props.workOrder.updated_at,
-        dataPrevista: newStatus.value === 'agendada' ? dataPrevista.value : undefined,
         reason: newStatus.value === 'cancelada' ? cancelReason.value.trim() : undefined
       }
     })
@@ -87,7 +92,6 @@ async function handleSave() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[WorkOrderStatusModal] Erro ao alterar status:', err)
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao atualizar status da OS'
   } finally {
     isSubmitting.value = false
@@ -97,14 +101,20 @@ async function handleSave() {
 
 <template>
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-    <div class="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 shadow-2xl p-6 space-y-5">
+    <div
+      class="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 shadow-2xl p-6 space-y-5"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="work-order-status-modal-title"
+    >
       <div class="flex items-center justify-between border-b border-white/10 pb-4">
         <div>
-          <h3 class="text-base font-bold text-white">Alterar Status da OS</h3>
+          <h3 id="work-order-status-modal-title" class="text-base font-bold text-white">Alterar Status da OS</h3>
           <p class="text-xs text-slate-400">Status atual: <span class="text-indigo-400 font-semibold">{{ statusLabels[currentStatus] || currentStatus }}</span></p>
         </div>
         <button
           @click="emit('close')"
+          aria-label="Fechar modal"
           class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
         >
           <Icon name="lucide:x" class="w-5 h-5" />
@@ -123,7 +133,7 @@ async function handleSave() {
         <div class="pt-2">
           <button
             @click="emit('close')"
-            class="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 min-h-[40px] cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 min-h-[44px] cursor-pointer"
           >
             Fechar
           </button>
@@ -132,6 +142,39 @@ async function handleSave() {
 
       <!-- Formulário de Transição -->
       <form v-else @submit.prevent="handleSave" class="space-y-4">
+        <!-- Orientação de Agendamento quando em aguardando_agendamento ou aprovada -->
+        <div
+          v-if="currentStatus === 'aguardando_agendamento' || currentStatus === 'aprovada'"
+          class="rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3.5 text-xs text-indigo-300 space-y-2.5"
+        >
+          <div class="flex items-start gap-2.5">
+            <Icon name="lucide:calendar-clock" class="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+            <div>
+              <p class="font-bold text-white">Status "Agendada" é Automático</p>
+              <p class="text-slate-300 text-[11px] mt-0.5 leading-relaxed">
+                Para agendar esta Ordem de Serviço, crie um agendamento do tipo <strong>Instalação</strong> na Agenda.
+              </p>
+            </div>
+          </div>
+          <div class="pt-1 flex items-center gap-2">
+            <button
+              type="button"
+              @click="handleGoToSchedule"
+              class="px-3 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
+            >
+              <Icon name="lucide:calendar-plus" class="w-3.5 h-3.5" />
+              <span>Agendar Instalação</span>
+            </button>
+            <NuxtLink
+              to="/admin/agenda"
+              class="px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer min-h-[44px]"
+            >
+              <Icon name="lucide:calendar" class="w-3.5 h-3.5" />
+              <span>Ver Agenda</span>
+            </NuxtLink>
+          </div>
+        </div>
+
         <div class="space-y-1.5">
           <label class="text-xs text-slate-300 font-medium">Novo Status *</label>
           <select
@@ -142,19 +185,6 @@ async function handleSave() {
               {{ opt.label }}
             </option>
           </select>
-        </div>
-
-        <!-- Se for 'agendada': Exige Data Prevista -->
-        <div v-if="newStatus === 'agendada'" class="space-y-1.5 pt-1">
-          <label class="text-xs text-slate-300 font-medium">Data Prevista para Instalação *</label>
-          <input
-            v-model="dataPrevista"
-            type="date"
-            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px]"
-          />
-          <p class="text-[11px] text-slate-400">
-            * Agendamento detalhado com horário e equipe será disponibilizado no módulo Agenda.
-          </p>
         </div>
 
         <!-- Se for 'cancelada': Exige Motivo -->

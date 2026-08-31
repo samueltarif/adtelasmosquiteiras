@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, toRef } from 'vue'
 import type { CrmAppointmentDetail } from '~/types/crmAppointments'
 import { toSaoPauloIso, getSaoPauloDateString, getSaoPauloTimeString } from '~/utils/crmDateTime'
+import { extractAppointmentErrorMessage } from '~/utils/crmAgendaErrors'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -12,6 +14,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'rescheduled', appt: any): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const newDate = ref(getSaoPauloDateString())
 const newHoraInicio = ref('09:00')
@@ -71,12 +75,8 @@ async function handleReschedule() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[AppointmentRescheduleModal] Erro ao reagendar:', err)
-    if (err?.statusCode === 409 && err?.data?.statusMessage?.includes('ERR_STAFF_SCHEDULE_CONFLICT')) {
-      errorMessage.value = 'Conflito de agenda: o técnico já possui outro compromisso ativo no horário selecionado.'
-    } else {
-      errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao reagendar compromisso.'
-    }
+    console.error('[AppointmentRescheduleModal] Falha ao reagendar')
+    errorMessage.value = extractAppointmentErrorMessage(err)
   } finally {
     isSubmitting.value = false
   }

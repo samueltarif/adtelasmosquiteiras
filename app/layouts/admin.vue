@@ -83,6 +83,24 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <NuxtLink 
+          to="/admin/agenda" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/agenda') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:calendar" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Agenda</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/equipe" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/equipe') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:users-round" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Equipe</span>
+        </NuxtLink>
+
+        <NuxtLink 
           to="/admin/galeria" 
           class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
           :class="route.path.startsWith('/admin/galeria') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
@@ -185,6 +203,26 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <NuxtLink 
+          to="/admin/agenda" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/agenda') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:calendar" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Agenda</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/equipe" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/equipe') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:users-round" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Equipe</span>
+        </NuxtLink>
+
+        <NuxtLink 
           to="/admin/galeria" 
           @click="closeMobileMenu"
           class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
@@ -219,21 +257,23 @@ const handleLogout = async () => {
     <!-- Main Content Area -->
     <div class="flex-1 min-w-0 md:ml-[260px] lg:ml-[280px] flex flex-col min-h-screen min-h-[100dvh]">
       <!-- TopNavBar -->
-      <header class="flex justify-between items-center h-16 px-4 sm:px-6 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-white/10 shadow-sm w-full">
-        <div class="flex items-center gap-3">
+      <header class="flex justify-between items-center h-16 px-3 sm:px-6 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-white/10 shadow-sm w-full max-w-full">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           <button 
             @click="toggleMobileMenu" 
-            class="md:hidden text-slate-300 p-2.5 rounded-xl hover:bg-white/10 transition-colors active:scale-95 flex items-center justify-center min-h-[44px] min-w-[44px]"
+            class="md:hidden text-slate-300 p-2.5 rounded-xl hover:bg-white/10 transition-colors active:scale-95 flex items-center justify-center min-h-[44px] min-w-[44px] shrink-0"
             aria-label="Abrir menu"
           >
             <Icon name="lucide:menu" class="w-6 h-6" />
           </button>
-          <div class="text-xs sm:text-sm text-slate-400 truncate">
+          <div class="text-xs sm:text-sm text-slate-400 truncate min-w-0">
             Administração <span class="mx-1 text-slate-600">/</span> 
             <span class="text-white font-semibold">
               {{ 
                 route.path.startsWith('/admin/clientes') ? 'Clientes' : 
                 route.path.startsWith('/admin/ordens-servico') ? 'Ordens de Serviço' :
+                route.path.startsWith('/admin/agenda') ? 'Agenda & Agendamentos' :
+                route.path.startsWith('/admin/equipe') ? 'Equipe Operacional' :
                 route.path.startsWith('/admin/configuracoes') ? 'Perfil da Empresa' : 
                 route.path.startsWith('/admin/galeria') ? 'Galeria de Serviços' : 
                 route.path === '/admin/leads' ? 'Leads' : 'Dashboard' 
@@ -241,12 +281,12 @@ const handleLogout = async () => {
             </span>
           </div>
         </div>
-        
-        <div class="flex items-center gap-3">
+
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
           <NuxtLink 
             to="/" 
             target="_blank"
-            class="text-xs text-slate-400 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors hidden sm:flex items-center gap-1.5 min-h-[36px]"
+            class="text-xs text-slate-400 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5 transition-colors hidden sm:flex items-center gap-1.5 min-h-[44px]"
             title="Ver site público"
           >
             <Icon name="lucide:external-link" class="w-3.5 h-3.5" />

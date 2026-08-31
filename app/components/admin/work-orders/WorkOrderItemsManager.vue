@@ -65,7 +65,7 @@ async function handleDeleteItem(itemId: string) {
       }
     }
   } catch (err: any) {
-    console.error('[WorkOrderItemsManager] Erro ao deletar item:', err)
+    console.error('[WorkOrderItemsManager] Falha ao deletar item')
     alert(err?.data?.message || 'Falha ao excluir item da OS')
   } finally {
     isDeletingItemId.value = null
@@ -118,7 +118,7 @@ function formatCurrency(val?: number | string | null) {
       <button
         v-if="!isLocked"
         @click="openCreateItemModal"
-        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer min-h-[38px]"
+        class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer min-h-[44px]"
       >
         <Icon name="lucide:plus" class="w-3.5 h-3.5" />
         <span>Adicionar Primeiro Item</span>
@@ -163,7 +163,7 @@ function formatCurrency(val?: number | string | null) {
               <button
                 type="button"
                 @click="openEditItemModal(item)"
-                class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Editar Item"
               >
                 <Icon name="lucide:edit" class="w-4 h-4" />
@@ -174,7 +174,7 @@ function formatCurrency(val?: number | string | null) {
                 type="button"
                 :disabled="isDeletingItemId === item.id"
                 @click="handleDeleteItem(item.id)"
-                class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Excluir Item"
               >
                 <Icon v-if="isDeletingItemId === item.id" name="lucide:loader-2" class="w-4 h-4 animate-spin" />

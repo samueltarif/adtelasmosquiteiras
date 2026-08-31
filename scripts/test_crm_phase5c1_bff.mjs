@@ -1,11 +1,13 @@
 /**
  * ======================================================================
- * SUÍTE DE TESTES REAIS DE BFF & HANDLERS — CRM FASE 5.0C.3
+ * SUÍTE DE TESTES REAIS DE BFF & HANDLERS — CRM FASE 5.0C.5
  * Arquivo: scripts/test_crm_phase5c1_bff.mjs
  * ======================================================================
  */
 
 import assert from 'assert'
+import fs from 'fs'
+import path from 'path'
 import * as h3 from 'h3'
 import {
   isValidUUID,
@@ -15,8 +17,18 @@ import {
 
 import { APPOINTMENT_ERROR_MAP } from '../server/shared/appointmentErrorMap.mjs'
 import { IncomingMessage, ServerResponse } from 'http'
+import { requireActiveAdmin } from '../server/utils/adminAuth.ts'
+import { findDuplicateClients } from '../server/utils/crmDuplicateSearch.ts'
+import { validateMutationOrigin, verifyActiveAdmin } from '../server/shared/adminAuthCore.mjs'
+import {
+  APPOINTMENT_CALENDAR_SELECT,
+  APPOINTMENT_DETAIL_SELECT,
+  APPOINTMENT_SEARCH_SELECT,
+  hasActiveInstallation
+} from '../server/utils/crmAppointmentHelpers.ts'
+import { handleRpcError } from '../server/utils/crmAppointmentErrors.ts'
 
-// Handlers reais importados
+// Handlers reais importados (16 handlers)
 import createAppointmentsHandler from '../server/api/admin/crm/appointments/index.post.ts'
 import getAppointmentsHandler from '../server/api/admin/crm/appointments/index.get.ts'
 import searchAppointmentsHandler from '../server/api/admin/crm/appointments/search.post.ts'
@@ -35,7 +47,7 @@ import convertLeadHandler from '../server/api/admin/crm/leads/[id]/convert.post.
 import createWorkOrderHandler from '../server/api/admin/crm/work-orders/index.post.ts'
 
 console.log('======================================================================')
-console.log('--- SUÍTE DE TESTES REAIS DE BFF & HANDLERS CRM FASE 5.0C.3 ---')
+console.log('--- SUÍTE DE TESTES REAIS DE BFF & HANDLERS CRM FASE 5.0C.5 ---')
 console.log('======================================================================\n')
 
 let passed = 0
@@ -95,7 +107,8 @@ function createMockEvent({ method = 'GET', url = '/', headers = {}, body = undef
 
 globalThis.useRuntimeConfig = () => ({
   supabaseUrl: 'http://127.0.0.1:54321',
-  supabaseServiceRoleKey: 'test_service_key'
+  supabaseServiceRoleKey: 'test_service_key',
+  supabaseAnonKey: 'test_anon_key'
 })
 
 const defaultAdminContext = {
@@ -116,7 +129,7 @@ function getErrorStatus(err) {
 }
 
 async function runSuite() {
-  console.log('--- A. VALIDAÇÃO UNITÁRIA (UUID, RFC3339, POSTGREST QUOTING, ERROR MAP) ---')
+  console.log('--- A. VALIDAÇÃO UNITÁRIA (UUID, RFC3339, POSTGREST QUOTING, ERROR MAP, STATIC CHECKS) ---')
 
   test('A.1 UUID version-agnostic (v1, v4, v7, random hex)', () => {
     assert.strictEqual(isValidUUID('c6745e05-20a8-4865-b2b1-dc1d102a818e'), true)
@@ -146,6 +159,188 @@ async function runSuite() {
   test('A.4 Dicionário de Erros — 25 códigos Migration 012 + 3 aplicação = 28 chaves', () => {
     const keys = Object.keys(APPOINTMENT_ERROR_MAP)
     assert.strictEqual(keys.length, 28)
+    assert.ok(APPOINTMENT_ERROR_MAP.ERR_APPOINTMENT_STALE_VERSION)
+    assert.ok(APPOINTMENT_ERROR_MAP.ERR_DATA_PREVISTA_MANAGED_BY_AGENDA)
+    assert.ok(APPOINTMENT_ERROR_MAP.ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED)
+  })
+
+  test('A.5 Static Security Check: zero bypass tokens no runtime auth code (DEV_MOCK_AUTH_RUNTIME=REMOVED)', () => {
+    const adminAuthFile = fs.readFileSync(path.resolve('server/utils/adminAuth.ts'), 'utf8')
+    assert.strictEqual(adminAuthFile.includes('dev_mock_admin_token'), false, 'dev_mock_admin_token não pode existir')
+    assert.strictEqual(adminAuthFile.includes('dev_mock_refresh_token'), false, 'dev_mock_refresh_token não pode existir')
+    assert.strictEqual(adminAuthFile.includes('ENABLE_TEST_AUTH'), false, 'ENABLE_TEST_AUTH não pode existir no runtime')
+    assert.strictEqual(adminAuthFile.includes('e2e_test_admin_token'), false, 'e2e_test_admin_token não pode existir no runtime')
+  })
+
+  test('A.6 verifyActiveAdmin Role Fail-Closed (role ausente/null/operator -> UNAUTHORIZED_ROLE)', () => {
+    assert.strictEqual(verifyActiveAdmin({ id: 'u1' }, [{ user_id: 'u1', role: 'admin', is_active: true }]).authorized, true)
+    assert.strictEqual(verifyActiveAdmin({ id: 'u1' }, [{ user_id: 'u1', role: 'superadmin', is_active: true }]).authorized, true)
+    assert.strictEqual(verifyActiveAdmin({ id: 'u1' }, [{ user_id: 'u1', role: 'operator', is_active: true }]).authorized, false)
+    assert.strictEqual(verifyActiveAdmin({ id: 'u1' }, [{ user_id: 'u1', role: null, is_active: true }]).authorized, false)
+    assert.strictEqual(verifyActiveAdmin({ id: 'u1' }, [{ user_id: 'u1', role: undefined, is_active: true }]).authorized, false)
+  })
+
+  test('A.7 CALENDAR_PII_MINIMIZATION: APPOINTMENT_CALENDAR_SELECT não contém campos PII proibidos', () => {
+    // CALENDAR_PII_MINIMIZATION=PASS
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('telefone'), false, 'telefone não deve estar no calendário')
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('email'), false, 'email não deve estar no calendário')
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('observacoes'), false, 'observacoes não deve estar no calendário')
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('motivo_reagendamento'), false, 'motivo_reagendamento não deve estar no calendário')
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('created_by'), false, 'created_by não deve estar no calendário')
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('valor_final'), false, 'valor_final não deve estar no calendário')
+    // Garante os campos mínimos obrigatórios presentes
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('id'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('data_hora_inicio'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('data_hora_fim'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('status_agendamento'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('updated_at'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('client:clients(id,nome)'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('work_order:work_orders(id,numero_os,status_os)'), true)
+  })
+
+  test('A.8 APPOINTMENT_DETAIL_SELECT permanece completo com campos operacionais e PII necessária ao detalhe', () => {
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('telefone_principal'), true, 'Detail deve ter telefone')
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('email'), true, 'Detail deve ter email')
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('observacoes'), true, 'Detail deve ter observacoes')
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('motivo_reagendamento_cancelamento'), true)
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('created_by'), true)
+    assert.strictEqual(APPOINTMENT_DETAIL_SELECT.includes('valor_final'), true)
+  })
+
+  test('A.9 APPOINTMENT_SEARCH_SELECT é projeção minimizada (igual ao calendário)', () => {
+    assert.strictEqual(APPOINTMENT_SEARCH_SELECT, APPOINTMENT_CALENDAR_SELECT, 'SEARCH_RESULT_PROJECTION=MINIMIZED')
+    assert.strictEqual(APPOINTMENT_SEARCH_SELECT.includes('telefone'), false)
+    assert.strictEqual(APPOINTMENT_SEARCH_SELECT.includes('email'), false)
+  })
+
+  test('A.10 LEAD_CONVERT_RAW_ERROR_LOGGING=REMOVED: convert.post.ts não contém logging de rpcErr bruto', () => {
+    const content = fs.readFileSync(path.resolve('server/api/admin/crm/leads/[id]/convert.post.ts'), 'utf8')
+    // NUNCA logar: rpcErr diretamente, ou payload completo
+    assert.strictEqual(content.includes('console.error(\'[leads/convert] Erro na RPC de conversão:\', rpcErr)'), false, 'raw rpcErr logging removido')
+    assert.strictEqual(content.includes('rpcErr)'), false, 'zero referência a rpcErr como último argumento de log')
+    // Log técnico permitido deve estar presente
+    assert.strictEqual(content.includes('LEAD_CONVERT_RAW_ERROR_LOGGING=REMOVED'), true, 'comentário de conformidade obrigatório')
+  })
+
+  test('A.11 MANUAL_SCHEDULE_ERROR_CODE=ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED: código canônico no status.post.ts', () => {
+    const content = fs.readFileSync(path.resolve('server/api/admin/crm/work-orders/[id]/status.post.ts'), 'utf8')
+    assert.strictEqual(content.includes('ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED'), true, 'código canônico obrigatório')
+    assert.strictEqual(content.includes('ERR_STATUS_MANAGED_BY_AGENDA'), false, 'código não-canônico proibido')
+  })
+
+  test('A.12 ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS: hasActiveInstallation fail-closed em config ausente e workOrderId inválido', async () => {
+    // Config ausente -> 503
+    try {
+      await hasActiveInstallation({ url: '', serviceRoleKey: '' }, 'some-id')
+      assert.fail('Deveria ter lançado 503')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 503, 'config ausente deve lançar 503')
+    }
+    // workOrderId ausente -> 400
+    try {
+      await hasActiveInstallation({ url: 'http://localhost', serviceRoleKey: 'key' }, '')
+      assert.fail('Deveria ter lançado 400')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 400, 'workOrderId inválido deve lançar 400')
+    }
+  })
+
+  test('A.13 RUNTIME_RPC_ERROR_MAP_KEYS=28 & RUNTIME_RPC_ERROR_MAP_DRIFT=NO: handleRpcError mapeia todas as 28 chaves', () => {
+    const canonicalKeys = Object.keys(APPOINTMENT_ERROR_MAP)
+    assert.strictEqual(canonicalKeys.length, 28, 'Dicionário canônico deve ter 28 chaves')
+    for (const key of canonicalKeys) {
+      const def = APPOINTMENT_ERROR_MAP[key]
+      try {
+        handleRpcError({ message: `RPC error: ${key} occurred` })
+        assert.fail(`handleRpcError deveria lançar para ${key}`)
+      } catch (err) {
+        assert.strictEqual(err?.statusCode, def.status, `Status incorreto para ${key}: ${err?.statusCode} vs ${def.status}`)
+        assert.ok(err?.data?.error?.code === def.code || err?.data?.error?.code === key, `Código incorreto para ${key}`)
+      }
+    }
+  })
+
+  test('A.14 RUNTIME_RPC_ERROR_MAP_DRIFT=NO: Cobertura explícita dos 7 códigos da Migration 012 sem retornar 500', () => {
+    const missingSeven = [
+      { key: 'ERR_STAFF_INACTIVE', expectedStatus: 409 },
+      { key: 'ERR_APPOINTMENT_DRIFT', expectedStatus: 409 },
+      { key: 'ERR_QUOTE_WORK_ORDER_STATUS', expectedStatus: 400 },
+      { key: 'ERR_MAINTENANCE_WORK_ORDER_STATUS', expectedStatus: 400 },
+      { key: 'ERR_WARRANTY_WORK_ORDER_STATUS', expectedStatus: 400 },
+      { key: 'ERR_INVALID_APPOINTMENT_TIPO', expectedStatus: 400 },
+      { key: 'ERR_HARD_DELETE_FORBIDDEN', expectedStatus: 400 }
+    ]
+
+    for (const { key, expectedStatus } of missingSeven) {
+      try {
+        handleRpcError({ message: key })
+        assert.fail(`Deveria lançar erro para ${key}`)
+      } catch (err) {
+        assert.strictEqual(err?.statusCode, expectedStatus, `${key} deve retornar status ${expectedStatus} e nunca 500`)
+      }
+    }
+  })
+
+  test('A.15 STRUCTURED_SQLSTATE_MAPPING: handleRpcError interpreta SQLSTATE estruturado via err.code e err.data.code', () => {
+    // 23P01 via err.code
+    try {
+      handleRpcError({ code: '23P01', message: 'exclusion constraint' })
+      assert.fail('Deveria ter lançado erro para 23P01')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 409, '23P01 via err.code deve ser 409')
+      assert.strictEqual(err?.data?.error?.code, 'ERR_STAFF_SCHEDULE_CONFLICT')
+    }
+
+    // 23P01 via err.data.code
+    try {
+      handleRpcError({ data: { code: '23P01', message: 'exclusion constraint' } })
+      assert.fail('Deveria ter lançado erro para data.code 23P01')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 409, '23P01 via err.data.code deve ser 409')
+    }
+
+    // 23505 com active installation
+    try {
+      handleRpcError({ code: '23505', message: 'unq_active_installation_per_wo violation' })
+      assert.fail('Deveria ter lançado erro para 23505')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 409, '23505 active installation deve ser 409')
+      assert.strictEqual(err?.data?.error?.code, 'ERR_ACTIVE_INSTALLATION_EXISTS')
+    }
+
+    // 23503 via err.code
+    try {
+      handleRpcError({ code: '23503', message: 'foreign key violation' })
+      assert.fail('Deveria ter lançado erro para 23503')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 400, '23503 deve ser 400')
+      assert.strictEqual(err?.data?.error?.code, 'ERR_FOREIGN_KEY_VIOLATION')
+    }
+  })
+
+  test('A.16 RUNTIME_RPC_RAW_PII_LOGGING=NONE: Fallback de handleRpcError NUNCA loga mensagens sensíveis/PII', () => {
+    const sentinelPii = 'SENSIBLE_CLIENT_TELEFONE_11999998888_EMAIL_SECRET@DOMAIN.COM_RUA_TESTE_123'
+    const capturedLogs = []
+    const originalConsoleError = console.error
+    console.error = (...args) => {
+      capturedLogs.push(args.join(' '))
+    }
+
+    try {
+      handleRpcError({
+        statusCode: 500,
+        message: `Database error with client data: ${sentinelPii}`,
+        details: `Detailed leak: ${sentinelPii}`
+      })
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 500)
+    } finally {
+      console.error = originalConsoleError
+    }
+
+    const fullLog = capturedLogs.join('\n')
+    assert.strictEqual(fullLog.includes(sentinelPii), false, 'String de PII NÃO pode vazar no console.error!')
+    assert.ok(fullLog.includes('[CRM Appointment RPC Error]'), 'Log técnico estruturado deve estar presente')
   })
 
   console.log('\n--- B. TESTES REAIS DOS 16 HANDLERS NITRO (BFF) ---')
@@ -164,7 +359,6 @@ async function runSuite() {
     const event = createMockEvent({
       method: 'GET',
       url: '/api/admin/crm/appointments',
-      headers: { authorization: 'Bearer dev_mock_admin_token' },
       context: {
         auth: {
           adminSession: true,
@@ -402,7 +596,7 @@ async function runSuite() {
     assert.strictEqual(calledRpc.includes('update_appointment_status_atomic'), true)
   })
 
-  await asyncTest('B.13 GET /api/admin/crm/appointments passa staffId para query PostgREST com overlap gt/lt', async () => {
+  await asyncTest('B.13 GET /api/admin/crm/appointments passa staffId, overlap gt/lt e CALENDAR_PII_MINIMIZATION=PASS', async () => {
     let queriedUrl = null
     globalThis.$fetch = async (url) => {
       queriedUrl = url
@@ -423,9 +617,26 @@ async function runSuite() {
     assert.strictEqual(queriedUrl.includes('staff_id=eq.00000000-0000-0000-0000-000000000001'), true)
     assert.strictEqual(queriedUrl.includes('data_hora_fim=gt.'), true)
     assert.strictEqual(queriedUrl.includes('data_hora_inicio=lt.'), true)
+    // CALENDAR_PII_MINIMIZATION: telefone/email NÃO podem aparecer na projeção da URL
+    assert.strictEqual(queriedUrl.includes('telefone'), false, 'Calendário não deve solicitar telefone')
+    assert.strictEqual(queriedUrl.includes('observacoes'), false, 'Calendário não deve solicitar observacoes')
+    assert.strictEqual(queriedUrl.includes('motivo_reagendamento'), false, 'Calendário não deve solicitar motivo_reagendamento')
   })
 
-  await asyncTest('B.14 POST /api/admin/crm/appointments/search desabilita busca textual q (400) e aceita filtros estruturados (200)', async () => {
+  await asyncTest('B.14 POST /api/admin/crm/appointments/search valida q vazio (200), q com valor (400) e tipos inválidos (400)', async () => {
+    globalThis.$fetch = async () => []
+    
+    // q string vazia -> aceita (200)
+    const eventEmptyQ = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/appointments/search',
+      context: defaultAdminContext,
+      body: { q: '  ' }
+    })
+    const resEmpty = await searchAppointmentsHandler(eventEmptyQ)
+    assert.strictEqual(resEmpty.success, true)
+
+    // q com valor não vazio -> 400 SEARCH_PII_DEFERRED
     const eventWithQ = createMockEvent({
       method: 'POST',
       url: '/api/admin/crm/appointments/search',
@@ -434,12 +645,40 @@ async function runSuite() {
     })
     try {
       await searchAppointmentsHandler(eventWithQ)
-      assert.fail('Deveria ter retornado 400 para q')
+      assert.fail('Deveria ter retornado 400 para q não vazio')
     } catch (err) {
       assert.strictEqual(getErrorStatus(err), 400)
     }
 
-    globalThis.$fetch = async () => []
+    // q number -> 400
+    const eventNumberQ = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/appointments/search',
+      context: defaultAdminContext,
+      body: { q: 123 }
+    })
+    try {
+      await searchAppointmentsHandler(eventNumberQ)
+      assert.fail('Deveria ter retornado 400 para q number')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // staffId inválido -> 400
+    const eventBadStaff = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/appointments/search',
+      context: defaultAdminContext,
+      body: { staffId: 'not-a-uuid' }
+    })
+    try {
+      await searchAppointmentsHandler(eventBadStaff)
+      assert.fail('Deveria ter retornado 400 para staffId inválido')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // Filtros estruturados válidos -> 200
     const eventStructured = createMockEvent({
       method: 'POST',
       url: '/api/admin/crm/appointments/search',
@@ -466,7 +705,7 @@ async function runSuite() {
     }
   })
 
-  await asyncTest('B.16 POST /api/admin/crm/work-orders/:id/status com agendada retorna 400', async () => {
+  await asyncTest('B.16 POST /api/admin/crm/work-orders/:id/status com agendada retorna 400 ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED', async () => {
     const event = createMockEvent({
       method: 'POST',
       url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
@@ -478,7 +717,14 @@ async function runSuite() {
       await statusWorkOrderHandler(event)
       assert.fail('Deveria ter lançado 400')
     } catch (err) {
-      assert.strictEqual(getErrorStatus(err), 400)
+      assert.strictEqual(getErrorStatus(err), 400, 'HTTP status deve ser 400')
+      // Verifica código de erro canônico no statusMessage ou data.error.code
+      const errMsg = err?.statusMessage || err?.data?.error?.code || err?.message || ''
+      assert.strictEqual(
+        errMsg.includes('ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED'),
+        true,
+        `MANUAL_SCHEDULE_ERROR_CODE=ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED — obtido: "${errMsg}"`
+      )
     }
   })
 
@@ -692,19 +938,50 @@ async function runSuite() {
     assert.strictEqual(queriedUrl.includes('offset=20'), true)
   })
 
-  await asyncTest('B.26 POST /api/admin/crm/leads/:id/convert valida criar_os booleano estrito (true/false/undefined aceitos, strings/numeros 400)', async () => {
+  await asyncTest('B.26 POST /api/admin/crm/leads/:id/convert valida criar_os booleano estrito e FAIL-CLOSED em falha de duplicidade', async () => {
+    globalThis.$fetch = async () => []
+
+    // 1. criar_os com string -> 400
     const eventBad = createMockEvent({
       method: 'POST',
       url: '/api/admin/crm/leads/00000000-0000-0000-0000-000000000001/convert',
       context: defaultAdminContext,
       params: { id: '00000000-0000-0000-0000-000000000001' },
-      body: { criar_os: 'true' }
+      body: { nome: 'Cliente Teste', telefone_principal: '11999998888', criar_os: 'true', confirmPossibleDuplicate: true }
     })
     try {
       await convertLeadHandler(eventBad)
       assert.fail('Deveria ter lançado 400')
     } catch (err) {
       assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // 2. Falha de upstream na verificação de duplicidade -> 503 e ZERO chamadas à RPC
+    let conversionRpcCalls = 0
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/clients?')) {
+        throw new Error('Database unavailable')
+      }
+      if (url.includes('convert_lead_to_client_atomic')) {
+        conversionRpcCalls++
+        return { success: true }
+      }
+      return []
+    }
+
+    const eventDuplicateFail = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/leads/00000000-0000-0000-0000-000000000001/convert',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { nome: 'Cliente Teste', telefone_principal: '11999998888' }
+    })
+    try {
+      await convertLeadHandler(eventDuplicateFail)
+      assert.fail('Deveria ter lançado 503 na falha de busca de duplicata')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 503)
+      assert.strictEqual(conversionRpcCalls, 0, 'DUPLICATE_SEARCH_FAILURE_CONVERSION_RPC_CALLS=0')
     }
   })
 
@@ -723,10 +1000,72 @@ async function runSuite() {
     }
   })
 
+  console.log('\n--- C. TESTES REAIS DO GUARD requireActiveAdmin & CSRF PRODUCTION FAIL-CLOSED ---')
+
+  await asyncTest('C.1 requireActiveAdmin com cached inactive admin retorna 403 (CACHED_INACTIVE_ADMIN=REJECTED)', async () => {
+    const event = createMockEvent({
+      context: {
+        auth: {
+          admin: { adminId: '1', userId: '1', email: 'test@adt.local', role: 'admin', isActive: false }
+        }
+      }
+    })
+    try {
+      await requireActiveAdmin(event)
+      assert.fail('Deveria ter lançado 403 para cached inactive admin')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+  })
+
+  await asyncTest('C.2 CSRF validateMutationOrigin em produção sem Origin e sem Referer retorna 403 (CSRF_MISSING_ORIGIN_REFERER_POLICY=FAIL_CLOSED_PRODUCTION)', () => {
+    const resProd = validateMutationOrigin(null, null, 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resProd.allowed, false)
+    assert.strictEqual(resProd.statusCode, 403)
+
+    const resProdNoHost = validateMutationOrigin('https://painel.adt.local', null, '', false, null, false, 'https')
+    assert.strictEqual(resProdNoHost.allowed, false)
+    assert.strictEqual(resProdNoHost.statusCode, 403)
+
+    const resProdOk = validateMutationOrigin('https://painel.adt.local', null, 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resProdOk.allowed, true)
+  })
+
+  await asyncTest('C.3 findDuplicateClients executa buscas independentes sem raw PostgREST OR e lança 503 se upstream falhar', async () => {
+    const executedUrls = []
+    globalThis.$fetch = async (url) => {
+      executedUrls.push(url)
+      return []
+    }
+
+    const config = { url: 'http://127.0.0.1:54321', serviceRoleKey: 'test_key' }
+    const res = await findDuplicateClients(config, {
+      telefone: '11999998888',
+      email: 'teste@exemplo.com',
+      cpfCnpj: '12345678901'
+    })
+
+    assert.strictEqual(Array.isArray(res), true)
+    assert.strictEqual(executedUrls.length, 3, 'Executa 3 buscas independentes')
+    assert.strictEqual(executedUrls.some(u => u.includes('or=(')), false, 'DUPLICATE_SEARCH_RAW_POSTGREST_OR=REMOVED: zero raw or=()')
+
+    // Teste de Fail-Closed em falha de upstream
+    globalThis.$fetch = async () => {
+      throw new Error('Supabase network error')
+    }
+    try {
+      await findDuplicateClients(config, { telefone: '11999998888' })
+      assert.fail('Deveria ter lançado 503')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 503, 'DUPLICATE_SEARCH_FAILURE_POLICY=FAIL_CLOSED')
+    }
+  })
+
   console.log('\n======================================================================')
-  console.log(`VALIDATION_UNIT_ASSERTS:   4`)
-  console.log(`BFF_REAL_HANDLER_ASSERTS:  27`)
-  console.log(`TOTAL DE ASSERTS:          31`)
+  console.log(`VALIDATION_UNIT_ASSERTS:   16`)
+  console.log(`BFF_REAL_HANDLER_ASSERTS:  30`)
+  console.log(`AUTH_CSRF_GUARD_ASSERTS:   3`)
+  console.log(`TOTAL DE ASSERTS:          49`)
   console.log(`BFF_IMPORTED_HANDLERS:     16`)
   console.log(`BFF_EXECUTED_HANDLERS:     16`)
   console.log(`FAILED:                    ${failed}`)

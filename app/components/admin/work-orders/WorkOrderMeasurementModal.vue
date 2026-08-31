@@ -119,7 +119,7 @@ async function handleSave(keepOpen = false) {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[MeasurementModal] Erro ao salvar vão:', err)
+    console.error('[MeasurementModal] Falha ao salvar vão')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao salvar medição técnica'
   } finally {
     isSubmitting.value = false

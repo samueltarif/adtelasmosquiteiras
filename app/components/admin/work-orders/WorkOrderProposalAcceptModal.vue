@@ -38,7 +38,7 @@ async function handleAccept() {
       errorMessage.value = 'Resposta inesperada ao aceitar orçamento.'
     }
   } catch (err: any) {
-    console.error('[ProposalAcceptModal] Erro ao aceitar orçamento:', err)
+    console.error('[ProposalAcceptModal] Falha ao aceitar orçamento')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao aceitar proposta comercial.'
   } finally {
     isLoading.value = false

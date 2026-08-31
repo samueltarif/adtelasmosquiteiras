@@ -63,8 +63,8 @@ const openSocialLink = (platform) => {
       @click="openSocialLink('instagram')"
       :style="{ backgroundColor: '#E4405F' }"
       :class="[
-        'flex items-center justify-center gap-2 text-white rounded-lg font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg',
-        showLabels ? 'px-4 py-2.5 md:px-6 md:py-3 min-w-[120px]' : 'w-10 h-10 md:w-12 md:h-12'
+        'flex items-center justify-center gap-2 text-white rounded-xl font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg min-h-[44px] min-w-[44px]',
+        showLabels ? 'px-4 py-2.5 md:px-6 md:py-3 min-w-[120px]' : 'w-11 h-11 md:w-12 md:h-12'
       ]"
       @mouseover="$event.target.style.backgroundColor = '#C13584'"
       @mouseout="$event.target.style.backgroundColor = '#E4405F'"
@@ -82,8 +82,8 @@ const openSocialLink = (platform) => {
       @click="openSocialLink('facebook')"
       :style="{ backgroundColor: '#1877F2' }"
       :class="[
-        'flex items-center justify-center gap-2 text-white rounded-lg font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg',
-        showLabels ? 'px-4 py-2.5 md:px-6 md:py-3 min-w-[120px]' : 'w-10 h-10 md:w-12 md:h-12'
+        'flex items-center justify-center gap-2 text-white rounded-xl font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg min-h-[44px] min-w-[44px]',
+        showLabels ? 'px-4 py-2.5 md:px-6 md:py-3 min-w-[120px]' : 'w-11 h-11 md:w-12 md:h-12'
       ]"
       @mouseover="$event.target.style.backgroundColor = '#166FE5'"
       @mouseout="$event.target.style.backgroundColor = '#1877F2'"

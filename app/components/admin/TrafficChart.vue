@@ -119,7 +119,7 @@ const hoveredPoint = computed(() => {
           v-for="mode in (['visitors', 'sessions', 'pageviews', 'leads'] as const)"
           :key="mode"
           @click="chartMode = mode"
-          class="px-2.5 sm:px-3 py-1.5 sm:py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all text-center cursor-pointer min-h-[32px] flex items-center justify-center"
+          class="px-2.5 sm:px-3 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition-all text-center cursor-pointer min-h-[44px] flex items-center justify-center"
           :class="chartMode === mode ? colorConfig.badge : 'text-slate-400 hover:text-slate-200'"
         >
           {{ mode === 'visitors' ? 'Visitantes' : mode === 'sessions' ? 'Sessões' : mode === 'pageviews' ? 'Pageviews' : 'Leads' }}

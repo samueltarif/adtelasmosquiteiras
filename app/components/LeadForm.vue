@@ -123,8 +123,8 @@ const submitLead = async () => {
 
   try {
     await redirectToThankYou(payload, mediaUploaderRef)
-  } catch (error) {
-    console.error('[LeadForm] Erro ao enviar formulário:', error)
+  } catch {
+    console.error('[LeadForm] Erro ao enviar formulário')
     submitError.value = true
   }
 }

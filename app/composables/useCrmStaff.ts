@@ -47,7 +47,7 @@ export function useCrmStaff() {
       }
       return staffList.value
     } catch (err: any) {
-      console.error('[useCrmStaff] Erro ao carregar equipe:', err)
+      console.error('[useCrmStaff] Falha ao carregar equipe')
       errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao carregar lista de membros da equipe.'
       return []
     } finally {
@@ -75,7 +75,7 @@ export function useCrmStaff() {
       }
       return { success: false, error: 'Resposta inesperada do servidor.' }
     } catch (err: any) {
-      console.error('[useCrmStaff] Erro ao cadastrar membro:', err)
+      console.error('[useCrmStaff] Falha ao cadastrar membro')
       const msg = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao cadastrar membro da equipe.'
       errorMessage.value = msg
       return { success: false, error: msg }
@@ -107,7 +107,7 @@ export function useCrmStaff() {
       }
       return { success: false, error: 'Resposta inesperada do servidor.' }
     } catch (err: any) {
-      console.error('[useCrmStaff] Erro ao atualizar membro:', err)
+      console.error('[useCrmStaff] Falha ao atualizar membro')
       const msg = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao atualizar dados do membro.'
       errorMessage.value = msg
       return { success: false, error: msg }

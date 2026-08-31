@@ -23,18 +23,7 @@ const statusLabels: Record<string, { label: string, color: string }> = {
   cancelada: { label: 'Cancelada', color: 'bg-red-500/10 text-red-400 border-red-500/20' }
 }
 
-function formatWhatsAppLink(phone?: string) {
-  if (!phone) return '#'
-  const digits = phone.replace(/\D/g, '')
-  const full = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${full}`
-}
-
-function formatPhoneLink(phone?: string) {
-  if (!phone) return '#'
-  const digits = phone.replace(/\D/g, '')
-  return `tel:+55${digits}`
-}
+import { formatPhoneLink, formatWhatsAppLink } from '~/utils/phone'
 
 function navigateToClient(clientId: string) {
   router.push(`/admin/clientes/${clientId}`)
@@ -42,7 +31,7 @@ function navigateToClient(clientId: string) {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-lg space-y-4">
+  <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 sm:p-5 shadow-lg space-y-4">
     <!-- Linha Superior: Voltar + Número da OS + Status Badge + Ações -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -62,9 +51,10 @@ function navigateToClient(clientId: string) {
 
             <button
               @click="emit('openStatusModal')"
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer hover:opacity-90 min-h-[30px]"
-              :class="statusLabels[workOrder.status_os]?.color || 'bg-slate-800 text-slate-300'"
+              class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold border transition-all cursor-pointer hover:opacity-90 min-h-[44px]"
+              style="min-height: 44px;"
               title="Clique para alterar status"
+              :class="statusLabels[workOrder.status_os]?.color || 'bg-slate-800 text-slate-300'"
             >
               <span>{{ statusLabels[workOrder.status_os]?.label || workOrder.status_os }}</span>
               <Icon name="lucide:chevron-down" class="w-3.5 h-3.5 opacity-70" />
@@ -75,11 +65,12 @@ function navigateToClient(clientId: string) {
             </span>
           </div>
 
-          <p class="text-xs text-slate-400 mt-0.5">
-            Solicitante: 
+          <p class="text-xs text-slate-400 mt-0.5 flex items-center gap-1 flex-wrap">
+            <span>Solicitante:</span>
             <button
               @click="navigateToClient(workOrder.client_id)"
-              class="font-semibold text-indigo-400 hover:underline cursor-pointer inline"
+              class="font-semibold text-indigo-400 hover:underline cursor-pointer inline-flex items-center min-h-[44px] py-1"
+              style="min-height: 44px;"
             >
               {{ workOrder.client?.nome || 'Cliente' }}
             </button>
@@ -95,7 +86,7 @@ function navigateToClient(clientId: string) {
           :href="formatWhatsAppLink(workOrder.client.telefone_principal)"
           target="_blank"
           rel="noopener noreferrer"
-          class="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center gap-1.5 transition-all min-h-[44px]"
+          class="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[44px] min-w-[44px]"
           title="WhatsApp (sem telemetria pública)"
         >
           <Icon name="lucide:message-circle" class="w-4 h-4" />
@@ -105,7 +96,7 @@ function navigateToClient(clientId: string) {
         <a
           v-if="workOrder.client?.telefone_principal"
           :href="formatPhoneLink(workOrder.client.telefone_principal)"
-          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-white/10 flex items-center gap-1.5 transition-all min-h-[44px]"
+          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-white/10 flex items-center justify-center gap-1.5 transition-all min-h-[44px] min-w-[44px]"
           title="Ligar"
         >
           <Icon name="lucide:phone" class="w-4 h-4" />

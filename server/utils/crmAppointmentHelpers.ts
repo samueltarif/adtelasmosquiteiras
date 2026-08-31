@@ -1,15 +1,47 @@
 /**
  * Helpers Reutilizáveis para Consultas da Agenda e Proteções de Estado
  * Arquivo: server/utils/crmAppointmentHelpers.ts
+ * PATCH 5.0C.5:
+ * - APPOINTMENT_CALENDAR_SELECT: projeção minimizada para calendário (sem PII)
+ * - APPOINTMENT_DETAIL_SELECT: projeção completa somente para endpoints de detalhe
+ * - ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS
  */
 
 import { getSupabaseHeaders } from './crm.ts'
+import { createError } from 'h3'
 
 export interface SupabaseConfig {
   url: string
   serviceRoleKey: string
 }
 
+/**
+ * Projeção mínima para renderização do Calendário.
+ * CALENDAR_PII_MINIMIZATION=PASS
+ * NÃO inclui: telefone, email, observacoes, motivo_reagendamento_cancelamento,
+ * created_by, valor_final, telefone do staff, endereço completo além do essencial.
+ */
+export const APPOINTMENT_CALENDAR_SELECT = [
+  'id',
+  'work_order_id',
+  'client_id',
+  'address_id',
+  'staff_id',
+  'tipo_agendamento',
+  'data_hora_inicio',
+  'data_hora_fim',
+  'status_agendamento',
+  'updated_at',
+  'client:clients(id,nome)',
+  'work_order:work_orders(id,numero_os,status_os)',
+  'staff:crm_staff(id,nome,funcao)',
+  'address:client_addresses(id,rotulo,bairro,cidade,uf)'
+].join(',')
+
+/**
+ * Projeção completa para endpoints de detalhe individual.
+ * Inclui dados operacionais necessários para o DrawerDetail.
+ */
 export const APPOINTMENT_DETAIL_SELECT = [
   'id',
   'work_order_id',
@@ -32,18 +64,28 @@ export const APPOINTMENT_DETAIL_SELECT = [
   'staff:crm_staff(id,nome,funcao,telefone)'
 ].join(',')
 
-import { createError } from 'h3'
+/**
+ * Projeção minimizada para resultados de busca estruturada.
+ * q textual é DEFERRED; resultado usa projeção de calendário por padrão.
+ * SEARCH_RESULT_PROJECTION=MINIMIZED
+ */
+export const APPOINTMENT_SEARCH_SELECT = APPOINTMENT_CALENDAR_SELECT
 
 /**
  * Consulta se uma Ordem de Serviço possui agendamento de instalação ativo
  * (status: agendado, confirmado, em_deslocamento).
- * FAIL-CLOSED: Re-throw como 503 em falhas upstream.
+ * ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS
  */
 export async function hasActiveInstallation(
   config: SupabaseConfig,
   workOrderId: string
 ): Promise<boolean> {
-  if (!config.url || !config.serviceRoleKey || !workOrderId) return false
+  if (!config.url || !config.serviceRoleKey) {
+    throw createError({ statusCode: 503, message: 'HAS_ACTIVE_INSTALLATION_CONFIG_MISSING: Configuração de banco de dados indisponível.' })
+  }
+  if (!workOrderId || typeof workOrderId !== 'string' || workOrderId.trim() === '') {
+    throw createError({ statusCode: 400, message: 'HAS_ACTIVE_INSTALLATION_INVALID_ID: workOrderId é obrigatório.' })
+  }
 
   try {
     const res = await $fetch<any[]>(
@@ -55,19 +97,25 @@ export async function hasActiveInstallation(
     return Array.isArray(res) && res.length > 0
   } catch (err: any) {
     if (err?.statusCode) throw err
-    console.error('[hasActiveInstallation] Upstream failure:', err?.message || err)
-    throw createError({ statusCode: 503, statusMessage: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
+    console.error('[hasActiveInstallation] Upstream failure:', err?.statusCode || 'unknown')
+    throw createError({ statusCode: 503, message: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
   }
 }
 
 /**
  * Obtém os dados do agendamento de instalação ativo de uma Ordem de Serviço, se existir.
+ * ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS
  */
 export async function getActiveInstallation(
   config: SupabaseConfig,
   workOrderId: string
 ): Promise<any | null> {
-  if (!config.url || !config.serviceRoleKey || !workOrderId) return null
+  if (!config.url || !config.serviceRoleKey) {
+    throw createError({ statusCode: 503, message: 'GET_ACTIVE_INSTALLATION_CONFIG_MISSING: Configuração de banco de dados indisponível.' })
+  }
+  if (!workOrderId || typeof workOrderId !== 'string' || workOrderId.trim() === '') {
+    throw createError({ statusCode: 400, message: 'GET_ACTIVE_INSTALLATION_INVALID_ID: workOrderId é obrigatório.' })
+  }
 
   try {
     const res = await $fetch<any[]>(
@@ -79,7 +127,7 @@ export async function getActiveInstallation(
     return Array.isArray(res) && res.length > 0 ? res[0] : null
   } catch (err: any) {
     if (err?.statusCode) throw err
-    console.error('[getActiveInstallation] Upstream failure:', err?.message || err)
-    throw createError({ statusCode: 503, statusMessage: 'Falha ao consultar agendamento ativo da ordem de serviço' })
+    console.error('[getActiveInstallation] Upstream failure:', err?.statusCode || 'unknown')
+    throw createError({ statusCode: 503, message: 'Falha ao consultar agendamento ativo da ordem de serviço' })
   }
 }

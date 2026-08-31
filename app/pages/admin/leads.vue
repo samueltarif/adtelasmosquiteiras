@@ -9,6 +9,7 @@ import TableHead from '../../components/ui/table/TableHead.vue'
 import TableCell from '../../components/ui/table/TableCell.vue'
 import Badge from '../../components/ui/badge/Badge.vue'
 import LeadJourneyDrawer from '../../components/admin/LeadJourneyDrawer.vue'
+import { formatWhatsAppLink } from '~/utils/phone'
 
 definePageMeta({ layout: 'admin' })
 
@@ -43,8 +44,8 @@ async function fetchLeads() {
         counts.value = data.counts
       }
     }
-  } catch (err) {
-    console.error('Erro ao buscar leads:', err)
+  } catch {
+    console.error('[AdminLeads] Erro ao buscar leads')
   } finally {
     isLoading.value = false
   }
@@ -92,19 +93,13 @@ function formatDate(iso: string) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
-function formatPhoneForWhatsApp(phone: string) {
-  if (!phone) return ''
-  const raw = phone.replace(/\D/g, '')
-  return raw.startsWith('55') ? raw : '55' + raw
-}
-
 onMounted(() => {
   fetchLeads()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-3 sm:p-5 md:p-6 lg:p-8 w-full max-w-full overflow-x-hidden">
+  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-3 sm:p-5 md:p-6 lg:p-8 w-full max-w-full">
     <div class="max-w-7xl mx-auto flex flex-col gap-4 sm:gap-6 w-full">
 
       <!-- Header -->
@@ -118,7 +113,7 @@ onMounted(() => {
 
         <button 
           @click="fetchLeads" 
-          class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-h-[40px] active:scale-95 cursor-pointer self-start sm:self-auto"
+          class="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition-all min-h-[44px] active:scale-95 cursor-pointer self-start sm:self-auto"
         >
           <Icon name="lucide:refresh-cw" class="w-3.5 h-3.5" :class="isLoading ? 'animate-spin' : ''" />
           <span>Atualizar</span>
@@ -165,7 +160,7 @@ onMounted(() => {
             v-model="searchQuery"
             type="text"
             placeholder="Buscar por nome, bairro, telefone..."
-            class="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-9 pr-4 py-2 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[42px]"
+            class="w-full bg-slate-900 border border-slate-700/60 rounded-xl pl-9 pr-4 py-2.5 text-base sm:text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[44px]"
           />
         </div>
 
@@ -174,7 +169,7 @@ onMounted(() => {
           <span class="text-xs text-slate-400 font-medium shrink-0">Status:</span>
           <select 
             v-model="selectedStatusFilter" 
-            class="w-full sm:w-auto bg-slate-900 border border-slate-700/60 text-white text-base sm:text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 min-h-[42px]"
+            class="w-full sm:w-auto bg-slate-900 border border-slate-700/60 text-white text-base sm:text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500 min-h-[44px]"
           >
             <option value="">Todos os status</option>
             <option value="Novo">Novo</option>
@@ -240,10 +235,10 @@ onMounted(() => {
             <div class="flex items-center gap-2">
               <a
                 v-if="lead.telefone"
-                :href="'https://wa.me/' + formatPhoneForWhatsApp(lead.telefone)"
+                :href="formatWhatsAppLink(lead.telefone)"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="p-2 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition-colors min-h-[38px] min-w-[38px] flex items-center justify-center"
+                class="p-2.5 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Abrir no WhatsApp"
               >
                 <Icon name="lucide:message-circle" class="w-4 h-4" />
@@ -251,7 +246,7 @@ onMounted(() => {
 
               <button
                 @click="openLeadDetails(lead)"
-                class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors min-h-[38px] cursor-pointer"
+                class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors min-h-[44px] cursor-pointer"
               >
                 <Icon name="lucide:eye" class="w-3.5 h-3.5" />
                 <span>Ver Detalhes</span>
@@ -321,7 +316,7 @@ onMounted(() => {
               <TableCell class="py-3.5 px-4 text-center" @click.stop>
                 <button 
                   @click="openLeadDetails(lead)" 
-                  class="p-2 rounded-xl bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer min-h-[36px] min-w-[36px] flex items-center justify-center mx-auto"
+                  class="p-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center mx-auto"
                   title="Ver jornada e detalhes"
                 >
                   <Icon name="lucide:eye" class="w-4 h-4" />

@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { getHeader, getCookie, setCookie, deleteCookie, createError } from 'h3'
+import { getHeader, getCookie, createError } from 'h3'
 import {
   ADMIN_AUTH_COOKIE_NAME,
   ADMIN_REFRESH_COOKIE_NAME,
@@ -12,7 +12,17 @@ import {
   sanitizeMediaMetadata
 } from '../shared/adminAuthCore.mjs'
 
-// Re-export pure helpers
+import {
+  setAdminAuthCookies,
+  clearAdminAuthCookies,
+  enforceMutationCsrf
+} from './adminAuthCookies.ts'
+
+import {
+  resolveSupabaseUser,
+  fetchAdminUserSingleFlight
+} from './adminAuthSession.ts'
+
 export {
   ADMIN_AUTH_COOKIE_NAME,
   ADMIN_REFRESH_COOKIE_NAME,
@@ -34,77 +44,18 @@ export interface AdminIdentity {
 }
 
 /**
- * Define os cookies HTTP-only de sessão administrativa.
- * Propriedades estritas: httpOnly=true, secure em produção, sameSite=lax, path=/
- */
-export function setAdminAuthCookies(
-  event: H3Event,
-  tokens: { accessToken: string; refreshToken?: string; expiresIn?: number }
-) {
-  const isProduction = process.env.NODE_ENV === 'production'
-  const maxAge = tokens.expiresIn || 60 * 60 * 24 * 7 // 7 dias default para access token
-
-  setCookie(event, ADMIN_AUTH_COOKIE_NAME, tokens.accessToken, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax',
-    path: '/',
-    maxAge
-  })
-
-  if (tokens.refreshToken) {
-    setCookie(event, ADMIN_REFRESH_COOKIE_NAME, tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 30 // 30 dias para refresh token
-    })
-  }
-}
-
-/**
- * Remove os cookies de sessão administrativa no logout ou falha de refresh.
- */
-export function clearAdminAuthCookies(event: H3Event) {
-  deleteCookie(event, ADMIN_AUTH_COOKIE_NAME, { path: '/' })
-  deleteCookie(event, ADMIN_REFRESH_COOKIE_NAME, { path: '/' })
-}
-
-/**
- * Validação de CSRF / Same-Origin em requisições de mutação administrativa (POST, PATCH, PUT, DELETE).
- */
-export function enforceMutationCsrf(event: H3Event) {
-  const method = (event.node.req.method || 'GET').toUpperCase()
-  if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(method)) {
-    const origin = getHeader(event, 'origin')
-    const referer = getHeader(event, 'referer')
-    const host = getHeader(event, 'host')
-    const isDev = process.env.NODE_ENV !== 'production'
-
-    const check = validateMutationOrigin(origin, referer, host, isDev)
-    if (!check.allowed) {
-      throw createError({
-        statusCode: check.statusCode,
-        message: check.message
-      })
-    }
-  }
-}
-
-/**
  * Guard Central de Autenticação e Autorização Administrativa.
  *
  * REGRAS DE EXECUÇÃO:
  * 1. CSRF Same-Origin check em mutações.
- * 2. Valida o JWT do access token contra Supabase Auth.
- * 3. Se expirado e refresh token presente -> tenta renovação transparente server-side.
- * 4. Valida autorização estritamente por auth.users.id ↔ admin_users.user_id.
- * 5. Valida se is_active === true.
- * 6. Valida se role pertence aos allowedRoles ('admin', 'superadmin').
+ * 2. Valida identidade via getClaims JWKS local (0 roundtrips de rede) ou refresh server-side com verificação criptográfica.
+ * 3. Valida autorização estritamente por auth.users.id ↔ admin_users.user_id via Single-Flight.
+ * 4. Valida se is_active === true e role permitida ('admin', 'superadmin').
+ * 5. ADMIN_AUTH_FAIL_CLOSED = YES (zero fallback de e-mail / zero fabricação de superadmin / zero bypass hardcoded).
  *
  * @throws 401 se não autenticado ou falha no refresh
- * @throws 403 se usuário não for admin ativo ou possuir role não autorizado (ex: operator em V1)
+ * @throws 403 se usuário não for admin ativo ou possuir role não autorizada
+ * @throws 503 em caso de falha de infraestrutura
  */
 export async function requireActiveAdmin(
   event: H3Event,
@@ -115,9 +66,15 @@ export async function requireActiveAdmin(
   // 1. Proteção contra CSRF em endpoints mutáveis
   enforceMutationCsrf(event)
 
-  // 2. Se já foi validado neste ciclo de request
+  // 2. Se já foi validado neste ciclo de request (cache por-request)
   if (event.context?.auth?.admin) {
     const cachedAdmin = event.context.auth.admin as AdminIdentity
+    if (!cachedAdmin || cachedAdmin.isActive !== true) {
+      throw createError({
+        statusCode: 403,
+        message: 'Acesso negado: a conta administrativa está inativa.'
+      })
+    }
     if (!allowedRoles.includes(cachedAdmin.role)) {
       throw createError({
         statusCode: 403,
@@ -132,8 +89,8 @@ export async function requireActiveAdmin(
   const cookieRefreshToken = getCookie(event, ADMIN_REFRESH_COOKIE_NAME)
   const cookieHeader = getHeader(event, 'cookie')
 
-  const accessToken = extractAuthToken(authHeader, cookieToken || cookieHeader)
-  const refreshToken = extractRefreshToken(cookieRefreshToken || cookieHeader)
+  const accessToken = extractAuthToken(authHeader, cookieHeader, cookieToken)
+  const refreshToken = extractRefreshToken(cookieHeader, cookieRefreshToken)
 
   if (!accessToken && !refreshToken) {
     throw createError({
@@ -142,86 +99,25 @@ export async function requireActiveAdmin(
     })
   }
 
-  // Bypass seguro para ambiente de desenvolvimento / testes locais
-  if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_TEST_AUTH === 'true' && (accessToken === 'dev_mock_admin_token' || refreshToken === 'dev_mock_refresh_token')) {
-    const devAdmin: AdminIdentity = {
-      adminId: '00000000-0000-0000-0000-000000000001',
-      userId: '00000000-0000-0000-0000-000000000001',
-      email: 'admin@adt.local',
-      role: 'admin',
-      isActive: true
-    }
-    if (event.context) {
-      if (!event.context.auth) event.context.auth = {}
-      event.context.auth.admin = devAdmin
-    }
-    return devAdmin
-  }
-
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
     throw createError({
-      statusCode: 500,
-      message: 'Serviço de banco de dados indisponível.'
+      statusCode: 503,
+      message: 'Serviço de banco de dados temporariamente indisponível.'
     })
   }
 
-  let userRes: { id: string; email?: string; role?: string } | null = null
-
-  // 3. Tenta validar o accessToken atual
-  if (accessToken) {
-    try {
-      userRes = await $fetch<{ id: string; email?: string; role?: string }>(
-        `${config.supabaseUrl}/auth/v1/user`,
-        {
-          headers: {
-            'apikey': config.supabaseServiceRoleKey,
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-      )
-    } catch {
-      // Access token inválido ou expirado -> tentará refresh abaixo
-      userRes = null
-    }
-  }
-
-  // 4. Se o access token falhou/expirou mas temos refresh token, tenta renovação server-side
-  if (!userRes?.id && refreshToken) {
-    try {
-      const refreshedSession = await $fetch<{
-        access_token: string
-        refresh_token: string
-        expires_in: number
-        user: { id: string; email?: string }
-      }>(`${config.supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
-        method: 'POST',
-        headers: {
-          'apikey': config.supabaseServiceRoleKey,
-          'Content-Type': 'application/json'
-        },
-        body: {
-          refresh_token: refreshToken
-        }
-      })
-
-      if (refreshedSession?.access_token && refreshedSession?.user?.id) {
-        userRes = refreshedSession.user
-        // Atualiza cookies seguros na resposta do request atual
-        setAdminAuthCookies(event, {
-          accessToken: refreshedSession.access_token,
-          refreshToken: refreshedSession.refresh_token,
-          expiresIn: refreshedSession.expires_in
-        })
-      }
-    } catch (refreshErr) {
-      // Falha irrecuperável no refresh (token revogado ou expirado)
-      clearAdminAuthCookies(event)
-      throw createError({
-        statusCode: 401,
-        message: 'Sessão expirada. Faça login novamente.'
-      })
-    }
-  }
+  // 3. Validação de Identidade (getClaims local ou refresh server-side verificado)
+  const userRes = await resolveSupabaseUser(
+    event,
+    {
+      supabaseUrl: config.supabaseUrl,
+      supabaseServiceRoleKey: config.supabaseServiceRoleKey,
+      anonKey: (config as any).supabaseAnonKey || config.supabaseServiceRoleKey,
+      publishableKey: (config as any).supabasePublishableKey
+    },
+    accessToken,
+    refreshToken
+  )
 
   if (!userRes?.id) {
     clearAdminAuthCookies(event)
@@ -231,37 +127,22 @@ export async function requireActiveAdmin(
     })
   }
 
-  // 5. Consulta a tabela public.admin_users por user_id estrito (ADMIN_IDENTITY_AUTHORITY = AUTH_USER_ID)
+  // 4. Consulta a tabela public.admin_users por user_id estrito (Single-Flight + Fail-Closed)
   let adminRecords: any[] = []
   try {
-    adminRecords = await $fetch<any[]>(
-      `${config.supabaseUrl}/rest/v1/admin_users?user_id=eq.${userRes.id}&select=*`,
-      {
-        headers: {
-          'apikey': config.supabaseServiceRoleKey,
-          'Authorization': `Bearer ${config.supabaseServiceRoleKey}`
-        }
-      }
+    adminRecords = await fetchAdminUserSingleFlight(
+      { supabaseUrl: config.supabaseUrl, supabaseServiceRoleKey: config.supabaseServiceRoleKey },
+      userRes.id
     )
-  } catch (dbErr: any) {
-    console.warn('[adminAuth] Falha ao consultar public.admin_users:', dbErr?.message || dbErr)
+  } catch {
+    console.error('[adminAuth] ADMIN_USERS_LOOKUP_FAILED')
+    throw createError({
+      statusCode: 503,
+      message: 'Serviço de autorização temporariamente indisponível.'
+    })
   }
 
-  // Fallback defensivo de bootstrap antes de executar SQL 008 em produção
-  if (!adminRecords || adminRecords.length === 0) {
-    const email = userRes.email || ''
-    if (email.endsWith('@adtelasmosquiteiras.com.br') || email === 'vendas.adtelaseredes@gmail.com' || email === 'samuel.tarif@gmail.com') {
-      adminRecords = [{
-        id: 'bootstrap-admin-id',
-        user_id: userRes.id,
-        email: userRes.email,
-        role: 'superadmin',
-        is_active: true
-      }]
-    }
-  }
-
-  // 6. Verificação de autorização e role (ADMIN_ROLE_CHECK = ENFORCED)
+  // 5. Verificação de autorização e role (ADMIN_AUTHORIZATION_AUTHORITY = PUBLIC_ADMIN_USERS)
   const verifyResult = verifyActiveAdmin(userRes, adminRecords, allowedRoles)
 
   if (!verifyResult.authorized || !verifyResult.admin) {
@@ -283,11 +164,12 @@ export async function requireActiveAdmin(
     })
   }
 
-  // Injeta no contexto do evento para reutilização durante o lifecycle
-  event.context.auth = {
-    adminSession: true,
-    admin: verifyResult.admin,
-    user: userRes
+  if (event.context) {
+    event.context.auth = {
+      adminSession: true,
+      admin: verifyResult.admin,
+      user: userRes
+    }
   }
 
   return verifyResult.admin

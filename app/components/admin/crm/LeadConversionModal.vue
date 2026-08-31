@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import ClientDuplicateAlert from './ClientDuplicateAlert.vue'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -21,6 +22,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'converted', result: any): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const router = useRouter()
 const isConverting = ref(false)
@@ -49,8 +52,7 @@ const form = ref({
   os_data: {
     categoria_operacional: 'tela_mosquiteira',
     descricao: '',
-    valor_orcamento: 0,
-    data_prevista: ''
+    valor_orcamento: 0
   },
   confirmPossibleDuplicate: false
 })
@@ -89,8 +91,7 @@ watch(() => props.lead, (l) => {
       os_data: {
         categoria_operacional: catOp,
         descricao: l.servico ? `Instalação de ${l.servico}` : 'Atendimento inicial',
-        valor_orcamento: isNaN(val) ? 0 : val,
-        data_prevista: ''
+        valor_orcamento: isNaN(val) ? 0 : val
       },
       confirmPossibleDuplicate: false
     }
@@ -129,7 +130,6 @@ async function handleConvert(overrideDuplicate = false) {
       }
     }
   } catch (err: any) {
-    console.error('[LeadConversionModal] Erro ao converter:', err)
     const errData = err?.data?.data || err?.data || {}
     if (err?.statusCode === 409 && errData.code === 'POSSIBLE_DUPLICATE') {
       duplicateCandidates.value = errData.duplicates || []
@@ -153,14 +153,19 @@ function openExistingClient(clientId: string) {
     <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" @click="emit('close')"></div>
 
     <!-- Modal Container -->
-    <div class="relative w-full max-w-xl rounded-2xl bg-slate-900 border border-white/10 p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto flex flex-col gap-4">
+    <div
+      class="relative w-full max-w-xl rounded-2xl bg-slate-900 border border-white/10 p-6 shadow-2xl z-10 max-h-[90vh] overflow-y-auto flex flex-col gap-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lead-conversion-modal-title"
+    >
       <div class="flex items-center justify-between border-b border-white/10 pb-4">
         <div class="flex items-center gap-3">
           <div class="p-2.5 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
             <Icon name="lucide:sparkles" class="w-5 h-5" />
           </div>
           <div>
-            <h3 class="text-base font-bold text-white leading-tight">Converter Lead em Cliente</h3>
+            <h3 id="lead-conversion-modal-title" class="text-base font-bold text-white leading-tight">Converter Lead em Cliente</h3>
             <p class="text-xs text-slate-400">Criar cadastro oficial e iniciar atendimento CRM</p>
           </div>
         </div>
@@ -168,6 +173,7 @@ function openExistingClient(clientId: string) {
         <button 
           type="button" 
           @click="emit('close')"
+          aria-label="Fechar modal"
           class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
         >
           <Icon name="lucide:x" class="w-5 h-5" />
@@ -262,7 +268,7 @@ function openExistingClient(clientId: string) {
 
         <!-- 2. Endereço Inicial Opcional (Com confirmação explícita) -->
         <div class="rounded-xl border border-white/10 bg-slate-950/60 p-4 space-y-3">
-          <label class="flex items-center gap-2 cursor-pointer select-none">
+          <label class="flex items-center gap-2 cursor-pointer select-none min-h-[44px] py-1">
             <input 
               v-model="form.criar_endereco" 
               type="checkbox" 
@@ -275,40 +281,40 @@ function openExistingClient(clientId: string) {
           </label>
 
           <div v-if="form.criar_endereco" class="space-y-3 pt-2 border-t border-white/10">
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">CEP</label>
-                <input v-model="form.endereco_data.cep" type="text" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" placeholder="00000-000" />
+                <input v-model="form.endereco_data.cep" type="text" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" placeholder="00000-000" />
               </div>
-              <div class="col-span-2">
+              <div class="sm:col-span-2">
                 <label class="block text-[11px] text-slate-400 mb-1">Logradouro / Rua</label>
-                <input v-model="form.endereco_data.logradouro" type="text" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" placeholder="Rua / Av" />
+                <input v-model="form.endereco_data.logradouro" type="text" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Rua / Av" />
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Número</label>
-                <input v-model="form.endereco_data.numero" type="text" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" placeholder="123" />
+                <input v-model="form.endereco_data.numero" type="text" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" placeholder="123" />
               </div>
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Complemento</label>
-                <input v-model="form.endereco_data.complemento" type="text" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" placeholder="Apto 10" />
+                <input v-model="form.endereco_data.complemento" type="text" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Apto 10" />
               </div>
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Bairro</label>
-                <input v-model="form.endereco_data.bairro" type="text" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" placeholder="Bairro" />
+                <input v-model="form.endereco_data.bairro" type="text" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" placeholder="Bairro" />
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
-              <div class="col-span-2">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="sm:col-span-2">
                 <label class="block text-[11px] text-slate-400 mb-1">Cidade</label>
-                <input v-model="form.endereco_data.cidade" type="text" required class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" />
+                <input v-model="form.endereco_data.cidade" type="text" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" />
               </div>
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">UF</label>
-                <input v-model="form.endereco_data.uf" type="text" maxlength="2" required class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs uppercase font-bold text-center" />
+                <input v-model="form.endereco_data.uf" type="text" maxlength="2" required class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs uppercase font-bold text-center min-h-[44px]" />
               </div>
             </div>
           </div>
@@ -316,7 +322,7 @@ function openExistingClient(clientId: string) {
 
         <!-- 3. Primeira Ordem de Serviço (Opcional) -->
         <div class="rounded-xl border border-white/10 bg-slate-950/60 p-4 space-y-3">
-          <label class="flex items-center gap-2 cursor-pointer select-none">
+          <label class="flex items-center gap-2 cursor-pointer select-none min-h-[44px] py-1">
             <input 
               v-model="form.criar_os" 
               type="checkbox" 
@@ -332,7 +338,7 @@ function openExistingClient(clientId: string) {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label class="block text-[11px] text-slate-400 mb-1">Categoria Operacional</label>
-                <select v-model="form.os_data.categoria_operacional" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs">
+                <select v-model="form.os_data.categoria_operacional" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]">
                   <option value="tela_mosquiteira">Tela Mosquiteira</option>
                   <option value="rede_protecao">Rede de Proteção</option>
                   <option value="vidracaria">Vidraçaria</option>
@@ -347,7 +353,7 @@ function openExistingClient(clientId: string) {
                   v-model.number="form.os_data.valor_orcamento" 
                   type="number" 
                   step="0.01" 
-                  class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs font-mono" 
+                  class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-mono min-h-[44px]" 
                 />
               </div>
             </div>
@@ -357,7 +363,7 @@ function openExistingClient(clientId: string) {
               <input 
                 v-model="form.os_data.descricao" 
                 type="text" 
-                class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white text-xs" 
+                class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs min-h-[44px]" 
                 placeholder="Ex: Instalação de telas em 3 janelas" 
               />
             </div>

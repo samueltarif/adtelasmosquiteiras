@@ -7,6 +7,7 @@ import ClientAddressManager from '~/components/admin/crm/ClientAddressManager.vu
 import ClientNotesManager from '~/components/admin/crm/ClientNotesManager.vue'
 import ClientActivityTimeline from '~/components/admin/crm/ClientActivityTimeline.vue'
 import ClientWorkOrdersReadOnly from '~/components/admin/crm/ClientWorkOrdersReadOnly.vue'
+import { formatWhatsAppLink } from '~/utils/phone'
 
 definePageMeta({
   layout: 'admin'
@@ -19,14 +20,16 @@ const clientId = route.params.id as string
 const client = ref<any | null>(null)
 const addresses = ref<any[]>([])
 const originLead = ref<any | null>(null)
-const isLoading = ref(true)
+const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
-
 const activeTab = ref<'geral' | 'enderecos' | 'ordens' | 'notas' | 'historico'>('geral')
+
+// Modals
 const isEditModalOpen = ref(false)
 const isArchiveModalOpen = ref(false)
 
 async function fetchClientData() {
+  if (!clientId) return
   isLoading.value = true
   errorMessage.value = null
   try {
@@ -39,7 +42,7 @@ async function fetchClientData() {
       errorMessage.value = 'Cliente não encontrado.'
     }
   } catch (err: any) {
-    console.error('[ClientDetail] Erro:', err)
+    console.error('[ClientDetail] Erro ao carregar dados')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao carregar dados do cliente.'
   } finally {
     isLoading.value = false
@@ -65,13 +68,6 @@ function formatPhone(phone?: string) {
   if (digits.length === 11) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
   if (digits.length === 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
   return phone
-}
-
-function formatWhatsAppLink(phone?: string) {
-  if (!phone) return '#'
-  const digits = phone.replace(/\D/g, '')
-  const full = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${full}`
 }
 
 function formatDate(iso?: string) {
@@ -174,8 +170,8 @@ onMounted(() => {
     <div v-else-if="errorMessage" class="rounded-2xl border border-red-500/20 bg-red-500/10 p-8 text-center text-red-300 space-y-3">
       <Icon name="lucide:alert-circle" class="w-8 h-8 mx-auto" />
       <p class="text-sm font-semibold">{{ errorMessage }}</p>
-      <NuxtLink to="/admin/clientes" class="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold inline-block min-h-[40px]">
-        Voltar para Clientes
+      <NuxtLink to="/admin/clientes" class="px-4 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-bold inline-flex items-center min-h-[44px]">
+        Voltar para Lista
       </NuxtLink>
     </div>
 

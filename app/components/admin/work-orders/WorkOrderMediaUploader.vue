@@ -132,7 +132,7 @@ async function startUpload() {
     clearFile()
     emit('uploadComplete')
   } catch (err: any) {
-    console.error('[WorkOrderMediaUploader] Erro no upload:', err)
+    console.error('[WorkOrderMediaUploader] Falha no upload')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao realizar upload da mídia técnica'
   } finally {
     isUploading.value = false
@@ -230,7 +230,7 @@ function uploadDirectToR2(uploadUrl: string, file: File): Promise<void> {
           type="button"
           :disabled="isUploading"
           @click="clearFile"
-          class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer disabled:opacity-50"
+          class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer disabled:opacity-50"
         >
           <Icon name="lucide:x" class="w-4 h-4" />
         </button>

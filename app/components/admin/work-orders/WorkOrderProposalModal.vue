@@ -65,7 +65,7 @@ async function handlePreview() {
       window.open(url, '_blank')
     }
   } catch (err: any) {
-    console.error('[ProposalModal] Erro ao gerar prévia:', err)
+    console.error('[ProposalModal] Falha ao gerar prévia')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao gerar prévia do orçamento.'
   } finally {
     isPreviewLoading.value = false
@@ -102,7 +102,7 @@ async function handleIssue() {
       errorMessage.value = 'Resposta inesperada ao emitir orçamento.'
     }
   } catch (err: any) {
-    console.error('[ProposalModal] Erro ao emitir orçamento:', err)
+    console.error('[ProposalModal] Falha ao emitir orçamento')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao emitir revisão oficial do orçamento.'
   } finally {
     isIssueLoading.value = false

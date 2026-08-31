@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, toRef } from 'vue'
 import type { CrmStaffMember } from '~/composables/useCrmStaff'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -11,6 +12,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'saved', member: CrmStaffMember): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const isEdit = computed(() => Boolean(props.member?.id))
 
@@ -75,7 +78,7 @@ async function handleSubmit() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[StaffFormModal] Erro ao salvar membro:', err)
+    console.error('[StaffFormModal] Falha ao salvar membro')
     errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao salvar dados do membro.'
   } finally {
     isSubmitting.value = false

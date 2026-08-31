@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { CrmAppointmentSummary } from '~/types/crmAppointments'
+import type { CrmAppointmentSummary, CrmAppointmentDetail } from '~/types/crmAppointments'
 import AppointmentCreateModal from '~/components/admin/agenda/AppointmentCreateModal.vue'
 import AppointmentDetailSheet from '~/components/admin/agenda/AppointmentDetailSheet.vue'
+import AppointmentEditModal from '~/components/admin/agenda/AppointmentEditModal.vue'
+import AppointmentRescheduleModal from '~/components/admin/agenda/AppointmentRescheduleModal.vue'
+import AppointmentCancelDialog from '~/components/admin/agenda/AppointmentCancelDialog.vue'
 import {
   formatDateRangeDisplay
 } from '~/utils/crmDateTime'
@@ -27,12 +30,16 @@ const limit = 20
 const offset = ref(0)
 const errorMessage = ref<string | null>(null)
 
+// Modais e Sheet
 const isCreateModalOpen = ref(false)
 const isDetailSheetOpen = ref(false)
-const selectedAppointmentDetail = ref<any | null>(null)
+const isEditModalOpen = ref(false)
+const isRescheduleModalOpen = ref(false)
+const isCancelDialogOpen = ref(false)
+const selectedAppointmentDetail = ref<CrmAppointmentDetail | null>(null)
 
 const { staffList, fetchStaff } = useCrmStaff()
-const { fetchAppointmentDetail } = useCrmAgenda()
+const { fetchAppointmentDetail, updateAppointmentStatus } = useCrmAgenda()
 
 const statusColors: Record<string, string> = {
   agendado: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
@@ -72,7 +79,7 @@ async function loadAppointments(reset = false) {
     hasMore.value = fetched.length === limit
     offset.value += fetched.length
   } catch (err: any) {
-    console.error('[WorkOrderAppointmentsSection] Erro ao carregar agendamentos:', err)
+    console.error('[WorkOrderAppointmentsSection] Falha ao carregar agendamentos')
     errorMessage.value = err?.data?.statusMessage || err?.data?.message || err?.message || 'Falha ao carregar histórico de agendamentos.'
   } finally {
     isLoading.value = false
@@ -88,7 +95,20 @@ async function handleOpenDetail(appt: CrmAppointmentSummary) {
   }
 }
 
-function handleAppointmentCreated() {
+async function handleAdvanceStatus(nextStatus: string) {
+  if (!selectedAppointmentDetail.value) return
+  const res = await updateAppointmentStatus(selectedAppointmentDetail.value.id, {
+    status: nextStatus as any,
+    expected_appointment_updated_at: selectedAppointmentDetail.value.updated_at
+  })
+  if (res.success) {
+    isDetailSheetOpen.value = false
+    await loadAppointments(true)
+    emit('appointmentsChanged')
+  }
+}
+
+function handleMutationCompleted() {
   loadAppointments(true)
   emit('appointmentsChanged')
 }
@@ -96,7 +116,7 @@ function handleAppointmentCreated() {
 onMounted(async () => {
   await Promise.all([
     loadAppointments(true),
-    fetchStaff({ isActive: true })
+    fetchStaff() // ACTIVE_AND_HISTORICAL
   ])
 })
 </script>
@@ -192,7 +212,7 @@ onMounted(async () => {
 
               <span v-if="appt.address" class="flex items-center gap-1 truncate">
                 <Icon name="lucide:map-pin" class="w-3.5 h-3.5 text-slate-500" />
-                <span class="truncate">{{ appt.address.logradouro }}, {{ appt.address.numero }}</span>
+                <span class="truncate">{{ appt.address.rotulo || appt.address.bairro || 'Endereço vinculado' }}</span>
               </span>
             </div>
           </div>
@@ -228,16 +248,39 @@ onMounted(async () => {
       :staff-list="staffList"
       :preselected-work-order-id="workOrderId"
       @close="isCreateModalOpen = false"
-      @appointment-created="handleAppointmentCreated"
+      @appointment-created="handleMutationCompleted"
     />
 
     <AppointmentDetailSheet
       :is-open="isDetailSheetOpen"
       :appointment="selectedAppointmentDetail"
       @close="isDetailSheetOpen = false"
-      @open-edit="isDetailSheetOpen = false"
-      @open-reschedule="isDetailSheetOpen = false"
-      @open-cancel="isDetailSheetOpen = false"
+      @open-edit="isEditModalOpen = true"
+      @open-reschedule="isRescheduleModalOpen = true"
+      @open-cancel="isCancelDialogOpen = true"
+      @update-status="handleAdvanceStatus"
+    />
+
+    <AppointmentEditModal
+      :is-open="isEditModalOpen"
+      :appointment="selectedAppointmentDetail"
+      :staff-list="staffList"
+      @close="isEditModalOpen = false"
+      @appointment-updated="isDetailSheetOpen = false; handleMutationCompleted()"
+    />
+
+    <AppointmentRescheduleModal
+      :is-open="isRescheduleModalOpen"
+      :appointment="selectedAppointmentDetail"
+      @close="isRescheduleModalOpen = false"
+      @rescheduled="isDetailSheetOpen = false; handleMutationCompleted()"
+    />
+
+    <AppointmentCancelDialog
+      :is-open="isCancelDialogOpen"
+      :appointment="selectedAppointmentDetail"
+      @close="isCancelDialogOpen = false"
+      @cancelled="isDetailSheetOpen = false; handleMutationCompleted()"
     />
   </div>
 </template>

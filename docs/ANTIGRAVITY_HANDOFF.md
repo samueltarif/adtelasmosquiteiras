@@ -42,18 +42,42 @@
 
 ## 3. Próxima Etapa de Desenvolvimento
 
-- **Próxima Fase**: `NEXT_PHASE=5.0C`
-- **Nome da Fase**: **FASE 5.0C — Nitro BFF + Types + Data Prevista Guards**
-- **Status Inicial**: `PRONTA PARA INÍCIO / EM PROGRESSO CONFORME COMANDOS DO USUÁRIO`
-- **Objetivos Exclusivos da Fase 5.0C**:
-  1. Tipos TypeScript canônicos do módulo Agenda/Equipe (`app/types/crmAppointments.ts`, `server/shared/appointmentTypes.ts`);
-  2. Implementação e roteamento dos 12 endpoints Nitro BFF aprovados;
-  3. Integração server-side com as 5 RPCs da Migration 012;
-  4. Mapeamento centralizado de erros de domínio e SQLSTATEs (`server/utils/crmAppointmentErrors.ts`);
-  5. Proteção e bloqueio dos fluxos legados de escrita em `work_orders.data_prevista` e transições manuais de status;
-  6. Testes automatizados backend/API em PostgreSQL 17 local (`scripts/test_crm_phase5_backend.mjs`);
-  7. Documentação técnica (`docs/CRM_PHASE_5_IMPLEMENTATION.md`).
-- **PROIBIÇÃO DA FASE 5.0C**: **NÃO** implementar componentes visuais Vue, páginas de admin (`/admin/agenda`, `/admin/equipe`), visualizador de calendário ou drag & drop nesta fase.
+- **Fase Atual**: `PHASE=5.0D.9`
+- **Nome da Fase**: **FASE 5.0D — Interface Administrativa (Agenda, Equipe & Integração com Ordens de Serviço — Final Touch Audit Evidence Hardening [Canonical 44x44])**
+- **Status da Fase 5.0C**: `PHASE_5_0C_STATUS=COMPLETE_VALIDATED`
+- **Status da Fase 5.0D**: `PHASE_5_0D_STATUS=COMPLETE_VALIDATED_READY_FOR_DEPLOY`
+- **Plano de Implementação Canônico**: `implementation_plan.md` (raiz do repositório). Em caso de divergência com qualquer outro documento, o `implementation_plan.md` prevalece.
+- **Objetivos Cumpridos da Fase 5.0D & Patch 5.0D.9**:
+  1. Módulo de Agenda (`/admin/agenda`): visões Mês, Semana, Dia, Lista, navegação temporal, "Hoje", filtros estruturados, timezone `America/Sao_Paulo`;
+  2. Módulo de Equipe (`/admin/equipe`): listagem, cadastro, edição e desativação lógica sem `DELETE` físico (`aria-labelledby="staff-deactivate-title"` verificado), com links de telefone (`tel:`) e email (`mailto:`) em cards mobile atendendo $\ge 44\times 44\text{px}$ (`STAFF_PHONE_EMAIL_TOUCH_TARGET=PASS`);
+  3. Integração de OS (`/admin/ordens-servico/:id`): navegação e auditoria física em todas as 7 abas operacionais (Geral, Itens, Orçamentos, Mídias, Notas, Agendamentos, Histórico) com `WORK_ORDER_ALL_TABS_TOUCH_AUDITED=YES`;
+  4. Alinhamento da UI legada: remoção de input e envio de `data_prevista` em `nova.vue`, `WorkOrderGeneralEditModal.vue` e `LeadConversionModal.vue`;
+  5. Bloqueio de transição manual para `agendada` em `WorkOrderStatusModal.vue` com orientação e CTA para Agenda;
+  6. `WORK_ORDER_DATA_PREVISTA_AUTHORITY=APPOINTMENT_INSTALLATION_SCHEDULE`;
+  7. `DATA_PREVISTA_UI_LEGACY_MUTATIONS=0` e `MANUAL_AGENDADA_UI_MUTATIONS=0`;
+  8. Acessibilidade, Focus Trap e Restauração Exata de Foco em 100% dos 10 modais/sheets com suporte a pilha de modais (`useModalA11y.ts`, `role="dialog"`, `aria-modal="true"`, `MODAL_FOCUS_RESTORE_EXACT_TRIGGER=PASS`);
+  9. Responsividade auditada em 10 viewports (320, 360, 375, 390, 412, 430, 768, 1024, 1280, 1920) em 11 rotas operacionais e públicas (`/admin/agenda`, `/admin/equipe`, `/admin/ordens-servico`, `/admin/ordens-servico/nova`, `/admin/ordens-servico/:id`, `/admin/leads`, `/admin/galeria`, `/admin/clientes`, `/admin/clientes/:id`, `/contato`, `/orcamento`) com `ZERO_HORIZONTAL_OVERFLOW=PASS` e `OVERFLOW_X_HIDDEN_BANDAID_COUNT=0`;
+  10. Auditoria Dinâmica Real de Touch Targets ($\ge 44\times 44\text{px}$ canônico, `width >= 43.5 && height >= 43.5`): medição física via Playwright `boundingBox` com gate estrito `TOUCH_TARGET_REQUIRED_EXPECTED_COUNT=484`, `FOUND=484`, `MEASURED=484`, `PASS=484`, `FAIL=0`, `TOUCH_TARGET_UNDER_44_COUNT=0` e `TOUCH_TARGET_MIN_44PX=PASS`;
+  11. Scanner dinâmico DOM complementar cobrindo `button, a[href], input, select, textarea, [role="button"], [role="link"], [tabindex="0"]` com 0 violações;
+  12. Estados profundos obrigatórios auditados: ClientAddressManager modal, LeadJourneyDrawer, MediaLightbox, MediaUploader com arquivo, botão X limpar pesquisa de clientes, Staff tel/mailto, OS todas as 7 abas, Agenda visões Mês/Semana/Dia/Lista;
+  13. `PHOTO_UPLOADER_RUNTIME_RELEASE_USAGE=NO`;
+  14. Auditoria global de controles interativos não aninhados em todas as rotas operacionais e estados profundos (`NESTED_INTERACTIVE_CONTROLS=0`);
+  15. Normalização canônica de telefone e WhatsApp via `app/utils/phone.ts` com suporte a DDD 55 sem duplicar DDI (`BRAZIL_DDD_55_NORMALIZATION=PASS`, `DDD55_WORK_ORDER_CARD_LINK=PASS`);
+  16. Data civil `data_prevista` tratada exclusivamente com `formatDateOnly()` (`DATA_PREVISTA_DATE_ONLY_ALL_CONSUMERS=PASS`);
+  17. Zero logging de objetos de erro brutos no cliente (`CLIENT_SIDE_RAW_ERROR_OBJECT_LOGGING=0`);
+  18. Limites de tamanho de código respeitados: `APPLICATION_LOGIC_FILES_OVER_200_LINES=0`, `APPLICATION_CODE_FILES_OVER_600_LINES=0`, `CODE_SIZE_POLICY=PASS`;
+  19. Testes automatizados executados e 100% aprovados:
+      - `node scripts/test_admin_ui_phase5d_browser.mjs` (663/663 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
+      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU, `100% PASS`);
+      - `node scripts/test_crm_phase5c1_bff.mjs` (49/49 ASSERTS PASSOU, `100% PASS`);
+      - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU, `100% PASS`);
+      - `node scripts/audit_git_diff_loc.mjs` (`APPLICATION_LOGIC_FILES_OVER_200=0`, `PASS`);
+      - `node scripts/scan_raw_logs.js` (`RAW LOGS COUNT=0`, `PASS`);
+      - `npm run build` (`BUILD STATUS = PASS`, exit code 0).
+      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU);
+      - `node scripts/test_crm_phase5c1_bff.mjs` (49/49 ASSERTS PASSOU);
+      - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU);
+      - `node scripts/audit_git_diff_loc.mjs` (`CODE_SIZE_POLICY=PASS`).
 
 ---
 
@@ -61,8 +85,8 @@
 
 | # | Método | Rota | Descrição | Mecanismo / RPC |
 |---|---|---|---|---|
-| 1 | `GET` | `/api/admin/crm/appointments` | Consulta de calendário estruturada (máx 62 dias) | Select indexado + Joins |
-| 2 | `POST` | `/api/admin/crm/appointments/search` | Busca textual/PII transmitida no body com segurança | Body (`readBody`) + Joins |
+| 1 | `GET` | `/api/admin/crm/appointments` | Consulta de calendário estruturada (máx 62 dias, `CALENDAR_PII_MINIMIZATION=PASS`) | Select indexado + Joins |
+| 2 | `POST` | `/api/admin/crm/appointments/search` | Busca estruturada no body (`TEXT_Q_SEARCH_ENABLED=NO`, `SEARCH_PII_SEMANTICS=DEFERRED`) | Body (`readBody`) + Joins |
 | 3 | `POST` | `/api/admin/crm/appointments` | Criação atômica de agendamento | `create_appointment_atomic` |
 | 4 | `GET` | `/api/admin/crm/appointments/:id` | Detalhes do agendamento com histórico e relações | Select detalhado + relações |
 | 5 | `PATCH` | `/api/admin/crm/appointments/:id` | Edição não-temporal (staff, address, observações) | `update_appointment_atomic` |
@@ -73,6 +97,12 @@
 | 10 | `GET` | `/api/admin/crm/staff` | Listagem da equipe técnica com filtros | Select estruturado |
 | 11 | `POST` | `/api/admin/crm/staff` | Cadastro de membro da equipe (`is_active = true`) | Service role INSERT |
 | 12 | `PATCH` | `/api/admin/crm/staff/:id` | Atualização de dados da equipe | Service role PATCH + Trigger check |
+
+> [!NOTE]
+> **Semântica de Busca Textual / PII no BFF**:
+> - `TEXT_Q_SEARCH_ENABLED=NO`: A busca textual genérica com termo livre `q` está temporariamente desativada no BFF para prevenir sobrecarga e vazamento indevido de PII via query string.
+> - `SEARCH_PII_SEMANTICS=DEFERRED`: Filtros estruturados (`status`, `tipo`, `staffId`, `clientId`) são suportados e validados no body via POST.
+> - `SEARCH_PII_SAFE_DB_RPC_REQUIRED=YES`: Qualquer implementação futura de busca textual exigirá RPC segura com índices dedicados no banco.
 
 ---
 
@@ -166,26 +196,26 @@ Quando a fase de interface visual for iniciada, a implementação e os testes vi
 Ao retomar o projeto em uma nova sessão, os seguintes arquivos reais existentes no repositório devem ser consultados:
 
 ### Documentação e Governança
-1. [`docs/ANTIGRAVITY_HANDOFF.md`](file:///d:/sicons/ADT/docs/ANTIGRAVITY_HANDOFF.md) (Este documento);
-2. [`docs/CRM_PHASE_5_IMPLEMENTATION.md`](file:///d:/sicons/ADT/docs/CRM_PHASE_5_IMPLEMENTATION.md) (Especificação técnica completa dos endpoints, RPCs, errors e guards);
-3. [`implementation_plan.md`](file:///C:/Users/Vendas2/.gemini/antigravity-ide/brain/7064ca89-3739-4b4b-99aa-476634e7cae6/implementation_plan.md) (Evidências de execução de todas as fases).
+1. [`docs/ANTIGRAVITY_HANDOFF.md`](docs/ANTIGRAVITY_HANDOFF.md) (Este documento);
+2. [`docs/CRM_PHASE_5_IMPLEMENTATION.md`](docs/CRM_PHASE_5_IMPLEMENTATION.md) (Especificação técnica completa dos endpoints, RPCs, errors e guards);
+3. [`implementation_plan.md`](implementation_plan.md) (Evidências de execução de todas as fases).
 
 ### Banco de Dados / Migrations Canônicas
-4. [`supabase/manual/010_crm_core_tables.sql`](file:///d:/sicons/ADT/supabase/manual/010_crm_core_tables.sql) (Fase 4 — Baseline do CRM);
-5. [`supabase/manual/011_crm_work_order_proposals.sql`](file:///d:/sicons/ADT/supabase/manual/011_crm_work_order_proposals.sql) (Fase 4.5 — Motor de Propostas);
-6. [`supabase/manual/012_crm_appointments_and_staff_engine.sql`](file:///d:/sicons/ADT/supabase/manual/012_crm_appointments_and_staff_engine.sql) (Fase 5.0B — Motor de Agenda e Equipe Instalado).
+4. [`supabase/manual/010_crm_core_tables.sql`](supabase/manual/010_crm_core_tables.sql) (Fase 4 — Baseline do CRM);
+5. [`supabase/manual/011_crm_work_order_proposals.sql`](supabase/manual/011_crm_work_order_proposals.sql) (Fase 4.5 — Motor de Propostas);
+6. [`supabase/manual/012_crm_appointments_and_staff_engine.sql`](supabase/manual/012_crm_appointments_and_staff_engine.sql) (Fase 5.0B — Motor de Agenda e Equipe Instalado).
 
 ### Tipos, Utilitários e Endpoints Backend
-7. [`app/types/crmAppointments.ts`](file:///d:/sicons/ADT/app/types/crmAppointments.ts) (Types TypeScript canônicos);
-8. [`server/shared/appointmentValidation.mjs`](file:///d:/sicons/ADT/server/shared/appointmentValidation.mjs) (Regras de validação);
-9. [`server/utils/crmAppointmentErrors.ts`](file:///d:/sicons/ADT/server/utils/crmAppointmentErrors.ts) (Mapeador central de erros HTTP/RPC);
-10. [`server/utils/crmAppointmentHelpers.ts`](file:///d:/sicons/ADT/server/utils/crmAppointmentHelpers.ts) (Helpers de consulta da agenda);
-11. [`server/utils/adminAuth.ts`](file:///d:/sicons/ADT/server/utils/adminAuth.ts) (Autenticação e CSRF de administradores);
-12. [`server/utils/crm.ts`](file:///d:/sicons/ADT/server/utils/crm.ts) (Utilitários compartilhados do CRM e Activity Log).
+7. [`app/types/crmAppointments.ts`](app/types/crmAppointments.ts) (Types TypeScript canônicos);
+8. [`server/shared/appointmentValidation.mjs`](server/shared/appointmentValidation.mjs) (Regras de validação);
+9. [`server/utils/crmAppointmentErrors.ts`](server/utils/crmAppointmentErrors.ts) (Mapeador central de erros HTTP/RPC);
+10. [`server/utils/crmAppointmentHelpers.ts`](server/utils/crmAppointmentHelpers.ts) (Helpers de consulta da agenda);
+11. [`server/utils/adminAuth.ts`](server/utils/adminAuth.ts) (Autenticação e CSRF de administradores);
+12. [`server/utils/crm.ts`](server/utils/crm.ts) (Utilitários compartilhados do CRM e Activity Log).
 
 ### Scripts de Teste e Validação
-13. [`scripts/test_crm_phase5_backend.mjs`](file:///d:/sicons/ADT/scripts/test_crm_phase5_backend.mjs) (Suíte de testes locais da Fase 5.0C);
-14. [`scripts/postflight_production_012_read_only.mjs`](file:///d:/sicons/ADT/scripts/postflight_production_012_read_only.mjs) (Auditoria read-only em produção).
+13. [`scripts/test_crm_phase5c1_bff.mjs`](scripts/test_crm_phase5c1_bff.mjs) (Suíte de testes locais da Fase 5.0C);
+14. [`scripts/postflight_production_012_read_only.mjs`](scripts/postflight_production_012_read_only.mjs) (Auditoria read-only em produção).
 
 ---
 
@@ -193,10 +223,11 @@ Ao retomar o projeto em uma nova sessão, os seguintes arquivos reais existentes
 
 > [!IMPORTANT]
 > **ANTES DE ESCREVER CÓDIGO EM UMA NOVA SESSÃO DO ANTIGRAVITY:**
-> 1. Ler integralmente [`docs/ANTIGRAVITY_HANDOFF.md`](file:///d:/sicons/ADT/docs/ANTIGRAVITY_HANDOFF.md);
-> 2. Ler [`implementation_plan.md`](file:///C:/Users/Vendas2/.gemini/antigravity-ide/brain/7064ca89-3739-4b4b-99aa-476634e7cae6/implementation_plan.md);
-> 3. Auditar o estado real do repository;
+> 1. Ler integralmente [`docs/ANTIGRAVITY_HANDOFF.md`](docs/ANTIGRAVITY_HANDOFF.md);
+> 2. Ler [`implementation_plan.md`](implementation_plan.md);
+> 3. Auditar o estado real do repositório;
 > 4. Confirmar que a **Migration 012 já está instalada** em produção e **NÃO DEVE ser reaplicada**;
 > 5. Resumir o estado atual do projeto de forma concisa;
 > 6. Confirmar qual é a próxima etapa autorizada pelo usuário (e.g., Fase 5.0D para UI ou validação de 5.0C);
 > 7. Somente então iniciar alterações após comando explícito do usuário.
+

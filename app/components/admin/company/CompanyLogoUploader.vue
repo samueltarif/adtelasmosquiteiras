@@ -80,7 +80,7 @@ async function handleFileSelected(event: Event) {
       emit('updated', finRes.profile.logo_url)
     }
   } catch (err: any) {
-    console.error('[CompanyLogoUploader] Erro:', err)
+    console.error('[CompanyLogoUploader] Erro no upload')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao enviar a nova logo.'
   } finally {
     isUploading.value = false
@@ -102,7 +102,7 @@ async function handleRestoreDefault() {
       emit('updated', res.profile.logo_url)
     }
   } catch (err: any) {
-    console.error('[CompanyLogoUploader] Erro ao restaurar padrão:', err)
+    console.error('[CompanyLogoUploader] Erro ao restaurar padrão')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao restaurar logo padrão.'
   } finally {
     isRestoring.value = false

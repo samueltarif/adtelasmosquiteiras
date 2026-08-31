@@ -11,6 +11,8 @@ import WorkOrderMediaUploader from '~/components/admin/work-orders/WorkOrderMedi
 import WorkOrderMediaGallery from '~/components/admin/work-orders/WorkOrderMediaGallery.vue'
 import WorkOrderNotesManager from '~/components/admin/work-orders/WorkOrderNotesManager.vue'
 import WorkOrderActivityTimeline from '~/components/admin/work-orders/WorkOrderActivityTimeline.vue'
+import WorkOrderAppointmentsSection from '~/components/admin/work-orders/WorkOrderAppointmentsSection.vue'
+import { formatDateOnly } from '~/utils/crmDateTime'
 
 definePageMeta({
   layout: 'admin'
@@ -29,7 +31,7 @@ const isItemsLoading = ref(false)
 const isMediaLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
-const activeTab = ref<'geral' | 'itens' | 'orcamentos' | 'midias' | 'notas' | 'historico'>('geral')
+const activeTab = ref<'geral' | 'itens' | 'orcamentos' | 'midias' | 'notas' | 'agendamentos' | 'historico'>('geral')
 
 const isStatusModalOpen = ref(false)
 const isEditModalOpen = ref(false)
@@ -50,7 +52,7 @@ async function fetchWorkOrder() {
       errorMessage.value = 'Ordem de serviço não encontrada.'
     }
   } catch (err: any) {
-    console.error('[WorkOrderDetailPage] Erro ao carregar OS:', err)
+    console.error('[WorkOrderDetailPage] Falha ao carregar OS')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao carregar dados da ordem de serviço.'
   } finally {
     isLoading.value = false
@@ -63,7 +65,7 @@ async function fetchItems() {
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${workOrderId}/items`)
     items.value = res?.items || []
   } catch (err) {
-    console.error('[WorkOrderDetailPage] Erro ao carregar itens:', err)
+    console.error('[WorkOrderDetailPage] Falha ao carregar itens')
   } finally {
     isItemsLoading.value = false
   }
@@ -75,7 +77,7 @@ async function fetchMedia() {
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${workOrderId}/media`)
     media.value = res?.media || []
   } catch (err) {
-    console.error('[WorkOrderDetailPage] Erro ao carregar mídias:', err)
+    console.error('[WorkOrderDetailPage] Falha ao carregar mídias')
   } finally {
     isMediaLoading.value = false
   }
@@ -113,8 +115,7 @@ function handleArchiveUpdated(isArchived: boolean) {
 }
 
 function formatDate(iso?: string | null) {
-  if (!iso) return '-'
-  return new Date(iso).toLocaleDateString('pt-BR')
+  return formatDateOnly(iso)
 }
 
 function formatCurrency(val?: number | string | null) {
@@ -197,6 +198,15 @@ onMounted(() => {
         </button>
 
         <button
+          @click="activeTab = 'agendamentos'"
+          class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer min-h-[44px]"
+          :class="activeTab === 'agendamentos' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:calendar" class="w-4 h-4" />
+          <span>Agendamentos</span>
+        </button>
+
+        <button
           @click="activeTab = 'historico'"
           class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer min-h-[44px]"
           :class="activeTab === 'historico' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'"
@@ -209,9 +219,9 @@ onMounted(() => {
       <!-- Conteúdo da Aba Ativa -->
       <div>
         <!-- 1. Aba Visão Geral -->
-        <div v-if="activeTab === 'geral'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div v-if="activeTab === 'geral'" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <!-- Card Cliente e Local -->
-          <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-lg space-y-4">
+          <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 sm:p-5 shadow-lg space-y-4">
             <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <Icon name="lucide:user" class="w-4 h-4 text-indigo-400" />
               <span>Cliente & Local de Atendimento</span>
@@ -244,13 +254,13 @@ onMounted(() => {
           </div>
 
           <!-- Card Dados Operacionais e Financeiros -->
-          <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-lg space-y-4">
+          <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 sm:p-5 shadow-lg space-y-4">
             <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <Icon name="lucide:info" class="w-4 h-4 text-indigo-400" />
               <span>Programação & Totais</span>
             </h3>
 
-            <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <span class="text-slate-500 block">Responsável Técnico:</span>
                 <span class="font-medium text-white">{{ workOrder.responsible?.nome || 'Não atribuído' }}</span>
@@ -273,7 +283,7 @@ onMounted(() => {
             </div>
 
             <!-- Resumo Financeiro -->
-            <div class="pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-xs">
+            <div class="pt-3 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
               <div class="p-2.5 rounded-xl bg-slate-800/60 border border-white/5">
                 <span class="text-slate-400 block text-[10px] uppercase font-bold">Subtotal</span>
                 <span class="font-semibold text-white">{{ formatCurrency(workOrder.valor_total) }}</span>
@@ -341,14 +351,24 @@ onMounted(() => {
           />
         </div>
 
-        <!-- 4. Aba Anotações Internas -->
+        <!-- 5. Aba Anotações Internas -->
         <div v-else-if="activeTab === 'notas'">
           <WorkOrderNotesManager
             :work-order-id="workOrderId"
           />
         </div>
 
-        <!-- 5. Aba Histórico / Timeline -->
+        <!-- 6. Aba Agendamentos & Compromissos -->
+        <div v-else-if="activeTab === 'agendamentos'">
+          <WorkOrderAppointmentsSection
+            :work-order-id="workOrderId"
+            :work-order-status="workOrder.status_os"
+            :is-archived="workOrder.is_archived"
+            @appointments-changed="fetchWorkOrder"
+          />
+        </div>
+
+        <!-- 7. Aba Histórico / Timeline -->
         <div v-else-if="activeTab === 'historico'">
           <WorkOrderActivityTimeline
             :work-order-id="workOrderId"
@@ -362,6 +382,7 @@ onMounted(() => {
         :work-order="workOrder"
         @close="isStatusModalOpen = false"
         @status-updated="handleStatusUpdated"
+        @open-schedule="activeTab = 'agendamentos'; isStatusModalOpen = false"
       />
 
       <WorkOrderGeneralEditModal

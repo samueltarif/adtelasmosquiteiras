@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 import type { CrmAppointmentDetail } from '~/types/crmAppointments'
 import {
-  formatAppointmentDate,
-  formatAppointmentTime,
   formatDateRangeDisplay
 } from '~/utils/crmDateTime'
+import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
   isOpen: boolean
@@ -20,6 +19,8 @@ const emit = defineEmits<{
   (e: 'openCancel'): void
   (e: 'updateStatus', nextStatus: string): void
 }>()
+
+useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
 const statusColors: Record<string, string> = {
   agendado: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
@@ -56,25 +57,23 @@ const isArchivedWo = computed(() => {
   return props.appointment?.work_order?.is_archived === true
 })
 
-// Emenda 3: Next valid status transitions supported by Migration 012
+// Next valid status transition supported by Migration 012 and UI specs
 const nextValidStatuses = computed(() => {
   if (!props.appointment || isTerminal.value || isArchivedWo.value) return []
   const current = props.appointment.status_agendamento
   if (current === 'agendado') {
     return [
-      { status: 'confirmado', label: 'Confirmar Agendamento', icon: 'lucide:check' },
-      { status: 'em_deslocamento', label: 'Em Deslocamento', icon: 'lucide:truck' }
+      { status: 'confirmado', label: 'Confirmar Agendamento', icon: 'lucide:check' }
     ]
   }
   if (current === 'confirmado') {
     return [
-      { status: 'em_deslocamento', label: 'Em Deslocamento', icon: 'lucide:truck' },
-      { status: 'realizado', label: 'Marcar Realizado', icon: 'lucide:check-circle' }
+      { status: 'em_deslocamento', label: 'Em Deslocamento', icon: 'lucide:truck' }
     ]
   }
   if (current === 'em_deslocamento') {
     return [
-      { status: 'realizado', label: 'Marcar Realizado', icon: 'lucide:check-circle' }
+      { status: 'realizado', label: 'Marcar como Realizado', icon: 'lucide:check-circle' }
     ]
   }
   return []
@@ -82,7 +81,11 @@ const nextValidStatuses = computed(() => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-sm transition-opacity">
+  <div
+    v-if="isOpen"
+    class="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-sm transition-opacity"
+    @click.self="emit('close')"
+  >
     <div
       class="w-full max-w-lg bg-slate-900 border-l border-white/10 shadow-2xl h-full flex flex-col overflow-y-auto"
       role="dialog"
@@ -92,7 +95,7 @@ const nextValidStatuses = computed(() => {
       <!-- Header do Sheet -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur-md z-10">
         <div class="space-y-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Detalhes do Agendamento</span>
+          <span id="detail-title" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Detalhes do Agendamento</span>
           <h2 id="sheet-title" class="text-lg font-bold text-white flex items-center gap-2">
             <span>{{ appointment ? (tipoLabels[appointment.tipo_agendamento] || appointment.tipo_agendamento) : 'Carregando...' }}</span>
           </h2>
@@ -175,10 +178,10 @@ const nextValidStatuses = computed(() => {
           <div class="pt-2 border-t border-white/5">
             <span class="text-slate-500 block text-[11px]">Cliente:</span>
             <span class="font-bold text-white text-sm block mt-0.5">
-              {{ appointment.work_order?.client?.nome || '-' }}
+              {{ appointment.client?.nome || '-' }}
             </span>
-            <span v-if="appointment.work_order?.client?.telefone_principal" class="text-slate-400 text-[11px] block mt-0.5">
-              Tel: {{ appointment.work_order.client.telefone_principal }}
+            <span v-if="appointment.client?.telefone_principal" class="text-slate-400 text-[11px] block mt-0.5">
+              Tel: {{ appointment.client.telefone_principal }}
             </span>
           </div>
         </div>
@@ -194,7 +197,6 @@ const nextValidStatuses = computed(() => {
             <span class="font-bold text-white block">{{ appointment.address.rotulo || 'Endereço Principal' }}</span>
             <p>{{ appointment.address.logradouro }}, {{ appointment.address.numero }} <span v-if="appointment.address.complemento">({{ appointment.address.complemento }})</span></p>
             <p class="text-slate-400">{{ appointment.address.bairro }} - {{ appointment.address.cidade }}/{{ appointment.address.uf }}</p>
-            <p v-if="appointment.address.cep" class="text-slate-500 font-mono text-[11px]">CEP: {{ appointment.address.cep }}</p>
           </div>
           <p v-else class="text-slate-500 italic pt-1">Nenhum endereço específico vinculado.</p>
         </div>
@@ -211,9 +213,6 @@ const nextValidStatuses = computed(() => {
               <span class="font-bold text-white block">{{ appointment.staff.nome }}</span>
               <span class="text-[11px] text-slate-400">{{ appointment.staff.funcao }}</span>
             </div>
-            <span v-if="appointment.staff.is_active" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Ativo
-            </span>
           </div>
           <p v-else class="text-slate-500 italic pt-1">Nenhum técnico atribuído a este compromisso.</p>
         </div>
@@ -224,29 +223,27 @@ const nextValidStatuses = computed(() => {
           <p class="text-slate-200 whitespace-pre-wrap leading-relaxed">{{ appointment.observacoes }}</p>
         </div>
 
-        <!-- Histórico de Reagendamento se houver -->
-        <div v-if="appointment.motivo_reagendamento" class="rounded-2xl border border-purple-500/20 bg-purple-950/20 p-4 space-y-2 text-xs">
-          <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Icon name="lucide:history" class="w-4 h-4" />
-            <span>Motivo do Reagendamento</span>
+        <!-- Motivo Canônico Contextualizado (Reagendamento ou Cancelamento) -->
+        <div
+          v-if="appointment.motivo_reagendamento_cancelamento"
+          class="rounded-2xl border p-4 space-y-2 text-xs"
+          :class="appointment.status_agendamento === 'reagendado' ? 'border-purple-500/20 bg-purple-950/20' : 'border-rose-500/20 bg-rose-950/20'"
+        >
+          <h3
+            class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
+            :class="appointment.status_agendamento === 'reagendado' ? 'text-purple-300' : 'text-rose-300'"
+          >
+            <Icon :name="appointment.status_agendamento === 'reagendado' ? 'lucide:history' : 'lucide:x-circle'" class="w-4 h-4" />
+            <span>{{ appointment.status_agendamento === 'reagendado' ? 'Motivo do Reagendamento' : (appointment.status_agendamento === 'cancelado' ? 'Motivo do Cancelamento' : 'Motivo Registrado') }}</span>
           </h3>
-          <p class="text-slate-200">{{ appointment.motivo_reagendamento }}</p>
-        </div>
-
-        <!-- Motivo de Cancelamento se houver -->
-        <div v-if="appointment.motivo_cancelamento" class="rounded-2xl border border-rose-500/20 bg-rose-950/20 p-4 space-y-2 text-xs">
-          <h3 class="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Icon name="lucide:x-circle" class="w-4 h-4" />
-            <span>Motivo do Cancelamento</span>
-          </h3>
-          <p class="text-slate-200">{{ appointment.motivo_cancelamento }}</p>
+          <p class="text-slate-200 whitespace-pre-wrap leading-relaxed">{{ appointment.motivo_reagendamento_cancelamento }}</p>
         </div>
       </div>
 
       <!-- Barra de Ações Inferior -->
       <div v-if="appointment && !isTerminal" class="p-6 border-t border-white/10 bg-slate-900/95 sticky bottom-0 space-y-3">
         <!-- Próximas Transições de Status -->
-        <div v-if="nextValidStatuses.length > 0" class="space-y-2">
+        <div v-if="nextValidStatuses.length > 0 && !isArchivedWo" class="space-y-2">
           <span class="text-[11px] text-slate-400 font-semibold block">Avançar Status:</span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button

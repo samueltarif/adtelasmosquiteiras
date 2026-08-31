@@ -62,7 +62,7 @@ async function handleDelete(mId: string) {
     })
     emit('measurementsChanged')
   } catch (err: any) {
-    console.error('[MeasurementsTable] Erro ao deletar vão:', err)
+    console.error('[MeasurementsTable] Falha ao deletar vão')
     alert(err?.data?.message || 'Falha ao excluir medição')
   } finally {
     isDeletingId.value = null
@@ -84,7 +84,7 @@ async function handleDelete(mId: string) {
         v-if="!isLocked"
         type="button"
         @click="openCreateModal"
-        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-all cursor-pointer min-h-[36px]"
+        class="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 text-xs font-semibold transition-all cursor-pointer min-h-[44px]"
       >
         <Icon name="lucide:plus" class="w-3.5 h-3.5" />
         <span>Adicionar Vão</span>
@@ -136,7 +136,7 @@ async function handleDelete(mId: string) {
               <button
                 type="button"
                 @click="duplicateMeasurement(m)"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-white/5 transition-all cursor-pointer min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-indigo-400 hover:bg-white/5 transition-all cursor-pointer min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                 title="Duplicar Vão"
               >
                 <Icon name="lucide:copy" class="w-3.5 h-3.5" />
@@ -145,7 +145,7 @@ async function handleDelete(mId: string) {
               <button
                 type="button"
                 @click="openEditModal(m)"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all cursor-pointer min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                 title="Editar Vão"
               >
                 <Icon name="lucide:edit" class="w-3.5 h-3.5" />
@@ -155,7 +155,7 @@ async function handleDelete(mId: string) {
                 type="button"
                 :disabled="isDeletingId === m.id"
                 @click="handleDelete(m.id)"
-                class="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
                 title="Excluir Vão"
               >
                 <Icon v-if="isDeletingId === m.id" name="lucide:loader-2" class="w-3.5 h-3.5 animate-spin" />

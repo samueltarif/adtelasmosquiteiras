@@ -13,12 +13,12 @@
         </div>
         
         <!-- Links Legais -->
-        <div class="flex justify-center gap-4 mt-4 text-xs opacity-70">
-          <a href="/termos-de-uso.html" target="_blank" class="hover:opacity-100 transition-opacity">
+        <div class="flex justify-center items-center gap-2 mt-4 text-xs opacity-70">
+          <a href="/termos-de-uso.html" target="_blank" class="hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-3">
             Termos de Uso
           </a>
           <span>|</span>
-          <a href="/politica-de-privacidade.html" target="_blank" class="hover:opacity-100 transition-opacity">
+          <a href="/politica-de-privacidade.html" target="_blank" class="hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-3">
             Política de Privacidade
           </a>
         </div>

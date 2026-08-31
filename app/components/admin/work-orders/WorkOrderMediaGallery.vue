@@ -65,7 +65,7 @@ async function openLightbox(m: any) {
       activeLightboxUrl.value = res.signedUrl
     }
   } catch (err: any) {
-    console.error('[WorkOrderMediaGallery] Erro ao obter signed URL:', err)
+    console.error('[WorkOrderMediaGallery] Falha ao obter signed URL')
     alert('Falha ao obter URL de visualização da mídia')
     isLightboxOpen.value = false
   } finally {
@@ -93,7 +93,7 @@ async function handleDelete(m: any) {
     })
     emit('mediaChanged')
   } catch (err: any) {
-    console.error('[WorkOrderMediaGallery] Erro ao excluir mídia:', err)
+    console.error('[WorkOrderMediaGallery] Falha ao excluir mídia')
     alert(err?.data?.message || 'Falha ao excluir mídia')
   } finally {
     isDeletingId.value = null
@@ -115,7 +115,7 @@ function formatDate(iso?: string) {
         :key="t"
         type="button"
         @click="activeTab = t"
-        class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer min-h-[40px]"
+        class="px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer min-h-[44px]"
         :class="activeTab === t ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'"
       >
         <span>{{ t === 'todas' ? 'Todas as Mídias' : etapaLabels[t]?.label || t }}</span>
@@ -190,7 +190,7 @@ function formatDate(iso?: string) {
             <button
               type="button"
               @click="openLightbox(m)"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all min-h-[32px] min-w-[32px] flex items-center justify-center cursor-pointer"
+              class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
               title="Visualizar / Download"
             >
               <Icon name="lucide:eye" class="w-4 h-4" />
@@ -199,7 +199,7 @@ function formatDate(iso?: string) {
             <button
               type="button"
               @click="openEdit(m)"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all min-h-[32px] min-w-[32px] flex items-center justify-center cursor-pointer"
+              class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
               title="Editar Metadados"
             >
               <Icon name="lucide:edit" class="w-4 h-4" />
@@ -209,7 +209,7 @@ function formatDate(iso?: string) {
               type="button"
               :disabled="isDeletingId === m.id"
               @click="handleDelete(m)"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all min-h-[32px] min-w-[32px] flex items-center justify-center cursor-pointer"
+              class="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
               title="Excluir Mídia"
             >
               <Icon v-if="isDeletingId === m.id" name="lucide:loader-2" class="w-4 h-4 animate-spin" />
@@ -248,14 +248,14 @@ function formatDate(iso?: string) {
               :href="activeLightboxUrl"
               target="_blank"
               download
-              class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-semibold border border-indigo-500/20 flex items-center gap-1.5 transition-all min-h-[36px]"
+              class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-400 text-xs font-semibold border border-indigo-500/20 flex items-center gap-1.5 transition-all min-h-[44px]"
             >
               <Icon name="lucide:download" class="w-4 h-4" />
               <span>Baixar</span>
             </a>
             <button
               @click="closeLightbox"
-              class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
+              class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
             >
               <Icon name="lucide:x" class="w-5 h-5" />
             </button>

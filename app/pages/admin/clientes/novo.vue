@@ -53,7 +53,7 @@ async function handleCreateClient(overrideDuplicate = false) {
       router.push(`/admin/clientes/${res.client.id}`)
     }
   } catch (err: any) {
-    console.error('[ClientsNovo] Erro ao cadastrar cliente:', err)
+    console.error('[ClientsNovo] Falha ao cadastrar cliente')
     const errData = err?.data?.data || err?.data || {}
     if (err?.statusCode === 409 && errData.code === 'POSSIBLE_DUPLICATE') {
       duplicateCandidates.value = errData.duplicates || []

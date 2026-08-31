@@ -67,6 +67,10 @@ export function getSupabaseHeaders(serviceRoleKey: string) {
   }
 }
 
+import { findDuplicateClients } from './crmDuplicateSearch.ts'
+
+export { findDuplicateClients }
+
 /**
  * Registra um evento de auditoria no crm_activity_log com minimização estrita de PII.
  */
@@ -105,67 +109,8 @@ export async function logCrmActivity(
       body: payload
     })
   } catch (err: any) {
-    console.error('[logCrmActivity] Erro ao gravar activity log:', err?.message || err)
-    // Não propaga para não quebrar a mutação principal, mas loga
-  }
-}
-
-/**
- * Busca possíveis duplicatas de clientes no banco por telefone, email ou CPF/CNPJ.
- */
-export async function findDuplicateClients(
-  config: SupabaseConfig,
-  criteria: {
-    telefone?: string | null
-    email?: string | null
-    cpfCnpj?: string | null
-    excludeClientId?: string | null
-  }
-): Promise<Array<{
-  id: string
-  nome: string
-  telefone_principal: string
-  email: string | null
-  cpf_cnpj: string | null
-  tipo_cliente: string
-  created_at: string
-}>> {
-  if (!config.url || !config.serviceRoleKey) return []
-
-  const conditions: string[] = []
-  const digitsPhone = normalizePhone(criteria.telefone || '')
-  if (digitsPhone && digitsPhone.length >= 8) {
-    // Busca por telefone com ilike ou eq
-    conditions.push(`telefone_principal.ilike.*${digitsPhone.slice(-8)}*`)
-  }
-
-  const cleanEmail = normalizeEmail(criteria.email || '')
-  if (cleanEmail) {
-    conditions.push(`email.eq.${cleanEmail}`)
-  }
-
-  const cleanDoc = normalizeCpfCnpj(criteria.cpfCnpj || '')
-  if (cleanDoc && cleanDoc.length >= 9) {
-    conditions.push(`cpf_cnpj.eq.${cleanDoc}`)
-  }
-
-  if (conditions.length === 0) return []
-
-  const orQuery = `or=(${conditions.join(',')})`
-  const selectQuery = `select=id,nome,telefone_principal,email,cpf_cnpj,tipo_cliente,created_at&${orQuery}&limit=5`
-
-  try {
-    const res = await $fetch<any[]>(`${config.url}/rest/v1/clients?${selectQuery}`, {
-      headers: getSupabaseHeaders(config.serviceRoleKey)
-    })
-
-    if (!Array.isArray(res)) return []
-    if (criteria.excludeClientId) {
-      return res.filter(c => c.id !== criteria.excludeClientId)
-    }
-    return res
-  } catch (err: any) {
-    console.error('[findDuplicateClients] Erro na busca de duplicatas:', err?.message || err)
-    return []
+    const status = err?.statusCode || err?.status || 'UNKNOWN'
+    console.error('[logCrmActivity] CRM_ACTIVITY_LOG_FAILED', { status })
+    // Não propaga para não quebrar a mutação principal, mas loga sem PII
   }
 }

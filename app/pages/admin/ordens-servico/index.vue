@@ -43,8 +43,8 @@ async function fetchSummary() {
     if (res?.summary) {
       summary.value = res.summary
     }
-  } catch (err: any) {
-    console.error('[WorkOrdersPage] Erro ao carregar sumário:', err)
+  } catch {
+    console.error('[WorkOrdersPage] Falha ao carregar sumário')
   } finally {
     isSummaryLoading.value = false
   }
@@ -93,7 +93,7 @@ async function fetchWorkOrders() {
       }
     }
   } catch (err: any) {
-    console.error('[WorkOrdersPage] Erro ao carregar OSs:', err)
+    console.error('[WorkOrdersPage] Falha ao carregar OSs')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao carregar ordens de serviço'
   } finally {
     isLoading.value = false
@@ -232,14 +232,14 @@ onMounted(() => {
         <button
           :disabled="page <= 1 || isLoading"
           @click="page--; fetchWorkOrders()"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white min-h-[40px] cursor-pointer transition-all"
+          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white min-h-[44px] cursor-pointer transition-all"
         >
           Anterior
         </button>
         <button
           :disabled="page >= totalPages || isLoading"
           @click="page++; fetchWorkOrders()"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white min-h-[40px] cursor-pointer transition-all"
+          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white min-h-[44px] cursor-pointer transition-all"
         >
           Próxima
         </button>

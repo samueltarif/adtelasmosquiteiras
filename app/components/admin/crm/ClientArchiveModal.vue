@@ -38,7 +38,7 @@ async function handleToggleArchive() {
       errorMessage.value = res?.message || 'Erro ao alterar estado de arquivamento.'
     }
   } catch (err: any) {
-    console.error('[ClientArchiveModal] Erro:', err)
+    console.error('[ClientArchiveModal] Erro ao alterar arquivamento')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao arquivar/reativar cliente.'
   } finally {
     isProcessing.value = false

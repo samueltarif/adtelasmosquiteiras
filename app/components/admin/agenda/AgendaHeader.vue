@@ -56,8 +56,13 @@ const headerTitle = computed(() => {
 function handleDateChange(e: Event) {
   const val = (e.target as HTMLInputElement).value
   if (!val) return
-  const [y, m, d] = val.split('-').map(Number)
-  emit('update:currentDate', new Date(Date.UTC(y, m - 1, d, 12, 0, 0)))
+  const parts = val.split('-').map(Number)
+  const y = parts[0]
+  const m = parts[1]
+  const d = parts[2]
+  if (typeof y === 'number' && typeof m === 'number' && typeof d === 'number') {
+    emit('update:currentDate', new Date(Date.UTC(y, m - 1, d, 12, 0, 0)))
+  }
 }
 </script>
 
@@ -94,29 +99,31 @@ function handleDateChange(e: Event) {
         </div>
 
         <!-- Seletor Rápido de Data -->
-        <div class="relative flex items-center">
+        <div class="relative flex items-center max-w-full">
           <input
             type="date"
             :value="getSaoPauloDateString(currentDate)"
             @change="handleDateChange"
             aria-label="Selecionar data específica"
-            class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
+            class="px-2.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer max-w-[130px] sm:max-w-none"
           />
         </div>
 
         <!-- Título do Período -->
-        <h2 class="text-sm sm:text-base font-bold text-white tracking-tight ml-1 truncate">
+        <h2 class="text-xs sm:text-base font-bold text-white tracking-tight ml-1 truncate max-w-full">
           {{ headerTitle }}
         </h2>
       </div>
 
       <!-- Modos de Visualização & Botão Novo Agendamento -->
-      <div class="flex flex-wrap items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3 max-w-full">
         <!-- Seletor de Modo -->
-        <div class="flex items-center rounded-xl bg-slate-900/90 border border-white/10 p-1 shadow-sm">
+        <div class="flex items-center rounded-xl bg-slate-900/90 border border-white/10 p-0.5 sm:p-1 shadow-sm max-w-full overflow-x-auto">
           <button
             @click="emit('update:viewMode', 'semana')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[40px] flex items-center gap-1.5 cursor-pointer"
+            aria-label="Semana"
+            title="Semana"
+            class="px-3 py-2 rounded-lg text-xs font-semibold transition-all min-h-[44px] min-w-[44px] justify-center flex items-center gap-1.5 cursor-pointer"
             :class="viewMode === 'semana' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'"
           >
             <Icon name="lucide:grid" class="w-3.5 h-3.5" />
@@ -125,7 +132,9 @@ function handleDateChange(e: Event) {
 
           <button
             @click="emit('update:viewMode', 'dia')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[40px] flex items-center gap-1.5 cursor-pointer"
+            aria-label="Dia"
+            title="Dia"
+            class="px-3 py-2 rounded-lg text-xs font-semibold transition-all min-h-[44px] min-w-[44px] justify-center flex items-center gap-1.5 cursor-pointer"
             :class="viewMode === 'dia' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'"
           >
             <Icon name="lucide:calendar" class="w-3.5 h-3.5" />
@@ -134,7 +143,9 @@ function handleDateChange(e: Event) {
 
           <button
             @click="emit('update:viewMode', 'lista')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[40px] flex items-center gap-1.5 cursor-pointer"
+            aria-label="Lista"
+            title="Lista"
+            class="px-3 py-2 rounded-lg text-xs font-semibold transition-all min-h-[44px] min-w-[44px] justify-center flex items-center gap-1.5 cursor-pointer"
             :class="viewMode === 'lista' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'"
           >
             <Icon name="lucide:list" class="w-3.5 h-3.5" />
@@ -143,7 +154,9 @@ function handleDateChange(e: Event) {
 
           <button
             @click="emit('update:viewMode', 'mes')"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all min-h-[40px] flex items-center gap-1.5 cursor-pointer"
+            aria-label="Mês"
+            title="Mês"
+            class="px-3 py-2 rounded-lg text-xs font-semibold transition-all min-h-[44px] min-w-[44px] justify-center flex items-center gap-1.5 cursor-pointer"
             :class="viewMode === 'mes' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'"
           >
             <Icon name="lucide:calendar-range" class="w-3.5 h-3.5" />
@@ -165,12 +178,12 @@ function handleDateChange(e: Event) {
     <!-- Linha Inferior: Filtros Estruturados -->
     <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-white/5">
       <!-- Filtro Técnico -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 max-w-full">
         <label class="text-[11px] text-slate-400 font-medium">Técnico:</label>
         <select
           :value="selectedStaffId"
           @change="emit('update:selectedStaffId', ($event.target as HTMLSelectElement).value)"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
+          class="px-2 sm:px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer max-w-full"
         >
           <option value="">Todos os Técnicos</option>
           <option v-for="st in staffList" :key="st.id" :value="st.id">
@@ -180,12 +193,12 @@ function handleDateChange(e: Event) {
       </div>
 
       <!-- Filtro Tipo -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 max-w-full">
         <label class="text-[11px] text-slate-400 font-medium">Tipo:</label>
         <select
           :value="selectedTipo"
           @change="emit('update:selectedTipo', ($event.target as HTMLSelectElement).value)"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
+          class="px-2 sm:px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer max-w-full"
         >
           <option value="">Todos os Tipos</option>
           <option value="visita_tecnica">Visita Técnica</option>
@@ -197,12 +210,12 @@ function handleDateChange(e: Event) {
       </div>
 
       <!-- Filtro Status -->
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1.5 max-w-full">
         <label class="text-[11px] text-slate-400 font-medium">Status:</label>
         <select
           :value="selectedStatus"
           @change="emit('update:selectedStatus', ($event.target as HTMLSelectElement).value)"
-          class="px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer"
+          class="px-2 sm:px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-indigo-500 min-h-[44px] cursor-pointer max-w-full"
         >
           <option value="">Todos os Status</option>
           <option value="agendado">Agendado</option>

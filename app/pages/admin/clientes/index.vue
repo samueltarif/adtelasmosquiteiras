@@ -62,8 +62,8 @@ async function fetchClients() {
         total.value = res.total || 0
       }
     }
-  } catch (err: any) {
-    console.error('[ClientsIndex] Erro ao carregar clientes:', err)
+  } catch {
+    console.error('[ClientsIndex] Falha ao carregar clientes')
   } finally {
     isLoading.value = false
   }
@@ -145,7 +145,9 @@ onMounted(() => {
             v-if="searchTerm"
             type="button"
             @click="searchTerm = ''"
-            class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white"
+            class="absolute right-0 top-0 bottom-0 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-400 hover:text-white cursor-pointer"
+            aria-label="Limpar pesquisa"
+            title="Limpar pesquisa"
           >
             <Icon name="lucide:x" class="w-4 h-4" />
           </button>
@@ -233,7 +235,7 @@ onMounted(() => {
             type="button"
             :disabled="page <= 1"
             @click="page--; fetchClients()"
-            class="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white transition-colors min-h-[40px] cursor-pointer"
+            class="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white transition-colors min-h-[44px] cursor-pointer"
           >
             Anterior
           </button>
@@ -242,7 +244,7 @@ onMounted(() => {
             type="button"
             :disabled="page * pageSize >= total"
             @click="page++; fetchClients()"
-            class="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white transition-colors min-h-[40px] cursor-pointer"
+            class="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 disabled:opacity-40 hover:bg-slate-800 text-white transition-colors min-h-[44px] cursor-pointer"
           >
             Próxima
           </button>

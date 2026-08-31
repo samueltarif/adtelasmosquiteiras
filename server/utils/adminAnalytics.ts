@@ -10,7 +10,9 @@ export {
   getSaoPauloDateRange,
   fetchAllPaginated,
   safeRate,
-  safeRateNum
+  safeRateNum,
+  computeOverviewData,
+  formatRecentActivityEvents
 } from '../shared/adminAnalyticsCore.mjs'
 
 export type LeadClassification = 'REAL' | 'LEGACY_SYNTHETIC' | 'AUTOMATED_TEST' | 'MANUAL_VALIDATION_TEST'

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { formatWhatsAppLink } from '~/utils/phone'
+import { formatDateOnly } from '~/utils/crmDateTime'
 
 const props = defineProps<{
   workOrders: any[]
@@ -26,13 +28,6 @@ function formatCurrency(val?: number | string | null) {
 function formatDate(iso?: string | null) {
   if (!iso) return '-'
   return new Date(iso).toLocaleDateString('pt-BR')
-}
-
-function formatWhatsAppLink(phone?: string) {
-  if (!phone) return '#'
-  const digits = phone.replace(/\D/g, '')
-  const full = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${full}`
 }
 
 function navigateToDetail(id: string) {
@@ -87,7 +82,7 @@ function navigateToDetail(id: string) {
 
         <div class="flex items-center gap-3 text-[11px] text-slate-400 pt-1">
           <span>Criada: {{ formatDate(wo.created_at) }}</span>
-          <span v-if="wo.data_prevista">| Prevista: {{ formatDate(wo.data_prevista) }}</span>
+          <span v-if="wo.data_prevista">| Prevista: {{ formatDateOnly(wo.data_prevista) }}</span>
         </div>
       </div>
 

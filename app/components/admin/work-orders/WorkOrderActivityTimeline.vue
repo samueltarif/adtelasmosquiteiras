@@ -24,7 +24,7 @@ async function fetchActivity() {
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${props.workOrderId}/activity`)
     activities.value = res?.activities || []
   } catch (err) {
-    console.error('[WorkOrderActivityTimeline] Erro ao carregar timeline:', err)
+    console.error('[WorkOrderActivityTimeline] Falha ao carregar timeline')
   } finally {
     isLoading.value = false
   }

@@ -29,7 +29,7 @@ async function fetchProposals() {
       proposals.value = res.proposals
     }
   } catch (err: any) {
-    console.error('[ProposalsManager] Erro ao carregar orçamentos:', err)
+    console.error('[ProposalsManager] Falha ao carregar orçamentos')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao carregar histórico de orçamentos.'
   } finally {
     isLoading.value = false
@@ -43,7 +43,7 @@ async function handleViewPdf(proposalId: string) {
       window.open(res.signedUrl, '_blank')
     }
   } catch (err: any) {
-    console.error('[ProposalsManager] Erro ao gerar link de visualização:', err)
+    console.error('[ProposalsManager] Falha ao gerar link de visualização')
     alert(err?.data?.message || err?.message || 'Falha ao abrir documento PDF.')
   }
 }
@@ -60,7 +60,7 @@ async function handleDownloadPdf(proposal: any) {
       document.body.removeChild(a)
     }
   } catch (err: any) {
-    console.error('[ProposalsManager] Erro no download do PDF:', err)
+    console.error('[ProposalsManager] Falha no download do PDF')
     alert(err?.data?.message || err?.message || 'Falha ao baixar documento PDF.')
   }
 }

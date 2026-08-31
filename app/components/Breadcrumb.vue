@@ -187,13 +187,13 @@ useHead(() => {
             <NuxtLink
               v-if="!item.current && item.path"
               :to="item.path"
-              class="text-gray-700 hover:text-emerald-600 hover:underline transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded px-1"
+              class="text-gray-700 hover:text-emerald-600 hover:underline transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
             >
               <span>{{ item.label }}</span>
             </NuxtLink>
             <span
               v-else
-              class="text-gray-900 font-semibold"
+              class="text-gray-900 font-semibold min-h-[44px] inline-flex items-center px-1"
               aria-current="page"
             >
               {{ item.label }}
@@ -225,7 +225,7 @@ useHead(() => {
             <!-- Ellipsis (truncado) -->
             <span
               v-if="item.truncated"
-              class="text-gray-500 font-medium px-1"
+              class="text-gray-500 font-medium px-1 min-h-[44px] inline-flex items-center"
             >
               ...
             </span>
@@ -234,7 +234,7 @@ useHead(() => {
             <NuxtLink
               v-else-if="!item.current && item.path"
               :to="item.path"
-              class="text-gray-700 hover:text-emerald-600 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-1"
+              class="text-gray-700 hover:text-emerald-600 font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center"
             >
               <span>{{ item.label }}</span>
             </NuxtLink>

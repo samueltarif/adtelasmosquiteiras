@@ -41,8 +41,8 @@ export default defineEventHandler(async (event) => {
   if (newStatus === 'agendada') {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ERR_STATUS_MANAGED_BY_AGENDA: O status "agendada" é gerenciado automaticamente pela Agenda através de agendamentos.',
-      data: { error: { code: 'ERR_STATUS_MANAGED_BY_AGENDA', message: 'O status "agendada" é gerenciado automaticamente pela Agenda através de agendamentos.' } }
+      statusMessage: 'ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED: O status "agendada" é gerenciado automaticamente pela Agenda através de agendamentos.',
+      data: { error: { code: 'ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED', message: 'O status "agendada" é gerenciado automaticamente pela Agenda através de agendamentos. Utilize o módulo de Agenda para agendar instalações.' } }
     })
   }
 

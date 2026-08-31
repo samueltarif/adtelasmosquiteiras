@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { formatDateOnly } from '~/utils/crmDateTime'
 
 const props = defineProps<{
   clientId: string
@@ -31,8 +32,8 @@ async function fetchWorkOrders() {
       workOrders.value = res.workOrders || []
       total.value = res.pagination?.total || 0
     }
-  } catch (err: any) {
-    console.error('[ClientWorkOrders] Erro ao carregar OSs:', err)
+  } catch {
+    console.error('[ClientWorkOrders] Falha ao carregar OSs')
   } finally {
     isLoading.value = false
   }
@@ -90,7 +91,7 @@ onMounted(() => {
       <p class="text-xs text-slate-400 mb-3">Nenhuma Ordem de Serviço cadastrada para este cliente ainda.</p>
       <button
         @click="navigateToNewWorkOrder"
-        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer min-h-[38px]"
+        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer min-h-[44px]"
       >
         <Icon name="lucide:plus" class="w-3.5 h-3.5" />
         <span>Criar Primeira OS</span>
@@ -124,7 +125,7 @@ onMounted(() => {
 
           <p class="text-[11px] text-slate-500">
             Criada em {{ formatDate(wo.created_at) }}
-            <span v-if="wo.data_prevista"> | Prevista para {{ formatDate(wo.data_prevista) }}</span>
+            <span v-if="wo.data_prevista"> | Prevista para {{ formatDateOnly(wo.data_prevista) }}</span>
           </p>
         </div>
 
@@ -147,7 +148,7 @@ onMounted(() => {
           <button 
             :disabled="page <= 1" 
             @click.stop="page--; fetchWorkOrders()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px] cursor-pointer"
+            class="px-3.5 py-2 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px] cursor-pointer"
           >
             Anterior
           </button>
@@ -155,7 +156,7 @@ onMounted(() => {
           <button 
             :disabled="page * pageSize >= total" 
             @click.stop="page++; fetchWorkOrders()"
-            class="px-2.5 py-1 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[32px] cursor-pointer"
+            class="px-3.5 py-2 rounded bg-slate-800 disabled:opacity-40 hover:bg-slate-700 text-white min-h-[44px] cursor-pointer"
           >
             Próxima
           </button>

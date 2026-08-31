@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatWhatsAppLink } from '~/utils/phone'
+
 const props = defineProps<{
   clients: Array<{
     id: string
@@ -31,12 +33,6 @@ function formatPhone(phone: string) {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
   }
   return phone
-}
-
-function formatWhatsAppLink(phone: string) {
-  const digits = phone.replace(/\D/g, '')
-  const full = digits.startsWith('55') ? digits : `55${digits}`
-  return `https://wa.me/${full}`
 }
 
 function formatDate(iso: string) {
@@ -166,7 +162,7 @@ function getTipoLabel(tipo: string) {
                 :href="formatWhatsAppLink(c.telefone_principal)" 
                 target="_blank"
                 rel="noopener noreferrer"
-                class="p-2 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+                class="p-2 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Conversar no WhatsApp"
                 aria-label="Conversar no WhatsApp"
               >
@@ -175,7 +171,7 @@ function getTipoLabel(tipo: string) {
 
               <a 
                 :href="`tel:${c.telefone_principal.replace(/\D/g, '')}`" 
-                class="p-2 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+                class="p-2 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Ligar para o cliente"
                 aria-label="Ligar para o cliente"
               >
@@ -185,7 +181,7 @@ function getTipoLabel(tipo: string) {
               <button 
                 type="button"
                 @click="emit('open', c.id)" 
-                class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
+                class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 title="Abrir ficha"
                 aria-label="Abrir ficha do cliente"
               >

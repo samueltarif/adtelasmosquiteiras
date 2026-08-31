@@ -45,8 +45,8 @@ async function fetchCompanyProfile() {
         ...res.profile
       }
     }
-  } catch (err: any) {
-    console.error('[CompanySettings] Erro ao carregar perfil:', err)
+  } catch {
+    console.error('[CompanySettings] Erro ao carregar perfil')
     errorMessage.value = 'Erro ao carregar dados da empresa.'
   } finally {
     isLoading.value = false
@@ -94,7 +94,7 @@ async function handleSaveProfile() {
       }, 4000)
     }
   } catch (err: any) {
-    console.error('[CompanySettings] Erro ao salvar:', err)
+    console.error('[CompanySettings] Erro ao salvar')
     errorMessage.value = err?.data?.message || err?.message || 'Erro ao salvar alterações.'
   } finally {
     isSaving.value = false

@@ -102,7 +102,7 @@ async function handleSave() {
       emit('close')
     }
   } catch (err: any) {
-    console.error('[WorkOrderItemModal] Erro ao salvar item:', err)
+    console.error('[WorkOrderItemModal] Falha ao salvar item')
     errorMessage.value = err?.data?.message || err?.message || 'Falha ao salvar item da ordem de serviço'
   } finally {
     isSubmitting.value = false

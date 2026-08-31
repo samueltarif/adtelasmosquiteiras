@@ -49,8 +49,8 @@ const sendToWhatsApp = async () => {
   isSubmitting.value = true
   try {
     await redirectToThankYou(formData.value, mediaUploaderRef)
-  } catch (e) {
-    console.error('Erro ao enviar contato:', e)
+  } catch {
+    console.error('[ContatoPage] Erro ao enviar contato')
   } finally {
     isSubmitting.value = false
   }
@@ -63,7 +63,7 @@ const emailLink = `mailto:${EMAIL}`
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 overflow-x-hidden">
+  <div class="min-h-screen bg-gray-50">
     <!-- Hero Contato -->
     <section class="bg-gradient-to-br from-[#1D7BA6] to-[#0F4F7D] text-white py-10 sm:py-14 md:py-20 mt-16 md:mt-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
