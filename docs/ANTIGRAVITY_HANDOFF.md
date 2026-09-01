@@ -11,41 +11,82 @@
   - **SHA-256 Canônico Instalado**: `43D5620DFDF590F2C3F9BE551ADE5FEE33754844E4A0815B4B4A94540D7A6C5F`
   - **Regra Absoluta de Reexecução**: `MIGRATION_012_REEXECUTION=FORBIDDEN` (A Migration 012 já está fisicamente instalada no Supabase de produção e **NÃO DEVE** ser reaplicada sob nenhuma hipótese).
   - **Ambiente de Produção**: PostgreSQL 17 / Supabase (Schema `public`, projeto `axjqhxpejwkuabeaoyaz`).
-  - **Postflight Read-Only de Produção**: `PASS` (100% dos testes de menor privilégio e integridade aprovados com zero mutações em dados reais).
   - **5 Stored Procedures (RPCs) Instaladas**:
     1. `create_appointment_atomic`
     2. `update_appointment_atomic`
     3. `reschedule_appointment_atomic`
     4. `cancel_appointment_atomic`
     5. `update_appointment_status_atomic`
-  - **Mecanismos Físicos de Banco Ativos**:
-    - Extensão `btree_gist` instalada;
-    - Exclusion constraint temporal `unq_appointments_staff_active_period` (GIST) para bloqueio no nível de banco de sobreposição de horários de técnicos;
-    - Índice parcial de unicidade `unq_active_installation_per_wo` (máximo de 1 instalação ativa por OS);
-    - Triggers de bloqueio de exclusão física `trg_prevent_hard_delete_appointments` e `trg_prevent_hard_delete_crm_staff`;
-    - Trigger de bloqueio de desativação de técnico com compromissos pendentes `trg_check_crm_staff_deactivation`;
-    - Row-Level Security (RLS) habilitada e validada;
-    - Menor privilégio: DML direto (`INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`) na tabela `public.appointments` revogado (`42501 permission denied for table appointments`);
-    - Entidades e ações de `proposals` (Migration 011) integralmente preservadas no `crm_activity_log`.
+- **Fase 5.0C (Backend, Endpoints BFF, Invariantes e Migration 013 em Produção)**: `COMPLETE_VALIDATED`
+  - **Arquivo Canônico da Migration 013**: `supabase/manual/013_work_order_terminal_appointment_guard.sql`
+  - **SHA-256 Canônico Instalado**: `04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08`
+  - **Regra Absoluta de Reexecução**: `MIGRATION_013_REEXECUTION=FORBIDDEN` (A Migration 013 já está fisicamente instalada e validada em produção e **NÃO DEVE** ser reaplicada).
+  - **Objetos Instalados**:
+    - Trigger Function: `public.fn_prevent_terminal_work_order_with_active_appointments()` (`VOLATILE`, `SECURITY DEFINER`, `search_path = ''`, `row_security = off`, `REVOKE ALL FROM PUBLIC, anon, authenticated, service_role`).
+    - Trigger: `trg_prevent_terminal_work_order_with_active_appointments` (`BEFORE UPDATE OF status_os ON public.work_orders FOR EACH ROW WHEN (OLD.status_os IS DISTINCT FROM NEW.status_os AND NEW.status_os IN ('concluida', 'cancelada'))`).
+  - **Postflight Read-Only de Produção**: `PASS` (100% dos testes aprovados, zero mutações em dados reais).
 
 ---
 
-## 2. Backup Lógico de Segurança Pré-Migration 012
+## 2. Backup Lógico de Segurança de Produção
 
-- **Estratégia**: Snapshot lógico local antes da instalação da Migration 012.
-- **Arquivo de Backup Local**: `backups/pre_migration_012_20260828_153949.sql`
-- **SHA-256 do Arquivo**: `31C930E066764A635E2EF77B0ABAF916B3320E5FFB2039EF8AD9CDB00AF8DB34`
-- **Validação de Restore Local em PostgreSQL 17**: `PASS` (100% íntegro).
-- **Segurança de Dados Pessoais / Secrets**: O diretório `backups/` permanece listado no `.gitignore`. **NUNCA** fazer commit ou push do arquivo de backup e nunca expor seu conteúdo.
+- **Backup Pré-Migration 012**:
+  - Snapshot lógico local pré-012: `backups/pre_migration_012_20260828_153949.sql` (SHA: `31C930E066764A635E2EF77B0ABAF916B3320E5FFB2039EF8AD9CDB00AF8DB34`).
+- **Backup Pré-Migration 013 (Fresco da Fase 5.0C.4D)**:
+  - **Arquivo de Backup Local**: `backups/pre_migration_013_20260901_164555.sql`
+  - **Tamanho do Arquivo**: `320289` bytes
+  - **SHA-256 do Arquivo**: `F4D6DBD91D4AF6C8BB439B0AEC2FA8914905503AF953A32CE729323A3DEE4AF4`
+  - **Validação de Restore Local em PostgreSQL 17**: `PASS` (100% íntegro em todas as 24 tabelas, baseline 012 verificado, ausência de 013 confirmada antes da aplicação).
+  - **Segurança de Dados Pessoais / Secrets**: O diretório `backups/` permanece listado no `.gitignore`. **NUNCA** fazer commit ou push do arquivo de backup e nunca expor seu conteúdo.
 
 ---
 
 ## 3. Próxima Etapa de Desenvolvimento
 
-- **Fase Atual**: `PHASE=5.0D.9`
-- **Nome da Fase**: **FASE 5.0D — Interface Administrativa (Agenda, Equipe & Integração com Ordens de Serviço — Final Touch Audit Evidence Hardening [Canonical 44x44])**
-- **Status da Fase 5.0C**: `PHASE_5_0C_STATUS=COMPLETE_VALIDATED`
-- **Status da Fase 5.0D**: `PHASE_5_0D_STATUS=COMPLETE_VALIDATED_READY_FOR_DEPLOY`
+- **Fase Atual**: `PHASE=5.0C.4D (Instalação e Validação da Migration 013 Concluídas)`
+- **Nome da Fase**: **FASE 5.0C.4D — MIGRATION 013 PRODUCTION INSTALLATION GATE & POSTFLIGHT**
+- **Status da Fase 5.0C**: `PHASE_5_0C_FINAL_STATUS=COMPLETE_VALIDATED`
+- **Status da Fase 5.0C.4D**: `PHASE_5_0C_4D_STATUS=COMPLETE_VALIDATED`
+- **Status de Implementação da Fase 5.0D (Admin UI)**:
+  - `PHASE_5_0D_IMPLEMENTATION_STATUS = IMPLEMENTED_LOCAL_NOT_RELEASED` (UI construída e testada localmente, pronta para release review)
+  - `PHASE_5_0D_PRODUCTION_RELEASE_AUTHORIZED = NO`
+  - `PHASE_5_0D_START_AUTHORIZED = NO`
+- **Governança da Migration 013**:
+  - `MIGRATION_013_INSTALLED_PRODUCTION = YES`
+  - `MIGRATION_013_PRODUCTION_VALIDATED = YES`
+  - `MIGRATION_013_CANONICAL_FILE = supabase/manual/013_work_order_terminal_appointment_guard.sql`
+  - `MIGRATION_013_CANDIDATE_SHA256 = 04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08`
+  - `FUNCTION_INSTALLED = YES`
+  - `TRIGGER_INSTALLED = YES`
+  - `TRIGGER_ENABLED = YES`
+  - `TRIGGER_TIMING = BEFORE`
+  - `TRIGGER_EVENT = UPDATE`
+  - `TRIGGER_COLUMN_EXACT = YES`
+  - `TRIGGER_WHEN_SEMANTICS = PASS`
+  - `FUNCTION_SECURITY_DEFINER = YES`
+  - `FUNCTION_EMPTY_SEARCH_PATH = YES`
+  - `FUNCTION_ROW_SECURITY_OFF = YES`
+  - `FUNCTION_DIRECT_EXECUTE_ALL_ROLES = DENIED`
+  - `MIGRATION_012_BASELINE_POSTFLIGHT = PASS`
+  - `RLS_POSTFLIGHT = PASS`
+  - `APPOINTMENTS_LEAST_PRIVILEGE_POSTFLIGHT = PASS`
+  - `CANCELLED_WITH_ACTIVE_APPOINTMENT_COUNT = 0`
+  - `CONCLUDED_WITH_ACTIVE_NON_WARRANTY_COUNT = 0`
+  - `PRODUCTION_OPERATIONAL_COUNTS_UNCHANGED = YES`
+  - `PRODUCTION_TEST_DATA_CREATED = NO`
+  - `PRODUCTION_DATABASE_WRITES_FROM_TESTS = 0`
+  - `MIGRATION_012_REEXECUTED = NO`
+  - `MIGRATION_013_REEXECUTED = NO`
+  - `APPLICATION_DEPLOY = NO`
+  - `READY_FOR_PHASE_5D_PRODUCTION_RELEASE_REVIEW = YES`
+- **Escopo e Semântica do Invariante Terminal**:
+  - `TERMINAL_INVARIANT_SCOPE = SUPPORTED_APPLICATION_AND_RPC_MUTATION_PATHS`
+  - `TERMINAL_INVARIANT_WARRANTY_COMPATIBLE = YES`
+  - `CONCLUDED_ACTIVE_WARRANTY_ALLOWED = YES`
+  - **Matriz Canônica de Estados Terminais**:
+    - `cancelada` + qualquer agendamento ativo (`agendado`, `confirmado`, `em_deslocamento`) $\to$ **BLOCK** (`ERR_ACTIVE_APPOINTMENTS_EXIST` / 409)
+    - `concluida` + agendamento ativo não-garantia (`visita_tecnica`, `medicao`, `instalacao`, `manutencao`) $\to$ **BLOCK** (`ERR_ACTIVE_APPOINTMENTS_EXIST` / 409)
+    - `concluida` + agendamento ativo tipo `garantia` $\to$ **ALLOW**
 - **Plano de Implementação Canônico**: `implementation_plan.md` (raiz do repositório). Em caso de divergência com qualquer outro documento, o `implementation_plan.md` prevalece.
 - **Objetivos Cumpridos da Fase 5.0D & Patch 5.0D.9**:
   1. Módulo de Agenda (`/admin/agenda`): visões Mês, Semana, Dia, Lista, navegação temporal, "Hoje", filtros estruturados, timezone `America/Sao_Paulo`;
@@ -67,17 +108,21 @@
   17. Zero logging de objetos de erro brutos no cliente (`CLIENT_SIDE_RAW_ERROR_OBJECT_LOGGING=0`);
   18. Limites de tamanho de código respeitados: `APPLICATION_LOGIC_FILES_OVER_200_LINES=0`, `APPLICATION_CODE_FILES_OVER_600_LINES=0`, `CODE_SIZE_POLICY=PASS`;
   19. Testes automatizados executados e 100% aprovados:
+      - `node scripts/test_crm_migration013_local.mjs` (58/58 ASSERTS PASSOU, `100% PASS`);
+      - `node scripts/test_crm_phase5c1_bff.mjs` (57/57 ASSERTS PASSOU, `CURRENT_BFF_ASSERTS=57`, `100% PASS` | `PREVIOUS_BFF_ASSERTS=49`);
       - `node scripts/test_admin_ui_phase5d_browser.mjs` (663/663 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
       - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU, `100% PASS`);
-      - `node scripts/test_crm_phase5c1_bff.mjs` (49/49 ASSERTS PASSOU, `100% PASS`);
       - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU, `100% PASS`);
       - `node scripts/audit_git_diff_loc.mjs` (`APPLICATION_LOGIC_FILES_OVER_200=0`, `PASS`);
       - `node scripts/scan_raw_logs.js` (`RAW LOGS COUNT=0`, `PASS`);
       - `npm run build` (`BUILD STATUS = PASS`, exit code 0).
-      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU);
-      - `node scripts/test_crm_phase5c1_bff.mjs` (49/49 ASSERTS PASSOU);
-      - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU);
-      - `node scripts/audit_git_diff_loc.mjs` (`CODE_SIZE_POLICY=PASS`).
+      - `node scripts/test_crm_phase5c1_bff.mjs` (57/57 ASSERTS PASSOU, `CURRENT_BFF_ASSERTS=57`, `100% PASS` | `PREVIOUS_BFF_ASSERTS=49`);
+      - `node scripts/test_admin_ui_phase5d_browser.mjs` (663/663 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
+      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU, `100% PASS`);
+      - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU, `100% PASS`);
+      - `node scripts/audit_git_diff_loc.mjs` (`APPLICATION_LOGIC_FILES_OVER_200=0`, `PASS`);
+      - `node scripts/scan_raw_logs.js` (`RAW LOGS COUNT=0`, `PASS`);
+      - `npm run build` (`BUILD STATUS = PASS`, exit code 0).
 
 ---
 

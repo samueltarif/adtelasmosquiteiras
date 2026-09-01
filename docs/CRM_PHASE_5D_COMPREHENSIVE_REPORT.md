@@ -117,7 +117,7 @@ PHOTO_UPLOADER_RUNTIME_RELEASE_USAGE=NO
    - `BROWSER_LEGACY_UI_ASSERTS`: 5
    - `BROWSER_UNEXPECTED_CONSOLE_ERRORS`: 0
 2. **Admin UI & Domínio (`scripts/test_admin_ui_phase5d.mjs`)**: **36/36 TESTS (100% PASS)**
-3. **BFF Handlers & SQLSTATE (`scripts/test_crm_phase5c1_bff.mjs`)**: **49/49 ASSERTS (100% PASS)**
+3. **BFF Handlers & SQLSTATE (`scripts/test_crm_phase5c1_bff.mjs`)**: **56/56 ASSERTS (`CURRENT_BFF_ASSERTS=56`, 100% PASS | `PREVIOUS_BFF_ASSERTS=49`)**
 4. **Auth, JWKS & Performance (`scripts/test_admin_performance_patch1.mjs`)**: **70/70 TESTS (100% PASS)**
 5. **Auditoria de LOC (`scripts/audit_git_diff_loc.mjs`)**: **100% PASS** (`APPLICATION_LOGIC_FILES_OVER_200 = 0`, `CODE_SIZE_POLICY = PASS`)
 6. **Scanner de Logs Brutos (`scripts/scan_raw_logs.js`)**: **100% PASS** (`RAW LOGS COUNT = 0`)
@@ -127,13 +127,26 @@ PHOTO_UPLOADER_RUNTIME_RELEASE_USAGE=NO
 
 ### 5. Pacote de Entrega e Estado do Repositório Git
 
-- **Pacote Delta de Revisão**: `docs/phase_5_0d9_delta_external_review.zip` (361.375 bytes, 155 arquivos confirmados)
-- **Sidecar SHA-256**: `docs/phase_5_0d9_delta_external_review.zip.sha256`
-- **Hash Canônico**: `6CBC2A77EA55119A379DB8AD2DF49B3A20D5257AA7A70D2F4ACFA53366641A84`
-- **Git Commit**: `371beca` (`origin/master`)
-- **Mensagem do Commit**: `feat(crm): Phase 5.0D.9 - Final Touch Target Hardening, Playwright E2E and Admin UI Refinements`
+- **Pacote Final de Revisão Externa**: `phase_5_0d_external_review.zip` (e cópia em `docs/phase_5_0d_external_review.zip`)
+- **Sidecar SHA-256**: `phase_5_0d_external_review.zip.sha256`
+- **Total de Arquivos**: 147 arquivos canônicos autossuficientes
 - **Estado de Produção**:
   - `MIGRATION_012_REEXECUTED = NO`
-  - `MIGRATION_013_CREATED = NO`
+  - `MIGRATION_013_CANDIDATE_CREATED = YES`
+  - `MIGRATION_013_LOCAL_VALIDATED = YES`
+  - `MIGRATION_013_CANONICAL_SHA256 = B900D0662D27DDCBBAD7D8DE0938E3D6EA0B3493C95D822FBD46881F2CE91C92`
+  - `MIGRATION_013_LOCAL_ASSERT_COUNT = 73`
+  - `MIGRATION_013_INSTALLED_PRODUCTION = NO`
+  - `MIGRATION_013_PRODUCTION_AUTHORIZED = NO`
+  - `MIGRATION_012_APPOINTMENTS_EFFECTIVE_PRIVILEGES_EXACT = PASS`
+  - `MIGRATION_012_RPC_EXECUTE_PRIVILEGES_EXACT = PASS`
+  - `MIGRATION_012_RPC_OVERLOAD_COUNT_EXACT = PASS`
+  - `MIGRATION_013_TRIGGER_COLUMN_EXACT = PASS`
+  - `MIGRATION_013_TRIGGER_WHEN_EXACT = PASS`
+  - `TRIGGER_RACE_ERROR_HTTP_MAPPING = PASS`
+  - `TRIGGER_RACE_SIDE_EFFECTS = ZERO`
+  - `TERMINAL_INVARIANT_SCOPE = SUPPORTED_APPLICATION_AND_RPC_MUTATION_PATHS`
+  - `TERMINAL_INVARIANT_WARRANTY_COMPATIBLE = YES`
+  - `CONCLUDED_ACTIVE_WARRANTY_ALLOWED = YES`
   - `PRODUCTION_DATABASE_WRITES = 0`
   - `APPLICATION_DEPLOY = NO`

@@ -131,3 +131,34 @@ export async function getActiveInstallation(
     throw createError({ statusCode: 503, message: 'Falha ao consultar agendamento ativo da ordem de serviço' })
   }
 }
+
+/**
+ * Consulta se uma Ordem de Serviço possui QUALQUER agendamento ativo
+ * (status: agendado, confirmado, em_deslocamento - qualquer tipo).
+ * ACTIVE_APPOINTMENT_GUARD_FAILURE_POLICY=FAIL_CLOSED
+ */
+export async function hasAnyActiveAppointment(
+  config: SupabaseConfig,
+  workOrderId: string
+): Promise<boolean> {
+  if (!config.url || !config.serviceRoleKey) {
+    throw createError({ statusCode: 503, message: 'HAS_ANY_ACTIVE_APPOINTMENT_CONFIG_MISSING: Configuração de banco de dados indisponível.' })
+  }
+  if (!workOrderId || typeof workOrderId !== 'string' || workOrderId.trim() === '') {
+    throw createError({ statusCode: 400, message: 'HAS_ANY_ACTIVE_APPOINTMENT_INVALID_ID: workOrderId é obrigatório.' })
+  }
+
+  try {
+    const res = await $fetch<any[]>(
+      `${config.url}/rest/v1/appointments?work_order_id=eq.${workOrderId}&status_agendamento=in.(agendado,confirmado,em_deslocamento)&select=id&limit=1`,
+      {
+        headers: getSupabaseHeaders(config.serviceRoleKey)
+      }
+    )
+    return Array.isArray(res) && res.length > 0
+  } catch (err: any) {
+    if (err?.statusCode) throw err
+    console.error('[hasAnyActiveAppointment] Upstream failure:', err?.statusCode || 'unknown')
+    throw createError({ statusCode: 503, message: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
+  }
+}

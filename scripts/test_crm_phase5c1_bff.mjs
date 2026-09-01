@@ -24,7 +24,8 @@ import {
   APPOINTMENT_CALENDAR_SELECT,
   APPOINTMENT_DETAIL_SELECT,
   APPOINTMENT_SEARCH_SELECT,
-  hasActiveInstallation
+  hasActiveInstallation,
+  hasAnyActiveAppointment
 } from '../server/utils/crmAppointmentHelpers.ts'
 import { handleRpcError } from '../server/utils/crmAppointmentErrors.ts'
 
@@ -156,12 +157,13 @@ async function runSuite() {
     assert.strictEqual(sanitizePostgrestSearchTerm(''), null)
   })
 
-  test('A.4 Dicionário de Erros — 25 códigos Migration 012 + 3 aplicação = 28 chaves', () => {
+  test('A.4 Dicionário de Erros — 25 códigos Migration 012 + 1 Migration 013 + 3 aplicação = 29 chaves', () => {
     const keys = Object.keys(APPOINTMENT_ERROR_MAP)
-    assert.strictEqual(keys.length, 28)
+    assert.strictEqual(keys.length, 29)
     assert.ok(APPOINTMENT_ERROR_MAP.ERR_APPOINTMENT_STALE_VERSION)
     assert.ok(APPOINTMENT_ERROR_MAP.ERR_DATA_PREVISTA_MANAGED_BY_AGENDA)
     assert.ok(APPOINTMENT_ERROR_MAP.ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED)
+    assert.ok(APPOINTMENT_ERROR_MAP.ERR_ACTIVE_APPOINTMENTS_EXIST)
   })
 
   test('A.5 Static Security Check: zero bypass tokens no runtime auth code (DEV_MOCK_AUTH_RUNTIME=REMOVED)', () => {
@@ -245,9 +247,9 @@ async function runSuite() {
     }
   })
 
-  test('A.13 RUNTIME_RPC_ERROR_MAP_KEYS=28 & RUNTIME_RPC_ERROR_MAP_DRIFT=NO: handleRpcError mapeia todas as 28 chaves', () => {
+  test('A.13 RUNTIME_RPC_ERROR_MAP_KEYS=29 & RUNTIME_RPC_ERROR_MAP_DRIFT=NO: handleRpcError mapeia todas as 29 chaves', () => {
     const canonicalKeys = Object.keys(APPOINTMENT_ERROR_MAP)
-    assert.strictEqual(canonicalKeys.length, 28, 'Dicionário canônico deve ter 28 chaves')
+    assert.strictEqual(canonicalKeys.length, 29, 'Dicionário canônico deve ter 29 chaves (25 Migration 012 + 1 Migration 013 + 3 Aplicação)')
     for (const key of canonicalKeys) {
       const def = APPOINTMENT_ERROR_MAP[key]
       try {
@@ -341,6 +343,23 @@ async function runSuite() {
     const fullLog = capturedLogs.join('\n')
     assert.strictEqual(fullLog.includes(sentinelPii), false, 'String de PII NÃO pode vazar no console.error!')
     assert.ok(fullLog.includes('[CRM Appointment RPC Error]'), 'Log técnico estruturado deve estar presente')
+  })
+
+  test('A.17 ACTIVE_APPOINTMENT_GUARD_FAILURE_POLICY=FAIL_CLOSED: hasAnyActiveAppointment fail-closed em config ausente e workOrderId inválido', async () => {
+    // Config ausente -> 503
+    try {
+      await hasAnyActiveAppointment({ url: '', serviceRoleKey: '' }, 'some-id')
+      assert.fail('Deveria ter lançado 503')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 503, 'config ausente deve lançar 503')
+    }
+    // workOrderId ausente -> 400
+    try {
+      await hasAnyActiveAppointment({ url: 'http://localhost', serviceRoleKey: 'key' }, '')
+      assert.fail('Deveria ter lançado 400')
+    } catch (err) {
+      assert.strictEqual(err?.statusCode, 400, 'workOrderId inválido deve lançar 400')
+    }
   })
 
   console.log('\n--- B. TESTES REAIS DOS 16 HANDLERS NITRO (BFF) ---')
@@ -772,6 +791,187 @@ async function runSuite() {
     }
   })
 
+  await asyncTest('B.18.1 CASO A: POST /api/admin/crm/work-orders/:id/status (target=cancelada com instalacao confirmado) retorna 409 ERR_ACTIVE_APPOINTMENTS_EXIST e ZERO mutações', async () => {
+    let patchedWorkOrders = 0
+    let createdNotes = 0
+    let createdActivities = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (opts?.method === 'PATCH') patchedWorkOrders++
+      if (url.includes('/crm_notes')) createdNotes++
+      if (url.includes('/admin_audit_logs')) createdActivities++
+      if (url.includes('/appointments?')) {
+        return [{ id: 'appt-1', tipo_agendamento: 'instalacao', status_agendamento: 'confirmado' }]
+      }
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'agendada', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'cancelada', reason: 'Cancelamento com instalacao confirmada', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    try {
+      await statusWorkOrderHandler(event)
+      assert.fail('Deveria ter lançado 409')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 409)
+      const errMsg = err?.statusMessage || err?.data?.error?.code || err?.message || ''
+      assert.strictEqual(errMsg.includes('ERR_ACTIVE_APPOINTMENTS_EXIST'), true, 'Deveria conter ERR_ACTIVE_APPOINTMENTS_EXIST')
+      assert.strictEqual(patchedWorkOrders, 0, 'Zero PATCH work_orders')
+      assert.strictEqual(createdNotes, 0, 'Zero crm_notes')
+      assert.strictEqual(createdActivities, 0, 'Zero crm_activity_log')
+    }
+  })
+
+  await asyncTest('B.18.2 CASO B: POST /api/admin/crm/work-orders/:id/status (target=concluida com manutencao em_deslocamento) retorna 409 ERR_ACTIVE_APPOINTMENTS_EXIST e ZERO mutações', async () => {
+    let patchedWorkOrders = 0
+    let createdActivities = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (opts?.method === 'PATCH') patchedWorkOrders++
+      if (url.includes('/admin_audit_logs')) createdActivities++
+      if (url.includes('/appointments?')) {
+        return [{ id: 'appt-2', tipo_agendamento: 'manutencao', status_agendamento: 'em_deslocamento' }]
+      }
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'em_execucao', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'concluida', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    try {
+      await statusWorkOrderHandler(event)
+      assert.fail('Deveria ter lançado 409')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 409)
+      const errMsg = err?.statusMessage || err?.data?.error?.code || err?.message || ''
+      assert.strictEqual(errMsg.includes('ERR_ACTIVE_APPOINTMENTS_EXIST'), true, 'Deveria conter ERR_ACTIVE_APPOINTMENTS_EXIST')
+      assert.strictEqual(patchedWorkOrders, 0, 'Zero PATCH work_orders')
+      assert.strictEqual(createdActivities, 0, 'Zero crm_activity_log')
+    }
+  })
+
+  await asyncTest('B.18.3 CASO C: POST /api/admin/crm/work-orders/:id/status (target=cancelada sem appointments ativos) é permitida', async () => {
+    let patchedWorkOrders = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (opts?.method === 'PATCH') {
+        patchedWorkOrders++
+        return [{ id: '00000000-0000-0000-0000-000000000001', status_os: 'cancelada', updated_at: '2026-08-28T20:10:00Z' }]
+      }
+      if (url.includes('/crm_notes')) return [{ id: 'note-1' }]
+      if (url.includes('/admin_audit_logs')) return [{ id: 'audit-1' }]
+      if (url.includes('/appointments?')) return []
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'agendada', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'cancelada', reason: 'Cancelamento sem appointments ativos', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    const res = await statusWorkOrderHandler(event)
+    assert.strictEqual(res.success, true)
+    assert.strictEqual(patchedWorkOrders, 1)
+  })
+
+  await asyncTest('B.18.4 CASO D: POST /api/admin/crm/work-orders/:id/status (target=concluida com appointments apenas realizados) é permitida', async () => {
+    let patchedWorkOrders = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (opts?.method === 'PATCH') {
+        patchedWorkOrders++
+        return [{ id: '00000000-0000-0000-0000-000000000001', status_os: 'concluida', updated_at: '2026-08-28T20:10:00Z' }]
+      }
+      if (url.includes('/admin_audit_logs')) return [{ id: 'audit-1' }]
+      if (url.includes('/appointments?')) return [] // status in (agendado,confirmado,em_deslocamento) retorna vazio
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'em_execucao', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'concluida', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    const res = await statusWorkOrderHandler(event)
+    assert.strictEqual(res.success, true)
+    assert.strictEqual(patchedWorkOrders, 1)
+  })
+
+  await asyncTest('B.18.5 CASO E: POST /api/admin/crm/work-orders/:id/status FAIL-CLOSED em falha upstream de hasAnyActiveAppointment retorna 503 e ZERO mutações', async () => {
+    let patchedWorkOrders = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (opts?.method === 'PATCH') patchedWorkOrders++
+      if (url.includes('/appointments?')) {
+        throw new Error('Upstream database connection failure')
+      }
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'em_execucao', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'concluida', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    try {
+      await statusWorkOrderHandler(event)
+      assert.fail('Deveria ter lançado 503')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 503)
+      assert.strictEqual(patchedWorkOrders, 0, 'Zero PATCH work_orders')
+    }
+  })
+
+  await asyncTest('B.18.6 CASO F: POST /api/admin/crm/work-orders/:id/status (Trigger Race Fallback) retorna 409 ERR_ACTIVE_APPOINTMENTS_EXIST e ZERO side effects', async () => {
+    let createdNotes = 0
+    let createdActivities = 0
+    globalThis.$fetch = async (url, opts) => {
+      if (url.includes('/crm_notes')) createdNotes++
+      if (url.includes('/admin_audit_logs')) createdActivities++
+      if (url.includes('/appointments?')) {
+        return [] // Precheck passa vazio (race condition)
+      }
+      if (opts?.method === 'PATCH') {
+        // Simula falha do trigger de banco propagada via PostgREST
+        const postgrestError = new Error('ERR_ACTIVE_APPOINTMENTS_EXIST')
+        postgrestError.code = 'P0001'
+        postgrestError.data = {
+          code: 'P0001',
+          message: 'ERR_ACTIVE_APPOINTMENTS_EXIST',
+          details: 'trg_prevent_terminal_work_order_with_active_appointments raised exception'
+        }
+        postgrestError.statusCode = 400
+        throw postgrestError
+      }
+      return [{ id: '00000000-0000-0000-0000-000000000001', numero_os: 'OS-001', client_id: 'c1', status_os: 'em_execucao', updated_at: '2026-08-28T20:00:00Z' }]
+    }
+    const event = createMockEvent({
+      method: 'POST',
+      url: '/api/admin/crm/work-orders/00000000-0000-0000-0000-000000000001/status',
+      context: defaultAdminContext,
+      params: { id: '00000000-0000-0000-0000-000000000001' },
+      body: { newStatus: 'concluida', expected_updated_at: '2026-08-28T20:00:00Z' }
+    })
+    try {
+      await statusWorkOrderHandler(event)
+      assert.fail('Deveria ter lançado 409')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 409, 'TRIGGER_RACE_HTTP_STATUS=409')
+      assert.strictEqual(err?.data?.error?.code, 'ERR_ACTIVE_APPOINTMENTS_EXIST', 'TRIGGER_RACE_ERROR_CODE=ERR_ACTIVE_APPOINTMENTS_EXIST')
+      assert.strictEqual(
+        err?.data?.error?.message,
+        'Existem agendamentos ativos incompatíveis vinculados a esta ordem de serviço. Conclua ou cancele esses agendamentos antes de finalizar a OS.',
+        'Mensagem sanitizada de domínio'
+      )
+      assert.strictEqual(createdNotes, 0, 'Zero crm_notes writes (TRIGGER_RACE_SIDE_EFFECTS=ZERO)')
+      assert.strictEqual(createdActivities, 0, 'Zero crm_activity_log writes (TRIGGER_RACE_SIDE_EFFECTS=ZERO)')
+    }
+  })
+
   await asyncTest('B.19 ATOMIC CAS: 2 mutações simultâneas com mesmo token resultam em exatamente 1 sucesso e 1 conflito 409', async () => {
     let currentDbVersion = '2026-08-28T20:00:00Z'
     globalThis.$fetch = async (url, opts) => {
@@ -1061,11 +1261,133 @@ async function runSuite() {
     }
   })
 
+  await asyncTest('C.4 requireActiveAdmin FAIL-CLOSED: lookup failure -> 503, empty -> 403, inactive -> 403, bad role -> 403, active admin -> 200', async () => {
+    function createMockJwt(userId = '00000000-0000-0000-0000-000000000001', url = 'http://127.0.0.1:54321') {
+      const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url')
+      const payload = Buffer.from(JSON.stringify({
+        sub: userId,
+        email: 'admin@adt.local',
+        role: 'authenticated',
+        aud: 'authenticated',
+        iss: `${url}/auth/v1`,
+        iat: Math.floor(Date.now() / 1000) - 60,
+        exp: Math.floor(Date.now() / 1000) + 3600
+      })).toString('base64url')
+      const sig = Buffer.from('mock_sig').toString('base64url')
+      return `${header}.${payload}.${sig}`
+    }
+
+    const validJwt = createMockJwt('00000000-0000-0000-0000-000000000001')
+
+    // 1. admin_users lookup failure -> 503
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/auth/v1/user')) {
+        return { id: '00000000-0000-0000-0000-000000000001', email: 'admin@adt.local' }
+      }
+      if (url.includes('/rest/v1/admin_users')) {
+        throw new Error('Database connection failed')
+      }
+      return []
+    }
+    const eventLookupFail = createMockEvent({
+      headers: { authorization: `Bearer ${validJwt}` },
+      context: {}
+    })
+    try {
+      await requireActiveAdmin(eventLookupFail)
+      assert.fail('Deveria ter lançado 503')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 503)
+    }
+
+    // 2. admin_users empty -> 403
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/auth/v1/user')) {
+        return { id: '00000000-0000-0000-0000-000000000001', email: 'admin@adt.local' }
+      }
+      if (url.includes('/rest/v1/admin_users')) {
+        return []
+      }
+      return []
+    }
+    const eventEmptyAdmin = createMockEvent({
+      headers: { authorization: `Bearer ${validJwt}` },
+      context: {}
+    })
+    try {
+      await requireActiveAdmin(eventEmptyAdmin)
+      assert.fail('Deveria ter lançado 403')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+
+    // 3. admin inactive -> 403
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/auth/v1/user')) {
+        return { id: '00000000-0000-0000-0000-000000000001', email: 'admin@adt.local' }
+      }
+      if (url.includes('/rest/v1/admin_users')) {
+        return [{ id: 'adm-1', user_id: '00000000-0000-0000-0000-000000000001', role: 'admin', is_active: false }]
+      }
+      return []
+    }
+    const eventInactiveAdmin = createMockEvent({
+      headers: { authorization: `Bearer ${validJwt}` },
+      context: {}
+    })
+    try {
+      await requireActiveAdmin(eventInactiveAdmin)
+      assert.fail('Deveria ter lançado 403')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+
+    // 4. role inválida -> 403
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/auth/v1/user')) {
+        return { id: '00000000-0000-0000-0000-000000000001', email: 'admin@adt.local' }
+      }
+      if (url.includes('/rest/v1/admin_users')) {
+        return [{ id: 'adm-1', user_id: '00000000-0000-0000-0000-000000000001', role: 'viewer', is_active: true }]
+      }
+      return []
+    }
+    const eventBadRole = createMockEvent({
+      headers: { authorization: `Bearer ${validJwt}` },
+      context: {}
+    })
+    try {
+      await requireActiveAdmin(eventBadRole)
+      assert.fail('Deveria ter lançado 403')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+
+    // 5. active admin -> accepted
+    globalThis.$fetch = async (url) => {
+      if (url.includes('/auth/v1/user')) {
+        return { id: '00000000-0000-0000-0000-000000000001', email: 'admin@adt.local' }
+      }
+      if (url.includes('/rest/v1/admin_users')) {
+        return [{ id: 'adm-1', user_id: '00000000-0000-0000-0000-000000000001', role: 'admin', is_active: true }]
+      }
+      return []
+    }
+    const eventActiveAdmin = createMockEvent({
+      headers: { authorization: `Bearer ${validJwt}` },
+      context: {}
+    })
+    const adminIdentity = await requireActiveAdmin(eventActiveAdmin)
+    assert.strictEqual(adminIdentity.userId, '00000000-0000-0000-0000-000000000001')
+    assert.strictEqual(adminIdentity.role, 'admin')
+    assert.strictEqual(adminIdentity.isActive, true)
+  })
+
   console.log('\n======================================================================')
-  console.log(`VALIDATION_UNIT_ASSERTS:   16`)
-  console.log(`BFF_REAL_HANDLER_ASSERTS:  30`)
-  console.log(`AUTH_CSRF_GUARD_ASSERTS:   3`)
-  console.log(`TOTAL DE ASSERTS:          49`)
+  console.log(`VALIDATION_UNIT_ASSERTS:   17`)
+  console.log(`BFF_REAL_HANDLER_ASSERTS:  36`)
+  console.log(`AUTH_CSRF_GUARD_ASSERTS:   4`)
+  console.log(`TOTAL DE ASSERTS:          57`)
   console.log(`BFF_IMPORTED_HANDLERS:     16`)
   console.log(`BFF_EXECUTED_HANDLERS:     16`)
   console.log(`FAILED:                    ${failed}`)

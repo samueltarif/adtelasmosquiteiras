@@ -13,7 +13,8 @@ import {
   ALLOWED_WORK_ORDER_STATUSES
 } from '../../../../../utils/crm.ts'
 import { isValidRfc3339, isValidUUID } from '../../../../../shared/appointmentValidation.mjs'
-import { hasActiveInstallation } from '../../../../../utils/crmAppointmentHelpers.ts'
+import { hasActiveInstallation, hasAnyActiveAppointment } from '../../../../../utils/crmAppointmentHelpers.ts'
+import { handleRpcError } from '../../../../../utils/crmAppointmentErrors.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
@@ -90,6 +91,26 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: `Transição de status inválida: não é permitido alterar de '${currentStatus}' para '${newStatus}'.` })
   }
 
+  // PATCH 5.0C.4: WORK_ORDER_TERMINAL_STATUS_ACTIVE_APPOINTMENT_POLICY = BLOCK
+  if (TERMINAL_WORK_ORDER_STATUSES.includes(newStatus)) {
+    const hasActiveAppt = await hasAnyActiveAppointment(
+      { url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey },
+      id
+    )
+    if (hasActiveAppt) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'ERR_ACTIVE_APPOINTMENTS_EXIST: Esta Ordem de Serviço possui agendamentos ativos. Finalize ou cancele os compromissos na Agenda antes de concluir ou cancelar a OS.',
+        data: {
+          error: {
+            code: 'ERR_ACTIVE_APPOINTMENTS_EXIST',
+            message: 'Esta Ordem de Serviço possui agendamentos ativos. Finalize ou cancele os compromissos na Agenda antes de concluir ou cancelar a OS.'
+          }
+        }
+      })
+    }
+  }
+
   const updates: Record<string, any> = { status_os: newStatus }
   if (currentStatus === 'aprovada' && newStatus === 'orcamento') updates.accepted_proposal_id = null
   if (newStatus === 'concluida') {
@@ -112,9 +133,10 @@ export default defineEventHandler(async (event) => {
     }
     updatedWo = patched[0]
   } catch (err: any) {
-    if (err?.statusCode) throw err
-    console.error('[WorkOrderStatus] Mutation failure:', err?.statusCode || 'unknown')
-    throw createError({ statusCode: 500, statusMessage: 'Falha ao atualizar status da ordem de serviço' })
+    if (err?.statusMessage?.includes('WORK_ORDER_STALE_VERSION')) {
+      throw err
+    }
+    handleRpcError(err)
   }
 
   // 2. SIDE EFFECTS ONLY AFTER WINNING CAS

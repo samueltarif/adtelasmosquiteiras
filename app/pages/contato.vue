@@ -66,7 +66,7 @@ const emailLink = `mailto:${EMAIL}`
   <div class="min-h-screen bg-gray-50">
     <!-- Hero Contato -->
     <section class="bg-gradient-to-br from-[#1D7BA6] to-[#0F4F7D] text-white py-10 sm:py-14 md:py-20 mt-16 md:mt-24">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div class="text-center">
           <h1 class="text-2xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4">
             Entre em Contato
@@ -101,10 +101,10 @@ const emailLink = `mailto:${EMAIL}`
                 :href="whatsappLink" 
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center p-4 sm:p-5 bg-gradient-to-r from-[#25D366] to-[#20BA5A] text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.01] active:scale-98"
+                class="flex items-center p-3.5 sm:p-5 bg-gradient-to-r from-[#25D366] to-[#20BA5A] text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-4 flex-shrink-0">
-                  <WhatsappIcon class="w-7 h-7" />
+                <div class="w-11 h-11 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
+                  <WhatsappIcon class="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-white/80 font-medium">WhatsApp Oficial</div>
@@ -117,10 +117,10 @@ const emailLink = `mailto:${EMAIL}`
               <!-- Telefone -->
               <a 
                 :href="phoneLink"
-                class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
+                class="flex items-center p-3.5 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="w-12 h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-[#1D7BA6]">
-                  <Icon name="lucide:phone" class="w-6 h-6" />
+                <div class="w-11 h-11 sm:w-12 sm:h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 text-[#1D7BA6]">
+                  <Icon name="lucide:phone" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-gray-500 font-medium">Ligue para nós</div>
@@ -133,10 +133,10 @@ const emailLink = `mailto:${EMAIL}`
               <!-- E-mail -->
               <a 
                 :href="emailLink"
-                class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
+                class="flex items-center p-3.5 sm:p-5 bg-white border-2 border-gray-200 hover:border-[#1D7BA6] text-gray-900 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 group hover:scale-[1.01] active:scale-98"
               >
-                <div class="w-12 h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-[#1D7BA6]">
-                  <Icon name="lucide:mail" class="w-6 h-6" />
+                <div class="w-11 h-11 sm:w-12 sm:h-12 bg-[#1D7BA6]/10 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 text-[#1D7BA6]">
+                  <Icon name="lucide:mail" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-gray-500 font-medium">E-mail Comercial</div>
@@ -147,9 +147,9 @@ const emailLink = `mailto:${EMAIL}`
               </a>
 
               <!-- Endereço -->
-              <div class="flex items-center p-4 sm:p-5 bg-white border-2 border-gray-200 text-gray-900 rounded-2xl shadow-sm">
-                <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mr-4 flex-shrink-0 text-gray-600">
-                  <Icon name="lucide:map-pin" class="w-6 h-6 text-[#F49A1A]" />
+              <div class="flex items-center p-3.5 sm:p-5 bg-white border-2 border-gray-200 text-gray-900 rounded-2xl shadow-sm">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 bg-gray-100 rounded-xl flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 text-gray-600">
+                  <Icon name="lucide:map-pin" class="w-5 h-5 sm:w-6 sm:h-6 text-[#F49A1A]" />
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-gray-500 font-medium">Localização</div>
@@ -162,7 +162,7 @@ const emailLink = `mailto:${EMAIL}`
 
           <!-- Coluna Direita - Formulário -->
           <div>
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 sm:p-6 md:p-8">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-3.5 sm:p-6 md:p-8">
               <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
                 Envie sua Mensagem
               </h2>
@@ -246,7 +246,7 @@ const emailLink = `mailto:${EMAIL}`
                 <button
                   type="submit"
                   :disabled="isSubmitting || isSubmitted"
-                  class="w-full min-h-[50px] px-6 py-3.5 bg-[#25D366] hover:bg-[#20B858] text-white rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                  class="w-full min-h-[50px] px-4 sm:px-6 py-3.5 bg-[#25D366] hover:bg-[#20B858] text-white rounded-xl font-bold text-base sm:text-lg transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                 >
                   <svg v-if="isSubmitting" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

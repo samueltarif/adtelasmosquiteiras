@@ -40,23 +40,64 @@ function escapeSqlString(val) {
   return `'${String(val).replace(/'/g, "''")}'`
 }
 
-async function fetchTableData(supabaseUrl, serviceKey, tableName) {
+/**
+ * Paginação segura obrigatória via PostgREST Range header
+ */
+async function fetchTableWithPagination(supabaseUrl, serviceKey, tableName, batchSize = 100) {
   const headers = {
     'apikey': serviceKey,
     'Authorization': `Bearer ${serviceKey}`,
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Prefer': 'count=exact'
   }
-  const res = await fetch(`${supabaseUrl}/rest/v1/${tableName}?select=*`, { headers })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Erro ao ler ${tableName}: HTTP ${res.status} - ${text}`)
+
+  // 1. Obter contagem exata remota
+  const probeRes = await fetch(`${supabaseUrl}/rest/v1/${tableName}?select=*`, {
+    headers: { ...headers, 'Range': '0-0' }
+  })
+  if (!probeRes.ok && probeRes.status !== 416) {
+    const text = await probeRes.text()
+    throw new Error(`Erro ao sondar ${tableName}: HTTP ${probeRes.status} - ${text}`)
   }
-  return res.json()
+
+  const contentRange = probeRes.headers.get('content-range') || ''
+  const totalMatch = contentRange.match(/\/(\d+|\*)$/)
+  const remoteExactCount = totalMatch && totalMatch[1] !== '*' ? parseInt(totalMatch[1], 10) : 0
+
+  if (remoteExactCount === 0) {
+    return { tableName, remoteExactCount: 0, rows: [] }
+  }
+
+  // 2. Paginar em blocos
+  const rows = []
+  let offset = 0
+  while (offset < remoteExactCount) {
+    const end = Math.min(offset + batchSize - 1, remoteExactCount - 1)
+    const pageRes = await fetch(`${supabaseUrl}/rest/v1/${tableName}?select=*`, {
+      headers: { ...headers, 'Range': `${offset}-${end}` }
+    })
+    if (!pageRes.ok) {
+      const text = await pageRes.text()
+      throw new Error(`Erro ao paginar ${tableName} [${offset}-${end}]: HTTP ${pageRes.status} - ${text}`)
+    }
+    const pageData = await pageRes.json()
+    if (!Array.isArray(pageData)) {
+      throw new Error(`Resposta inválida na paginação de ${tableName}`)
+    }
+    rows.push(...pageData)
+    offset = end + 1
+  }
+
+  if (rows.length !== remoteExactCount) {
+    throw new Error(`CONTAGEM DIVERGENTE na tabela ${tableName}: remoto=${remoteExactCount}, capturado=${rows.length}`)
+  }
+
+  return { tableName, remoteExactCount, rows }
 }
 
 async function main() {
   console.log('=================================================================')
-  console.log('GERAÇÃO E VALIDAÇÃO DE BACKUP LÓGICO LOCAL — PRODUÇÃO')
+  console.log('GERAÇÃO E VALIDAÇÃO DE BACKUP LÓGICO LOCAL PAGINADO — PRODUÇÃO')
   console.log('=================================================================\n')
 
   const env = parseEnv()
@@ -80,7 +121,7 @@ async function main() {
   const now = new Date()
   const pad = n => String(n).padStart(2, '0')
   const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
-  const backupBaseName = `pre_migration_012_${timestamp}`
+  const backupBaseName = `pre_migration_013_${timestamp}`
   const backupSqlPath = path.join(backupsDir, `${backupBaseName}.sql`)
   const backupJsonPath = path.join(backupsDir, `${backupBaseName}.json`)
 
@@ -112,15 +153,23 @@ async function main() {
     'service_media'
   ]
 
-  console.log('\n[2/5] Extraindo dados read-only de todas as 24 tabelas...')
+  console.log('\n[2/5] Extraindo dados paginados read-only de todas as 24 tabelas...')
   const backupData = {}
   let totalRecords = 0
+  let allCountsMatched = true
 
   for (const table of tables) {
-    const rows = await fetchTableData(supabaseUrl, serviceKey, table)
+    const { remoteExactCount, rows } = await fetchTableWithPagination(supabaseUrl, serviceKey, table, 100)
     backupData[table] = rows
     totalRecords += rows.length
-    console.log(`  - ${table}: ${rows.length} registros extraídos`)
+    const match = rows.length === remoteExactCount
+    if (!match) allCountsMatched = false
+    console.log(`  - ${table.padEnd(26)} remote=${String(remoteExactCount).padStart(3)} captured=${String(rows.length).padStart(3)} [${match ? 'PASS' : 'FAIL'}]`)
+  }
+
+  if (!allCountsMatched) {
+    console.error('FATAL: Divergência entre contagem remota e capturada em uma ou mais tabelas!')
+    process.exit(1)
   }
 
   // Gravar JSON completo
@@ -132,7 +181,7 @@ async function main() {
   sqlDump += `-- BACKUP LÓGICO DE PRODUÇÃO — AD TELAS E REDES\n`
   sqlDump += `-- Gerado em: ${now.toISOString()}\n`
   sqlDump += `-- Projeto Origem: ${projectRef}\n`
-  sqlDump += `-- Tipo: Schema Baseline (001-011) + Data Snapshot\n`
+  sqlDump += `-- Tipo: Schema Baseline (001-012) + Data Snapshot\n`
   sqlDump += `-- =====================================================================\n\n`
   sqlDump += `SET statement_timeout = 0;\n`
   sqlDump += `SET client_encoding = 'UTF8';\n`
@@ -156,7 +205,7 @@ async function main() {
   }
   sqlDump += '\n'
 
-  // Incluir DDLs dos schemas full e migrations 001 a 011
+  // Incluir DDLs dos schemas full e migrations 001 a 012
   const schemaFullPath = path.resolve('supabase/export/schema_full.sql')
   sqlDump += fs.readFileSync(schemaFullPath, 'utf8') + '\n\n'
   sqlDump += `ALTER TABLE public.cron_ticks ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'ok';\n\n`
@@ -167,7 +216,8 @@ async function main() {
     '005_reset_admin_analytics_data.sql', '006_lead_email_delivery_state.sql',
     '007_lead_media_storage.sql', '008_admin_auth.sql',
     '009_service_media_storage.sql', '010_crm_core_tables.sql',
-    '011_crm_work_order_proposals.sql'
+    '011_crm_work_order_proposals.sql',
+    '012_crm_appointments_and_staff_engine.sql'
   ]
 
   for (const m of baselineMigrations) {
@@ -276,6 +326,30 @@ async function main() {
       console.log(`  [PASS] Restauração validada com 100% de integridade no PostgreSQL 17 local!`)
     } else {
       console.error(`  [FAIL] Divergência na validação de restauração local.`)
+      process.exit(1)
+    }
+
+    // Validar presença de Migration 012 no restore
+    const rpcCountRes = execSync(`docker exec -i ${CONTAINER_NAME} psql -U postgres -d ${RESTORE_VAL_DB} -A -t -c "SELECT count(*) FROM pg_proc WHERE pronamespace = 'public'::regnamespace AND proname IN ('create_appointment_atomic', 'update_appointment_atomic', 'reschedule_appointment_atomic', 'cancel_appointment_atomic', 'update_appointment_status_atomic');"`, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim()
+    if (parseInt(rpcCountRes, 10) === 5) {
+      console.log(`  [PASS] Migration 012 baseline presente no banco restaurado (5 RPCs atômicas encontradas)`)
+    } else {
+      console.error(`  [FAIL] Migration 012 incompleta no restore: ${rpcCountRes} RPCs encontradas`)
+      process.exit(1)
+    }
+
+    // Validar ausência total de objetos da Migration 013 antes de qualquer aplicação
+    const obj013Res = execSync(`docker exec -i ${CONTAINER_NAME} psql -U postgres -d ${RESTORE_VAL_DB} -A -t -c "SELECT (SELECT count(*) FROM pg_proc WHERE proname = 'fn_prevent_terminal_work_order_with_active_appointments') + (SELECT count(*) FROM pg_trigger WHERE tgname = 'trg_prevent_terminal_work_order_with_active_appointments');"`, {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe']
+    }).trim()
+    if (parseInt(obj013Res, 10) === 0) {
+      console.log(`  [PASS] Ausência total de objetos da Migration 013 confirmada no banco restaurado`)
+    } else {
+      console.error(`  [FAIL] Objetos da Migration 013 encontrados no banco restaurado antes da aplicação!`)
       process.exit(1)
     }
 

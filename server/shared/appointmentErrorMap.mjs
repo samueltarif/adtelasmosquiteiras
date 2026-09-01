@@ -145,5 +145,10 @@ export const APPOINTMENT_ERROR_MAP = {
     status: 400,
     code: 'ERR_HARD_DELETE_FORBIDDEN',
     message: 'Exclusão física é proibida. Utilize cancelamento auditável ou desativação lógica.'
+  },
+  ERR_ACTIVE_APPOINTMENTS_EXIST: {
+    status: 409,
+    code: 'ERR_ACTIVE_APPOINTMENTS_EXIST',
+    message: 'Existem agendamentos ativos incompatíveis vinculados a esta ordem de serviço. Conclua ou cancele esses agendamentos antes de finalizar a OS.'
   }
 }

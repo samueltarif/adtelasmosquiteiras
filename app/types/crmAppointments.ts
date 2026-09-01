@@ -91,6 +91,8 @@ export interface CrmAppointmentSummary extends CrmAppointmentBase {
   staff?: { id: string; nome: string; funcao: CrmStaffRole } | null
 }
 
+export type AppointmentCalendarItem = CrmAppointmentSummary
+
 /**
  * CrmAppointmentDetail — Projeção completa de detalhes (APPOINTMENT_DETAIL_SELECT)
  * Apenas acessível mediante autorização e chamada explícita por ID.

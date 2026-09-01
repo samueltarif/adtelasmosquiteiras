@@ -70,7 +70,7 @@ const expectedSha = '43D5620DFDF590F2C3F9BE551ADE5FEE33754844E4A0815B4B4A94540D7
 console.log('Matches expected:', sql012Sha === expectedSha)
 
 console.log('--- 4. GERAÇÃO DO PACOTE ZIP ---')
-const zipName = 'phase_5_0c3_hotfix_external_review.zip'
+const zipName = 'phase_5_0c3_external_review.zip'
 if (fs.existsSync(zipName)) {
   fs.unlinkSync(zipName)
 }
@@ -90,9 +90,14 @@ fileList.forEach(f => {
 const psCmd = `powershell -NoProfile -Command "Compress-Archive -Path '${tempDir}/*' -DestinationPath '${zipName}' -Force"`
 execSync(psCmd, { stdio: 'inherit' })
 
+// Criar cópia com o alias hotfix também
+fs.copyFileSync(zipName, 'phase_5_0c3_hotfix_external_review.zip')
+
 fs.rmSync(tempDir, { recursive: true, force: true })
 
 const stats = fs.statSync(zipName)
 console.log(`ZIP_NAME = ${zipName}`)
 console.log(`FILE_COUNT = ${fileList.length}`)
 console.log(`ZIP_SIZE = ${stats.size} bytes (${(stats.size / 1024).toFixed(2)} KB)`)
+console.log(`SHA256 = ${crypto.createHash('sha256').update(fs.readFileSync(zipName)).digest('hex').toUpperCase()}`)
+

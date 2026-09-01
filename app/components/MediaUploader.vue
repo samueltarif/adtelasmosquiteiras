@@ -120,10 +120,10 @@ defineExpose({
         type="button"
         :disabled="photoCount >= maxPhotos || isProcessing || isUploading"
         @click="triggerPhotoPicker"
-        class="flex items-center justify-center gap-1.5 p-3 border-2 border-dashed border-gray-300 hover:border-[#1D7BA6] rounded-xl text-gray-700 hover:text-[#1D7BA6] hover:bg-sky-50/50 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        class="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:p-3 border-2 border-dashed border-gray-300 hover:border-[#1D7BA6] rounded-xl text-gray-700 hover:text-[#1D7BA6] hover:bg-sky-50/50 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
       >
-        <Icon name="lucide:camera" class="w-4 h-4 text-[#1D7BA6]" />
-        <span>Adicionar Fotos</span>
+        <Icon name="lucide:camera" class="w-4 h-4 text-[#1D7BA6] shrink-0" />
+        <span class="truncate">Adicionar Fotos</span>
       </button>
 
       <!-- Botão Vídeo -->
@@ -131,10 +131,10 @@ defineExpose({
         type="button"
         :disabled="videoCount >= maxVideos || isProcessing || isUploading"
         @click="triggerVideoPicker"
-        class="flex items-center justify-center gap-1.5 p-3 border-2 border-dashed border-gray-300 hover:border-purple-500 rounded-xl text-gray-700 hover:text-purple-600 hover:bg-purple-50/50 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        class="flex items-center justify-center gap-1.5 px-2 py-2.5 sm:p-3 border-2 border-dashed border-gray-300 hover:border-purple-500 rounded-xl text-gray-700 hover:text-purple-600 hover:bg-purple-50/50 transition-all text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
       >
-        <Icon name="lucide:video" class="w-4 h-4 text-purple-500" />
-        <span>Adicionar Vídeo</span>
+        <Icon name="lucide:video" class="w-4 h-4 text-purple-500 shrink-0" />
+        <span class="truncate">Adicionar Vídeo</span>
       </button>
     </div>
 

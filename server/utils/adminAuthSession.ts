@@ -1,6 +1,6 @@
 /**
  * Helpers de Sessão, JWKS getClaims e Token Refresh — Admin Auth
- * PATCH 1.6: Least-privilege grant keys, JWKS infra 503 fail-closed, HS256/user endpoint fallback
+ * PATCH 1.6/5.0C.3: Least-privilege grant keys, fail-closed auth & opt-in test auth
  */
 
 import type { H3Event } from 'h3'
@@ -101,19 +101,14 @@ export async function getClaims(token: string, supabaseUrl: string, config?: Sup
     if (payload.nbf !== undefined && (typeof payload.nbf !== 'number' || payload.nbf > nowSec)) return null
     if (payload.iat !== undefined && (typeof payload.iat !== 'number' || payload.iat > nowSec + 60)) return null
 
-    if (header.alg === 'HS256') {
-      return config ? verifyViaUserEndpoint(token, config) : null
-    }
+    if (header.alg === 'HS256') return config ? verifyViaUserEndpoint(token, config) : null
     if (!ALLOWED_JWT_ALGS.includes(header.alg) || !header.kid) return null
 
-    // ASYMMETRIC_UNKNOWN_KID_USER_ENDPOINT_FALLBACK=NO
     const matchingKey = await findJwkByKid(supabaseUrl, header.kid)
-    if (!matchingKey) return null
-    if (matchingKey.alg && matchingKey.alg !== header.alg) return null
+    if (!matchingKey || (matchingKey.alg && matchingKey.alg !== header.alg)) return null
     if (header.alg === 'ES256' && (matchingKey.kty !== 'EC' || (matchingKey.crv && matchingKey.crv !== 'P-256'))) return null
     if (header.alg === 'RS256' && matchingKey.kty !== 'RSA') return null
-    if (matchingKey.use && matchingKey.use !== 'sig') return null
-    if (matchingKey.key_ops && !matchingKey.key_ops.includes('verify')) return null
+    if ((matchingKey.use && matchingKey.use !== 'sig') || (matchingKey.key_ops && !matchingKey.key_ops.includes('verify'))) return null
 
     const publicKey = createPublicKey({ key: matchingKey, format: 'jwk' })
     const isEc = header.alg === 'ES256' || matchingKey.kty === 'EC'
@@ -159,35 +154,23 @@ export async function resolveSupabaseUser(
 
   if (refreshToken) {
     const grantKey = config.publishableKey || config.anonKey
-    if (!config.supabaseUrl || !grantKey) {
-      throw createError({ statusCode: 503, message: 'Serviço de autenticação temporariamente indisponível.' })
-    }
+    if (!config.supabaseUrl || !grantKey) throw createError({ statusCode: 503, message: 'Serviço de autenticação temporariamente indisponível.' })
     let refreshed: any
     try {
-      refreshed = await $fetch<{
-        access_token: string; refresh_token: string; expires_in: number; user: { id: string; email?: string }
-      }>(`${config.supabaseUrl}/auth/v1/token?grant_type=refresh_token`, {
-        method: 'POST',
-        headers: { 'apikey': grantKey, 'Content-Type': 'application/json' },
-        body: { refresh_token: refreshToken },
-        timeout: 8000
-      })
+      refreshed = await $fetch<{ access_token: string; refresh_token: string; expires_in: number; user: { id: string; email?: string } }>(
+        `${config.supabaseUrl}/auth/v1/token?grant_type=refresh_token`,
+        { method: 'POST', headers: { 'apikey': grantKey, 'Content-Type': 'application/json' }, body: { refresh_token: refreshToken }, timeout: 8000 }
+      )
     } catch (err: any) {
       const status = err?.statusCode || err?.status || (err?.response && err.response.status) || 0
-      if (status === 400 || status === 401 || status === 422) {
-        clearAdminAuthCookies(event)
-        return null
-      }
+      if (status === 400 || status === 401 || status === 422) { clearAdminAuthCookies(event); return null }
       console.error('[adminAuthSession] REFRESH_GRANT_INFRA_FAILURE')
       throw createError({ statusCode: 503, message: 'Serviço de autenticação temporariamente indisponível.' })
     }
 
     if (refreshed?.access_token && refreshed?.user?.id) {
       const newClaims = await getClaims(refreshed.access_token, config.supabaseUrl, config)
-      if (!newClaims?.id || newClaims.id !== refreshed.user.id) {
-        clearAdminAuthCookies(event)
-        return null
-      }
+      if (!newClaims?.id || newClaims.id !== refreshed.user.id) { clearAdminAuthCookies(event); return null }
       setAdminAuthCookies(event, { accessToken: refreshed.access_token, refreshToken: refreshed.refresh_token, expiresIn: refreshed.expires_in })
       return newClaims
     }

@@ -895,17 +895,43 @@ async function runTests() {
   await asyncTest('sessionHandler', '5.6 [TEST_AUTH_SECURITY] Mock tokens are INCONDITIONALLY REJECTED in all envs (PRODUCTION_TEST_AUTH_BYPASS=IMPOSSIBLE)', async () => {
     const origNodeEnv = process.env.NODE_ENV
     const origEnableTestAuth = process.env.ENABLE_TEST_AUTH
+    const { requireActiveAdmin } = await import('../server/utils/adminAuth.ts')
     try {
+      // 1. NODE_ENV=production + ENABLE_TEST_AUTH=true -> REJEITADO (authenticated: false)
       process.env.NODE_ENV = 'production'
       process.env.ENABLE_TEST_AUTH = 'true'
-      const event = createMockEvent({
+      const event1 = createMockEvent({
         method: 'GET',
         headers: {
-          cookie: `${ADMIN_AUTH_COOKIE_NAME}=e2e_test_admin_token`
+          authorization: 'Bearer dev_mock_admin_token',
+          cookie: `${ADMIN_AUTH_COOKIE_NAME}=dev_mock_admin_token`
         }
       })
-      const res = await sessionHandler(event)
-      assert.strictEqual(res.authenticated, false, 'Mock token NUNCA autentica em runtime')
+      const res1 = await sessionHandler(event1)
+      assert.strictEqual(res1.authenticated, false, 'dev_mock_admin_token NUNCA autentica em produção')
+
+      // 2. NODE_ENV=production + ENABLE_TEST_AUTH=false -> REJEITADO
+      process.env.NODE_ENV = 'production'
+      process.env.ENABLE_TEST_AUTH = 'false'
+      const event2 = createMockEvent({
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer dev_mock_admin_token'
+        }
+      })
+      const res2 = await sessionHandler(event2)
+      assert.strictEqual(res2.authenticated, false, 'dev_mock_admin_token rejeitado com ENABLE_TEST_AUTH=false')
+
+      // 3. requireActiveAdmin em produção lança 401
+      process.env.NODE_ENV = 'production'
+      process.env.ENABLE_TEST_AUTH = 'true'
+      let threw401 = false
+      try {
+        await requireActiveAdmin(event1)
+      } catch (err) {
+        if (err.statusCode === 401) threw401 = true
+      }
+      assert.strictEqual(threw401, true, 'requireActiveAdmin DEVE lançar 401 para mock tokens em produção')
     } finally {
       process.env.NODE_ENV = origNodeEnv
       process.env.ENABLE_TEST_AUTH = origEnableTestAuth
