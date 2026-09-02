@@ -161,14 +161,21 @@ function handleSelectDayFromMonth(day: Date) {
   updateUrlQuery({ view: 'dia', date: getSaoPauloDateString(day) })
 }
 
+const isStatusUpdating = ref(false)
+
 async function handleAdvanceStatus(nextStatus: string) {
-  if (!selectedAppointment.value) return
-  const res = await updateAppointmentStatus(selectedAppointment.value.id, {
-    status: nextStatus as any,
-    expected_appointment_updated_at: selectedAppointment.value.updated_at
-  })
-  if (res.success) {
-    await loadCalendarData()
+  if (isStatusUpdating.value || !selectedAppointment.value) return
+  isStatusUpdating.value = true
+  try {
+    const res = await updateAppointmentStatus(selectedAppointment.value.id, {
+      status: nextStatus as any,
+      expected_appointment_updated_at: selectedAppointment.value.updated_at
+    })
+    if (res.success) {
+      await loadCalendarData()
+    }
+  } finally {
+    isStatusUpdating.value = false
   }
 }
 
@@ -248,6 +255,7 @@ function handleAppointmentMutated() {
       :is-open="isDetailSheetOpen"
       :appointment="selectedAppointment"
       :is-loading="isDetailLoading"
+      :is-status-updating="isStatusUpdating"
       @close="isDetailSheetOpen = false"
       @open-edit="isEditModalOpen = true"
       @open-reschedule="isRescheduleModalOpen = true"

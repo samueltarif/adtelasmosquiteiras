@@ -1,6 +1,8 @@
 /**
  * PATCH /api/admin/crm/appointments/:id
  * Atualização não-temporal de agendamento via RPC update_appointment_atomic.
+ *
+ * HOTFIX: Preserva p_expected_appointment_updated_at exatamente sem truncamento de microsegundos.
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
@@ -8,19 +10,19 @@ import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
 import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
 import { isValidUUID, isValidRfc3339 } from '../../../../../shared/appointmentValidation.mjs'
 import { handleRpcError } from '../../../../../utils/crmAppointmentErrors.ts'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
+import { APPOINTMENT_DETAIL_SELECT, normalizeAppointmentDetail } from '../../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
   const config = useRuntimeConfig()
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
-    throw createError({ statusCode: 500, statusMessage: 'Supabase não configurado no servidor' })
+    throw createError({ statusCode: 500, message: 'Supabase não configurado no servidor' })
   }
 
   const id = getRouterParam(event, 'id')
   if (!id || !isValidUUID(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'ID do agendamento deve ser um UUID válido.' })
+    throw createError({ statusCode: 400, message: 'ID do agendamento deve ser um UUID válido.' })
   }
 
   const body = await readBody(event).catch(() => ({}))
@@ -29,28 +31,29 @@ export default defineEventHandler(async (event) => {
   if (body.data_hora_inicio !== undefined || body.data_hora_fim !== undefined) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Alterações de horário devem ser realizadas via endpoint dedicado de reagendamento (/reschedule).'
+      message: 'Alterações de horário devem ser realizadas via endpoint dedicado de reagendamento (/reschedule).'
     })
   }
 
   if (body.status_agendamento !== undefined || body.status !== undefined) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Alterações de status devem ser realizadas via endpoint dedicado (/status ou /cancel).'
+      message: 'Alterações de status devem ser realizadas via endpoint dedicado (/status ou /cancel).'
     })
   }
 
   if (!body.expected_appointment_updated_at || typeof body.expected_appointment_updated_at !== 'string') {
     throw createError({
       statusCode: 400,
-      statusMessage: 'O campo "expected_appointment_updated_at" é obrigatório para controle de concorrência.'
+      message: 'O campo "expected_appointment_updated_at" é obrigatório para controle de concorrência.'
     })
   }
 
-  if (!isValidRfc3339(body.expected_appointment_updated_at)) {
+  const rawExpectedUpdatedAt = body.expected_appointment_updated_at.trim()
+  if (!isValidRfc3339(rawExpectedUpdatedAt)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'expected_appointment_updated_at deve ser um timestamp RFC3339 válido com timezone explícito.'
+      message: 'expected_appointment_updated_at deve ser um timestamp RFC3339 válido com timezone explícito.'
     })
   }
 
@@ -61,7 +64,7 @@ export default defineEventHandler(async (event) => {
   if (!updateStaff && !updateAddress && !updateObservacoes) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ERR_NO_APPOINTMENT_CHANGES: Nenhum campo para atualização foi informado.',
+      message: 'ERR_NO_APPOINTMENT_CHANGES: Nenhum campo para atualização foi informado.',
       data: { error: { code: 'ERR_NO_APPOINTMENT_CHANGES', message: 'Nenhum campo para atualização foi informado.' } }
     })
   }
@@ -69,7 +72,7 @@ export default defineEventHandler(async (event) => {
   const rpcPayload = {
     p_actor_id: admin.userId,
     p_appointment_id: id,
-    p_expected_appointment_updated_at: new Date(body.expected_appointment_updated_at).toISOString(),
+    p_expected_appointment_updated_at: rawExpectedUpdatedAt,
     p_staff_id: body.staff_id ? String(body.staff_id).trim() : null,
     p_address_id: body.address_id ? String(body.address_id).trim() : null,
     p_observacoes: body.observacoes !== undefined && body.observacoes !== null ? String(body.observacoes).trim() : null,
@@ -101,7 +104,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      appointment: fullAppointment
+      appointment: normalizeAppointmentDetail(fullAppointment)
     }
   } catch (err: any) {
     handleRpcError(err)

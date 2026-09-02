@@ -44,12 +44,12 @@ export const APPOINTMENT_ERROR_MAP = {
   ERR_CONCURRENCY_CONFLICT: {
     status: 409,
     code: 'ERR_CONCURRENCY_CONFLICT',
-    message: 'O agendamento foi modificado por outro usuário. Recarregue os dados e tente novamente.'
+    message: 'Os dados deste agendamento foram atualizados desde que esta tela foi carregada. Os dados foram recarregados; tente novamente.'
   },
   ERR_APPOINTMENT_STALE_VERSION: {
     status: 409,
     code: 'ERR_CONCURRENCY_CONFLICT',
-    message: 'O agendamento foi modificado por outro usuário. Recarregue os dados e tente novamente.'
+    message: 'Os dados deste agendamento foram atualizados desde que esta tela foi carregada. Os dados foram recarregados; tente novamente.'
   },
   ERR_STAFF_SCHEDULE_CONFLICT: {
     status: 409,

@@ -1,6 +1,10 @@
 /**
  * POST /api/admin/crm/appointments/:id/status
  * Transição de status do agendamento via RPC update_appointment_status_atomic.
+ *
+ * HOTFIX: Preserva p_expected_appointment_updated_at exatamente como string opaca RFC3339
+ * sem re-serialização via new Date().toISOString() para evitar perda de precisão em microsegundos
+ * e falso conflito 409 ERR_CONCURRENCY_CONFLICT no PostgreSQL.
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
@@ -8,19 +12,19 @@ import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
 import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
 import { isValidAppointmentStatus, isValidUUID, isValidRfc3339 } from '../../../../../shared/appointmentValidation.mjs'
 import { handleRpcError } from '../../../../../utils/crmAppointmentErrors.ts'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
+import { APPOINTMENT_DETAIL_SELECT, normalizeAppointmentDetail } from '../../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)
   const config = useRuntimeConfig()
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
-    throw createError({ statusCode: 500, statusMessage: 'Supabase não configurado no servidor' })
+    throw createError({ statusCode: 500, message: 'Supabase não configurado no servidor' })
   }
 
   const id = getRouterParam(event, 'id')
   if (!id || !isValidUUID(id)) {
-    throw createError({ statusCode: 400, statusMessage: 'ID do agendamento deve ser um UUID válido.' })
+    throw createError({ statusCode: 400, message: 'ID do agendamento deve ser um UUID válido.' })
   }
 
   const body = await readBody(event).catch(() => ({}))
@@ -28,23 +32,24 @@ export default defineEventHandler(async (event) => {
   if (!isValidAppointmentStatus(body.status)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'ERR_INVALID_STATUS_TRANSITION: Status de agendamento informado é inválido.',
+      message: 'ERR_INVALID_STATUS_TRANSITION: Status de agendamento informado é inválido.',
       data: { error: { code: 'ERR_INVALID_STATUS_TRANSITION', message: 'Status de agendamento informado é inválido.' } }
     })
   }
 
   if (!body.expected_appointment_updated_at || typeof body.expected_appointment_updated_at !== 'string') {
-    throw createError({ statusCode: 400, statusMessage: 'O campo "expected_appointment_updated_at" é obrigatório.' })
+    throw createError({ statusCode: 400, message: 'O campo "expected_appointment_updated_at" é obrigatório.' })
   }
 
-  if (!isValidRfc3339(body.expected_appointment_updated_at)) {
-    throw createError({ statusCode: 400, statusMessage: 'expected_appointment_updated_at deve ser um timestamp RFC3339 válido com timezone explícito.' })
+  const rawExpectedUpdatedAt = body.expected_appointment_updated_at.trim()
+  if (!isValidRfc3339(rawExpectedUpdatedAt)) {
+    throw createError({ statusCode: 400, message: 'expected_appointment_updated_at deve ser um timestamp RFC3339 válido com timezone explícito.' })
   }
 
   const rpcPayload = {
     p_actor_id: admin.userId,
     p_appointment_id: id,
-    p_expected_appointment_updated_at: new Date(body.expected_appointment_updated_at).toISOString(),
+    p_expected_appointment_updated_at: rawExpectedUpdatedAt,
     p_next_status: body.status
   }
 
@@ -71,7 +76,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      appointment: fullAppointment
+      appointment: normalizeAppointmentDetail(fullAppointment)
     }
   } catch (err: any) {
     handleRpcError(err)

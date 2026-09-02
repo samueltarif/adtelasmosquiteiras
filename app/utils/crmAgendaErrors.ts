@@ -13,7 +13,7 @@ export function extractAppointmentErrorMessage(err: any): string {
     if (code.includes('ERR_ACTIVE_INSTALLATION_EXISTS')) {
       return 'Esta Ordem de Serviço já possui uma instalação ativa agendada ou em andamento.'
     }
-    return 'Os dados deste agendamento foram alterados por outro usuário. Recarregamos as informações mais recentes.'
+    return 'Os dados deste agendamento foram atualizados desde que esta tela foi carregada. Os dados foram recarregados; tente novamente.'
   }
   if (err?.statusCode === 403) return 'Acesso negado para esta operação.'
   if (err?.statusCode === 404) return 'Agendamento ou recurso não encontrado.'

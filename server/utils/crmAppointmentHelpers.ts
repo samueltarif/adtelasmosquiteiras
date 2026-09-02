@@ -169,3 +169,27 @@ export async function hasAnyActiveAppointment(
     throw createError({ statusCode: 503, message: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
   }
 }
+
+/**
+ * Normaliza o payload de detalhe de agendamento para o contrato CrmAppointmentDetail,
+ * extraindo client do work_order nested join e estruturando work_order.
+ */
+export function normalizeAppointmentDetail(raw: any): any {
+  if (!raw || typeof raw !== 'object') return raw
+  const clientFromWo = raw?.work_order?.client ?? raw?.client ?? null
+  const workOrder = raw?.work_order
+    ? {
+        id: raw.work_order.id,
+        numero_os: raw.work_order.numero_os,
+        status_os: raw.work_order.status_os,
+        valor_final: raw.work_order.valor_final ?? null,
+        is_archived: raw.work_order.is_archived ?? false
+      }
+    : null
+
+  return {
+    ...raw,
+    client: clientFromWo,
+    work_order: workOrder
+  }
+}

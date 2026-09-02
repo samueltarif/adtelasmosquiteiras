@@ -10,6 +10,7 @@ const props = defineProps<{
   isOpen: boolean
   appointment: CrmAppointmentDetail | null
   isLoading?: boolean
+  isStatusUpdating?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -19,6 +20,11 @@ const emit = defineEmits<{
   (e: 'openCancel'): void
   (e: 'updateStatus', nextStatus: string): void
 }>()
+
+function handleStatusClick(nextStatus: string) {
+  if (props.isStatusUpdating || props.isLoading) return
+  emit('updateStatus', nextStatus)
+}
 
 useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
 
@@ -249,11 +255,14 @@ const nextValidStatuses = computed(() => {
             <button
               v-for="st in nextValidStatuses"
               :key="st.status"
-              @click="emit('updateStatus', st.status)"
-              class="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
+              type="button"
+              :disabled="isStatusUpdating || isLoading"
+              @click="handleStatusClick(st.status)"
+              class="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
             >
-              <Icon :name="st.icon" class="w-4 h-4" />
-              <span>{{ st.label }}</span>
+              <Icon v-if="isStatusUpdating" name="lucide:loader-2" class="w-4 h-4 animate-spin text-white" />
+              <Icon v-else :name="st.icon" class="w-4 h-4" />
+              <span>{{ isStatusUpdating ? 'Atualizando...' : st.label }}</span>
             </button>
           </div>
         </div>
@@ -262,8 +271,10 @@ const nextValidStatuses = computed(() => {
         <div class="flex items-center gap-2 pt-2 border-t border-white/5">
           <button
             v-if="!isArchivedWo"
+            type="button"
+            :disabled="isStatusUpdating || isLoading"
             @click="emit('openEdit')"
-            class="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
+            class="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-slate-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
           >
             <Icon name="lucide:pencil" class="w-4 h-4 text-indigo-400" />
             <span>Editar</span>
@@ -271,16 +282,20 @@ const nextValidStatuses = computed(() => {
 
           <button
             v-if="!isArchivedWo"
+            type="button"
+            :disabled="isStatusUpdating || isLoading"
             @click="emit('openReschedule')"
-            class="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 hover:text-purple-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
+            class="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-purple-300 hover:text-purple-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
           >
             <Icon name="lucide:calendar-clock" class="w-4 h-4" />
             <span>Reagendar</span>
           </button>
 
           <button
+            type="button"
+            :disabled="isStatusUpdating || isLoading"
             @click="emit('openCancel')"
-            class="px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold border border-rose-500/20 transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 disabled:opacity-50 disabled:cursor-not-allowed text-rose-300 text-xs font-semibold border border-rose-500/20 transition-all flex items-center justify-center gap-1.5 min-h-[44px] cursor-pointer"
           >
             <Icon name="lucide:ban" class="w-4 h-4" />
             <span>Cancelar</span>

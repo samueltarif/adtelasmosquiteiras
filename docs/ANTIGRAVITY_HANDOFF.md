@@ -43,7 +43,21 @@
   - `SUPABASE_MCP_WRITES = 0`
   - `PRODUCTION_DATABASE_WRITES = 0`
   - `MIGRATION_012_REEXECUTED = NO`
-  - `MIGRATION_013_CREATED = NO`
+- **Hotfix — Concorrência 409 & Preservação Exata de Token**: `COMPLETE_VALIDATED`
+  - `CONCURRENCY_409_ROOT_CAUSE = new Date(body.expected_appointment_updated_at).toISOString() nos endpoints BFF truncava a precisão de microsegundos (ex: 2026-09-02 10:58:25.53129+00 -> 2026-09-02T10:58:25.531Z), fazendo PostgreSQL timestamptz IS DISTINCT FROM avaliar como TRUE`
+  - `CONCURRENCY_TOKEN_PRESERVED_EXACTLY = YES (string RFC3339 opaca preservada diretamente do client para a RPC)`
+  - `DUPLICATE_STATUS_REQUEST_ROOT_CAUSE = Ausência de mutex de submissão e ausência de disabled/loading visual nos botões de transição do AppointmentDetailSheet`
+  - `STATUS_SUBMISSION_MUTEX = IMPLEMENTED (isStatusUpdating ref + guard if (isStatusUpdating) return + disabled visual com spinner)`
+  - `STATUS_REQUEST_COUNT_PER_CLICK = 1`
+  - `CONCURRENCY_USER_MESSAGE = NEUTRALIZED (atualizado em appointmentErrorMap.mjs e crmAgendaErrors.ts sem alegar outro usuário)`
+  - `STARTTIME_ERROR_SOURCE = Ferramental externo / Extensão de browser / Devtools (zero referências a startTime no runtime da aplicação)`
+  - `BUILD_STATUS = PASS (exit code 0)`
+  - `MIGRATION_012_CHANGED = NO`
+  - `MIGRATION_013_CHANGED = NO`
+  - `SUPABASE_MCP_WRITES = 0`
+  - `PRODUCTION_DATABASE_WRITES = 0`
+  - `APPLICATION_DEPLOY = NO`
+
 
 ---
 
