@@ -2,6 +2,10 @@
  * GET /api/admin/crm/appointments
  * Consulta estruturada de compromissos da Agenda para visualização em Calendário.
  * Range máximo permitido: 62 dias. Sem busca textual de PII via query string.
+ *
+ * PHASE_5_0D_0: Embeddings de FK composta corrigidos via !constraint_name.
+ * O campo client é normalizado do work_order.client para a raiz do objeto
+ * para compatibilidade com o contrato TypeScript CrmAppointmentSummary.
  */
 
 import { defineEventHandler, getQuery, createError } from 'h3'
@@ -15,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
-    throw createError({ statusCode: 500, statusMessage: 'Supabase não configurado no servidor' })
+    throw createError({ statusCode: 500, message: 'Supabase não configurado no servidor' })
   }
 
   const query = getQuery(event)
@@ -25,14 +29,14 @@ export default defineEventHandler(async (event) => {
   if (!startStr || !endStr) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Os parâmetros temporais "start" e "end" (ISO 8601) são obrigatórios.'
+      message: 'Os parâmetros temporais "start" e "end" (ISO 8601) são obrigatórios.'
     })
   }
 
   if (!isValidAppointmentDateRange(startStr, endStr, 62)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Intervalo de calendário inválido. O range máximo permitido é de 62 dias e a data de início deve ser anterior à de fim.'
+      message: 'Intervalo de calendário inválido. O range máximo permitido é de 62 dias e a data de início deve ser anterior à de fim.'
     })
   }
 
@@ -46,37 +50,51 @@ export default defineEventHandler(async (event) => {
   const rawStaffId = (query.staff_id !== undefined ? query.staff_id : query.staffId) as string | undefined
   if (rawStaffId !== undefined && rawStaffId !== null && rawStaffId !== '') {
     if (typeof rawStaffId !== 'string' || !isValidUUID(rawStaffId)) {
-      throw createError({ statusCode: 400, statusMessage: 'Parâmetro staff_id inválido. Deve ser um UUID válido.' })
+      throw createError({ statusCode: 400, message: 'Parâmetro staff_id inválido. Deve ser um UUID válido.' })
     }
     params.push(`staff_id=eq.${encodeURIComponent(rawStaffId.trim())}`)
   }
 
   if (query.status !== undefined && query.status !== null && query.status !== '') {
     if (typeof query.status !== 'string' || !isValidAppointmentStatus(query.status.trim())) {
-      throw createError({ statusCode: 400, statusMessage: 'Parâmetro status inválido.' })
+      throw createError({ statusCode: 400, message: 'Parâmetro status inválido.' })
     }
     params.push(`status_agendamento=eq.${encodeURIComponent(query.status.trim())}`)
   }
 
   if (query.tipo !== undefined && query.tipo !== null && query.tipo !== '') {
     if (typeof query.tipo !== 'string' || !isValidAppointmentType(query.tipo.trim())) {
-      throw createError({ statusCode: 400, statusMessage: 'Parâmetro tipo inválido.' })
+      throw createError({ statusCode: 400, message: 'Parâmetro tipo inválido.' })
     }
     params.push(`tipo_agendamento=eq.${encodeURIComponent(query.tipo.trim())}`)
   }
 
   try {
-    const appointments = await $fetch<any[]>(
+    const raw = await $fetch<any[]>(
       `${config.supabaseUrl}/rest/v1/appointments?${params.join('&')}`,
       { headers: getSupabaseHeaders(config.supabaseServiceRoleKey) }
     )
 
-    return {
-      success: true,
-      appointments: Array.isArray(appointments) ? appointments : []
-    }
+    // Normalizar client do work_order.client para a raiz do objeto,
+    // mantendo o contrato CrmAppointmentSummary: appt.client?.nome
+    const appointments = Array.isArray(raw)
+      ? raw.map((appt: any) => {
+          const clientFromWo = appt?.work_order?.client ?? null
+          return {
+            ...appt,
+            client: clientFromWo,
+            work_order: appt?.work_order
+              ? { id: appt.work_order.id, numero_os: appt.work_order.numero_os, status_os: appt.work_order.status_os }
+              : null
+          }
+        })
+      : []
+
+    return { success: true, appointments }
   } catch (err: any) {
-    console.error('[AppointmentsList] Erro ao consultar compromissos. Status:', err?.statusCode || 'unknown')
-    throw createError({ statusCode: 500, statusMessage: 'Falha ao carregar agendamentos da agenda.' })
+    const statusCode = err?.statusCode || err?.response?.status || 'unknown'
+    const errCode = err?.data?.code || err?.data?.message || ''
+    console.error(`[AppointmentsList] route=GET /api/admin/crm/appointments status=${statusCode} errorCode=${errCode}`)
+    throw createError({ statusCode: 500, message: 'Não foi possível carregar os agendamentos da agenda.' })
   }
 })

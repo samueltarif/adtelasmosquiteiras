@@ -24,7 +24,10 @@ const activeStaffList = computed(() => (props.staffList || []).filter(st => st.i
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
 const isSearching = ref(false)
+const searchError = ref<string | null>(null)
 const selectedWorkOrder = ref<any | null>(null)
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+let searchRequestSeq = 0
 
 // Client Addresses
 const clientAddresses = ref<any[]>([])
@@ -98,24 +101,35 @@ async function loadPreselectedWorkOrder(woId: string) {
   }
 }
 
-async function handleSearchWorkOrders() {
+function handleSearchWorkOrders() {
+  searchError.value = null
   const query = searchQuery.value.trim()
   if (query.length < 2) {
     searchResults.value = []
     return
   }
 
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => performSearchWorkOrders(query), 350)
+}
+
+async function performSearchWorkOrders(query: string) {
+  const seq = ++searchRequestSeq
   isSearching.value = true
+  searchError.value = null
   try {
     const res = await $fetch<any>('/api/admin/crm/work-orders/search', {
       method: 'POST',
       body: { search: query, limit: 10 }
     })
+    if (seq !== searchRequestSeq) return // stale request — descartado
     searchResults.value = res?.workOrders || []
-  } catch (err) {
-    console.error('[AppointmentCreateModal] Falha na busca de OS')
+  } catch {
+    if (seq !== searchRequestSeq) return
+    searchError.value = 'Não foi possível pesquisar as ordens de serviço.'
+    searchResults.value = []
   } finally {
-    isSearching.value = false
+    if (seq === searchRequestSeq) isSearching.value = false
   }
 }
 
@@ -237,6 +251,9 @@ async function handleSubmit() {
             <Icon name="lucide:search" class="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
             <Icon v-if="isSearching" name="lucide:loader-2" class="w-4 h-4 animate-spin text-indigo-400 absolute right-3 top-3.5" />
           </div>
+
+          <!-- Erro de busca de OS -->
+          <p v-if="searchError" class="text-xs text-red-400 mt-1">{{ searchError }}</p>
 
           <!-- Dropdown de Resultados da OS -->
           <div

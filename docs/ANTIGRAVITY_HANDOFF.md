@@ -25,6 +25,25 @@
     - Trigger Function: `public.fn_prevent_terminal_work_order_with_active_appointments()` (`VOLATILE`, `SECURITY DEFINER`, `search_path = ''`, `row_security = off`, `REVOKE ALL FROM PUBLIC, anon, authenticated, service_role`).
     - Trigger: `trg_prevent_terminal_work_order_with_active_appointments` (`BEFORE UPDATE OF status_os ON public.work_orders FOR EACH ROW WHEN (OLD.status_os IS DISTINCT FROM NEW.status_os AND NEW.status_os IN ('concluida', 'cancelada'))`).
   - **Postflight Read-Only de Produção**: `PASS` (100% dos testes aprovados, zero mutações em dados reais).
+- **Fase 5.0D.0 (Runtime Integration & UI Stabilization)**: `COMPLETE_VALIDATED`
+  - `PHASE_5_0D_0_STATUS = COMPLETE_VALIDATED`
+  - **Bug 1 — WorkOrdersSearch PGRST100**:
+    - **Causa Raiz**: `or=()` PostgREST com `client.nome.ilike.*q*` — o PostgREST não suporta dot-notation em tabelas relacionadas via embedding dentro de `or=()`. Coluna `nome` pertence a `clients`, não a `work_orders`.
+    - **Correção**: `server/api/admin/crm/work-orders/search.post.ts` — busca em dois passos no BFF: resolve `client_id[]` de `clients` por nome/telefone, depois usa `client_id.in.(...)` em `work_orders`. Nunca usa `or=()` com colunas relacionadas.
+    - `WORK_ORDER_SEARCH_PGRST100 = FIXED`
+  - **Bug 2 — AppointmentsList HTTP 400**:
+    - **Causa Raiz**: FKs compostas na `appointments` (`fk_appointments_work_order_client` e `fk_appointments_client_address`) geram ambiguidade no PostgREST para embeddings sem `!constraint_name`. Além disso, `client:clients(...)` não existe como FK direta de `appointments` — `appointments.client_id` não tem FK para `clients` diretamente.
+    - **Correção**: `server/utils/crmAppointmentHelpers.ts` — `APPOINTMENT_CALENDAR_SELECT` e `APPOINTMENT_DETAIL_SELECT` agora usam `work_order:work_orders!fk_appointments_work_order_client(id,numero_os,status_os,client:clients(id,nome))` (nested) e `address:client_addresses!fk_appointments_client_address(...)`. Campo `client` normalizado para raiz do objeto no BFF.
+    - `APPOINTMENTS_LIST_400 = FIXED`
+  - `DIRECT_SUPABASE_SEARCH_FROM_MODAL = NO`
+  - `RAW_SUPABASE_ERROR_LOGGING = NO`
+  - `H3_LONG_STATUS_MESSAGE_WARNINGS = 0` (nos fluxos tocados)
+  - `APPOINTMENT_DUPLICATE_FETCH = NO` (flag `isInitialMounting` já prevenia corretamente)
+  - `BUILD_STATUS = PASS` (exit code 0)
+  - `SUPABASE_MCP_WRITES = 0`
+  - `PRODUCTION_DATABASE_WRITES = 0`
+  - `MIGRATION_012_REEXECUTED = NO`
+  - `MIGRATION_013_CREATED = NO`
 
 ---
 

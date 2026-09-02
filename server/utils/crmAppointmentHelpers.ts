@@ -21,6 +21,15 @@ export interface SupabaseConfig {
  * NÃO inclui: telefone, email, observacoes, motivo_reagendamento_cancelamento,
  * created_by, valor_final, telefone do staff, endereço completo além do essencial.
  */
+/**
+ * APPOINTMENT_CALENDAR_SELECT — projeção mínima para calendário.
+ * FKs disambiguadas com !constraint_name (FKs compostas na Migration 012).
+ * - work_orders: via !fk_appointments_work_order_client (composta: work_order_id+client_id)
+ *   com nested client:clients(id,nome) para obter nome do cliente.
+ * - client_addresses: via !fk_appointments_client_address (composta: address_id+client_id)
+ * - crm_staff: via FK simples fk_appointments_staff (staff_id)
+ * NÃO existe FK direta appointments.client_id -> clients.id.
+ */
 export const APPOINTMENT_CALENDAR_SELECT = [
   'id',
   'work_order_id',
@@ -32,10 +41,9 @@ export const APPOINTMENT_CALENDAR_SELECT = [
   'data_hora_fim',
   'status_agendamento',
   'updated_at',
-  'client:clients(id,nome)',
-  'work_order:work_orders(id,numero_os,status_os)',
+  'work_order:work_orders!fk_appointments_work_order_client(id,numero_os,status_os,client:clients(id,nome))',
   'staff:crm_staff(id,nome,funcao)',
-  'address:client_addresses(id,rotulo,bairro,cidade,uf)'
+  'address:client_addresses!fk_appointments_client_address(id,rotulo,bairro,cidade,uf)'
 ].join(',')
 
 /**
@@ -58,9 +66,8 @@ export const APPOINTMENT_DETAIL_SELECT = [
   'created_by',
   'created_at',
   'updated_at',
-  'client:clients(id,nome,telefone_principal,email,tipo_cliente)',
-  'work_order:work_orders(id,numero_os,status_os,valor_final)',
-  'address:client_addresses(id,rotulo,logradouro,numero,complemento,bairro,cidade,uf)',
+  'work_order:work_orders!fk_appointments_work_order_client(id,numero_os,status_os,valor_final,is_archived,client:clients(id,nome,telefone_principal,email,tipo_cliente))',
+  'address:client_addresses!fk_appointments_client_address(id,rotulo,logradouro,numero,complemento,bairro,cidade,uf)',
   'staff:crm_staff(id,nome,funcao,telefone)'
 ].join(',')
 
