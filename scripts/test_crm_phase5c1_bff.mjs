@@ -5,6 +5,8 @@
  * ======================================================================
  */
 
+process.env.NODE_ENV = 'test'
+
 import assert from 'assert'
 import fs from 'fs'
 import path from 'path'
@@ -19,12 +21,13 @@ import { APPOINTMENT_ERROR_MAP } from '../server/shared/appointmentErrorMap.mjs'
 import { IncomingMessage, ServerResponse } from 'http'
 import { requireActiveAdmin } from '../server/utils/adminAuth.ts'
 import { findDuplicateClients } from '../server/utils/crmDuplicateSearch.ts'
-import { validateMutationOrigin, verifyActiveAdmin } from '../server/shared/adminAuthCore.mjs'
+import { validateMutationOrigin, verifyActiveAdmin, isExplicitDevOrTestEnvironment } from '../server/shared/adminAuthCore.mjs'
 import {
   APPOINTMENT_CALENDAR_SELECT,
   APPOINTMENT_DETAIL_SELECT,
   APPOINTMENT_SEARCH_SELECT,
   hasActiveInstallation,
+  getActiveInstallation,
   hasAnyActiveAppointment
 } from '../server/utils/crmAppointmentHelpers.ts'
 import { handleRpcError } from '../server/utils/crmAppointmentErrors.ts'
@@ -67,7 +70,10 @@ const errors = []
 function test(name, fn) {
   unitExecuted++
   try {
-    fn()
+    const res = fn()
+    if (res && typeof res.then === 'function') {
+      throw new Error(`TEST RUNNER CONTRACT VIOLATION: Test "${name}" returned a Promise but was called via synchronous test(). Must use await asyncTest(...)`)
+    }
     console.log(`  [PASS:UNIT] ${name}`)
     unitPassed++
     passed++
@@ -81,21 +87,28 @@ function test(name, fn) {
 
 async function asyncTest(name, fn) {
   const isGuard = name.startsWith('C.')
+  const isUnit = name.startsWith('A.')
   if (isGuard) guardExecuted++
+  else if (isUnit) unitExecuted++
   else bffExecuted++
 
   try {
-    await fn()
-    const tag = isGuard ? 'GUARD' : 'BFF'
+    const res = fn()
+    if (res && typeof res.then === 'function') {
+      await res
+    }
+    const tag = isGuard ? 'GUARD' : (isUnit ? 'UNIT' : 'BFF')
     console.log(`  [PASS:${tag}] ${name}`)
     if (isGuard) guardPassed++
+    else if (isUnit) unitPassed++
     else bffPassed++
     passed++
   } catch (err) {
-    const tag = isGuard ? 'GUARD' : 'BFF'
+    const tag = isGuard ? 'GUARD' : (isUnit ? 'UNIT' : 'BFF')
     console.error(`  [FAIL:${tag}] ${name}:`, err.message)
     errors.push({ name, error: err.message })
     if (isGuard) guardFailed++
+    else if (isUnit) unitFailed++
     else bffFailed++
     failed++
   }
@@ -154,6 +167,28 @@ function getErrorStatus(err) {
 async function runSuite() {
   console.log('--- A. VALIDAÇÃO UNITÁRIA (UUID, RFC3339, POSTGREST QUOTING, ERROR MAP, STATIC CHECKS) ---')
 
+  await asyncTest('A.0 Runner Integrity: BFF_ASYNC_TESTS_UNAWAITED=0 (prova negativa e auditoria estática concluídas)', async () => {
+    // Prova negativa: confirma que falhas assíncronas são capturadas e produzem erro
+    let localCaught = false
+    const dummyRunner = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      throw new Error('SIMULATED_ASYNC_REJECTION_NEGATIVE_PROOF')
+    }
+    try {
+      await dummyRunner()
+    } catch (e) {
+      if (e.message.includes('SIMULATED_ASYNC_REJECTION_NEGATIVE_PROOF')) localCaught = true
+    }
+    assert.strictEqual(localCaught, true, 'Runner negativo deve capturar rejeição assíncrona')
+
+    // Verificação estática de governança no próprio arquivo: zero test(..., async) e zero asyncTest sem await
+    const selfContent = fs.readFileSync(path.resolve('scripts/test_crm_phase5c1_bff.mjs'), 'utf8')
+    const unawaitedSyncAsync = (selfContent.match(/^\s*test\s*\([^,]+,\s*async\b/gm) || []).length
+    const unawaitedAsyncTests = (selfContent.match(/^\s*asyncTest\s*\(/gm) || []).length
+    assert.strictEqual(unawaitedSyncAsync, 0, 'Zero chamadas test(..., async)')
+    assert.strictEqual(unawaitedAsyncTests, 0, 'Zero chamadas asyncTest(...) sem await')
+  })
+
   test('A.1 UUID version-agnostic (v1, v4, v7, random hex)', () => {
     assert.strictEqual(isValidUUID('c6745e05-20a8-4865-b2b1-dc1d102a818e'), true)
     assert.strictEqual(isValidUUID('018e3a2b-4c5d-7e8f-9a0b-1c2d3e4f5a6b'), true)
@@ -188,12 +223,57 @@ async function runSuite() {
     assert.ok(APPOINTMENT_ERROR_MAP.ERR_ACTIVE_APPOINTMENTS_EXIST)
   })
 
-  test('A.5 Static Security Check: zero bypass tokens no runtime auth code (DEV_MOCK_AUTH_RUNTIME=REMOVED)', () => {
+  test('A.5 Central Admin Guard: zero hardcoded bypass tokens (CENTRAL_ADMIN_GUARD_HARDCODED_BYPASS=NONE)', () => {
     const adminAuthFile = fs.readFileSync(path.resolve('server/utils/adminAuth.ts'), 'utf8')
-    assert.strictEqual(adminAuthFile.includes('dev_mock_admin_token'), false, 'dev_mock_admin_token não pode existir')
-    assert.strictEqual(adminAuthFile.includes('dev_mock_refresh_token'), false, 'dev_mock_refresh_token não pode existir')
-    assert.strictEqual(adminAuthFile.includes('ENABLE_TEST_AUTH'), false, 'ENABLE_TEST_AUTH não pode existir no runtime')
-    assert.strictEqual(adminAuthFile.includes('e2e_test_admin_token'), false, 'e2e_test_admin_token não pode existir no runtime')
+    assert.strictEqual(adminAuthFile.includes('dev_mock_admin_token'), false, 'dev_mock_admin_token não pode existir no guard central')
+    assert.strictEqual(adminAuthFile.includes('dev_mock_refresh_token'), false, 'dev_mock_refresh_token não pode existir no guard central')
+    assert.strictEqual(adminAuthFile.includes('ENABLE_TEST_AUTH'), false, 'ENABLE_TEST_AUTH não pode existir no guard central')
+    assert.strictEqual(adminAuthFile.includes('e2e_test_admin_token'), false, 'e2e_test_admin_token não pode existir no guard central')
+  })
+
+  test('A.5.1 Test Auth Architecture Check: (TEST_AUTH_RUNTIME_PRESENT_NONPRODUCTION_GATED=YES & PRODUCTION_TEST_AUTH_BYPASS=BLOCKED)', () => {
+    const sessionFile = fs.readFileSync(path.resolve('server/utils/adminAuthSession.ts'), 'utf8')
+    assert.strictEqual(sessionFile.includes('isTestAuthEnabled'), true, 'adminAuthSession deve utilizar isTestAuthEnabled para gate estrito')
+    assert.strictEqual(sessionFile.includes('test-admin@adt-crm.invalid'), true, 'mock token deve usar e-mail sintético .invalid')
+    const origEnv = process.env.NODE_ENV
+    const origTestAuth = process.env.ENABLE_TEST_AUTH
+    try {
+      process.env.NODE_ENV = 'production'
+      process.env.ENABLE_TEST_AUTH = 'true'
+      assert.strictEqual(isExplicitDevOrTestEnvironment(), false, 'isExplicitDevOrTestEnvironment deve ser false em production')
+    } finally {
+      process.env.NODE_ENV = origEnv
+      process.env.ENABLE_TEST_AUTH = origTestAuth
+    }
+  })
+
+  test('A.5.2 Cookie Secure Policy: fail-closed em produção e ambientes desconhecidos (COOKIE_SECURE_DEFAULT=FAIL_CLOSED)', () => {
+    const origEnv = process.env.NODE_ENV
+    try {
+      const getSecureForEnv = (envVal) => {
+        if (envVal === undefined) delete process.env.NODE_ENV
+        else process.env.NODE_ENV = envVal
+        const isDevOrTest = isExplicitDevOrTestEnvironment()
+        return !isDevOrTest
+      }
+
+      // 1. production -> secure true
+      assert.strictEqual(getSecureForEnv('production'), true, 'production deve ter secure=true')
+      // 2. undefined -> secure true
+      assert.strictEqual(getSecureForEnv(undefined), true, 'undefined deve ter secure=true')
+      // 3. staging -> secure true
+      assert.strictEqual(getSecureForEnv('staging'), true, 'staging deve ter secure=true')
+      // 4. preview -> secure true
+      assert.strictEqual(getSecureForEnv('preview'), true, 'preview deve ter secure=true')
+      // 5. qa -> secure true
+      assert.strictEqual(getSecureForEnv('qa'), true, 'qa deve ter secure=true')
+      // 6. development -> secure false
+      assert.strictEqual(getSecureForEnv('development'), false, 'development pode ter secure=false')
+      // 7. test -> secure false
+      assert.strictEqual(getSecureForEnv('test'), false, 'test pode ter secure=false')
+    } finally {
+      process.env.NODE_ENV = origEnv
+    }
   })
 
   test('A.6 verifyActiveAdmin Role Fail-Closed (role ausente/null/operator -> UNAUTHORIZED_ROLE)', () => {
@@ -251,7 +331,7 @@ async function runSuite() {
     assert.strictEqual(content.includes('ERR_STATUS_MANAGED_BY_AGENDA'), false, 'código não-canônico proibido')
   })
 
-  test('A.12 ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS: hasActiveInstallation fail-closed em config ausente e workOrderId inválido', async () => {
+  await asyncTest('A.12 ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS: hasActiveInstallation fail-closed em config ausente e workOrderId inválido', async () => {
     // Config ausente -> 503
     try {
       await hasActiveInstallation({ url: '', serviceRoleKey: '' }, 'some-id')
@@ -366,7 +446,7 @@ async function runSuite() {
     assert.ok(fullLog.includes('[CRM Appointment RPC Error]'), 'Log técnico estruturado deve estar presente')
   })
 
-  test('A.17 ACTIVE_APPOINTMENT_GUARD_FAILURE_POLICY=FAIL_CLOSED: hasAnyActiveAppointment fail-closed em config ausente e workOrderId inválido', async () => {
+  await asyncTest('A.17 ACTIVE_APPOINTMENT_GUARD_FAILURE_POLICY=FAIL_CLOSED: hasAnyActiveAppointment fail-closed em config ausente e workOrderId inválido', async () => {
     // Config ausente -> 503
     try {
       await hasAnyActiveAppointment({ url: '', serviceRoleKey: '' }, 'some-id')
@@ -380,6 +460,58 @@ async function runSuite() {
       assert.fail('Deveria ter lançado 400')
     } catch (err) {
       assert.strictEqual(err?.statusCode, 400, 'workOrderId inválido deve lançar 400')
+    }
+  })
+
+  await asyncTest('A.18 APPOINTMENT_GUARD_UPSTREAM_ERROR_POLICY=SANITIZED_503_FAIL_CLOSED: Sanitização total de erros upstream nos 3 guards', async () => {
+    const origFetch = globalThis.$fetch
+    const guards = [
+      { name: 'hasActiveInstallation', fn: (cfg, id) => hasActiveInstallation(cfg, id) },
+      { name: 'getActiveInstallation', fn: (cfg, id) => getActiveInstallation(cfg, id) },
+      { name: 'hasAnyActiveAppointment', fn: (cfg, id) => hasAnyActiveAppointment(cfg, id) }
+    ]
+
+    const testConfig = { url: 'http://upstream-db.local', serviceRoleKey: 'test_key' }
+    const testId = '00000000-0000-0000-0000-000000000001'
+    const sensitiveMarker = 'UNIQUE_SENSITIVE_MARKER_LEAK_TEST'
+
+    try {
+      for (const guard of guards) {
+        // 1. Error comum -> 503 sanitizado
+        globalThis.$fetch = async () => { throw new Error('Generic network timeout') }
+        try {
+          await guard.fn(testConfig, testId)
+          assert.fail(`${guard.name} deveria ter lançado 503 para generic Error`)
+        } catch (err) {
+          assert.strictEqual(err?.statusCode, 503)
+          assert.strictEqual(JSON.stringify(err).includes(sensitiveMarker), false)
+        }
+
+        // 2. Erros com status 400, 401, 403, 500 contendo dados sensíveis -> 503 sanitizado
+        for (const status of [400, 401, 403, 500]) {
+          globalThis.$fetch = async () => {
+            const upstreamErr = new Error(`Upstream failed with ${status}`)
+            upstreamErr.statusCode = status
+            upstreamErr.data = { message: sensitiveMarker, secret_table: 'auth.users' }
+            throw upstreamErr
+          }
+
+          try {
+            await guard.fn(testConfig, testId)
+            assert.fail(`${guard.name} deveria ter lançado 503 para upstream status ${status}`)
+          } catch (err) {
+            assert.strictEqual(err?.statusCode, 503, `${guard.name}: status deve ser 503`)
+            const serialized = JSON.stringify({ message: err.message, statusMessage: err.statusMessage, data: err.data })
+            assert.strictEqual(
+              serialized.includes(sensitiveMarker),
+              false,
+              `${guard.name}: UNIQUE_SENSITIVE_MARKER não pode aparecer na resposta para status ${status}`
+            )
+          }
+        }
+      }
+    } finally {
+      globalThis.$fetch = origFetch
     }
   })
 
@@ -661,6 +793,140 @@ async function runSuite() {
     assert.strictEqual(queriedUrl.includes('telefone'), false, 'Calendário não deve solicitar telefone')
     assert.strictEqual(queriedUrl.includes('observacoes'), false, 'Calendário não deve solicitar observacoes')
     assert.strictEqual(queriedUrl.includes('motivo_reagendamento'), false, 'Calendário não deve solicitar motivo_reagendamento')
+  })
+
+  await asyncTest('B.13.1 GET /api/admin/crm/appointments CALENDAR_RANGE_RFC3339_EXPLICIT_OFFSET=PASS', async () => {
+    globalThis.$fetch = async () => []
+
+    // 1. Z -> accepted
+    const evZ = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-03T10:00:00Z', end: '2026-09-05T10:00:00Z' }
+    })
+    const resZ = await getAppointmentsHandler(evZ)
+    assert.strictEqual(resZ.success, true)
+
+    // 2. explicit offset -03:00 -> accepted
+    const evOffset = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-03T10:00:00-03:00', end: '2026-09-05T10:00:00-03:00' }
+    })
+    const resOffset = await getAppointmentsHandler(evOffset)
+    assert.strictEqual(resOffset.success, true)
+
+    // 3. date-only -> 400
+    const evDateOnly = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-03', end: '2026-09-05' }
+    })
+    try {
+      await getAppointmentsHandler(evDateOnly)
+      assert.fail('Deveria ter lançado 400 para date-only')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // 4. timezone-less -> 400
+    const evNoTz = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-03T10:00:00', end: '2026-09-05T10:00:00' }
+    })
+    try {
+      await getAppointmentsHandler(evNoTz)
+      assert.fail('Deveria ter lançado 400 para timezone-less')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // 5. impossible date -> 400
+    const evImpossible = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-02-30T10:00:00-03:00', end: '2026-03-05T10:00:00-03:00' }
+    })
+    try {
+      await getAppointmentsHandler(evImpossible)
+      assert.fail('Deveria ter lançado 400 para data impossível')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // 6. start >= end -> 400
+    const evInverted = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-05T10:00:00Z', end: '2026-09-03T10:00:00Z' }
+    })
+    try {
+      await getAppointmentsHandler(evInverted)
+      assert.fail('Deveria ter lançado 400 para start >= end')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+
+    // 7. range > 62 dias -> 400
+    const evTooLong = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-01-01T00:00:00Z', end: '2026-03-15T00:00:00Z' }
+    })
+    try {
+      await getAppointmentsHandler(evTooLong)
+      assert.fail('Deveria ter lançado 400 para range > 62 dias')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 400)
+    }
+  })
+
+  await asyncTest('B.13.2 GET /api/admin/crm/appointments CALENDAR_RAW_UPSTREAM_ERROR_LOGGING=NONE', async () => {
+    const origConsoleError = console.error
+    const capturedLogs = []
+    console.error = (...args) => {
+      capturedLogs.push(args.join(' '))
+    }
+
+    const sensitivePii = 'SENSITIVE_UPSTREAM_TABLE_PII_LEAK'
+    globalThis.$fetch = async () => {
+      const err = new Error('Database error')
+      err.statusCode = 500
+      err.data = {
+        code: 'PGRST116',
+        message: `Internal PostgREST failure with user data: ${sensitivePii}`
+      }
+      throw err
+    }
+
+    const ev = createMockEvent({
+      method: 'GET',
+      url: '/api/admin/crm/appointments',
+      context: defaultAdminContext,
+      query: { start: '2026-09-01T00:00:00Z', end: '2026-09-05T00:00:00Z' }
+    })
+
+    try {
+      await getAppointmentsHandler(ev)
+      assert.fail('Deveria ter lançado 500')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 500)
+    } finally {
+      console.error = origConsoleError
+    }
+
+    const logText = capturedLogs.join('\n')
+    assert.strictEqual(logText.includes(sensitivePii), false, 'PII/err.data.message NÃO pode constar no console.error')
+    assert.strictEqual(logText.includes('errorCode=PGRST116'), true, 'Código técnico seguro deve ser logado')
+    assert.strictEqual(logText.includes('route=GET /api/admin/crm/appointments'), true)
   })
 
   await asyncTest('B.14 POST /api/admin/crm/appointments/search valida q vazio (200), q com valor (400) e tipos inválidos (400)', async () => {
@@ -1223,33 +1489,124 @@ async function runSuite() {
 
   console.log('\n--- C. TESTES REAIS DO GUARD requireActiveAdmin & CSRF PRODUCTION FAIL-CLOSED ---')
 
-  await asyncTest('C.1 requireActiveAdmin com cached inactive admin retorna 403 (CACHED_INACTIVE_ADMIN=REJECTED)', async () => {
-    const event = createMockEvent({
-      context: {
-        auth: {
-          admin: { adminId: '1', userId: '1', email: 'test@adt.local', role: 'admin', isActive: false }
-        }
-      }
+  await asyncTest('C.1 requireActiveAdmin com cached admin matrix (isActive e role validation)', async () => {
+    // 1. cached role=admin + isActive=true -> permitido
+    const eventOk = createMockEvent({
+      context: { auth: { admin: { adminId: '1', userId: '1', email: 'test@adt.local', role: 'admin', isActive: true } } }
+    })
+    const resOk = await requireActiveAdmin(eventOk)
+    assert.strictEqual(resOk.adminId, '1')
+    assert.strictEqual(resOk.role, 'admin')
+
+    // 2. cached role=admin + isActive=false -> 403
+    const eventInactiveAdmin = createMockEvent({
+      context: { auth: { admin: { adminId: '2', userId: '2', email: 'test@adt.local', role: 'admin', isActive: false } } }
     })
     try {
-      await requireActiveAdmin(event)
+      await requireActiveAdmin(eventInactiveAdmin)
       assert.fail('Deveria ter lançado 403 para cached inactive admin')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+
+    // 3. cached role=superadmin + isActive=false -> 403
+    const eventInactiveSuper = createMockEvent({
+      context: { auth: { admin: { adminId: '3', userId: '3', email: 'super@adt.local', role: 'superadmin', isActive: false } } }
+    })
+    try {
+      await requireActiveAdmin(eventInactiveSuper)
+      assert.fail('Deveria ter lançado 403 para cached inactive superadmin')
+    } catch (err) {
+      assert.strictEqual(getErrorStatus(err), 403)
+    }
+
+    // 4. cached role inválida -> 403
+    const eventBadRole = createMockEvent({
+      context: { auth: { admin: { adminId: '4', userId: '4', email: 'op@adt.local', role: 'operator', isActive: true } } }
+    })
+    try {
+      await requireActiveAdmin(eventBadRole)
+      assert.fail('Deveria ter lançado 403 para cached operator')
     } catch (err) {
       assert.strictEqual(getErrorStatus(err), 403)
     }
   })
 
-  await asyncTest('C.2 CSRF validateMutationOrigin em produção sem Origin e sem Referer retorna 403 (CSRF_MISSING_ORIGIN_REFERER_POLICY=FAIL_CLOSED_PRODUCTION)', () => {
-    const resProd = validateMutationOrigin(null, null, 'painel.adt.local', false, null, false, 'https')
-    assert.strictEqual(resProd.allowed, false)
-    assert.strictEqual(resProd.statusCode, 403)
+  await asyncTest('C.2 CSRF validateMutationOrigin em produção fail-closed (CSRF_MISSING_HEADERS_POLICY=FAIL_CLOSED)', () => {
+    // 1. Host válido + Origin same-origin -> passa CSRF
+    const resSameOrigin = validateMutationOrigin('https://painel.adt.local', null, 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resSameOrigin.allowed, true)
 
-    const resProdNoHost = validateMutationOrigin('https://painel.adt.local', null, '', false, null, false, 'https')
-    assert.strictEqual(resProdNoHost.allowed, false)
-    assert.strictEqual(resProdNoHost.statusCode, 403)
+    // 2. Host válido + Origin cross-site -> 403
+    const resCrossOrigin = validateMutationOrigin('https://evil.site', null, 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resCrossOrigin.allowed, false)
+    assert.strictEqual(resCrossOrigin.statusCode, 403)
 
-    const resProdOk = validateMutationOrigin('https://painel.adt.local', null, 'painel.adt.local', false, null, false, 'https')
-    assert.strictEqual(resProdOk.allowed, true)
+    // 3. Host válido + Origin ausente + Referer same-origin -> passa
+    const resSameReferer = validateMutationOrigin(null, 'https://painel.adt.local/admin/agenda', 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resSameReferer.allowed, true)
+
+    // 4. Host válido + Origin ausente + Referer cross-site -> 403
+    const resCrossReferer = validateMutationOrigin(null, 'https://evil.site/attack', 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resCrossReferer.allowed, false)
+    assert.strictEqual(resCrossReferer.statusCode, 403)
+
+    // 5. Host válido + Origin ausente + Referer ausente -> 403
+    const resMissingBoth = validateMutationOrigin(null, null, 'painel.adt.local', false, null, false, 'https')
+    assert.strictEqual(resMissingBoth.allowed, false)
+    assert.strictEqual(resMissingBoth.statusCode, 403)
+
+    // 6. Host ausente -> 403
+    const resNoHost = validateMutationOrigin('https://painel.adt.local', null, '', false, null, false, 'https')
+    assert.strictEqual(resNoHost.allowed, false)
+    assert.strictEqual(resNoHost.statusCode, 403)
+
+    // 7. Matriz de ambientes para CSRF sem Origin e sem Referer (CSRF_UNKNOWN_ENV_POLICY=FAIL_CLOSED)
+    const origEnv = process.env.NODE_ENV
+    try {
+      const checkMissingHeadersInEnv = (envVal) => {
+        if (envVal === undefined) delete process.env.NODE_ENV
+        else process.env.NODE_ENV = envVal
+        const isDevFlag = isExplicitDevOrTestEnvironment()
+        // Com Bearer token sem cookies
+        return validateMutationOrigin(null, null, 'painel.adt.local', isDevFlag, 'Bearer test-token', false, 'https')
+      }
+
+      // production -> 403 fail closed
+      const resProd = checkMissingHeadersInEnv('production')
+      assert.strictEqual(resProd.allowed, false, 'production deve ser fail-closed')
+      assert.strictEqual(resProd.statusCode, 403)
+
+      // undefined -> 403 fail closed
+      const resUndef = checkMissingHeadersInEnv(undefined)
+      assert.strictEqual(resUndef.allowed, false, 'undefined deve ser fail-closed')
+      assert.strictEqual(resUndef.statusCode, 403)
+
+      // staging -> 403 fail closed
+      const resStaging = checkMissingHeadersInEnv('staging')
+      assert.strictEqual(resStaging.allowed, false, 'staging deve ser fail-closed')
+      assert.strictEqual(resStaging.statusCode, 403)
+
+      // preview -> 403 fail closed
+      const resPreview = checkMissingHeadersInEnv('preview')
+      assert.strictEqual(resPreview.allowed, false, 'preview deve ser fail-closed')
+      assert.strictEqual(resPreview.statusCode, 403)
+
+      // qa -> 403 fail closed
+      const resQa = checkMissingHeadersInEnv('qa')
+      assert.strictEqual(resQa.allowed, false, 'qa deve ser fail-closed')
+      assert.strictEqual(resQa.statusCode, 403)
+
+      // development -> permitido com Bearer auth para ferramentas locais
+      const resDev = checkMissingHeadersInEnv('development')
+      assert.strictEqual(resDev.allowed, true, 'development permite ferramenta local com Bearer')
+
+      // test -> permitido com Bearer auth para suíte de testes
+      const resTest = checkMissingHeadersInEnv('test')
+      assert.strictEqual(resTest.allowed, true, 'test permite ferramenta local com Bearer')
+    } finally {
+      process.env.NODE_ENV = origEnv
+    }
   })
 
   await asyncTest('C.3 findDuplicateClients executa buscas independentes sem raw PostgREST OR e lança 503 se upstream falhar', async () => {

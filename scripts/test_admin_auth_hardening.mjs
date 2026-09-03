@@ -67,6 +67,7 @@ async function runTestAuthMatrix() {
     assert.strictEqual(isTestAuthEnabled(), true, '6. isTestAuthEnabled deve ser true em dev com opt-in')
     const res6 = await resolveSupabaseUser(mockEvent, mockConfig, 'dev_mock_admin_token', null)
     assert.ok(res6 && res6.id === 'a0000000-0000-0000-0000-000000000001', '6. dev_mock_admin_token aceito em dev com opt-in')
+    assert.strictEqual(res6.email, 'test-admin@adt-crm.invalid', '6. mock email deve ser sintético .invalid')
     console.log('  [PASS] 6. NODE_ENV=development + ENABLE_TEST_AUTH=true -> ACEITO (MOCK VÁLIDO)')
 
     // 7. NODE_ENV=test + ENABLE_TEST_AUTH=true -> ACEITO
@@ -75,6 +76,7 @@ async function runTestAuthMatrix() {
     assert.strictEqual(isTestAuthEnabled(), true, '7. isTestAuthEnabled deve ser true em test com opt-in')
     const res7 = await resolveSupabaseUser(mockEvent, mockConfig, 'dev_mock_admin_token', null)
     assert.ok(res7 && res7.id === 'a0000000-0000-0000-0000-000000000001', '7. dev_mock_admin_token aceito em test com opt-in')
+    assert.strictEqual(res7.email, 'test-admin@adt-crm.invalid', '7. mock email deve ser sintético .invalid')
     console.log('  [PASS] 7. NODE_ENV=test + ENABLE_TEST_AUTH=true -> ACEITO (MOCK VÁLIDO)')
 
     console.log('\n=================================================================')

@@ -1,11 +1,19 @@
 # DOCUMENTAÇÃO TÉCNICA — CRM FASE 5.0
-## Agenda, Agendamentos, Equipe Operacional, BFF & Hardening de Autenticação (Patch 5.0D.9)
+## Agenda, Agendamentos, Equipe Operacional, BFF & Hardening de Autenticação (Patch 5.0C.4.2)
 
 ---
 
-### 1. Visão Geral da Fase 5.0 & Patch 5.0D.9
+### 1. Visão Geral da Fase 5.0 & Governança Atual
 
 A **Fase 5.0 do CRM** introduziu o motor de agendamentos atômicos, gestão de equipe operacional (*staff*), integração com Ordens de Serviço (OS), proteção de concorrência otimista atômica (*Compare-And-Set*), endurecimento estrito de autenticação e CSRF (*fail-closed*), busca segura e determinística de duplicidades de clientes, minimização de PII em calendário (`APPOINTMENT_CALENDAR_SELECT`), normalização canônica de números telefônicos brasileiros (DDD 55 de Santa Maria/RS sem confundir com DDI 55 do Brasil via `app/utils/phone.ts`), prova real de foco exato de retorno de modais/sheets WAI-ARIA, expansão e auditoria dinâmica física de touch targets $\ge 44\times 44\text{px}$ (`width >= 43.5 && height >= 43.5`) iterando sobre as 10 viewports reais (320 a 1920px) em 11 rotas físicas operacionais e públicas, modais, lightboxes e uploaders (`TOUCH_TARGET_UNDER_44_COUNT = 0`, `TOUCH_TARGET_REQUIRED_EXPECTED_COUNT = 484`, `FOUND = 484`, `MEASURED = 484`, `PASS = 484`, `FAIL = 0`), auditoria global de zero controles interativos aninhados (`NESTED_INTERACTIVE_CONTROLS = 0`), auditoria de zero overflow horizontal sem band-aids (`OVERFLOW_X_HIDDEN_BANDAID_COUNT = 0`), sanitização estrita de logging de erro de cliente (`CLIENT_SIDE_RAW_ERROR_OBJECT_LOGGING = 0`), correção de parser do git status (`AUDIT_GIT_STATUS_PARSER = FIXED`), modularização de `MediaUploader.vue` e `useFormSubmit.js`, e conformidade com limites de linhas (`APPLICATION_LOGIC_FILES_OVER_200_LINES = 0`, `APPLICATION_CODE_FILES_OVER_600_LINES = 0`, `CODE_SIZE_POLICY = PASS`).
+
+**Estado Canônico Atual de Deploy e Produção**:
+- `PHASE_5_0C_BASELINE_STATUS = COMPLETE_VALIDATED`
+- `PHASE_5_0D_PRODUCTION_STATUS = COMPLETE_VALIDATED` (A Fase 5.0D já se encontra instalada e servida em produção)
+- `PATCH_5_0C_4_2_STATUS = IMPLEMENTED_PENDING_FINAL_EXTERNAL_REVIEW`
+- `LATEST_AUTH_HARDENING_DEPLOYED = NO` (Deploy do hardening pendente de autorização da revisão externa)
+- `PRODUCTION_DATABASE_WRITES = 0`
+- `APPLICATION_DEPLOY = NO`
 
 ---
 
@@ -13,18 +21,24 @@ A **Fase 5.0 do CRM** introduziu o motor de agendamentos atômicos, gestão de e
 
 #### A. Banco de Dados / Engine PostgreSQL 17
 - **Migration 012**: `supabase/manual/012_crm_appointments_and_staff_engine.sql`
-- **SHA-256 Canônico LF**: `43D5620DFDF590F2C3F9BE551ADE5FEE33754844E4A0815B4B4A94540D7A6C5F`
-- **Status da Migration 012**: `INSTALLED_VALIDATED` / `REEXECUTION=FORBIDDEN`
-- **5 RPCs Atômicas**:
-  1. `create_appointment_atomic`: Cria agendamento com validação de overlap, limites de status e actor_id.
-  2. `update_appointment_atomic`: Atualiza dados do agendamento com validação de janelas e status.
-  3. `reschedule_appointment_atomic`: Reagenda agendamento existente encadeando `rescheduled_from_id`.
-  4. `cancel_appointment_atomic`: Cancela agendamento garantindo atomicidade e auditoria.
-  5. `update_appointment_status_atomic`: Transiciona status com validação de regras de negócio.
+  - **SHA-256 Canônico LF**: `43D5620DFDF590F2C3F9BE551ADE5FEE33754844E4A0815B4B4A94540D7A6C5F`
+  - **Status da Migration 012**: `INSTALLED_VALIDATED` / `REEXECUTION=FORBIDDEN`
+  - **5 RPCs Atômicas**:
+    1. `create_appointment_atomic`: Cria agendamento com validação de overlap, limites de status e actor_id.
+    2. `update_appointment_atomic`: Atualiza dados do agendamento com validação de janelas e status.
+    3. `reschedule_appointment_atomic`: Reagenda agendamento existente encadeando `rescheduled_from_id`.
+    4. `cancel_appointment_atomic`: Cancela agendamento garantindo atomicidade e auditoria.
+    5. `update_appointment_status_atomic`: Transiciona status com validação de regras de negócio.
+- **Migration 013**: `supabase/manual/013_work_order_terminal_appointment_guard.sql`
+  - **SHA-256 Canônico LF**: `04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08`
+  - **Status da Migration 013**: `INSTALLED_VALIDATED` / `REEXECUTION=FORBIDDEN`
+  - **Objetos Instalados**:
+    - Trigger Function: `public.fn_prevent_terminal_work_order_with_active_appointments()` (`VOLATILE`, `SECURITY DEFINER`, `search_path = ''`, `row_security = off`).
+    - Trigger: `trg_prevent_terminal_work_order_with_active_appointments` (invariante terminal impedindo OS `concluida` ou `cancelada` com agendamento ativo).
 
 #### B. Handlers BFF (Nitro / Nuxt 4) — 16 Handlers Executados
 - `server/api/admin/crm/appointments/index.post.ts`: Criação de agendamento via `create_appointment_atomic`.
-- `server/api/admin/crm/appointments/index.get.ts`: Consulta estruturada de calendário com projeção minimizada `APPOINTMENT_CALENDAR_SELECT` e validação estrita 400 em filtros e intervalos temporais (máximo 62 dias).
+- `server/api/admin/crm/appointments/index.get.ts`: Consulta estruturada de calendário com projeção minimizada `APPOINTMENT_CALENDAR_SELECT`, validação estrita de timestamps RFC3339 com timezone explícito (`CALENDAR_RANGE_RFC3339_EXPLICIT_OFFSET=PASS`), intervalo máximo de 62 dias e sanitização de logs de erro (`CALENDAR_RAW_UPSTREAM_ERROR_LOGGING=NONE`).
 - `server/api/admin/crm/appointments/search.post.ts`: Busca estruturada com validação estrita de tipos para `q` (DEFERRED), `staffId`, `clientId`, `status` e `tipo`.
 - `server/api/admin/crm/appointments/[id]/index.get.ts`: Detalhes do agendamento.
 - `server/api/admin/crm/appointments/[id]/index.patch.ts`: Edição não-temporal via `update_appointment_atomic`.
@@ -44,12 +58,14 @@ A **Fase 5.0 do CRM** introduziu o motor de agendamentos atômicos, gestão de e
 - `app/utils/phone.ts`: Helper canônico de normalização de números telefônicos e links `tel:` / WhatsApp com suporte a DDD 55 sem duplicar DDI (`BRAZIL_DDD_55_NORMALIZATION=PASS`).
 - `server/utils/crmDuplicateSearch.ts`: Busca determinística de duplicidades por telefone, email e CPF/CNPJ com consultas independentes, sem raw postgrest `or=(...)`, fail-closed (503) e zero logging de PII.
 - `server/utils/crm.ts`: Utilitários do CRM, auditoria sanitizada e re-export de duplicidades.
-- `server/shared/appointmentValidation.mjs`: Validações puras de UUID, RFC3339 com timezone, quoting e enums.
-- `server/shared/appointmentErrorMap.mjs`: Mapeamento canônico de erros (25 Migration 012 + 3 aplicação = 28 chaves).
+- `server/shared/appointmentValidation.mjs`: Validações puras de UUID, RFC3339 com timezone explícito (`isValidRfc3339`), quoting e enums.
+- `server/shared/appointmentErrorMap.mjs`: Mapeamento canônico de erros (25 Migration 012 + 1 Migration 013 + 3 aplicação = 29 chaves).
 - `server/utils/crmAppointmentErrors.ts`: Formatador de erros HTTP para handlers BFF.
-- `server/utils/crmAppointmentHelpers.ts`: Helper de verificação de instalação ativa e relações com `is_archived`.
-- `server/utils/adminAuth.ts`: Guard de autenticação fail-closed sem tokens de teste em runtime.
-- `server/shared/adminAuthCore.mjs`: Funções puras de auth, RBAC fail-closed (`admin`, `superadmin`) e validação CSRF Same-Origin com fail-closed em produção.
+- `server/utils/crmAppointmentHelpers.ts`: Helper de verificação de instalação ativa e relações com `is_archived`, com sanitização fail-closed 503 em falhas de upstream.
+- `server/utils/adminAuth.ts`: Guard de autenticação fail-closed (`CENTRAL_ADMIN_GUARD_HARDCODED_BYPASS=NONE`).
+- `server/utils/adminAuthSession.ts`: Resolução de sessão com test auth estritamente limitado e e-mail sintético (`test-admin@adt-crm.invalid`).
+- `server/utils/adminAuthCookies.ts`: Gestão de cookies de sessão com política fail-closed (`secure: true` para todos os ambientes exceto dev/test).
+- `server/shared/adminAuthCore.mjs`: Funções puras de auth, RBAC fail-closed (`admin`, `superadmin`), `isExplicitDevOrTestEnvironment()` e validação CSRF com fail-closed incondicional em produção e ambientes desconhecidos.
 - `app/composables/useModalA11y.ts`: Focus Trap, Escape e Restauração Exata de Foco para todos os 10 modais/sheets com suporte a pilha de modais (topmost dismiss).
 - `app/composables/useLeadJourneyMedia.ts`: Cache em memória de thumbnails de mídia com renovação segura de signed URLs.
 - `app/composables/useSiteMediaUpload.ts` e `app/composables/useLightboxZoom.ts`: Módulos desacoplados de upload e lightbox zoom/pan $\le 200$ linhas.
@@ -85,115 +101,71 @@ A **Fase 5.0 do CRM** introduziu o motor de agendamentos atômicos, gestão de e
   24. `ERR_NO_APPOINTMENT_CHANGES` (400)
   25. `ERR_HARD_DELETE_FORBIDDEN` (400)
 
-- **APPLICATION_ADDITIONAL_ERROR_CODES = 4**:
-  26. `ERR_APPOINTMENT_STALE_VERSION` (409 - Concorrência otimista / CAS)
-  27. `ERR_DATA_PREVISTA_MANAGED_BY_AGENDA` (400 - Guard de autoridade de data prevista)
-  28. `ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED` (400 - Guard de transição para agendada)
-  29. `ERR_ACTIVE_APPOINTMENTS_EXIST` (409 - Guard de integridade para OS terminal com agendamento ativo)
+- **MIGRATION_013_DOMAIN_ERROR_CODES = 1**:
+  26. `ERR_ACTIVE_APPOINTMENTS_EXIST` (409 - Guard de integridade para OS terminal com agendamento ativo)
 
-- **ERROR_MAP_TOTAL_KEYS = 29**
+- **APPLICATION_ADDITIONAL_ERROR_CODES = 3**:
+  27. `ERR_APPOINTMENT_STALE_VERSION` (409 - Concorrência otimista / CAS)
+  28. `ERR_DATA_PREVISTA_MANAGED_BY_AGENDA` (400 - Guard de autoridade de data prevista)
+  29. `ERR_SCHEDULE_VIA_APPOINTMENT_REQUIRED` (400 - Guard de transição manual para agendada)
+
+- **ERROR_MAP_TOTAL_KEYS = 29** (25 Migration 012 + 1 Migration 013 + 3 Aplicação)
 
 ---
 
-### 4. Validação e Testes Automatizados
+### 4. Arquitetura de Autenticação de Teste (Test Auth)
 
-1. **Suíte de Testes E2E com Browser Real Playwright (`scripts/test_admin_ui_phase5d_browser.mjs`)**:
-   - 663/663 asserts aprovados (100% PASS).
-   - `UI_BROWSER_ASSERTS=PASS`.
-   - `UI_BROWSER_ASSERTS_TOTAL=663/663`.
-   - Prova real dos 10 modais/sheets com abertura, Focus Trap, Escape e restauração exata de foco ao trigger disparador (`MODAL_FOCUS_RESTORE_EXACT_TRIGGER=PASS`).
-   - Auditoria de zero overflow horizontal em 10 viewports (320, 360, 375, 390, 412, 430, 768, 1024, 1280, 1920) em 11 rotas operacionais e públicas (`ZERO_HORIZONTAL_OVERFLOW=PASS`, `OVERFLOW_X_HIDDEN_BANDAID_COUNT=0`).
-   - Touch targets $\ge 44\times 44\text{px}$ auditados iterando sobre as 10 viewports reais em todos os controles operacionais e estados profundos (`TOUCH_TARGET_MIN_44PX=PASS`, `TOUCH_TARGET_UNDER_44_COUNT=0`, `TOUCH_TARGET_REQUIRED_EXPECTED_COUNT=484`, `FOUND=484`, `MEASURED=484`, `PASS=484`, `FAIL=0`).
-   - Controles interativos aninhados: 0 em todas as rotas operacionais e estados profundos (`NESTED_INTERACTIVE_CONTROLS=0`).
-   - Normalização de telefone e WhatsApp com DDD 55 (`BRAZIL_DDD_55_NORMALIZATION=PASS`, `DDD55_WORK_ORDER_CARD_LINK=PASS`).
-   - Data civil `data_prevista` sem deslocamento UTC em cards e tabelas (`DATA_PREVISTA_DATE_ONLY_ALL_CONSUMERS=PASS`).
-   - Zero console errors inesperados no browser (`BROWSER_UNEXPECTED_CONSOLE_ERRORS=0`, `BROWSER_UNEXPECTED_PAGE_ERRORS=0`, `BROWSER_UNEXPECTED_NETWORK_5XX=0`).
+A arquitetura física mantém o runtime de autenticação de teste estritamente delimitado a ambientes de teste e desenvolvimento:
+- `TEST_AUTH_RUNTIME_PRESENT_NONPRODUCTION_GATED = YES`
+- `TEST_AUTH_REQUIRES_EXPLICIT_DEV_OR_TEST_ENV = YES`
+- `TEST_AUTH_REQUIRES_ENABLE_TEST_AUTH_TRUE = YES`
+- `PRODUCTION_TEST_AUTH_BYPASS = BLOCKED`
+- `UNKNOWN_ENV_TEST_AUTH_BYPASS = BLOCKED`
+- `CENTRAL_ADMIN_GUARD_HARDCODED_BYPASS = NONE`
+- `TEST_AUTH_MOCK_EMAIL = test-admin@adt-crm.invalid`
 
-2. **Suíte UI e Domínio CRM (`scripts/test_admin_ui_phase5d.mjs`)**:
-   - 36/36 testes aprovados (100% PASS).
-   - Timezone operacional `America/Sao_Paulo` (zero hardcoded `-03:00`).
-   - Helper puro `formatDateOnly` sem deslocamento UTC para datas `YYYY-MM-DD`.
-   - Alinhamento da UI legada: `DATA_PREVISTA_UI_LEGACY_MUTATIONS=0`, `MANUAL_AGENDADA_UI_MUTATIONS=0`.
-   - `WORK_ORDER_DATA_PREVISTA_AUTHORITY=APPOINTMENT_INSTALLATION_SCHEDULE`.
-   - `CLIENT_SIDE_RAW_ERROR_OBJECT_LOGGING=0` (scanner global dinâmico em `app/`).
-   - `BRAZIL_DDD_55_NORMALIZATION=PASS`.
+---
 
-3. **Suíte BFF CRM (`scripts/test_crm_phase5c1_bff.mjs`)**:
-   - 56/56 asserts aprovados (`CURRENT_BFF_ASSERTS=56`, 100% PASS | `PREVIOUS_BFF_ASSERTS=49`).
-   - 16/16 handlers Nitro executados.
-   - Minimização de PII validada (`CALENDAR_PII_MINIMIZATION=PASS`).
+### 5. Validação e Testes Automatizados
+
+1. **Suíte BFF CRM (`scripts/test_crm_phase5c1_bff.mjs`)**:
+   - `BFF_TEST_CASES_EXECUTED = 60`
+   - `BFF_TEST_CASES_PASSED = 60` (100% PASS)
+   - `BFF_TEST_CASES_FAILED = 0`
+   - `BFF_ASYNC_TESTS_UNAWAITED = 0` (prova negativa e auditoria estática concluídas)
+   - `CALENDAR_RANGE_RFC3339_EXPLICIT_OFFSET = PASS`
+   - `CALENDAR_DATE_ONLY = REJECTED` (400)
+   - `CALENDAR_TIMEZONELESS_DATETIME = REJECTED` (400)
+   - `CALENDAR_INVALID_SEMANTIC_DATE = REJECTED` (400)
+   - `CALENDAR_RAW_UPSTREAM_ERROR_LOGGING = NONE`
+   - 16/16 handlers Nitro importados e executados.
+   - Minimização de PII validada (`CALENDAR_PII_MINIMIZATION = PASS`).
    - Tratamento estruturado de SQLSTATE (`23P01`, `23505`, `23503`).
-   - Zero log de PII em runtime RPC (`RUNTIME_RPC_RAW_PII_LOGGING=NONE`).
-   - Zero bypass tokens no runtime (`DEV_MOCK_AUTH_RUNTIME=REMOVED`).
+   - Zero log de PII em runtime RPC (`RUNTIME_RPC_RAW_PII_LOGGING = NONE`).
    - Fail-closed comprovado em autenticação, CSRF, guards de OS e busca de duplicidades.
 
-4. **Suíte de Auth & Segurança (`scripts/test_admin_performance_patch1.mjs`)**:
-   - 70/70 testes aprovados (100% PASS).
-   - Criptografia assimétrica JWKS (ES256/RS256).
-   - Rate limiting de rotação JWKS.
-   - Single flight deduplication.
-   - CSRF em produção fail-closed incondicional.
+2. **Suíte Test Auth Hardening (`scripts/test_admin_auth_hardening.mjs`)**:
+   - `AUTH_HARDENING_TESTS_EXECUTED = 7`
+   - `AUTH_HARDENING_TESTS_PASSED = 7` (100% PASS)
+   - `AUTH_HARDENING_TESTS_FAILED = 0`
+   - Matriz completa de 7 cenários fail-closed validada.
 
-5. **Auditoria de Linhas de Código (Git Diff Real & Global)**:
-   - `DEPLOY_DIFF_SOURCE=git status --porcelain=v1 -z`
-   - `DEPLOY_DIFF_APPLICATION_LOGIC_FILES_OVER_200=0`
-   - `DEPLOY_DIFF_APPLICATION_CODE_FILES_OVER_600=0`
-   - `APPLICATION_LOGIC_FILES_OVER_200_LINES=0`
-   - `APPLICATION_CODE_FILES_OVER_600_LINES=0`
-   - `CODE_SIZE_POLICY=PASS`
+3. **Suíte Backend Regressiva (`scripts/test_crm_phase5_backend.mjs`)**:
+   - `BACKEND_RPC_ASSERTS_EXECUTED = 85`
+   - `BACKEND_RPC_ASSERTS_PASSED = 85` (100% PASS)
+   - `BACKEND_RPC_ASSERTS_FAILED = 0`
 
-6. **Status de Produção e Integridade**:
-   - `MIGRATION_012_LOGIC_CHANGED = NO`
+4. **Auditoria de Linhas de Código**:
+   - `APPLICATION_LOGIC_FILES_OVER_200_LINES = 0`
+   - `APPLICATION_CODE_FILES_OVER_600_LINES = 0`
+   - `CODE_SIZE_POLICY = PASS`
+
+5. **Status de Migrações e Integridade**:
+   - `MIGRATION_012_NORMALIZED_SHA = 43D5620DFDF590F2C3F9BE551ADE5FEE33754844E4A0815B4B4A94540D7A6C5F`
+   - `MIGRATION_013_NORMALIZED_SHA = 04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08`
+   - `MIGRATION_012_GIT_DIFF = EMPTY`
+   - `MIGRATION_013_GIT_DIFF = EMPTY`
    - `MIGRATION_012_REEXECUTED = NO`
-   - `MIGRATION_013_CANONICAL_FILE = supabase/manual/013_work_order_terminal_appointment_guard.sql`
-   - `MIGRATION_013_CANDIDATE_SHA256 = 04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08`
-   - `MIGRATION_013_LOCAL_ASSERTS_CANONICAL = 58`
-   - `MIGRATION_013_FILES_FOUND = 1`
-   - `MIGRATION_013_DUPLICATE_NUMBERING = NO`
-   - `TRIGGER_WHEN_POSTCHECK = SEMANTIC`
-   - `WORK_ORDERS_RLS_PREFLIGHT = IMPLEMENTED`
-   - `MIGRATION_013_SCOPE = WORK_ORDER_TERMINAL_ACTIVE_APPOINTMENT_GUARD`
-   - `SEARCH_RPC_INCLUDED = NO`
-   - `CREATE_OR_REPLACE_USED = NO`
-   - `GLOBAL_TRANSACTION = YES`
-   - `PREFLIGHT_FAIL_CLOSED = PASS`
-   - `PARTIAL_INSTALLATION_AFTER_FAILURE = NO`
-   - `CONCLUDED_WORK_ORDER_ACTIVE_WARRANTY_ALLOWED = PASS`
-   - `TERMINAL_NON_WARRANTY_ACTIVE_APPOINTMENT_GUARD = PASS`
-   - `NON_STATUS_UPDATE_REGRESSION = PASS`
-   - `SAME_STATUS_UPDATE_REGRESSION = PASS`
-   - `FUNCTION_SECURITY_DEFINER = YES`
-   - `FUNCTION_EMPTY_SEARCH_PATH = YES`
-   - `FUNCTION_PUBLIC_EXECUTE = NO`
-   - `FUNCTION_SERVICE_ROLE_DIRECT_EXECUTE = NO`
-   - `TWO_CONNECTION_REAL_TESTS = PASS`
-   - `BOTH_LOCK_ORDERS_TESTED = YES`
-   - `CONCURRENT_STRESS_ITERATIONS = 150`
-   - `FORBIDDEN_FINAL_STATE_COUNT = 0`
-   - `DEADLOCK_40P01_COUNT = 0`
-   - `ERR_ACTIVE_APPOINTMENTS_EXIST_HTTP = 409`
-   - `DEV_MOCK_AUTH_RUNTIME_FOUND_AFTER = NO`
-   - `PRODUCTION_MOCK_TOKEN_BYPASS = IMPOSSIBLE`
-   - `FRESH_LOCAL_BACKUP_CREATED = YES`
-   - `FRESH_BACKUP_PATH = backups/pre_migration_013_20260901_164555.sql`
-   - `FRESH_BACKUP_SIZE_BYTES = 320289`
-   - `FRESH_BACKUP_SHA256 = F4D6DBD91D4AF6C8BB439B0AEC2FA8914905503AF953A32CE729323A3DEE4AF4`
-   - `FRESH_BACKUP_RESTORE_VALIDATION = PASS`
-   - `MIGRATION_013_INSTALLED_PRODUCTION = YES`
-   - `MIGRATION_013_PRODUCTION_VALIDATED = YES`
-   - `MIGRATION_013_REEXECUTION = FORBIDDEN`
-   - `PHASE_5_0C_FINAL_STATUS = COMPLETE_VALIDATED`
-   - `PATCH_5_0C_4_AUTH_HARDENING_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0C_4A_PLAN_STATUS = APPROVED_WITH_AMENDMENTS`
-   - `PHASE_5_0C_4B_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0C_4B_1_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0C_4C_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0C_4C_1_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0C_4D_STATUS = COMPLETE_VALIDATED`
-   - `PHASE_5_0D_IMPLEMENTATION_STATUS = IMPLEMENTED_LOCAL_NOT_RELEASED`
-   - `PHASE_5_0D_PRODUCTION_RELEASE_AUTHORIZED = NO`
-   - `PHASE_5_0D_START_AUTHORIZED = NO`
+   - `MIGRATION_013_REEXECUTED = NO`
    - `PRODUCTION_DATABASE_WRITES = 0`
    - `APPLICATION_DEPLOY = NO`
-   - `READY_FOR_PHASE_5D_PRODUCTION_RELEASE_REVIEW = YES`
-

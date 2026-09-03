@@ -11,7 +11,13 @@
 import { defineEventHandler, getQuery, createError } from 'h3'
 import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
 import { getSupabaseHeaders } from '../../../../utils/crm.ts'
-import { isValidAppointmentDateRange, isValidAppointmentStatus, isValidAppointmentType, isValidUUID } from '../../../../shared/appointmentValidation.mjs'
+import {
+  isValidAppointmentDateRange,
+  isValidAppointmentStatus,
+  isValidAppointmentType,
+  isValidRfc3339,
+  isValidUUID
+} from '../../../../shared/appointmentValidation.mjs'
 import { APPOINTMENT_CALENDAR_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
 
 export default defineEventHandler(async (event) => {
@@ -29,7 +35,14 @@ export default defineEventHandler(async (event) => {
   if (!startStr || !endStr) {
     throw createError({
       statusCode: 400,
-      message: 'Os parâmetros temporais "start" e "end" (ISO 8601) são obrigatórios.'
+      message: 'Os parâmetros temporais "start" e "end" são obrigatórios.'
+    })
+  }
+
+  if (!isValidRfc3339(startStr) || !isValidRfc3339(endStr)) {
+    throw createError({
+      statusCode: 400,
+      message: 'Os parâmetros "start" e "end" devem ser timestamps RFC3339 válidos com timezone explícito.'
     })
   }
 
@@ -92,9 +105,12 @@ export default defineEventHandler(async (event) => {
 
     return { success: true, appointments }
   } catch (err: any) {
-    const statusCode = err?.statusCode || err?.response?.status || 'unknown'
-    const errCode = err?.data?.code || err?.data?.message || ''
-    console.error(`[AppointmentsList] route=GET /api/admin/crm/appointments status=${statusCode} errorCode=${errCode}`)
+    const statusCode = err?.statusCode || err?.response?.status || err?.status || 'unknown'
+    const rawCode = err?.code || err?.data?.code
+    const technicalCode = (typeof rawCode === 'string' && /^[A-Z0-9_]{3,20}$/i.test(rawCode.trim()))
+      ? rawCode.trim()
+      : 'NONE'
+    console.error(`[AppointmentsList] route=GET /api/admin/crm/appointments status=${statusCode} errorCode=${technicalCode}`)
     throw createError({ statusCode: 500, message: 'Não foi possível carregar os agendamentos da agenda.' })
   }
 })

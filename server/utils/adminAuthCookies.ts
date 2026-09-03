@@ -10,23 +10,27 @@ import { getHeader, getCookie, setCookie, deleteCookie, createError } from 'h3'
 import {
   ADMIN_AUTH_COOKIE_NAME,
   ADMIN_REFRESH_COOKIE_NAME,
-  validateMutationOrigin
+  validateMutationOrigin,
+  isExplicitDevOrTestEnvironment
 } from '../shared/adminAuthCore.mjs'
+
+export { isExplicitDevOrTestEnvironment }
 
 /**
  * Define os cookies HTTP-only de sessão administrativa.
- * Propriedades estritas: httpOnly=true, secure em produção, sameSite=lax, path=/
+ * Propriedades estritas: httpOnly=true, secure por padrão (fail-closed, false apenas em dev/test), sameSite=lax, path=/
  */
 export function setAdminAuthCookies(
   event: H3Event,
   tokens: { accessToken: string; refreshToken?: string; expiresIn?: number }
 ) {
-  const isProduction = process.env.NODE_ENV === 'production'
+  const isDevOrTest = isExplicitDevOrTestEnvironment()
+  const secure = !isDevOrTest
   const maxAge = tokens.expiresIn || 60 * 60 * 24 * 7 // 7 dias default
 
   setCookie(event, ADMIN_AUTH_COOKIE_NAME, tokens.accessToken, {
     httpOnly: true,
-    secure: isProduction,
+    secure,
     sameSite: 'lax',
     path: '/',
     maxAge
@@ -35,7 +39,7 @@ export function setAdminAuthCookies(
   if (tokens.refreshToken) {
     setCookie(event, ADMIN_REFRESH_COOKIE_NAME, tokens.refreshToken, {
       httpOnly: true,
-      secure: isProduction,
+      secure,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 30 // 30 dias para refresh
@@ -70,7 +74,7 @@ export function enforceMutationCsrf(event: H3Event) {
       cookieHeader.includes(ADMIN_AUTH_COOKIE_NAME) ||
       cookieHeader.includes(ADMIN_REFRESH_COOKIE_NAME)
     )
-    const isDev = process.env.NODE_ENV !== 'production'
+    const isDev = isExplicitDevOrTestEnvironment()
     const protocol = getHeader(event, 'x-forwarded-proto') || (isDev ? 'http' : 'https')
 
     const check = validateMutationOrigin(origin, referer, host, isDev, authorization, hasAdminCookies, protocol)

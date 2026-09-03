@@ -103,8 +103,8 @@ export async function hasActiveInstallation(
     )
     return Array.isArray(res) && res.length > 0
   } catch (err: any) {
-    if (err?.statusCode) throw err
-    console.error('[hasActiveInstallation] Upstream failure:', err?.statusCode || 'unknown')
+    const upstreamStatus = err?.statusCode || err?.status || (err?.response && err.response.status) || 'unknown'
+    console.error('[hasActiveInstallation] Upstream failure:', upstreamStatus)
     throw createError({ statusCode: 503, message: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
   }
 }
@@ -133,8 +133,8 @@ export async function getActiveInstallation(
     )
     return Array.isArray(res) && res.length > 0 ? res[0] : null
   } catch (err: any) {
-    if (err?.statusCode) throw err
-    console.error('[getActiveInstallation] Upstream failure:', err?.statusCode || 'unknown')
+    const upstreamStatus = err?.statusCode || err?.status || (err?.response && err.response.status) || 'unknown'
+    console.error('[getActiveInstallation] Upstream failure:', upstreamStatus)
     throw createError({ statusCode: 503, message: 'Falha ao consultar agendamento ativo da ordem de serviço' })
   }
 }
@@ -164,8 +164,8 @@ export async function hasAnyActiveAppointment(
     )
     return Array.isArray(res) && res.length > 0
   } catch (err: any) {
-    if (err?.statusCode) throw err
-    console.error('[hasAnyActiveAppointment] Upstream failure:', err?.statusCode || 'unknown')
+    const upstreamStatus = err?.statusCode || err?.status || (err?.response && err.response.status) || 'unknown'
+    console.error('[hasAnyActiveAppointment] Upstream failure:', upstreamStatus)
     throw createError({ statusCode: 503, message: 'Falha ao verificar agendamentos ativos da ordem de serviço' })
   }
 }

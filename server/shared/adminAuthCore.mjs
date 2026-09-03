@@ -119,9 +119,12 @@ export function validateMutationOrigin(
     return { allowed: false, statusCode: 403, message: 'Acesso negado: Host ausente.' }
   }
 
+  const cleanOrigin = (originHeader && typeof originHeader === 'string' && originHeader.trim()) ? originHeader.trim() : null
+  const cleanReferer = (refererHeader && typeof refererHeader === 'string' && refererHeader.trim()) ? refererHeader.trim() : null
+
   // CSRF_MISSING_ORIGIN_REFERER_POLICY=FAIL_CLOSED_PRODUCTION
   // Em produção, se Origin e Referer estiverem ausentes, rejeita incondicionalmente com 403.
-  if (!originHeader && !refererHeader) {
+  if (!cleanOrigin && !cleanReferer) {
     if (isDev && !hasAdminCookies && authorizationHeader && typeof authorizationHeader === 'string' && authorizationHeader.trim().toLowerCase().startsWith('bearer ')) {
       return { allowed: true, statusCode: 200, message: 'OK' }
     }
@@ -140,9 +143,9 @@ export function validateMutationOrigin(
     return { allowed: false, statusCode: 403, message: 'Acesso negado: Host inválido.' }
   }
 
-  if (originHeader) {
+  if (cleanOrigin) {
     try {
-      const originUrl = new URL(originHeader)
+      const originUrl = new URL(cleanOrigin)
       const originVal = originUrl.origin.toLowerCase()
       if (originVal === expectedOrigin) return { allowed: true, statusCode: 200, message: 'OK' }
       if (isDev && (originUrl.hostname === 'localhost' || originUrl.hostname === '127.0.0.1')) {
@@ -158,9 +161,9 @@ export function validateMutationOrigin(
     }
   }
 
-  if (refererHeader) {
+  if (cleanReferer) {
     try {
-      const refererUrl = new URL(refererHeader)
+      const refererUrl = new URL(cleanReferer)
       const refererVal = refererUrl.origin.toLowerCase()
       if (refererVal === expectedOrigin) return { allowed: true, statusCode: 200, message: 'OK' }
       if (isDev && (refererUrl.hostname === 'localhost' || refererUrl.hostname === '127.0.0.1')) {
@@ -176,7 +179,11 @@ export function validateMutationOrigin(
     }
   }
 
-  return { allowed: true, statusCode: 200, message: 'OK' }
+  return { allowed: false, statusCode: 403, message: 'Acesso negado: solicitação rejeitada por política de segurança CSRF.' }
+}
+
+export function isExplicitDevOrTestEnvironment() {
+  return process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
 }
 
 export { validateMediaAccess, sanitizeMediaMetadata }

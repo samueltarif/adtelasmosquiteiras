@@ -24,6 +24,12 @@ const inFlightAdminLookups = new Map<string, Promise<any[]>>()
 
 function normalizeIssuer(url: string): string { return (url || '').trim().replace(/\/+$/, '') }
 
+import { isExplicitDevOrTestEnvironment } from '../shared/adminAuthCore.mjs'
+
+export function isTestAuthEnabled(): boolean {
+  return isExplicitDevOrTestEnvironment() && process.env.ENABLE_TEST_AUTH === 'true'
+}
+
 export function clearJwksCacheForTest() {
   jwksCacheByIssuer.clear(); jwksInFlight.clear(); jwksLastForcedRefresh.clear()
 }
@@ -148,6 +154,9 @@ export async function resolveSupabaseUser(
   refreshToken: string | null
 ): Promise<UserClaims | null> {
   if (accessToken) {
+    if (isTestAuthEnabled() && accessToken === 'dev_mock_admin_token') {
+      return { id: 'a0000000-0000-0000-0000-000000000001', email: 'test-admin@adt-crm.invalid', role: 'authenticated' }
+    }
     const claims = await getClaims(accessToken, config.supabaseUrl, config)
     if (claims?.id) return claims
   }

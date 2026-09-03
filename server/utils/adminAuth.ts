@@ -75,7 +75,7 @@ export async function requireActiveAdmin(
         message: 'Acesso negado: a conta administrativa está inativa.'
       })
     }
-    if (!allowedRoles.includes(cachedAdmin.role)) {
+    if (!cachedAdmin.role || !allowedRoles.includes(cachedAdmin.role)) {
       throw createError({
         statusCode: 403,
         message: 'Acesso restrito a administradores com privilégios completos.'
