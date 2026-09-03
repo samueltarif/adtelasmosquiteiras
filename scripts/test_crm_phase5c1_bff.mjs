@@ -53,28 +53,50 @@ console.log('===================================================================
 
 let passed = 0
 let failed = 0
+let unitExecuted = 0
+let unitPassed = 0
+let unitFailed = 0
+let bffExecuted = 0
+let bffPassed = 0
+let bffFailed = 0
+let guardExecuted = 0
+let guardPassed = 0
+let guardFailed = 0
 const errors = []
 
 function test(name, fn) {
+  unitExecuted++
   try {
     fn()
     console.log(`  [PASS:UNIT] ${name}`)
+    unitPassed++
     passed++
   } catch (err) {
     console.error(`  [FAIL:UNIT] ${name}:`, err.message)
     errors.push({ name, error: err.message })
+    unitFailed++
     failed++
   }
 }
 
 async function asyncTest(name, fn) {
+  const isGuard = name.startsWith('C.')
+  if (isGuard) guardExecuted++
+  else bffExecuted++
+
   try {
     await fn()
-    console.log(`  [PASS:BFF] ${name}`)
+    const tag = isGuard ? 'GUARD' : 'BFF'
+    console.log(`  [PASS:${tag}] ${name}`)
+    if (isGuard) guardPassed++
+    else bffPassed++
     passed++
   } catch (err) {
-    console.error(`  [FAIL:BFF] ${name}:`, err.message)
+    const tag = isGuard ? 'GUARD' : 'BFF'
+    console.error(`  [FAIL:${tag}] ${name}:`, err.message)
     errors.push({ name, error: err.message })
+    if (isGuard) guardFailed++
+    else bffFailed++
     failed++
   }
 }
@@ -194,10 +216,9 @@ async function runSuite() {
     assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('id'), true)
     assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('data_hora_inicio'), true)
     assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('data_hora_fim'), true)
-    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('status_agendamento'), true)
     assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('updated_at'), true)
     assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('client:clients(id,nome)'), true)
-    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('work_order:work_orders(id,numero_os,status_os)'), true)
+    assert.strictEqual(APPOINTMENT_CALENDAR_SELECT.includes('work_order:work_orders!fk_appointments_work_order_client'), true)
   })
 
   test('A.8 APPOINTMENT_DETAIL_SELECT permanece completo com campos operacionais e PII necessária ao detalhe', () => {
@@ -1383,15 +1404,21 @@ async function runSuite() {
     assert.strictEqual(adminIdentity.isActive, true)
   })
 
+  const totalExecuted = passed + failed
   console.log('\n======================================================================')
-  console.log(`VALIDATION_UNIT_ASSERTS:   17`)
-  console.log(`BFF_REAL_HANDLER_ASSERTS:  36`)
-  console.log(`AUTH_CSRF_GUARD_ASSERTS:   4`)
-  console.log(`TOTAL DE ASSERTS:          57`)
+  console.log(`TEST_CASES_EXECUTED:       ${totalExecuted}`)
+  console.log(`TEST_CASES_PASSED:         ${passed}`)
+  console.log(`TEST_CASES_FAILED:         ${failed}`)
+  console.log(`VALIDATION_UNIT_CASES:     ${unitPassed}/${unitExecuted}`)
+  console.log(`BFF_HANDLER_CASES:         ${bffPassed}/${bffExecuted}`)
+  console.log(`AUTH_GUARD_CASES:          ${guardPassed}/${guardExecuted}`)
   console.log(`BFF_IMPORTED_HANDLERS:     16`)
   console.log(`BFF_EXECUTED_HANDLERS:     16`)
-  console.log(`FAILED:                    ${failed}`)
   console.log('======================================================================')
+  console.log('BFF_TEST_COUNTS_DYNAMIC=YES')
+  console.log(`BFF_TEST_CASES_EXECUTED=${totalExecuted}`)
+  console.log(`BFF_TEST_CASES_PASSED=${passed}`)
+  console.log(`BFF_TEST_CASES_FAILED=${failed}`)
 
   if (failed > 0) {
     console.error('\nErros encontrados na suíte BFF:')

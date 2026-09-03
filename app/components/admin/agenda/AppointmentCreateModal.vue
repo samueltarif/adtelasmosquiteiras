@@ -2,7 +2,7 @@
 import { ref, computed, watch, toRef } from 'vue'
 import type { CrmStaffMember } from '~/composables/useCrmStaff'
 import { toSaoPauloIso, getSaoPauloDateString } from '~/utils/crmDateTime'
-import { extractAppointmentErrorMessage } from '~/utils/crmAgendaErrors'
+import { extractAppointmentErrorMessage, getAppointmentTipoWarning } from '~/utils/crmAgendaErrors'
 import { useModalA11y } from '~/composables/useModalA11y'
 
 const props = defineProps<{
@@ -16,105 +16,91 @@ const emit = defineEmits<{
   (e: 'appointmentCreated', appt: any): void
 }>()
 
-useModalA11y(toRef(props, 'isOpen'), () => emit('close'))
-
+function tryClose() { if (!isSubmitting.value) emit('close') }
+useModalA11y(toRef(props, 'isOpen'), tryClose)
 const activeStaffList = computed(() => (props.staffList || []).filter(st => st.is_active !== false))
 
-// Search & Work Order Selection
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
 const isSearching = ref(false)
 const searchError = ref<string | null>(null)
 const selectedWorkOrder = ref<any | null>(null)
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
-let searchRequestSeq = 0
-
-// Client Addresses
+let searchRequestSeq = 0, modalEpoch = 0, addressRequestSeq = 0
 const clientAddresses = ref<any[]>([])
-const selectedAddressId = ref<string>('')
+const selectedAddressId = ref('')
 const isLoadingAddresses = ref(false)
-
-// Appointment Form
 const tipoAgendamento = ref('instalacao')
 const appointmentDate = ref(getSaoPauloDateString())
 const horaInicio = ref('09:00')
 const horaFim = ref('11:00')
-const selectedStaffId = ref<string>('')
-const observacoes = ref<string>('')
-
+const selectedStaffId = ref('')
+const observacoes = ref('')
 const isSubmitting = ref(false)
 const errorMessage = ref<string | null>(null)
 
-// Emenda 4: Status x Tipo matrix warnings
-const tipoWarning = computed(() => {
-  if (!selectedWorkOrder.value) return null
-  const status = selectedWorkOrder.value.status_os
-  const tipo = tipoAgendamento.value
+const tipoWarning = computed(() => getAppointmentTipoWarning(selectedWorkOrder.value?.status_os, tipoAgendamento.value))
 
-  if (['visita_tecnica', 'medicao'].includes(tipo) && !['orcamento', 'aprovada', 'aguardando_agendamento'].includes(status)) {
-    return `Visita técnica e medição são permitidas apenas para OS em 'Orçamento', 'Aprovada' ou 'Aguardando Agendamento' (atual: '${status}').`
-  }
-  if (tipo === 'instalacao' && !['aprovada', 'aguardando_agendamento'].includes(status)) {
-    return `Agendamento de instalação exige que a OS esteja 'Aprovada' ou 'Aguardando Agendamento' (atual: '${status}').`
-  }
-  if (tipo === 'manutencao' && !['aprovada', 'aguardando_agendamento', 'agendada', 'em_execucao'].includes(status)) {
-    return `Manutenção exige ordem de serviço operacional em aberto (atual: '${status}').`
-  }
-  if (tipo === 'garantia' && status !== 'concluida') {
-    return `Agendamento de garantia exige ordem de serviço 'Concluída' com garantia ativa.`
-  }
-  return null
-})
+function resetModalState() {
+  if (searchDebounceTimer) { clearTimeout(searchDebounceTimer); searchDebounceTimer = null }
+  searchRequestSeq++
+  modalEpoch++
+  addressRequestSeq++
+  isSearching.value = false
+  isLoadingAddresses.value = false
+  searchError.value = null
+  errorMessage.value = null
+  searchQuery.value = ''
+  searchResults.value = []
+  selectedWorkOrder.value = null
+  selectedAddressId.value = ''
+  selectedStaffId.value = ''
+  clientAddresses.value = []
+  observacoes.value = ''
+  tipoAgendamento.value = 'instalacao'
+  appointmentDate.value = getSaoPauloDateString()
+  horaInicio.value = '09:00'
+  horaFim.value = '11:00'
+}
 
 watch(() => props.isOpen, async (open) => {
-  if (open) {
-    errorMessage.value = null
-    searchQuery.value = ''
-    searchResults.value = []
-    selectedWorkOrder.value = null
-    selectedAddressId.value = ''
-    selectedStaffId.value = ''
-    clientAddresses.value = []
-    observacoes.value = ''
-    tipoAgendamento.value = 'instalacao'
-    appointmentDate.value = getSaoPauloDateString()
-    horaInicio.value = '09:00'
-    horaFim.value = '11:00'
-
-    if (props.preselectedWorkOrderId) {
-      await loadPreselectedWorkOrder(props.preselectedWorkOrderId)
-    }
+  resetModalState()
+  if (open && props.preselectedWorkOrderId) {
+    await loadPreselectedWorkOrder(props.preselectedWorkOrderId, modalEpoch)
   }
 })
 
-async function loadPreselectedWorkOrder(woId: string) {
+async function loadPreselectedWorkOrder(woId: string, epoch: number) {
+  if (epoch < modalEpoch) return
   isSearching.value = true
   try {
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${woId}`)
-    if (res?.workOrder) {
-      selectWorkOrder(res.workOrder)
-    }
-  } catch (err) {
+    if (epoch < modalEpoch) return
+    if (res?.workOrder) selectWorkOrder(res.workOrder)
+  } catch {
+    if (epoch < modalEpoch) return
     console.error('[AppointmentCreateModal] Falha ao carregar OS pré-selecionada')
   } finally {
-    isSearching.value = false
+    if (epoch >= modalEpoch) isSearching.value = false
   }
 }
 
-function handleSearchWorkOrders() {
+watch(searchQuery, (query) => {
+  if (searchDebounceTimer) { clearTimeout(searchDebounceTimer); searchDebounceTimer = null }
+  const seq = ++searchRequestSeq
   searchError.value = null
-  const query = searchQuery.value.trim()
-  if (query.length < 2) {
+  const trimmed = (query || '').trim()
+  if (trimmed.length < 2) {
     searchResults.value = []
+    isSearching.value = false
     return
   }
+  if (selectedWorkOrder.value) return
+  searchDebounceTimer = setTimeout(() => performSearchWorkOrders(trimmed, seq), 100)
+})
 
-  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
-  searchDebounceTimer = setTimeout(() => performSearchWorkOrders(query), 350)
-}
-
-async function performSearchWorkOrders(query: string) {
-  const seq = ++searchRequestSeq
+async function performSearchWorkOrders(query: string, seq: number) {
+  if (seq < searchRequestSeq) return
   isSearching.value = true
   searchError.value = null
   try {
@@ -122,57 +108,56 @@ async function performSearchWorkOrders(query: string) {
       method: 'POST',
       body: { search: query, limit: 10 }
     })
-    if (seq !== searchRequestSeq) return // stale request — descartado
-    searchResults.value = res?.workOrders || []
+    if (seq < searchRequestSeq) return
+    const data = typeof res === 'string' ? JSON.parse(res) : res
+    searchResults.value = data?.workOrders || data?.work_orders || (Array.isArray(data) ? data : [])
   } catch {
-    if (seq !== searchRequestSeq) return
+    if (seq < searchRequestSeq) return
     searchError.value = 'Não foi possível pesquisar as ordens de serviço.'
     searchResults.value = []
   } finally {
-    if (seq === searchRequestSeq) isSearching.value = false
+    if (seq >= searchRequestSeq) isSearching.value = false
   }
 }
 
 async function selectWorkOrder(wo: any) {
+  if (searchDebounceTimer) { clearTimeout(searchDebounceTimer); searchDebounceTimer = null }
+  searchRequestSeq++
+  const addrSeq = ++addressRequestSeq
+  isSearching.value = false
+  searchError.value = null
   selectedWorkOrder.value = wo
   searchResults.value = []
-  searchQuery.value = `${wo.numero_os} - ${wo.client?.nome || 'Cliente'}`
-
+  searchQuery.value = ''
   selectedAddressId.value = wo.address_id || ''
-  if (wo.responsible_staff_id) {
-    selectedStaffId.value = wo.responsible_staff_id
-  } else {
-    selectedStaffId.value = ''
-  }
+  selectedStaffId.value = wo.responsible_staff_id || ''
 
-  // Load all client addresses (Emenda 6)
   if (wo.client_id) {
     isLoadingAddresses.value = true
     try {
       const res = await $fetch<any>(`/api/admin/crm/clients/${wo.client_id}`)
+      if (addrSeq < addressRequestSeq) return
       clientAddresses.value = res?.addresses || []
     } catch {
+      if (addrSeq < addressRequestSeq) return
       clientAddresses.value = []
     } finally {
-      isLoadingAddresses.value = false
+      if (addrSeq >= addressRequestSeq) isLoadingAddresses.value = false
     }
+  } else {
+    clientAddresses.value = []
+    isLoadingAddresses.value = false
   }
 }
 
 async function handleSubmit() {
-  if (!selectedWorkOrder.value) {
-    errorMessage.value = 'Selecione uma Ordem de Serviço.'
-    return
-  }
-
+  if (!selectedWorkOrder.value) { errorMessage.value = 'Selecione uma Ordem de Serviço.'; return }
   if (!appointmentDate.value || !horaInicio.value || !horaFim.value) {
     errorMessage.value = 'Informe a data, horário de início e término do compromisso.'
     return
   }
-
   const startIso = toSaoPauloIso(appointmentDate.value, horaInicio.value)
   const endIso = toSaoPauloIso(appointmentDate.value, horaFim.value)
-
   if (new Date(startIso).getTime() >= new Date(endIso).getTime()) {
     errorMessage.value = 'O horário de término deve ser estritamente posterior ao horário de início.'
     return
@@ -180,7 +165,6 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   errorMessage.value = null
-
   const payload = {
     work_order_id: selectedWorkOrder.value.id,
     tipo_agendamento: tipoAgendamento.value,
@@ -196,7 +180,6 @@ async function handleSubmit() {
       method: 'POST',
       body: payload
     })
-
     if (res?.success && res.appointment) {
       emit('appointmentCreated', res.appointment)
       emit('close')
@@ -224,8 +207,9 @@ async function handleSubmit() {
           <p class="text-xs text-slate-400">Programe um compromisso vinculado a uma Ordem de Serviço.</p>
         </div>
         <button
-          @click="emit('close')"
-          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+          @click="tryClose"
+          :disabled="isSubmitting"
+          class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Fechar modal"
         >
           <Icon name="lucide:x" class="w-5 h-5" />
@@ -243,7 +227,6 @@ async function handleSubmit() {
           <div class="relative">
             <input
               v-model="searchQuery"
-              @input="handleSearchWorkOrders"
               type="text"
               placeholder="Digite o número da OS, nome ou telefone do cliente..."
               class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-950/60 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 min-h-[44px]"
@@ -258,21 +241,23 @@ async function handleSubmit() {
           <!-- Dropdown de Resultados da OS -->
           <div
             v-if="searchResults.length > 0"
-            class="absolute z-20 w-full mt-1 rounded-xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden max-h-48 overflow-y-auto"
+            class="absolute top-full left-0 z-20 w-full mt-1 rounded-xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden max-h-48 overflow-y-auto"
           >
-            <div
+            <button
               v-for="wo in searchResults"
               :key="wo.id"
+              type="button"
+              data-testid="os-search-result-btn"
               @click="selectWorkOrder(wo)"
-              class="p-2.5 hover:bg-indigo-600/20 border-b last:border-b-0 border-white/5 cursor-pointer transition-colors text-xs"
+              class="w-full text-left p-2.5 hover:bg-indigo-600/20 border-b last:border-b-0 border-white/5 cursor-pointer transition-colors text-xs min-h-[44px] focus:outline-none focus:bg-indigo-600/30"
             >
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between pointer-events-none">
                 <span class="font-mono font-bold text-indigo-400">{{ wo.numero_os }}</span>
                 <span class="text-[10px] uppercase font-semibold text-slate-400">{{ wo.status_os }}</span>
               </div>
-              <p class="text-white font-medium truncate">{{ wo.client?.nome || 'Cliente' }}</p>
-              <p class="text-slate-400 text-[11px] truncate">{{ wo.client?.telefone_principal || '' }}</p>
-            </div>
+              <p class="text-white font-medium truncate pointer-events-none">{{ wo.client?.nome || 'Cliente' }}</p>
+              <p class="text-slate-400 text-[11px] truncate pointer-events-none">{{ wo.client?.telefone_principal || '' }}</p>
+            </button>
           </div>
         </div>
 
@@ -380,8 +365,9 @@ async function handleSubmit() {
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
           <button
             type="button"
-            @click="emit('close')"
-            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-all min-h-[44px] cursor-pointer"
+            @click="tryClose"
+            :disabled="isSubmitting"
+            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition-all min-h-[44px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancelar
           </button>

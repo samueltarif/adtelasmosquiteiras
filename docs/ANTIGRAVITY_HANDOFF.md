@@ -44,13 +44,17 @@
   - `PRODUCTION_DATABASE_WRITES = 0`
   - `MIGRATION_012_REEXECUTED = NO`
 - **Hotfix — Concorrência 409 & Preservação Exata de Token**: `COMPLETE_VALIDATED`
-  - `CONCURRENCY_409_ROOT_CAUSE = new Date(body.expected_appointment_updated_at).toISOString() nos endpoints BFF truncava a precisão de microsegundos (ex: 2026-09-02 10:58:25.53129+00 -> 2026-09-02T10:58:25.531Z), fazendo PostgreSQL timestamptz IS DISTINCT FROM avaliar como TRUE`
-  - `CONCURRENCY_TOKEN_PRESERVED_EXACTLY = YES (string RFC3339 opaca preservada diretamente do client para a RPC)`
-  - `DUPLICATE_STATUS_REQUEST_ROOT_CAUSE = Ausência de mutex de submissão e ausência de disabled/loading visual nos botões de transição do AppointmentDetailSheet`
-  - `STATUS_SUBMISSION_MUTEX = IMPLEMENTED (isStatusUpdating ref + guard if (isStatusUpdating) return + disabled visual com spinner)`
+  - `CONCURRENCY_409_ROOT_CAUSE = new Date(expected_appointment_updated_at).toISOString() perdia precisão submilissegundo do timestamptz PostgreSQL`
+  - `CONCURRENCY_TOKEN_PRESERVED_EXACTLY = YES`
+  - `STATUS_SUBMISSION_MUTEX = IMPLEMENTED`
   - `STATUS_REQUEST_COUNT_PER_CLICK = 1`
-  - `CONCURRENCY_USER_MESSAGE = NEUTRALIZED (atualizado em appointmentErrorMap.mjs e crmAgendaErrors.ts sem alegar outro usuário)`
-  - `STARTTIME_ERROR_SOURCE = Ferramental externo / Extensão de browser / Devtools (zero referências a startTime no runtime da aplicação)`
+  - `FRESH_DETAIL_STATUS_TRANSITION = PASS`
+  - `STALE_TOKEN_409_BEHAVIOR = PASS`
+  - `POST_409_DETAIL_REFRESH = PASS`
+  - `CONCURRENCY_USER_MESSAGE = NEUTRALIZED`
+  - `STARTTIME_APPLICATION_RUNTIME_REFERENCE_COUNT = 0`
+  - `STARTTIME_ERROR_SOURCE = NOT_CONFIRMED`
+  - `STARTTIME_EXTERNAL_INSTRUMENTATION_SUSPECTED = YES`
   - `BUILD_STATUS = PASS (exit code 0)`
   - `MIGRATION_012_CHANGED = NO`
   - `MIGRATION_013_CHANGED = NO`
@@ -76,14 +80,12 @@
 
 ## 3. Próxima Etapa de Desenvolvimento
 
-- **Fase Atual**: `PHASE=5.0C.4D (Instalação e Validação da Migration 013 Concluídas)`
-- **Nome da Fase**: **FASE 5.0C.4D — MIGRATION 013 PRODUCTION INSTALLATION GATE & POSTFLIGHT**
-- **Status da Fase 5.0C**: `PHASE_5_0C_FINAL_STATUS=COMPLETE_VALIDATED`
-- **Status da Fase 5.0C.4D**: `PHASE_5_0C_4D_STATUS=COMPLETE_VALIDATED`
+- **Estado Atual do Projeto**: `CURRENT_PROJECT_STATE = PHASE_5_0D_IMPLEMENTED_LOCAL_PENDING_PRODUCTION_RELEASE_REVIEW`
+- **Status da Fase 5.0C**: `PHASE_5_0C_FINAL_STATUS = COMPLETE_VALIDATED`
+- **Status da Fase 5.0D.0 (Runtime Integration & UI Stabilization)**: `PHASE_5_0D_0_STATUS = COMPLETE_VALIDATED`
 - **Status de Implementação da Fase 5.0D (Admin UI)**:
-  - `PHASE_5_0D_IMPLEMENTATION_STATUS = IMPLEMENTED_LOCAL_NOT_RELEASED` (UI construída e testada localmente, pronta para release review)
+  - `PHASE_5_0D_IMPLEMENTATION_STATUS = IMPLEMENTED_LOCAL_NOT_RELEASED` (UI construída e testada localmente, aguardando release review de produção)
   - `PHASE_5_0D_PRODUCTION_RELEASE_AUTHORIZED = NO`
-  - `PHASE_5_0D_START_AUTHORIZED = NO`
 - **Governança da Migration 013**:
   - `MIGRATION_013_INSTALLED_PRODUCTION = YES`
   - `MIGRATION_013_PRODUCTION_VALIDATED = YES`
@@ -142,19 +144,13 @@
   18. Limites de tamanho de código respeitados: `APPLICATION_LOGIC_FILES_OVER_200_LINES=0`, `APPLICATION_CODE_FILES_OVER_600_LINES=0`, `CODE_SIZE_POLICY=PASS`;
   19. Testes automatizados executados e 100% aprovados:
       - `node scripts/test_crm_migration013_local.mjs` (58/58 ASSERTS PASSOU, `100% PASS`);
-      - `node scripts/test_crm_phase5c1_bff.mjs` (57/57 ASSERTS PASSOU, `CURRENT_BFF_ASSERTS=57`, `100% PASS` | `PREVIOUS_BFF_ASSERTS=49`);
-      - `node scripts/test_admin_ui_phase5d_browser.mjs` (663/663 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
-      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU, `100% PASS`);
+      - `node scripts/test_crm_phase5c1_bff.mjs` (54/54 TESTES PASSOU, `CURRENT_BFF_ASSERTS=54`, `100% PASS`);
+      - `node scripts/test_admin_ui_phase5d_browser.mjs` (673/673 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
+      - `node scripts/test_admin_ui_phase5d.mjs` (44/44 TESTES PASSOU, `100% PASS`);
       - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU, `100% PASS`);
       - `node scripts/audit_git_diff_loc.mjs` (`APPLICATION_LOGIC_FILES_OVER_200=0`, `PASS`);
       - `node scripts/scan_raw_logs.js` (`RAW LOGS COUNT=0`, `PASS`);
-      - `npm run build` (`BUILD STATUS = PASS`, exit code 0).
-      - `node scripts/test_crm_phase5c1_bff.mjs` (57/57 ASSERTS PASSOU, `CURRENT_BFF_ASSERTS=57`, `100% PASS` | `PREVIOUS_BFF_ASSERTS=49`);
-      - `node scripts/test_admin_ui_phase5d_browser.mjs` (663/663 ASSERTS PASSOU, `UI_BROWSER_ASSERTS=PASS`);
-      - `node scripts/test_admin_ui_phase5d.mjs` (36/36 TESTES PASSOU, `100% PASS`);
-      - `node scripts/test_admin_performance_patch1.mjs` (70/70 TESTES PASSOU, `100% PASS`);
-      - `node scripts/audit_git_diff_loc.mjs` (`APPLICATION_LOGIC_FILES_OVER_200=0`, `PASS`);
-      - `node scripts/scan_raw_logs.js` (`RAW LOGS COUNT=0`, `PASS`);
+      - `node scripts/test_hotfix_concurrency_409.mjs` (7/7 PASS, `100% PASS`);
       - `npm run build` (`BUILD STATUS = PASS`, exit code 0).
 
 ---
@@ -184,8 +180,9 @@
 
 ---
 
-## 5. Regras de Integridade de `data_prevista` (Pendência Crítica)
+## 5. Regras de Integridade de `data_prevista` (Implementado e Validado)
 
+- **Status**: `IMPLEMENTED_VALIDATED`
 - **Flag**: `DATA_PREVISTA_APPLICATION_GUARD_REQUIRED=YES`
 - **Autoridade Única**: `WORK_ORDER_DATA_PREVISTA_AUTHORITY=APPOINTMENT_INSTALLATION_SCHEDULE`
 - **Contexto**: A Migration 012 centralizou a regra de negócio na RPC, mas os endpoints legados de aplicação precisam barrar qualquer tentativa de bypass:
@@ -254,18 +251,18 @@ Os limites estritos aplicam-se **SOMENTE ao código da aplicação**:
 
 ---
 
-## 9. Diretrizes de Responsividade Futura (Etapa de UI)
+## 9. Diretrizes de Responsividade (Implementado e Validado na UI)
 
-Quando a fase de interface visual for iniciada, a implementação e os testes visuais devem obrigatoriamente cobrir a matriz canônica de resoluções:
+A implementação e os testes visuais cobrem integralmente a matriz canônica de resoluções:
 
 - **Mobile**: `320px`, `360px`, `375px`, `390px`, `412px`, `430px`;
 - **Tablet**: `768px`, `1024px`;
 - **Desktop / Wide**: `1280px`, `1920px`.
 
-**Regras de UX e Layout**:
-- Alvos de toque (touch targets) de botões e itens interativos: no mínimo `44x44px`;
-- Zero scroll horizontal indesejado (`zero real horizontal overflow`);
-- **Proibido** usar `overflow-x: hidden` no `body`/`html` como paliativo para consertar layouts desalinhados.
+**Regras de UX e Layout Validadas**:
+- Alvos de toque (touch targets) de botões e itens interativos: no mínimo `44x44px` (`TOUCH_TARGET_MIN_44PX=PASS`);
+- Zero scroll horizontal indesejado (`ZERO_HORIZONTAL_OVERFLOW=PASS`);
+- Proibido usar `overflow-x: hidden` no `body`/`html` como paliativo (`OVERFLOW_X_HIDDEN_BANDAID_COUNT=0`).
 
 ---
 
@@ -281,7 +278,8 @@ Ao retomar o projeto em uma nova sessão, os seguintes arquivos reais existentes
 ### Banco de Dados / Migrations Canônicas
 4. [`supabase/manual/010_crm_core_tables.sql`](supabase/manual/010_crm_core_tables.sql) (Fase 4 — Baseline do CRM);
 5. [`supabase/manual/011_crm_work_order_proposals.sql`](supabase/manual/011_crm_work_order_proposals.sql) (Fase 4.5 — Motor de Propostas);
-6. [`supabase/manual/012_crm_appointments_and_staff_engine.sql`](supabase/manual/012_crm_appointments_and_staff_engine.sql) (Fase 5.0B — Motor de Agenda e Equipe Instalado).
+6. [`supabase/manual/012_crm_appointments_and_staff_engine.sql`](supabase/manual/012_crm_appointments_and_staff_engine.sql) (Fase 5.0B — Motor de Agenda e Equipe Instalado — `MIGRATION_012_REEXECUTION=FORBIDDEN`);
+7. [`supabase/manual/013_work_order_terminal_appointment_guard.sql`](supabase/manual/013_work_order_terminal_appointment_guard.sql) (Fase 5.0C — Invariante Terminal de OS Instalado — SHA: `04CC6E99D8DBEC4F63A8B18AF105165C166BF9BBDDE8FB0F4964713D02A90E08` — Status: `INSTALLED_VALIDATED` — `MIGRATION_013_REEXECUTION=FORBIDDEN`).
 
 ### Tipos, Utilitários e Endpoints Backend
 7. [`app/types/crmAppointments.ts`](app/types/crmAppointments.ts) (Types TypeScript canônicos);
@@ -306,6 +304,27 @@ Ao retomar o projeto em uma nova sessão, os seguintes arquivos reais existentes
 > 3. Auditar o estado real do repositório;
 > 4. Confirmar que a **Migration 012 já está instalada** em produção e **NÃO DEVE ser reaplicada**;
 > 5. Resumir o estado atual do projeto de forma concisa;
-> 6. Confirmar qual é a próxima etapa autorizada pelo usuário (e.g., Fase 5.0D para UI ou validação de 5.0C);
-> 7. Somente então iniciar alterações após comando explícito do usuário.
+> 6. Confirmar qual é a próxima etapa autorizada pelo usuário (e.g., Production Release Review / próxima fase explicitamente autorizada);
+
+---
+
+## 12. Histórico de Patches — Fase 5.0D.RELEASE.3 (Lifecycle Assíncrono & E2E Hardening)
+
+- **Supressão de Busca Programática após Seleção de OS**: Ao selecionar uma OS em `AppointmentCreateModal.vue`, `searchQuery` é resetado para `''`, o dropdown é fechado e o `watch(searchQuery)` verifica `selectedWorkOrder` antes de agendar debounce. Resultado: `SEARCH_AFTER_WORK_ORDER_SELECTION=0` (unit) e `SEARCH_AFTER_WORK_ORDER_SELECTION_REQUESTS=0` (E2E).
+- **Submit In-Flight Lifecycle**: Durante submissão ativa (`isSubmitting = true`), o fechamento do modal por tecla Escape, botão X ou Cancelar é estritamente bloqueado via `tryClose()`. Botões visuais ficam `:disabled="isSubmitting"`. Política confirmada por E2E: `APPOINTMENT_SUBMIT_CLOSE_POLICY=BLOCK_WHILE_SUBMITTING` e `APPOINTMENT_SUBMIT_INFLIGHT_LIFECYCLE=PASS`.
+- **E2E Isolado de Corridas Assíncronas**:
+  - `APPOINTMENT_SEARCH_QUERY_CLEAR_INVALIDATION=PASS` (query limpa descarta request pendente)
+  - `APPOINTMENT_SEARCH_INFLIGHT_CLOSE_INVALIDATION=PASS` (fechar/reabrir modal descarta request em voo)
+  - `APPOINTMENT_SEARCH_STALE_REQUEST_INVALIDATION=PASS` (requests obsoletos não sobrescrevem estado atual)
+  - `PRESELECTED_WORK_ORDER_STALE_RESPONSE_E2E=PASS` (epoch monotônico descarta respostas assíncronas entre ciclos de abertura do modal)
+  - `CLIENT_ADDRESS_STALE_RESPONSE_E2E=PASS` (sequência monotônica de requisição descarta endereços de cliente obsoletos entre seleções/ciclos)
+- **Status de Deploy**: `DEPLOY_AUTHORIZED=NO` (Aguardando aprovação de gate externo). `PRODUCTION_DATABASE_WRITES=0`.
+- **Contagens Canônicas de Testes Sincronizadas**:
+  - `CANONICAL_E2E_ASSERTS=673` (`node scripts/test_admin_ui_phase5d_browser.mjs`, 673/673 PASS)
+  - `CANONICAL_ADMIN_UI_ASSERTS=44` (`node scripts/test_admin_ui_phase5d.mjs`, 44/44 PASS)
+  - `CANONICAL_BFF_ASSERTS=54` (`node scripts/test_crm_phase5c1_bff.mjs`, 54/54 PASS)
+  - `CANONICAL_CONCURRENCY_ASSERTS=7` (`node scripts/test_hotfix_concurrency_409.mjs`, 7/7 PASS)
+  - `DOCUMENTATION_TEST_COUNTS_SYNCHRONIZED=YES`
+
+
 

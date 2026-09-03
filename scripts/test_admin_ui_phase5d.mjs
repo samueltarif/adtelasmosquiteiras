@@ -218,13 +218,9 @@ test('errors', '2.2 ERR_ACTIVE_INSTALLATION_EXISTS retorna aviso de instalação
   assert.strictEqual(msg, 'Esta Ordem de Serviço já possui uma instalação ativa agendada ou em andamento.')
 })
 
-test('errors', '2.3 Conflito genérico 409 (CAS) alerta alteração concorrente por outro usuário', () => {
-  const err = {
-    statusCode: 409,
-    data: { statusMessage: 'ERR_CONCURRENCY_CONFLICT: Record has been modified' }
-  }
-  const msg = extractAppointmentErrorMessage(err)
-  assert.strictEqual(msg, 'Os dados deste agendamento foram alterados por outro usuário. Recarregamos as informações mais recentes.')
+test('errors', '2.3 Conflito genérico 409 (CAS) alerta alteração concorrente com mensagem neutra', () => {
+  const msg = extractAppointmentErrorMessage({ statusCode: 409, message: 'ERR_CONCURRENCY_CONFLICT' })
+  assert.strictEqual(msg, 'Os dados deste agendamento foram atualizados desde que esta tela foi carregada. Os dados foram recarregados; tente novamente.')
 })
 
 test('errors', '2.4 403, 404 e 503 retornam mensagens estruturadas fail-closed', () => {
@@ -604,6 +600,204 @@ test('legacyUI', '8.11 Zero raw error object logging: scanner dinâmico em todo 
 
   assert.strictEqual(violations.length, 0, `Nenhum raw error object deve ser logado no client-side: ${JSON.stringify(violations, null, 2)}`)
   console.log('CLIENT_SIDE_RAW_ERROR_OBJECT_LOGGING=0')
+})
+
+test('a11y', '8.12 AppointmentCreateModal: dropdown de pesquisa usa <button type="button"> semântico com touch target >= 44px', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. Deve usar <button para cada resultado de busca
+  assert.strictEqual(
+    /<button[^>]*v-for="wo in searchResults"[^>]*type="button"[^>]*@click="selectWorkOrder\(wo\)"/s.test(code),
+    true,
+    'Resultados de busca de OS devem ser <button type="button">'
+  )
+
+  // 2. Não deve conter <div @click="selectWorkOrder
+  assert.strictEqual(
+    /<div[^>]*@click="selectWorkOrder/i.test(code),
+    false,
+    'Não deve conter <div @click="selectWorkOrder" semântica inválida'
+  )
+
+  // 3. Deve possuir min-height >= 44px
+  assert.strictEqual(
+    code.includes('min-h-[44px]'),
+    true,
+    'Item do dropdown deve ter min-h-[44px]'
+  )
+
+  console.log('APPOINTMENT_SEARCH_RESULT_SEMANTIC_CONTROL=BUTTON')
+  console.log('APPOINTMENT_SEARCH_KEYBOARD_ACCESS=PASS')
+})
+
+test('a11y', '8.13 AppointmentCreateModal: cancelamento assíncrono estrito e invalidação de stale requests no reset do modal', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. Deve possuir função resetModalState
+  assert.ok(code.includes('function resetModalState()'), 'Deve possuir resetModalState()')
+
+  // 2. resetModalState deve limpar searchDebounceTimer
+  assert.ok(code.includes('clearTimeout(searchDebounceTimer)'), 'Deve limpar searchDebounceTimer')
+
+  // 3. resetModalState deve incrementar searchRequestSeq
+  assert.ok(code.includes('searchRequestSeq++'), 'Deve incrementar searchRequestSeq no reset')
+
+  // 4. resetModalState deve resetar searchError, searchResults, isSearching
+  assert.ok(code.includes('searchError.value = null'), 'Deve resetar searchError')
+  assert.ok(code.includes('searchResults.value = []'), 'Deve resetar searchResults')
+  assert.ok(code.includes('isSearching.value = false'), 'Deve resetar isSearching')
+
+  console.log('APPOINTMENT_SEARCH_STALE_REQUEST_INVALIDATION=PASS')
+})
+
+test('a11y', '8.14 Scanner de controles não-semânticos em app/components/admin/agenda/: zero divs/spans clicáveis sem role/tabindex', () => {
+  const agendaDir = 'app/components/admin/agenda'
+  const files = fs.readdirSync(agendaDir).filter(f => f.endsWith('.vue'))
+  const violations = []
+
+  for (const file of files) {
+    const filePath = path.join(agendaDir, file)
+    const content = fs.readFileSync(filePath, 'utf8')
+    const templateMatch = content.match(/<template>([\s\S]*)<\/template>/)
+    if (!templateMatch) continue
+    const template = templateMatch[1]
+
+    // Procura tags <div ou <span com @click que não tenham role="button" ou tabindex=
+    const tagMatches = template.matchAll(/<(div|span)\s+([^>]*@click[^>]*)>/gi)
+    for (const match of tagMatches) {
+      const tag = match[1]
+      const attrs = match[2]
+      // Ignora backdrop de overlay fixo (ex: fixed inset-0) e diretivas de stop pura sem ação
+      if (attrs.includes('fixed') && attrs.includes('inset-0')) continue
+      if (attrs.includes('@click.stop') && !attrs.includes('=')) continue
+      
+      const hasRole = /role="(button|link|checkbox|radio|tab)"/i.test(attrs)
+      const hasTabIndex = /tabindex="0"/i.test(attrs)
+      if (!hasRole && !hasTabIndex) {
+        violations.push({ file, tag, attrs: attrs.slice(0, 80) })
+      }
+    }
+  }
+
+  assert.strictEqual(violations.length, 0, `Nenhum controle não-semântico encontrado na agenda: ${JSON.stringify(violations, null, 2)}`)
+  console.log('AGENDA_NON_SEMANTIC_CLICKABLE_CONTROLS=0')
+})
+
+test('a11y', '8.15 Invalidação Imediata ao alterar Search Query (Watcher cancela debounce e incrementa seq imediatamente)', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. watch(searchQuery) deve cancelar debounce imediatamente
+  assert.ok(
+    /watch\(searchQuery,\s*\([^)]*\)\s*=>\s*\{[^}]*clearTimeout\(searchDebounceTimer\)/s.test(code),
+    'watch(searchQuery) deve cancelar timer de debounce imediatamente na alteração'
+  )
+
+  // 2. watch(searchQuery) deve incrementar searchRequestSeq imediatamente
+  assert.ok(
+    /watch\(searchQuery,\s*\([^)]*\)\s*=>\s*\{[^}]*searchRequestSeq\+\+/s.test(code) ||
+    /const\s+seq\s*=\s*\+\+searchRequestSeq/s.test(code),
+    'watch(searchQuery) deve incrementar monotonicamente searchRequestSeq a cada mudança'
+  )
+
+  // 3. trimmed.length < 2 deve esvaziar searchResults e não disparar request
+  assert.ok(
+    /if\s*\(\s*trimmed\.length\s*<\s*2\s*\)\s*\{[^}]*searchResults\.value\s*=\s*\[\]/s.test(code),
+    'trimmed.length < 2 deve limpar searchResults'
+  )
+
+  console.log('STATIC_RACE_GUARD_QUERY_CLEAR=PASS')
+})
+
+test('a11y', '8.16 Preselected Work Order Stale Response Blocking (modalEpoch monotônico)', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. Deve declarar modalEpoch
+  assert.ok(code.includes('modalEpoch'), 'Deve declarar modalEpoch')
+
+  // 2. resetModalState deve incrementar modalEpoch
+  assert.ok(code.includes('modalEpoch++'), 'resetModalState deve incrementar modalEpoch++')
+
+  // 3. loadPreselectedWorkOrder deve verificar epoch < modalEpoch
+  assert.ok(
+    /epoch\s*<\s*modalEpoch/.test(code),
+    'loadPreselectedWorkOrder deve descartar response se epoch < modalEpoch'
+  )
+
+  console.log('STATIC_RACE_GUARD_PRESELECTED_WO=PASS')
+})
+
+test('a11y', '8.17 Client Address Request Race Protection (addressRequestSeq monotônico)', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. Deve declarar addressRequestSeq
+  assert.ok(code.includes('addressRequestSeq'), 'Deve declarar addressRequestSeq')
+
+  // 2. resetModalState deve incrementar addressRequestSeq
+  assert.ok(code.includes('addressRequestSeq++'), 'resetModalState deve incrementar addressRequestSeq++')
+
+  // 3. selectWorkOrder deve comparar addrSeq com addressRequestSeq
+  assert.ok(
+    /addrSeq\s*<\s*addressRequestSeq/.test(code),
+    'selectWorkOrder deve descartar resposta de endereços de OS anterior'
+  )
+
+  console.log('STATIC_RACE_GUARD_CLIENT_ADDRESS=PASS')
+})
+
+test('a11y', '8.18 Search suppression after Work Order selection (selectedWorkOrder guard in watcher)', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. selectWorkOrder must clear searchQuery to '' (not populate it)
+  assert.ok(
+    /function selectWorkOrder[\s\S]*?searchQuery\.value\s*=\s*''/s.test(code),
+    'selectWorkOrder deve limpar searchQuery para string vazia'
+  )
+
+  // 2. Watch must check selectedWorkOrder before scheduling search
+  assert.ok(
+    /if\s*\(\s*selectedWorkOrder\.value\s*\)\s*return/s.test(code),
+    'watch(searchQuery) deve bloquear busca se selectedWorkOrder já estiver definido'
+  )
+
+  console.log('SEARCH_AFTER_WORK_ORDER_SELECTION=0')
+})
+
+test('a11y', '8.19 Submit in-flight close policy: modal stays open during isSubmitting', () => {
+  const modalPath = 'app/components/admin/agenda/AppointmentCreateModal.vue'
+  const code = fs.readFileSync(modalPath, 'utf8')
+
+  // 1. tryClose function must check isSubmitting
+  assert.ok(
+    /function tryClose[\s\S]*?isSubmitting\.value/s.test(code),
+    'tryClose deve verificar isSubmitting.value antes de fechar'
+  )
+
+  // 2. useModalA11y must use tryClose (not direct emit)
+  assert.ok(
+    /useModalA11y\([\s\S]*?,\s*tryClose\)/.test(code),
+    'useModalA11y deve usar tryClose como callback de fechamento'
+  )
+
+  // 3. X button must use tryClose
+  assert.ok(
+    /@click="tryClose"/s.test(code),
+    'Botão X e Cancelar devem usar tryClose'
+  )
+
+  // 4. X and Cancel buttons must be disabled during isSubmitting
+  const disabledSubmittingCount = (code.match(/:disabled="isSubmitting"/g) || []).length
+  assert.ok(
+    disabledSubmittingCount >= 2,
+    'Botão X e Cancelar devem ter :disabled="isSubmitting"'
+  )
+
+  console.log('APPOINTMENT_SUBMIT_CLOSE_POLICY=BLOCK_WHILE_SUBMITTING')
 })
 
 console.log('\n======================================================================')

@@ -310,7 +310,16 @@ function closeLightbox() {
               class="relative group rounded-xl border border-white/10 bg-slate-950/60 p-2 flex flex-col justify-between overflow-hidden"
             >
               <!-- Card Foto com Thumbnail Real -->
-              <div v-if="m.media_type === 'photo'" class="flex flex-col gap-1.5 cursor-pointer" @click="openMediaPreview(m)">
+              <div
+                v-if="m.media_type === 'photo'"
+                role="button"
+                tabindex="0"
+                :aria-label="`Ver foto ${m.safe_filename || ''}`"
+                class="flex flex-col gap-1.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 rounded-lg"
+                @click="openMediaPreview(m)"
+                @keydown.enter.prevent="openMediaPreview(m)"
+                @keydown.space.prevent="openMediaPreview(m)"
+              >
                 <div class="w-full aspect-square rounded-lg bg-slate-800/80 relative overflow-hidden flex items-center justify-center">
                   <!-- Skeleton Loading -->
                   <div v-if="thumbnailCache[m.id]?.loading" class="absolute inset-0 bg-slate-800 animate-pulse flex items-center justify-center text-slate-500">
@@ -353,8 +362,13 @@ function closeLightbox() {
               <!-- Card Vídeo -->
               <div v-else class="flex flex-col gap-1.5">
                 <div 
-                  class="w-full aspect-square rounded-lg bg-slate-900 border border-purple-500/20 flex flex-col items-center justify-center text-center p-2 cursor-pointer hover:bg-slate-800/80 transition-colors"
+                  role="button"
+                  tabindex="0"
+                  :aria-label="`Reproduzir vídeo ${m.safe_filename || ''}`"
+                  class="w-full aspect-square rounded-lg bg-slate-900 border border-purple-500/20 flex flex-col items-center justify-center text-center p-2 cursor-pointer hover:bg-slate-800/80 transition-colors focus:outline-none focus:ring-1 focus:ring-purple-500"
                   @click="openMediaPreview(m)"
+                  @keydown.enter.prevent="openMediaPreview(m)"
+                  @keydown.space.prevent="openMediaPreview(m)"
                 >
                   <Icon name="lucide:play-circle" class="w-7 h-7 sm:w-8 sm:h-8 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
                   <p class="text-[10px] text-slate-300 font-bold truncate max-w-full px-1">{{ m.safe_filename }}</p>

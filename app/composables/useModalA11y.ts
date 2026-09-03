@@ -60,7 +60,15 @@ export function useModalA11y(
     }
 
     if (e.key === 'Tab') {
-      const container = currentDialogEl.value || options.dialogRef?.value || (document.querySelector('[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]') as HTMLElement | null)
+      const allDialogs = Array.from(document.querySelectorAll<HTMLElement>('[role="dialog"], [role="alertdialog"]'))
+      if (allDialogs.length > 1) {
+        const topmostDialog = allDialogs[allDialogs.length - 1]
+        if (currentDialogEl.value && currentDialogEl.value !== topmostDialog) {
+          return
+        }
+      }
+
+      const container = currentDialogEl.value || options.dialogRef?.value || (allDialogs[allDialogs.length - 1] as HTMLElement | null)
       if (!container) return
 
       const focusables = getFocusableElements(container)
