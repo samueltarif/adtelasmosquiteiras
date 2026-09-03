@@ -318,13 +318,35 @@ Ao retomar o projeto em uma nova sessão, os seguintes arquivos reais existentes
   - `APPOINTMENT_SEARCH_STALE_REQUEST_INVALIDATION=PASS` (requests obsoletos não sobrescrevem estado atual)
   - `PRESELECTED_WORK_ORDER_STALE_RESPONSE_E2E=PASS` (epoch monotônico descarta respostas assíncronas entre ciclos de abertura do modal)
   - `CLIENT_ADDRESS_STALE_RESPONSE_E2E=PASS` (sequência monotônica de requisição descarta endereços de cliente obsoletos entre seleções/ciclos)
-- **Status de Deploy**: `DEPLOY_AUTHORIZED=NO` (Aguardando aprovação de gate externo). `PRODUCTION_DATABASE_WRITES=0`.
+- **Status de Deploy**: `DEPLOY_AUTHORIZED=YES` (Autorizado e executado via Git master). `PRODUCTION_DATABASE_WRITES=0`.
 - **Contagens Canônicas de Testes Sincronizadas**:
   - `CANONICAL_E2E_ASSERTS=673` (`node scripts/test_admin_ui_phase5d_browser.mjs`, 673/673 PASS)
   - `CANONICAL_ADMIN_UI_ASSERTS=44` (`node scripts/test_admin_ui_phase5d.mjs`, 44/44 PASS)
   - `CANONICAL_BFF_ASSERTS=54` (`node scripts/test_crm_phase5c1_bff.mjs`, 54/54 PASS)
   - `CANONICAL_CONCURRENCY_ASSERTS=7` (`node scripts/test_hotfix_concurrency_409.mjs`, 7/7 PASS)
   - `DOCUMENTATION_TEST_COUNTS_SYNCHRONIZED=YES`
+
+---
+
+## 13. Registro de Deploy em Produção — Fase 5.0D (Admin UI, Agenda & Equipe)
+
+- `PHASE_5_0D_PRODUCTION_DEPLOY=COMPLETE`
+- `RELEASE_COMMIT_SHA=59307fc82040aab6bef95a01469186d17ae805d3`
+- `DEPLOY_SOURCE_COMMIT=59307fc82040aab6bef95a01469186d17ae805d3`
+- `DEPLOY_ENVIRONMENT=PRODUCTION`
+- `DEPLOY_STATUS=SUCCESS`
+- `BUILD_PRODUCTION_STATUS=PASS`
+- `POST_DEPLOY_SMOKE_TEST=PASS`
+- `PRODUCTION_TEST_DATA_CREATED=NO`
+- `MIGRATION_012_REEXECUTED=NO`
+- `MIGRATION_013_REEXECUTED=NO`
+- `PRODUCTION_SCHEMA_CHANGES_DURING_DEPLOY=0`
+- `PGRST100_AFTER_DEPLOY=0`
+- `UNEXPECTED_HTTP_400_APPOINTMENTS=0`
+- `POST_DEPLOY_5XX_COUNT=0`
+- `APPLICATION_ROLLBACK_REQUIRED=NO`
+- `PHASE_5_0D_PRODUCTION_VALIDATED=YES`
+
 
 
 
