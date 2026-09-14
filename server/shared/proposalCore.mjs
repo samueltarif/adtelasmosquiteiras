@@ -3,10 +3,11 @@
  * Arquivo: server/shared/proposalCore.mjs
  */
 
-import PDFDocument from 'pdfkit'
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
+import PDFDocument from './pdfkitClient.mjs'
+
 import {
   S3Client,
   PutObjectCommand,
