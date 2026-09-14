@@ -30,12 +30,12 @@ export function computeCommercialTermsInputHash(
   const cleanValidUntil = validUntil ? String(validUntil).trim().slice(0, 10) : null
   
   const sanitizedTerms: Record<string, any> = {
-    condicoes_pagamento: terms?.condicoes_pagamento ? String(terms.condicoes_pagamento).trim() : null,
+    condicoes_pagamento: terms?.condicoes_pagamento ? String(terms.condicoes_pagamento).trim() : '',
     prazo_instalacao_dias: typeof terms?.prazo_instalacao_dias === 'number' && Number.isInteger(terms.prazo_instalacao_dias)
       ? Math.max(1, Math.min(365, terms.prazo_instalacao_dias))
       : (terms?.prazo_instalacao_dias ? parseInt(String(terms.prazo_instalacao_dias), 10) || null : null),
     incluir_medicoes: typeof terms?.incluir_medicoes === 'boolean' ? terms.incluir_medicoes : false,
-    observacoes_proposta: terms?.observacoes_proposta ? String(terms.observacoes_proposta).trim() : null
+    observacoes_proposta: terms?.observacoes_proposta ? String(terms.observacoes_proposta).trim() : ''
   }
 
   // Objeto canônico com chaves ordenadas

@@ -64,6 +64,12 @@ export default defineNuxtConfig({
   
   // Security Headers & SEO 301 Redirects
   nitro: {
+    // pdfkit usa require() dinâmico para carregar as fontes padrão (Helvetica, etc.)
+    // O bundler do Nitro/Rollup corta esses módulos ao bundlar para Vercel.
+    // Marcando como externo, o Node.js resolve em runtime via node_modules nativos do Vercel.
+    externals: {
+      inline: ['pdfkit']
+    },
     routeRules: {
       '/**': {
         headers: {

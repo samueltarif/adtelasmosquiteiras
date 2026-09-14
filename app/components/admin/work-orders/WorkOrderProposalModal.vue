@@ -75,10 +75,10 @@ async function handlePreview() {
     const payload = {
       validUntil: validUntil.value || null,
       commercialTerms: {
-        condicoes_pagamento: condicoesPagamento.value.trim() || null,
+        condicoes_pagamento: condicoesPagamento.value.trim() || '',
         prazo_instalacao_dias: prazoInstalacaoDias.value ? Number(prazoInstalacaoDias.value) : null,
         incluir_medicoes: incluirMedicoes.value,
-        observacoes_proposta: observacoesProposta.value.trim() || null
+        observacoes_proposta: observacoesProposta.value.trim() || ''
       }
     }
 
@@ -124,10 +124,10 @@ async function handleIssue() {
       expectedUpdatedAt: freshUpdatedAt,
       validUntil: validUntil.value || null,
       commercialTerms: {
-        condicoes_pagamento: condicoesPagamento.value.trim() || null,
+        condicoes_pagamento: condicoesPagamento.value.trim() || '',
         prazo_instalacao_dias: prazoInstalacaoDias.value ? Number(prazoInstalacaoDias.value) : null,
         incluir_medicoes: incluirMedicoes.value,
-        observacoes_proposta: observacoesProposta.value.trim() || null
+        observacoes_proposta: observacoesProposta.value.trim() || ''
       }
     }
 
