@@ -39,6 +39,34 @@ watch(() => props.isOpen, (open) => {
   }
 })
 
+function friendlyErrorMessage(rawMsg: string): string {
+  if (rawMsg.includes('ERR_CONCURRENCY_CONFLICT') || rawMsg.includes('STALE_VERSION')) {
+    return 'Esta Ordem de Serviço foi alterada por outra ação antes da emissão. Tente novamente.'
+  }
+  if (rawMsg.includes('RESERVE_FAILED: ERR_PROPOSAL_ISSUE_IN_PROGRESS')) {
+    return 'Outra emissão está em andamento para este orçamento. Aguarde alguns instantes e tente novamente.'
+  }
+  if (rawMsg.includes('ERR_INVALID_STATUS')) {
+    return 'Não é possível emitir: a Ordem de Serviço não está no status "Orçamento".'
+  }
+  if (rawMsg.includes('ERR_WORK_ORDER_ARCHIVED')) {
+    return 'Não é possível emitir um orçamento para uma OS arquivada.'
+  }
+  if (rawMsg.includes('PDF_GENERATION_FAILED')) {
+    return 'Falha ao gerar o PDF do orçamento. Verifique os dados da OS e tente novamente.'
+  }
+  if (rawMsg.includes('R2_UPLOAD_FAILED')) {
+    return 'Falha ao armazenar o documento. Tente novamente em instantes.'
+  }
+  if (rawMsg.includes('ERR_VALID_UNTIL_IN_PAST')) {
+    return 'A data de validade do orçamento não pode ser no passado.'
+  }
+  if (rawMsg.includes('ERR_IDEMPOTENCY_MISMATCH')) {
+    return 'Conflito de requisição duplicada. Feche e reabra o modal para emitir novamente.'
+  }
+  return rawMsg || 'Falha ao emitir revisão oficial do orçamento. Tente novamente.'
+}
+
 // Gera Prévia (Sem persistir no DB ou R2)
 async function handlePreview() {
   errorMessage.value = null
@@ -77,10 +105,23 @@ async function handleIssue() {
   errorMessage.value = null
   isIssueLoading.value = true
   try {
+    // Busca o updated_at mais recente da OS imediatamente antes de emitir,
+    // evitando ERR_CONCURRENCY_CONFLICT causado por agendamentos ou outras
+    // ações que atualizam updated_at sem que o usuário perceba.
+    let freshUpdatedAt: string | null = props.workOrder?.updated_at || null
+    try {
+      const fresh = await $fetch<any>(`/api/admin/crm/work-orders/${props.workOrderId}`)
+      if (fresh?.workOrder?.updated_at) {
+        freshUpdatedAt = fresh.workOrder.updated_at
+      }
+    } catch {
+      // Se o GET falhar, continua com o updated_at da prop (melhor esforço)
+    }
+
     const idempotencyKey = crypto.randomUUID()
     const payload = {
       idempotencyKey,
-      expectedUpdatedAt: props.workOrder?.updated_at || null,
+      expectedUpdatedAt: freshUpdatedAt,
       validUntil: validUntil.value || null,
       commercialTerms: {
         condicoes_pagamento: condicoesPagamento.value.trim() || null,
@@ -103,7 +144,8 @@ async function handleIssue() {
     }
   } catch (err: any) {
     console.error('[ProposalModal] Falha ao emitir orçamento')
-    errorMessage.value = err?.data?.message || err?.message || 'Falha ao emitir revisão oficial do orçamento.'
+    const raw = err?.data?.statusMessage || err?.data?.message || err?.statusMessage || err?.message || ''
+    errorMessage.value = friendlyErrorMessage(raw)
   } finally {
     isIssueLoading.value = false
   }

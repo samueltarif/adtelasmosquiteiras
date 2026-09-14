@@ -16,14 +16,49 @@ const emit = defineEmits<{
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
+function friendlyErrorMessage(rawMsg: string): string {
+  if (rawMsg.includes('ERR_CONCURRENCY_CONFLICT') || rawMsg.includes('STALE_VERSION')) {
+    return 'Esta Ordem de Serviço foi alterada por outra ação antes do aceite. A página foi atualizada — tente novamente.'
+  }
+  if (rawMsg.includes('ERR_PROPOSAL_NOT_FOUND')) {
+    return 'Orçamento não encontrado. Atualize a página e tente novamente.'
+  }
+  if (rawMsg.includes('ERR_PROPOSAL_ALREADY_ACCEPTED') || rawMsg.includes('ERR_WORK_ORDER_ALREADY_APPROVED')) {
+    return 'Este orçamento já foi aprovado anteriormente.'
+  }
+  if (rawMsg.includes('ERR_INVALID_STATUS')) {
+    return 'Não é possível aprovar: a Ordem de Serviço não está no status "Orçamento".'
+  }
+  if (rawMsg.includes('ERR_WORK_ORDER_ARCHIVED')) {
+    return 'Não é possível aprovar um orçamento de uma OS arquivada.'
+  }
+  if (rawMsg.includes('ERR_PROPOSAL_NOT_READY')) {
+    return 'Só é possível aprovar orçamentos com status "Emitida".'
+  }
+  return rawMsg || 'Falha ao aceitar proposta comercial. Tente novamente.'
+}
+
 async function handleAccept() {
   if (!props.proposal || !props.workOrder) return
   errorMessage.value = null
   isLoading.value = true
 
   try {
+    // Busca o updated_at mais recente da OS imediatamente antes de aceitar,
+    // evitando ERR_CONCURRENCY_CONFLICT causado por agendamentos ou outras
+    // ações que atualizam updated_at sem que o usuário perceba.
+    let freshUpdatedAt: string | null = props.workOrder?.updated_at || null
+    try {
+      const fresh = await $fetch<any>(`/api/admin/crm/work-orders/${props.workOrderId}`)
+      if (fresh?.workOrder?.updated_at) {
+        freshUpdatedAt = fresh.workOrder.updated_at
+      }
+    } catch {
+      // Se o GET falhar, continua com o updated_at da prop (melhor esforço)
+    }
+
     const payload = {
-      expectedUpdatedAt: props.workOrder.updated_at
+      expectedUpdatedAt: freshUpdatedAt
     }
 
     const res = await $fetch<any>(`/api/admin/crm/work-orders/${props.workOrderId}/proposals/${props.proposal.id}/accept`, {
@@ -39,7 +74,8 @@ async function handleAccept() {
     }
   } catch (err: any) {
     console.error('[ProposalAcceptModal] Falha ao aceitar orçamento')
-    errorMessage.value = err?.data?.message || err?.message || 'Falha ao aceitar proposta comercial.'
+    const raw = err?.data?.statusMessage || err?.data?.message || err?.statusMessage || err?.message || ''
+    errorMessage.value = friendlyErrorMessage(raw)
   } finally {
     isLoading.value = false
   }

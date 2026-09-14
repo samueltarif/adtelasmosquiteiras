@@ -10,8 +10,7 @@ import {
   buildProposalStorageKey,
   uploadProposalPdfToR2,
   headProposalObjectInR2,
-  generateProposalSignedDownloadUrl,
-  deleteProposalObjectFromR2
+  generateProposalSignedDownloadUrl
 } from './r2ProposalStorage'
 
 export interface CanonicalCommercialTerms {
@@ -131,6 +130,28 @@ export async function orchestrateProposalIssue(
   // Se for replay de proposta já finalizada com sucesso (ready)
   if (reserveRes.generation_status === 'ready') {
     const storageKey = reserveRes.pdf_storage_key || buildProposalStorageKey(workOrderId, proposalId)
+    try {
+      const head = await headProposalObjectInR2(storageKey).catch(() => ({ exists: false }))
+      if (!head.exists) {
+        const replayBuffer = await generateProposalPdfBuffer({
+          isPreview: false,
+          versionNumber,
+          numeroOs,
+          issuedAt: reserveRes.issued_at ? new Date(reserveRes.issued_at) : new Date(),
+          validUntil: reserveRes.valid_until,
+          companySnapshot: reserveRes.company_snapshot || {},
+          clientSnapshot: reserveRes.client_snapshot || {},
+          addressSnapshot: reserveRes.address_snapshot || null,
+          itemsSnapshot: reserveRes.items_snapshot || [],
+          totalsSnapshot: reserveRes.totals_snapshot || {},
+          commercialTerms: reserveRes.commercial_terms || sanitizedTerms
+        })
+        await uploadProposalPdfToR2(storageKey, replayBuffer)
+      }
+    } catch (replayErr) {
+      console.warn('[orchestrateProposalIssue] Replay upload fallback failed:', replayErr)
+    }
+
     const signedUrl = await generateProposalSignedDownloadUrl(storageKey).catch(() => undefined)
 
     return {
@@ -197,7 +218,7 @@ export async function orchestrateProposalIssue(
   } catch (r2Err: any) {
     console.warn('[orchestrateProposalIssue] Erro no upload R2, verificando existência via HEAD:', r2Err?.message)
     // Unknown outcome recovery via HEAD
-    const headRes = await headProposalObjectInR2(storageKey).catch(() => ({ exists: false }))
+    const headRes = await headProposalObjectInR2(storageKey).catch(() => ({ exists: false, contentLength: undefined }))
     if (headRes.exists && headRes.contentLength === pdfSizeBytes) {
       uploadSuccess = true
     } else {
