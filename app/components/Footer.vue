@@ -1,6 +1,15 @@
 <template>
   <footer data-cta-location="footer" class="bg-text-primary text-white py-10">
     <div class="max-w-[1200px] mx-auto px-5">
+      <nav aria-label="Serviços e atendimento" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1 pb-8 mb-8 border-b border-white/20 text-sm">
+        <NuxtLink to="/servicos/redes" class="py-3 hover:underline">Redes de proteção em São Paulo</NuxtLink>
+        <NuxtLink to="/servicos/telas" class="py-3 hover:underline">Telas mosquiteiras sob medida</NuxtLink>
+        <NuxtLink to="/servicos/vidracaria" class="py-3 hover:underline">Serviços de vidraçaria</NuxtLink>
+        <NuxtLink to="/servicos/redes/janelas" class="py-3 hover:underline">Redes de proteção para janelas</NuxtLink>
+        <NuxtLink to="/servicos/redes/sacadas-e-varandas" class="py-3 hover:underline">Redes para sacadas e varandas</NuxtLink>
+        <NuxtLink to="/servicos/redes/gatos-e-pets" class="py-3 hover:underline">Redes para gatos e pets</NuxtLink>
+        <NuxtLink to="/areas-atendidas" class="py-3 hover:underline">Consultar áreas atendidas</NuxtLink>
+      </nav>
       <!-- Informações da Empresa -->
       <div class="text-center">
         <p class="font-bold">AD Telas e Redes © 2026 — Proteção Profissional em São Paulo</p>

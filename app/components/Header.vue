@@ -145,7 +145,7 @@ onUnmounted(() => {
 
         <!-- WhatsApp Direto -->
         <a
-          href="https://wa.me/5511983586611?text=Olá! Gostaria de um orçamento para telas mosquiteiras."
+          href="https://wa.me/5511983586611?text=Ol%C3%A1%21%20Vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento.%20Podem%20me%20ajudar%20a%20escolher%20o%20servi%C3%A7o%3F"
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center w-11 h-11 bg-[#25D366] hover:bg-[#20B858] text-white rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer min-h-[44px] min-w-[44px]"

@@ -208,7 +208,7 @@ onUnmounted(() => {
     <section class="py-12 bg-[#F9FAFB] border-b border-[#E5EDF8]">
       <div class="max-w-7xl mx-auto px-4 md:px-6">
         <div class="text-center max-w-2xl mx-auto mb-8">
-          <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-2">Páginas de Aplicações Específicas</h2>
+          <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-2">Onde você precisa instalar a rede de proteção?</h2>
           <p class="text-gray-600 text-sm">Conheça detalhes sobre cada aplicação de rede de proteção:</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -229,6 +229,39 @@ onUnmounted(() => {
               <p class="text-gray-600 text-xs mt-1">{{ modelo.desc }}</p>
             </div>
           </NuxtLink>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-12 md:py-16 bg-white" aria-labelledby="redes-orcamento-title">
+      <div class="max-w-5xl mx-auto px-4 md:px-6">
+        <h2 id="redes-orcamento-title" class="text-2xl md:text-3xl font-bold text-[#22345F] mb-6">Quanto custa instalar uma rede de proteção?</h2>
+        <p class="text-gray-600 leading-relaxed mb-6">O orçamento depende das medidas, da quantidade de vãos e das condições de fixação e acesso. Uma janela, uma varanda em L e vários ambientes de um apartamento exigem avaliações diferentes. Envie as informações do seu imóvel para consultar o valor da instalação.</p>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="rounded-2xl bg-[#F9FAFB] p-6">
+            <h3 class="text-lg font-bold text-[#22345F] mb-3">O que enviar para pedir seu orçamento</h3>
+            <ul class="list-disc pl-5 space-y-2 text-gray-600">
+              <li>Bairro e cidade onde será feita a instalação.</li>
+              <li>Fotos de cada janela, sacada ou outro vão.</li>
+              <li>Medidas aproximadas de largura e altura, se disponíveis.</li>
+              <li>Quantidade de ambientes e se há crianças ou pets.</li>
+            </ul>
+            <p class="mt-4 text-sm text-gray-600">As fotos ajudam na avaliação inicial. Medidas e condições de instalação precisam ser confirmadas.</p>
+          </div>
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-bold text-[#22345F] mb-2">Rede de proteção é igual a tela mosquiteira?</h3>
+              <p class="text-gray-600 leading-relaxed">Não. A rede fecha vãos para ajudar a prevenir quedas; a tela mosquiteira dificulta a entrada de insetos. Se você precisa das duas funções, consulte também as <NuxtLink to="/servicos/telas" class="underline text-[#22345F]">telas mosquiteiras sob medida</NuxtLink> para avaliar a compatibilidade no mesmo vão.</p>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-[#22345F] mb-2">O que verificar antes da instalação no condomínio?</h3>
+              <p class="text-gray-600 leading-relaxed">Consulte as regras do condomínio sobre aparência da fachada, acesso dos instaladores e horários de trabalho. Informe essas condições ao solicitar o orçamento.</p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 flex flex-col sm:flex-row items-start gap-4" data-cta-location="service_page">
+          <a :href="getWhatsappUrl('Redes de Proteção')" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-xl bg-[#22345F] px-6 py-3 text-white font-semibold hover:bg-[#1a2847]">Pedir orçamento de redes de proteção</a>
+          <NuxtLink to="/areas-atendidas" class="px-2 py-3 font-semibold text-[#22345F] underline">Consultar áreas atendidas</NuxtLink>
         </div>
       </div>
     </section>

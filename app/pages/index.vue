@@ -2,14 +2,14 @@
 useScrollAnimation()
 
 useHead({
-  title: 'Telas Mosquiteiras e Redes de Proteção SP | Instalação em 24h',
+  title: 'Telas Mosquiteiras e Redes de Proteção em SP | AD Telas',
   meta: [
     {
       name: 'description',
-      content: 'Instalação profissional de telas mosquiteiras e redes de proteção em São Paulo. Atendemos 19 cidades, garantia de 2 anos, orçamento grátis. Proteja sua família e pets com segurança.'
+      content: 'Telas mosquiteiras, redes de proteção para janelas, sacadas e pets e vidraçaria em São Paulo. Conheça os serviços sob medida e solicite seu orçamento.'
     },
     { property: 'og:title', content: 'AD Telas e Redes SP - Proteção Profissional para Sua Família' },
-    { property: 'og:description', content: 'Telas mosquiteiras e redes de proteção com instalação rápida em 24h. Atendemos toda Grande São Paulo com garantia de 2 anos.' },
+    { property: 'og:description', content: 'Telas mosquiteiras, redes de proteção e vidraçaria em São Paulo. Encontre o serviço para seu imóvel e solicite um orçamento sob medida.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: 'https://www.adtelasmosquiteiras.com.br/' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
@@ -41,6 +41,7 @@ onMounted(() => {
   <div>
     <div id="hero"><HeroSection /></div>
     <div id="services"><ServicesCards /></div>
+    <HomeServiceGuide />
     <div id="reviews"><ReviewsCarousel /></div>
     <div id="faq"><FaqSection /></div>
     <StickyFormModal v-model="showFormModal" />

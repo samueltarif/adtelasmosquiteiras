@@ -60,6 +60,10 @@ const pontosAtencaoPets = [
 
 const faqs = [
   {
+    pergunta: 'O que informar ao pedir uma rede de proteção para gatos?',
+    resposta: 'Envie fotos dos ambientes e dos cantos que precisam ser fechados, a quantidade de janelas ou sacadas e a localização do imóvel. Informe também se o animal é filhote e se costuma morder ou escalar, para que essas características sejam consideradas na avaliação.'
+  },
+  {
     pergunta: 'Como funciona a instalação da rede de proteção para pets?',
     resposta: 'A instalação é planejada conforme as dimensões do vão e as características do local para manter uma barreira física contínua.'
   },
@@ -81,7 +85,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white" data-service-key="redes_pets" data-service-name="Redes de Proteção para Gatos e Pets">
     <Breadcrumb :items="breadcrumbItems" />
 
     <section class="relative bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-14 md:py-20 overflow-hidden">

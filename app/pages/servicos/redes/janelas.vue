@@ -57,6 +57,10 @@ const caracteristicasRede = [
 
 const faqs = [
   {
+    pergunta: 'Quanto custa colocar rede de proteção nas janelas?',
+    resposta: 'O valor depende da quantidade de janelas, das medidas de cada vão e das condições de fixação e acesso. Para consultar um orçamento, envie fotos das janelas, as medidas aproximadas e o bairro e a cidade do imóvel.'
+  },
+  {
     pergunta: 'Como é planejada a instalação da rede para janelas?',
     resposta: 'A instalação é planejada conforme as dimensões do vão e a necessidade de proteção no imóvel residencial.'
   },
@@ -78,7 +82,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white" data-service-key="redes_janelas" data-service-name="Redes de Proteção para Janelas">
     <Breadcrumb :items="breadcrumbItems" />
 
     <section class="relative bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-14 md:py-20 overflow-hidden">

@@ -57,6 +57,10 @@ const cuidadosEstruturais = [
 
 const faqs = [
   {
+    pergunta: 'O que influencia o preço da rede de proteção para sacada?',
+    resposta: 'A largura e a altura dos vãos, os cantos da varanda, o acesso para instalação e a estrutura disponível para fixação entram na avaliação. Envie fotos que mostrem a sacada inteira e informe se existe cortina de vidro para solicitar o orçamento.'
+  },
+  {
     pergunta: 'A rede de proteção pode ser instalada em sacadas com cortina de vidro?',
     resposta: 'A rede é instalada de modo a permitir o manuseio normal do envidraçamento existente.'
   },
@@ -78,7 +82,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white" data-service-key="redes_sacadas" data-service-name="Redes de Proteção para Sacadas e Varandas">
     <Breadcrumb :items="breadcrumbItems" />
 
     <section class="relative bg-gradient-to-br from-[#22345F] to-[#1a2847] text-white py-14 md:py-20 overflow-hidden">

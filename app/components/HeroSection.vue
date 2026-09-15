@@ -2,10 +2,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const carouselImages = [
-  { src: '/images/mosquiteira_area_externa.png', alt: 'Mosquiteira área externa' },
+  { src: '/images/redes_para_sacadas.jpg', alt: 'Rede de proteção para sacada' },
   { src: '/images/mosquiteira_janela.png', alt: 'Mosquiteira para janela' },
-  { src: '/images/mosquiteira_para_porta.png', alt: 'Mosquiteira para porta' },
-  { src: '/images/mosquiteira_porta_de_correr.png', alt: 'Mosquiteira porta de correr' },
+  { src: '/images/redes_para_janelas.png', alt: 'Rede de proteção para janela' },
+  { src: '/images/vidro_janela_8mm.png', alt: 'Janela de vidro temperado' },
   { src: '/images/mosquiteira_removivel.png', alt: 'Mosquiteira removível' },
   { src: '/images/tela_mosquiteira.png', alt: 'Tela mosquiteira' },
 ]
@@ -27,6 +27,7 @@ onUnmounted(() => { clearInterval(timer) })
 
 <template>
   <section data-cta-location="hero" class="mt-16 md:mt-28 bg-white relative overflow-hidden">
+    <h1 class="sr-only">Telas Mosquiteiras e Redes de Proteção em São Paulo</h1>
 
     <!-- ===== MOBILE (< 768px) ===== -->
     <div class="block md:hidden">
@@ -52,9 +53,9 @@ onUnmounted(() => { clearInterval(timer) })
         <!-- Headline sobre a imagem -->
         <div class="absolute bottom-0 left-0 right-0 px-5 pb-5">
           <p class="text-[28px] leading-[1.15] font-bold text-white tracking-tight drop-shadow">
-            Telas Mosquiteiras<br>em São Paulo
+            Telas Mosquiteiras e<br>Redes de Proteção<br>em São Paulo
           </p>
-          <p class="text-white/80 text-sm mt-1">Instalação profissional • Garantia 2 anos</p>
+          <p class="text-white/90 text-sm mt-1">Telas, redes e vidraçaria sob medida</p>
         </div>
 
         <!-- Dots -->
@@ -62,6 +63,7 @@ onUnmounted(() => { clearInterval(timer) })
           <button
             v-for="(img, i) in carouselImages"
             :key="i"
+            :aria-label="`Ver imagem: ${img.alt}`"
             @click="goTo(i)"
             class="w-2 h-2 rounded-full transition-all"
             :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
@@ -113,14 +115,14 @@ onUnmounted(() => { clearInterval(timer) })
           </NuxtLink>
         </div>
 
-        <!-- CTA Notícias -->
+        <!-- Acesso ao terceiro serviço -->
         <div class="flex justify-center">
           <NuxtLink
-            to="/por-que-instalar-tela-mosquiteira"
+            to="/servicos/vidracaria"
             class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
           >
-            <Icon name="lucide:newspaper" class="w-4 h-4 shrink-0" />
-            Por que instalar tela mosquiteira?
+            <Icon name="lucide:panels-top-left" class="w-4 h-4 shrink-0" />
+            Vidraçaria sob medida
           </NuxtLink>
         </div>
 
@@ -139,18 +141,18 @@ onUnmounted(() => { clearInterval(timer) })
               <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
               </svg>
-              Instalação em 24h • Garantia 2 Anos
+              Instalação profissional sob medida
             </div>
 
             <!-- Headline -->
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-[#22345F] mb-4 leading-tight tracking-tight">
-              Telas Mosquiteiras<br>
+            <p aria-hidden="true" class="text-4xl md:text-5xl lg:text-5xl font-bold text-[#22345F] mb-4 leading-tight tracking-tight">
+              Telas Mosquiteiras e Redes de Proteção<br>
               <span class="text-[#F49A1A]">em São Paulo</span>
-            </h1>
+            </p>
 
             <!-- Subheadline -->
             <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg">
-              Instalação profissional de telas e redes para janelas, sacadas e áreas externas. Orçamento grátis e sem compromisso.
+              Redes para janelas, sacadas e pets, telas contra insetos e serviços de vidraçaria. Escolha o serviço para conhecer as opções e solicitar seu orçamento.
             </p>
 
             <!-- Trust badges desktop -->
@@ -189,13 +191,13 @@ onUnmounted(() => { clearInterval(timer) })
                   Redes de Proteção
                 </NuxtLink>
               </div>
-              <!-- Notícias abaixo -->
+              <!-- Vidraçaria abaixo -->
               <NuxtLink
-                to="/por-que-instalar-tela-mosquiteira"
+                to="/servicos/vidracaria"
                 class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#F49A1A]/20 hover:bg-[#e08a10] transition-all"
               >
-                <Icon name="lucide:newspaper" class="w-5 h-5 shrink-0" />
-                Por que instalar tela mosquiteira?
+                <Icon name="lucide:panels-top-left" class="w-5 h-5 shrink-0" />
+                Vidraçaria sob medida
               </NuxtLink>
             </div>
           </div>
@@ -221,6 +223,7 @@ onUnmounted(() => { clearInterval(timer) })
                 <button
                   v-for="(img, i) in carouselImages"
                   :key="i"
+                  :aria-label="`Ver imagem: ${img.alt}`"
                   @click="goTo(i)"
                   class="w-2.5 h-2.5 rounded-full transition-all"
                   :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"

@@ -12,21 +12,21 @@ const servicosCards = [
   {
     slug: 'redes',
     titulo: 'Redes de Proteção',
-    subtitulo: '17 serviços disponíveis',
-    descricaoCurta: 'Proteção certificada contra quedas para crianças, pets e adultos',
+    subtitulo: 'Janelas, sacadas e ambientes com pets',
+    descricaoCurta: 'Instalação de redes de proteção para vãos de casas e apartamentos',
     imagem: '/images/familia.png',
-    destaque: 'Mais Procurado',
+    destaque: 'Redes Sob Medida',
     beneficios: [
       { titulo: 'Instalação sob medida' },
-      { titulo: 'Instalação em 24h' },
-      { titulo: 'Garantia 2 anos' }
+      { titulo: 'Janelas e sacadas' },
+      { titulo: 'Ambientes com pets' }
     ],
     url: '/servicos/redes'
   },
   {
     slug: 'telas',
     titulo: 'Telas Mosquiteiras',
-    subtitulo: '18 serviços disponíveis',
+    subtitulo: 'Janelas, portas e sacadas',
     descricaoCurta: 'Proteção contra mosquitos transmissores de dengue, zika e chikungunya',
     imagem: '/images/tela_mosquiteira.png',
     destaque: 'Anti-Dengue',
@@ -40,14 +40,14 @@ const servicosCards = [
   {
     slug: 'vidracaria',
     titulo: 'Vidraçaria',
-    subtitulo: 'Box, janelas, portas e espelhos',
+    subtitulo: 'Janelas, telhados e fachadas de vidro',
     descricaoCurta: 'Vidro temperado com instalação profissional, sob medida para qualquer ambiente',
     imagem: '/images/vidro_janela_8mm.png',
     destaque: 'Vidro Temperado',
     beneficios: [
-      { titulo: 'Box de banheiro' },
-      { titulo: 'Janelas e portas' },
-      { titulo: 'Garantia 2 anos' }
+      { titulo: 'Janelas de vidro' },
+      { titulo: 'Telhados e fachadas' },
+      { titulo: 'Orçamento do projeto' }
     ],
     url: '/servicos/vidracaria'
   }
