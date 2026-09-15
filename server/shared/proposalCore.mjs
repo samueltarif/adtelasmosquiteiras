@@ -7,6 +7,8 @@ import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
 import PDFDocument from './pdfkitClient.mjs'
+import { DEFAULT_COMPANY_LOGO_BUFFER } from './defaultLogo.mjs'
+import { getSiteR2Config, isSiteR2Configured, getSiteS3Client } from './r2SiteStorageCore.mjs'
 
 import {
   S3Client,
@@ -187,9 +189,53 @@ export const PDF_LAYOUT = {
 }
 
 /**
+ * Baixa um buffer binário do bucket R2 de mídias públicas do site (ex: logo da empresa)
+ */
+export async function fetchR2SiteMediaBuffer(storageKey) {
+  if (!storageKey || typeof storageKey !== 'string') return null
+  try {
+    const cfg = getSiteR2Config()
+    if (!isSiteR2Configured(cfg)) return null
+    const client = getSiteS3Client(cfg)
+    const res = await client.send(new GetObjectCommand({
+      Bucket: cfg.bucketName,
+      Key: storageKey
+    }))
+    if (!res.Body) return null
+    const byteArray = await res.Body.transformToByteArray()
+    return Buffer.from(byteArray)
+  } catch (err) {
+    console.warn('[proposalCore] Falha ao baixar logo customizada do R2:', err?.message || err)
+    return null
+  }
+}
+
+/**
+ * Resolve o Buffer da logo da empresa:
+ * 1. Se configurado logo no R2 (logo_source === 'r2'), busca do R2
+ * 2. Se houver caminho local válido no filesystem (dev local), lê do disco
+ * 3. Fallback garantido: Logo institucional padrão embutida em memória (Base64)
+ */
+export async function resolveCompanyLogoBuffer(company) {
+  if (company?.logo_source === 'r2' && company?.logo_storage_key) {
+    try {
+      const r2Buf = await fetchR2SiteMediaBuffer(company.logo_storage_key)
+      if (r2Buf && r2Buf.length > 0) return r2Buf
+    } catch (e) {
+      console.warn('[proposalCore] Erro ao obter logo customizada do R2, aplicando fallback:', e)
+    }
+  }
+
+  return DEFAULT_COMPANY_LOGO_BUFFER
+}
+
+/**
  * Gera o documento PDF em memória e retorna um Buffer binário completo.
  */
 export async function generateProposalPdfBuffer(options) {
+  const company = options?.companySnapshot || {}
+  const logoBuffer = await resolveCompanyLogoBuffer(company)
+
   return new Promise((resolve, reject) => {
     try {
       const L = PDF_LAYOUT
@@ -218,7 +264,6 @@ export async function generateProposalPdfBuffer(options) {
       doc.on('error', (err) => reject(err))
 
       const isPreview = !!options.isPreview
-      const company = options.companySnapshot || {}
       const client = options.clientSnapshot || {}
       const address = options.addressSnapshot || null
       const items = Array.isArray(options.itemsSnapshot) ? options.itemsSnapshot : []
@@ -266,20 +311,16 @@ export async function generateProposalPdfBuffer(options) {
       const headerStartY = L.MARGIN_TOP
       let logoLoaded = false
 
-      if (company.logo_path && typeof company.logo_path === 'string') {
-        const cleanPath = company.logo_path.startsWith('/') ? company.logo_path.slice(1) : company.logo_path
-        const fullLocalPath = path.resolve('public', cleanPath)
-        if (fs.existsSync(fullLocalPath)) {
-          try {
-            doc.image(fullLocalPath, L.MARGIN_LEFT, headerStartY, {
-              fit: [L.LOGO_BOX_WIDTH, L.LOGO_BOX_HEIGHT],
-              align: 'left',
-              valign: 'center'
-            })
-            logoLoaded = true
-          } catch (e) {
-            // Ignora falha de decodificação de imagem
-          }
+      if (logoBuffer && Buffer.isBuffer(logoBuffer) && logoBuffer.length > 0) {
+        try {
+          doc.image(logoBuffer, L.MARGIN_LEFT, headerStartY, {
+            fit: [L.LOGO_BOX_WIDTH, L.LOGO_BOX_HEIGHT],
+            align: 'left',
+            valign: 'center'
+          })
+          logoLoaded = true
+        } catch (e) {
+          console.warn('[proposalCore] Falha ao decodificar imagem da logo no PDF:', e?.message || e)
         }
       }
 
