@@ -88,13 +88,13 @@ onUnmounted(() => {
         <!-- Logo -->
         <button 
           @click="goToHome"
-          class="flex items-center justify-center p-2 cursor-pointer hover:opacity-80 transition-opacity min-h-[48px] h-12 min-w-[155px]"
+          class="flex items-center justify-center p-1 cursor-pointer hover:opacity-80 transition-opacity min-h-[48px] h-16"
           aria-label="Ir para página inicial AD Telas e Redes"
         >
           <img 
             src="/images/logo_adt_telas_nova.png" 
             alt="AD Telas e Redes" 
-            class="w-[140px] lg:w-[155px] h-auto"
+            class="h-14 lg:h-16 w-auto max-h-16 object-contain"
           />
         </button>
 
