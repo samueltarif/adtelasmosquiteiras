@@ -7,8 +7,14 @@ const route = useRoute()
 const quoteVisible = ref(true)
 let quoteObserver = null
 function openQuoteForm() {
-  document.getElementById('orcamento-telas')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  document.getElementById('quote-name')?.focus({ preventScroll: true })
+  const formEl = document.getElementById('orcamento-telas')
+  const nameInput = document.getElementById('quote-name')
+  if (formEl) {
+    formEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setTimeout(() => {
+      nameInput?.focus({ preventScroll: true })
+    }, 450)
+  }
 }
 
 useHead({
@@ -189,7 +195,13 @@ onUnmounted(() => {
           Instalação profissional sob medida para residências e comércios em São Paulo
         </p>
         <div class="flex gap-3 mt-6 flex-wrap justify-center lg:justify-start">
-          <a href="#orcamento-telas" class="flex items-center gap-2 bg-[#F49A1A] text-[#22345F] font-bold px-6 py-3 rounded-xl hover:bg-[#e78b0e] shadow-lg">Solicitar orçamento gratuito</a>
+          <a
+            href="#orcamento-telas"
+            @click.prevent="openQuoteForm"
+            class="flex items-center gap-2 bg-[#F49A1A] text-[#22345F] font-bold px-6 py-3 rounded-xl hover:bg-[#e78b0e] shadow-lg transition-colors cursor-pointer"
+          >
+            Solicitar orçamento gratuito
+          </a>
         </div>
         <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start text-sm">
           <a
@@ -214,13 +226,28 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Trust bar (neutral factual) -->
-    <div class="bg-[#22345F] py-3">
-      <div class="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-center gap-6 text-white text-sm">
-        <span class="flex items-center gap-1.5"><Icon name="lucide:shield-check" class="w-4 h-4 text-[#F49A1A]" />Instalação sob medida</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:clock" class="w-4 h-4 text-[#F49A1A]" />Atendimento sob medida</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-4 h-4 text-[#F49A1A]" />Orçamento sob medida</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" />São Paulo e Região</span>
+    <!-- Faixa de benefícios com Certificado INMETRO -->
+    <div class="bg-[#22345F] py-3.5 border-y border-[#2d4377]/60">
+      <div class="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 text-white text-xs sm:text-sm">
+        <span class="flex items-center gap-1.5 font-medium tracking-wide">
+          <Icon name="lucide:award" class="w-4 h-4 text-[#F49A1A] shrink-0" />
+          Certificado INMETRO
+        </span>
+        <span class="hidden sm:inline text-white/30 font-bold">·</span>
+        <span class="flex items-center gap-1.5 font-medium tracking-wide">
+          <Icon name="lucide:ruler" class="w-4 h-4 text-[#F49A1A] shrink-0" />
+          Instalação Sob Medida
+        </span>
+        <span class="hidden sm:inline text-white/30 font-bold">·</span>
+        <span class="flex items-center gap-1.5 font-medium tracking-wide">
+          <Icon name="lucide:check-circle" class="w-4 h-4 text-[#F49A1A] shrink-0" />
+          Orçamento Gratuito
+        </span>
+        <span class="hidden sm:inline text-white/30 font-bold">·</span>
+        <span class="flex items-center gap-1.5 font-medium tracking-wide">
+          <Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A] shrink-0" />
+          São Paulo e Região
+        </span>
       </div>
     </div>
 
