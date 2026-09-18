@@ -4,7 +4,12 @@ import { useServicos } from '~/composables/useServicos'
 
 const { WHATSAPP_NUMBER } = useServicos()
 const route = useRoute()
-const showFormModal = ref(false)
+const quoteVisible = ref(true)
+let quoteObserver = null
+function openQuoteForm() {
+  document.getElementById('orcamento-telas')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  document.getElementById('quote-name')?.focus({ preventScroll: true })
+}
 
 useHead({
   title: 'Telas Mosquiteiras em São Paulo | Modelos Sob Medida | AD Telas',
@@ -140,10 +145,16 @@ let heroTimer = null
 let cardTimer = null
 
 onMounted(() => { 
+  const quote = document.getElementById('orcamento-telas')
+  if (quote) {
+    quoteObserver = new IntersectionObserver(([entry]) => { quoteVisible.value = entry.isIntersecting })
+    quoteObserver.observe(quote)
+  }
   heroTimer = setInterval(() => { heroIndex.value = (heroIndex.value + 1) % heroImages.length }, 3500)
   cardTimer = setInterval(() => { cardImageIndex.value = (cardImageIndex.value + 1) % 2 }, 3000)
 })
 onUnmounted(() => { 
+  quoteObserver?.disconnect()
   clearInterval(heroTimer)
   clearInterval(cardTimer)
 })
@@ -156,7 +167,7 @@ onUnmounted(() => {
     <Breadcrumb :path="route.path" />
 
     <!-- Hero -->
-    <section class="relative w-full overflow-hidden" style="height: 360px;">
+    <section class="relative w-full overflow-hidden" data-cta-location="hero">
       <img
         v-for="(img, i) in heroImages"
         :key="img.src"
@@ -168,7 +179,8 @@ onUnmounted(() => {
         :class="heroIndex === i ? 'opacity-100' : 'opacity-0'"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-[#22345F]/90 via-[#22345F]/60 to-[#22345F]/30"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+      <div class="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-12 items-center px-4 py-8 md:py-10">
+      <div class="text-center lg:text-left">
         <span class="inline-block bg-[#F49A1A] text-white text-xs font-bold px-4 py-1.5 rounded-full mb-4 tracking-wide">🦟 Telas Sob Medida</span>
         <h1 class="text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-3">
           Telas Mosquiteiras em São Paulo
@@ -176,23 +188,29 @@ onUnmounted(() => {
         <p class="text-white/90 text-base md:text-lg max-w-2xl">
           Instalação profissional sob medida para residências e comércios em São Paulo
         </p>
-        <div class="flex gap-3 mt-6 flex-wrap justify-center">
+        <div class="flex gap-3 mt-6 flex-wrap justify-center lg:justify-start">
+          <a href="#orcamento-telas" class="flex items-center gap-2 bg-[#F49A1A] text-[#22345F] font-bold px-6 py-3 rounded-xl hover:bg-[#e78b0e] shadow-lg">Solicitar orçamento gratuito</a>
+        </div>
+        <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start text-sm">
           <a
             href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Telas+Mosquiteiras.+Vim+pelo+site.&type=phone_number&app_absent=0"
             target="_blank"
-            class="flex items-center gap-2 bg-[#25D366] text-white font-bold px-6 py-3 rounded-xl hover:bg-[#1fb854] transition-all shadow-lg"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-white underline underline-offset-4 py-2"
           >
             <Icon name="lucide:message-circle" class="w-5 h-5" />
-            Solicitar Orçamento no WhatsApp
+            Prefere conversar? WhatsApp
           </a>
           <a
             href="tel:+5511983586611"
-            class="flex items-center gap-2 bg-white/20 backdrop-blur text-white font-semibold px-6 py-3 rounded-xl hover:bg-white/30 transition-all border border-white/40"
+            class="flex items-center gap-2 text-white underline underline-offset-4 py-2"
           >
             <Icon name="lucide:phone" class="w-5 h-5" />
             Ligar Agora
           </a>
         </div>
+      </div>
+      <LandingQuoteForm />
       </div>
     </section>
 
@@ -392,10 +410,10 @@ onUnmounted(() => {
 
     <!-- Mobile CTA -->
     <MobileUnifiedCTA
+      v-if="!quoteVisible"
       servico-atual="Telas Mosquiteiras"
-      @open-form="showFormModal = true"
+      @open-form="openQuoteForm"
     />
-    <StickyFormModal v-model="showFormModal" />
 
   </div>
 </template>

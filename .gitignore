@@ -34,6 +34,7 @@ backups/
 
 # Local Scratch
 scratch/
+artifacts/
 
 # Local Review Packages
 *.zip

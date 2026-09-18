@@ -21,7 +21,7 @@ export function useFormSubmit() {
    * @param {Object} fields Dados do formulário
    * @param {Object} mediaUploaderRef Referência opcional ao componente MediaUploader
    */
-  const redirectToThankYou = async (fields, mediaUploaderRef = null) => {
+  const redirectToThankYou = async (fields, mediaUploaderRef = null, options = {}) => {
     if (isSubmitting.value) return
     isSubmitting.value = true
 
@@ -106,6 +106,10 @@ export function useFormSubmit() {
         body: payload
       })
 
+      if (response?.success !== true || response?.leadSaved !== true || !response?.leadId) {
+        throw new Error('Não foi possível confirmar o recebimento do pedido.')
+      }
+
       const t_sendLeadResponse = performance.now()
       const preMediaWaitMs = (t_sendLeadResponse - t_submitStart).toFixed(1)
 
@@ -135,7 +139,8 @@ export function useFormSubmit() {
       activeSubmissionId = null
 
       // Redirecionar para página de obrigado (pura UI)
-      await navigateTo('/obrigado')
+      if (options.redirect !== false) await navigateTo('/obrigado')
+      return response
     } catch (e) {
       console.error('[useFormSubmit] Erro ao enviar formulário')
       throw e

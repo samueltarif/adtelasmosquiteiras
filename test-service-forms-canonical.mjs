@@ -59,7 +59,7 @@ const { getServiceFromPath } = evalTaxonomy()
 
 // -------------------------------------------------------------
 // Mock de useFormSubmit
-const cleanedFormSubmitCode = formSubmitCode
+const cleanedFormSubmitCode = fs.readFileSync(path.resolve('app/utils/formConversion.js'), 'utf8')
   .replace(/import .*/g, '')
   .replace(/import\.meta\.dev/g, 'false')
   .replace(/export /g, '')

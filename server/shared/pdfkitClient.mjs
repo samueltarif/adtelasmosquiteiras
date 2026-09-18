@@ -5,7 +5,7 @@
  * evitando require() dinâmicos de subpaths (#standard-fonts/*) que falham
  * em ambientes serverless como o Vercel.
  */
-import PDFDocument, { registerStdFonts } from '../../node_modules/pdfkit/js/pdfkit.browser.mjs'
+import PDFDocument, { registerStdFonts } from 'pdfkit/browser'
 import Helvetica from 'pdfkit/standard-fonts/Helvetica'
 import HelveticaBold from 'pdfkit/standard-fonts/HelveticaBold'
 import HelveticaOblique from 'pdfkit/standard-fonts/HelveticaOblique'

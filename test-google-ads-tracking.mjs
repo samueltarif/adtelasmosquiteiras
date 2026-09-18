@@ -33,7 +33,7 @@ const trackClicksCode = fs.readFileSync(path.resolve('app/plugins/track-clicks.c
 
 // Import dynamic functions from useFormSubmit
 // Evaluated within mock context
-const cleanedCode = formSubmitCode
+const cleanedCode = fs.readFileSync(path.resolve('app/utils/formConversion.js'), 'utf8')
   .replace(/import .*/g, '')
   .replace(/import\.meta\.dev/g, 'false')
   .replace(/export /g, '')

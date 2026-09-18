@@ -4,7 +4,7 @@ import { computed } from 'vue'
 const route = useRoute()
 const isVisible = computed(() => {
   // Ocultar botões flutuantes no painel administrativo
-  return !route.path.startsWith('/admin')
+  return !route.path.startsWith('/admin') && route.path.replace(/\/$/, '') !== '/servicos/telas'
 })
 </script>
 
