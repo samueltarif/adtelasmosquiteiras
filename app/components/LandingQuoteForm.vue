@@ -2,6 +2,12 @@
 import { nextTick, reactive, ref } from 'vue'
 import { useFormSubmit } from '~/composables/useFormSubmit'
 
+defineProps({
+  showTrustBadges: { type: Boolean, default: true },
+  ctaLocation: { type: String, default: 'quote_form' },
+  description: { type: String, default: 'Conte onde precisa instalar. Retornamos pelo WhatsApp.' }
+})
+
 const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const fields = reactive({ nome: '', telefone: '', cep: '', instalacao: '' })
 const error = ref('')
@@ -36,7 +42,7 @@ async function submit() {
 </script>
 
 <template>
-  <div id="orcamento-telas" class="scroll-mt-36 rounded-2xl bg-white p-5 sm:p-6 text-[#22345F] shadow-xl" data-cta-location="quote_form">
+  <div id="orcamento-telas" class="scroll-mt-36 rounded-2xl bg-white p-5 sm:p-6 text-[#22345F] shadow-xl" :data-cta-location="ctaLocation">
     <div v-if="submitted" ref="statusElement" tabindex="-1" role="status" class="py-8 focus:outline-none">
       <Icon name="lucide:check-circle" class="h-10 w-10 text-green-700 mb-3" />
       <h2 class="text-2xl font-bold">Pedido recebido!</h2>
@@ -44,7 +50,7 @@ async function submit() {
     </div>
     <form v-else aria-labelledby="quote-title" :aria-busy="isSubmitting" @submit.prevent="submit">
       <!-- Prova Social Discreta -->
-      <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 text-xs">
+      <div v-if="showTrustBadges" class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 text-xs">
         <span class="inline-flex items-center gap-1.5 font-semibold text-[#22345F]">
           <Icon name="lucide:award" class="w-4 h-4 text-[#F49A1A] shrink-0" />
           Certificado INMETRO
@@ -56,7 +62,7 @@ async function submit() {
       </div>
 
       <h2 id="quote-title" class="text-xl sm:text-2xl font-bold">Peça seu orçamento gratuito</h2>
-      <p class="mt-1 mb-4 text-sm text-gray-600">Conte onde precisa instalar. Retornamos pelo WhatsApp.</p>
+      <p class="mt-1 mb-4 text-sm text-gray-600">{{ description }}</p>
       <fieldset :disabled="isSubmitting" class="grid gap-3 sm:grid-cols-2">
         <div class="sm:col-span-2">
           <label for="quote-name" class="block text-sm font-semibold mb-1">Nome</label>

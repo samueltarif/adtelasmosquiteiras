@@ -108,6 +108,9 @@ export default defineNuxtPlugin(() => {
           utm_content: attr.utm_content,
           utm_term: attr.utm_term,
           gclid: attr.gclid,
+          gbraid: attr.gbraid,
+          wbraid: attr.wbraid,
+          referrer: attr.referrer,
           channel: attr.channel,
           text: text.substring(0, 100)
         }

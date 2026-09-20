@@ -16,6 +16,11 @@ export interface AttributionContext {
 }
 
 export const ALLOWED_CTA_LOCATIONS = new Set([
+  'lp_header',
+  'lp_hero',
+  'lp_sticky',
+  'lp_bottom',
+  'lp_form',
   'header',
   'hero',
   'footer',

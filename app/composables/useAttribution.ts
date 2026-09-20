@@ -8,6 +8,8 @@ export interface SessionAttribution {
   utm_campaign: string | null
   utm_content: string | null
   utm_term: string | null
+  campaign_id?: string | null
+  adgroup_id?: string | null
   gclid: string | null
   gbraid: string | null
   wbraid: string | null
@@ -76,7 +78,8 @@ export function useAttribution() {
   function getOrInitAttribution(): SessionAttribution {
     const query = route.query || {}
     const hasParamsInUrl = !!(
-      query.utm_source || query.utm_medium || query.utm_campaign || 
+      query.utm_source || query.utm_medium || query.utm_campaign || query.utm_term || query.utm_content ||
+      query.campaign_id || query.adgroup_id ||
       query.gclid || query.gbraid || query.wbraid || query.fbclid || query.msclkid
     )
 
@@ -99,6 +102,8 @@ export function useAttribution() {
         utm_campaign: (query.utm_campaign as string) || attributionCookie.value?.utm_campaign || null,
         utm_content: (query.utm_content as string) || attributionCookie.value?.utm_content || null,
         utm_term: (query.utm_term as string) || attributionCookie.value?.utm_term || null,
+        campaign_id: (query.campaign_id as string) || attributionCookie.value?.campaign_id || null,
+        adgroup_id: (query.adgroup_id as string) || attributionCookie.value?.adgroup_id || null,
         gclid: (query.gclid as string) || attributionCookie.value?.gclid || null,
         gbraid: (query.gbraid as string) || attributionCookie.value?.gbraid || null,
         wbraid: (query.wbraid as string) || attributionCookie.value?.wbraid || null,
@@ -118,6 +123,8 @@ export function useAttribution() {
       utm_campaign: null,
       utm_content: null,
       utm_term: null,
+      campaign_id: null,
+      adgroup_id: null,
       gclid: null,
       gbraid: null,
       wbraid: null,

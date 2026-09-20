@@ -1,4 +1,9 @@
 export const CTA_LOCATIONS = [
+  'lp_header',
+  'lp_hero',
+  'lp_sticky',
+  'lp_bottom',
+  'lp_form',
   'header',
   'hero',
   'footer',
