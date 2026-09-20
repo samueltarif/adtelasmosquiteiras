@@ -2,7 +2,8 @@
 import { nextTick, reactive, ref } from 'vue'
 import { useFormSubmit } from '~/composables/useFormSubmit'
 
-defineProps({
+const props = defineProps({
+  inlineValidation: { type: Boolean, default: false },
   showTrustBadges: { type: Boolean, default: true },
   ctaLocation: { type: String, default: 'quote_form' },
   description: { type: String, default: 'Conte onde precisa instalar. Retornamos pelo WhatsApp.' }
@@ -14,10 +15,36 @@ const error = ref('')
 const submitted = ref(false)
 const statusElement = ref(null)
 const installationTypes = ['Janelas', 'Portas', 'Sacadas e varandas', 'Ambiente comercial', 'Outros / preciso de orientação']
+const fieldErrors = reactive({ nome: '', telefone: '', cep: '', instalacao: '' })
+const fieldIds = { nome: 'quote-name', telefone: 'quote-phone', cep: 'quote-cep', instalacao: 'quote-installation' }
+
+function validateField(field) {
+  if (!props.inlineValidation) return
+  const checks = {
+    nome: fields.nome.trim().length >= 2 ? '' : 'Informe seu nome com pelo menos 2 caracteres.',
+    telefone: /^\d{10,11}$/.test(fields.telefone.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '')) ? '' : 'Informe o WhatsApp com DDD (10 ou 11 dígitos).',
+    cep: /^\d{5}-?\d{3}$/.test(fields.cep) ? '' : 'Informe um CEP com 8 dígitos.',
+    instalacao: installationTypes.includes(fields.instalacao) ? '' : 'Escolha o tipo de instalação.'
+  }
+  fieldErrors[field] = checks[field]
+}
+
+function updateField(field) {
+  if (fieldErrors[field]) validateField(field)
+}
 
 async function submit() {
   if (isSubmitting.value || submitted.value) return
   error.value = ''
+  if (props.inlineValidation) {
+    Object.keys(fieldErrors).forEach(validateField)
+    const invalidField = Object.keys(fieldErrors).find(field => fieldErrors[field])
+    if (invalidField) {
+      await nextTick()
+      document.getElementById(fieldIds[invalidField])?.focus()
+      return
+    }
+  }
   const phone = fields.telefone.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '')
   const cep = fields.cep.replace(/\D/g, '')
   if (fields.nome.trim().length < 2 || !/^\d{10,11}$/.test(phone) || !/^\d{8}$/.test(cep) || !installationTypes.includes(fields.instalacao)) {
@@ -42,13 +69,13 @@ async function submit() {
 </script>
 
 <template>
-  <div id="orcamento-telas" class="scroll-mt-36 rounded-2xl bg-white p-5 sm:p-6 text-[#22345F] shadow-xl" :data-cta-location="ctaLocation">
+  <div id="orcamento-telas" :tabindex="inlineValidation ? -1 : undefined" class="rounded-2xl bg-white p-5 sm:p-6 text-[#22345F] shadow-xl" :class="inlineValidation ? 'scroll-mt-4' : 'scroll-mt-36'" :data-cta-location="ctaLocation">
     <div v-if="submitted" ref="statusElement" tabindex="-1" role="status" class="py-8 focus:outline-none">
       <Icon name="lucide:check-circle" class="h-10 w-10 text-green-700 mb-3" />
       <h2 class="text-2xl font-bold">Pedido recebido!</h2>
       <p class="mt-3 text-gray-600">Nossa equipe vai entrar em contato pelo WhatsApp informado para preparar seu orçamento.</p>
     </div>
-    <form v-else aria-labelledby="quote-title" :aria-busy="isSubmitting" @submit.prevent="submit">
+    <form v-else aria-labelledby="quote-title" :aria-busy="isSubmitting" :novalidate="inlineValidation" @submit.prevent="submit">
       <!-- Prova Social Discreta -->
       <div v-if="showTrustBadges" class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 text-xs">
         <span class="inline-flex items-center gap-1.5 font-semibold text-[#22345F]">
@@ -66,22 +93,26 @@ async function submit() {
       <fieldset :disabled="isSubmitting" class="grid gap-3 sm:grid-cols-2">
         <div class="sm:col-span-2">
           <label for="quote-name" class="block text-sm font-semibold mb-1">Nome</label>
-          <input id="quote-name" v-model="fields.nome" name="nome" autocomplete="name" required minlength="2" maxlength="120" class="quote-input" placeholder="Seu nome" />
+          <input id="quote-name" v-model="fields.nome" name="nome" autocomplete="name" required minlength="2" maxlength="120" class="quote-input" placeholder="Seu nome" :aria-invalid="fieldErrors.nome ? 'true' : undefined" :aria-describedby="fieldErrors.nome ? 'quote-name-error' : undefined" @blur="validateField('nome')" @input="updateField('nome')" />
+          <p v-if="fieldErrors.nome" id="quote-name-error" class="mt-1 text-sm text-red-700" aria-live="polite">{{ fieldErrors.nome }}</p>
         </div>
         <div>
           <label for="quote-phone" class="block text-sm font-semibold mb-1">WhatsApp com DDD</label>
-          <input id="quote-phone" v-model="fields.telefone" name="telefone" type="tel" autocomplete="tel" required maxlength="22" class="quote-input" placeholder="(11) 99999-9999" />
+          <input id="quote-phone" v-model="fields.telefone" name="telefone" type="tel" :inputmode="inlineValidation ? 'tel' : undefined" autocomplete="tel" required maxlength="22" class="quote-input" placeholder="(11) 99999-9999" :aria-invalid="fieldErrors.telefone ? 'true' : undefined" :aria-describedby="fieldErrors.telefone ? 'quote-phone-error' : undefined" @blur="validateField('telefone')" @input="updateField('telefone')" />
+          <p v-if="fieldErrors.telefone" id="quote-phone-error" class="mt-1 text-sm text-red-700" aria-live="polite">{{ fieldErrors.telefone }}</p>
         </div>
         <div>
           <label for="quote-cep" class="block text-sm font-semibold mb-1">CEP da instalação</label>
-          <input id="quote-cep" v-model="fields.cep" name="cep" inputmode="numeric" autocomplete="postal-code" required maxlength="9" pattern="[0-9]{5}-?[0-9]{3}" class="quote-input" placeholder="00000-000" />
+          <input id="quote-cep" v-model="fields.cep" name="cep" inputmode="numeric" autocomplete="postal-code" required maxlength="9" pattern="[0-9]{5}-?[0-9]{3}" class="quote-input" placeholder="00000-000" :aria-invalid="fieldErrors.cep ? 'true' : undefined" :aria-describedby="fieldErrors.cep ? 'quote-cep-error' : undefined" @blur="validateField('cep')" @input="updateField('cep')" />
+          <p v-if="fieldErrors.cep" id="quote-cep-error" class="mt-1 text-sm text-red-700" aria-live="polite">{{ fieldErrors.cep }}</p>
         </div>
         <div class="sm:col-span-2">
           <label for="quote-installation" class="block text-sm font-semibold mb-1">Tipo de instalação</label>
-          <select id="quote-installation" v-model="fields.instalacao" name="instalacao" required class="quote-input">
+          <select id="quote-installation" v-model="fields.instalacao" name="instalacao" required class="quote-input" :aria-invalid="fieldErrors.instalacao ? 'true' : undefined" :aria-describedby="fieldErrors.instalacao ? 'quote-installation-error' : undefined" @blur="validateField('instalacao')" @change="updateField('instalacao')">
             <option disabled value="">Selecione uma opção</option>
             <option v-for="type in installationTypes" :key="type" :value="type">{{ type }}</option>
           </select>
+          <p v-if="fieldErrors.instalacao" id="quote-installation-error" class="mt-1 text-sm text-red-700" aria-live="polite">{{ fieldErrors.instalacao }}</p>
         </div>
       </fieldset>
       <p v-if="error" role="alert" class="mt-3 text-sm text-red-700">{{ error }}</p>

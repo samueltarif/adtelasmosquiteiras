@@ -10,7 +10,7 @@ Status: implementação local; publicação e troca da URL nos anúncios não fa
 - `/servicos/telas` permanece sem alterações. O formulário compartilhado conserva seus valores padrão e comportamento nessa página.
 - Seis links diretos para páginas canônicas. Outras aplicações usam redirects para as páginas existentes; não foram criadas páginas ou links fictícios.
 - `noindex, follow`, canonical próprio sem parâmetros (fornecido pelo `app.vue`), title e description próprios. Landing fora do sitemap orgânico.
-- Sem avaliações ou selo INMETRO na landing: foram encontrados textos fixos, mas nenhuma fonte de avaliações ou documento de certificação verificável. Os benefícios utilizados são sob medida, orçamento gratuito, instalação profissional e atendimento em São Paulo, presentes no projeto.
+- Sem avaliação Google na landing: foram encontrados textos fixos, sem fonte atual verificável. Na segunda rodada, o texto “Certificado INMETRO” foi incluído por solicitação explícita do usuário e já consta no conteúdo do projeto; esta implementação não realizou uma auditoria de certificação. “São Paulo e região” foi confirmado na página de áreas atendidas e nas páginas de telas.
 
 ## Arquivos criados
 
@@ -66,8 +66,8 @@ O form_start manual é registrado apenas no admin, evitando sobreposição com a
 
 - Header de 72px, sem menu e sem fixação.
 - Hero curto; serviço e CTA visíveis na primeira dobra dos tamanhos testados.
-- Cards com aproximadamente 96px de altura, área clicável integral, coluna única no celular; duas colunas a partir de 640px. Desktop organiza hero e seleção lado a lado.
-- Barra de orçamento com botão de 48px; padding inferior reservado e safe-area. Desaparece quando o formulário está visível.
+- Cards com aproximadamente 96px de altura, área clicável integral, coluna única no celular; duas colunas a partir de 640px. Quatro opções iniciais; Pet Screen e Restaurantes em `details/summary` nativo, com abertura por toque ou teclado. Desktop organiza hero e seleção lado a lado.
+- Barra de orçamento com botão de 48px; padding inferior reservado e safe-area. Desaparece quando o formulário está visível ou quando um campo permanece focado, inclusive com altura útil reduzida pelo teclado.
 - Labels do formulário original, foco visível, navegação por âncoras, opção de pular conteúdo e respeito a movimento reduzido nos comandos de rolagem.
 - Uma imagem pequena com dimensões explícitas (logo); cards usam ícones existentes. Sem carrossel, vídeo, nova fonte ou biblioteca.
 
@@ -91,3 +91,29 @@ O form_start manual é registrado apenas no admin, evitando sobreposição com a
 - Conferir a entrega dos eventos no Tag Assistant/GA4 e a gravação real de um lead autorizado no admin. Testes locais verificam emissão e payload, não o recebimento pelos serviços externos.
 - Avaliar LCP, INP e CLS em dispositivo/rede reais e dados de campo. As metas 2,5s/200ms/0,1 não são certificadas por estes testes funcionais.
 - Trocar a URL do anúncio é uma ação separada e não foi executada.
+
+## Segunda rodada — UX/CRO mobile
+
+Arquivos alterados nesta rodada:
+
+1. `app/pages/lp/telas-mosquiteiras.vue`
+2. `app/components/LandingQuoteForm.vue`
+3. `scripts/test-ppc-landing.mjs`
+4. `docs/LP_TELAS_MOSQUITEIRAS.md`
+
+Hero: CTA principal “Pedir orçamento gratuito” → `#orcamento-telas`; secundário “Ver modelos de telas ↓” → `#lp-services`; WhatsApp preservado. Header sem símbolo ↗. Benefícios: Certificado INMETRO, Feito sob medida, Orçamento gratuito, Atendimento em São Paulo e região.
+
+Formulário: mesmos quatro campos e pipeline. Nova prop `inlineValidation` (false por padrão, true apenas nesta landing). Erros junto de cada campo, `aria-invalid`, `aria-describedby`, anúncio acessível, foco no primeiro inválido e correção dos erros durante a digitação. Na landing, WhatsApp explicita inputmode=tel/autocomplete=tel; CEP mantém numeric/postal-code e Nome mantém autocomplete=name. A página `/servicos/telas` mantém validação nativa e configuração anterior.
+
+Validação desta rodada:
+
+- Build de produção passou.
+- Testes do navegador passaram em 360, 390, 412, 430px, além de 768/1440px: primeira dobra, quatro opções iniciais, expansão/contração por teclado, cards inteiros clicáveis (clique na área de padding), links reais, hero/sticky/header → formulário.
+- CTAs hero e sticky geram `quote_cta_click` com lp_hero/lp_sticky; WhatsApps mantêm lp_hero/lp_bottom e telefone mantém tipo=telefone/localização=lp_bottom. Nenhum evento adicional duplicado foi introduzido.
+- Form_start único; erros inline, bloqueio de envio inválido, falha de API sem conversão e sucesso após retry com apenas um lead_form_success/conversão. IDs e origem Google Ads preservados.
+- Altura de viewport reduzida a 420px com campo focado nas quatro larguras: campo acessível e sticky oculto. É uma simulação; teclado nativo iOS/Android continua sendo uma validação manual.
+- Política de Privacidade fica acima da barra no fim da página; padding e safe-area preservados.
+- Sem erros de página, console antes da falha simulada ou avisos de hidratação. Analytics, envios de leads e galerias externas são simulados no teste; nenhum lead real é enviado.
+- Typecheck por tsc: 495 diagnósticos, idênticos ao registro anterior (zero diferenças). Nenhuma correção fora do escopo foi feita. Vue-tsc ausente; templates verificados pelo build.
+- Lint continua sem configuração/script no projeto; `git diff --check` passou.
+- Verificado que páginas de serviços, GTM/gtag, atribuição, useFormSubmit, utilitário lead_form_success, servidor, banco, painel e dependências não foram alterados nesta rodada.
