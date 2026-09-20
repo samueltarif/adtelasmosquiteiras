@@ -4,8 +4,8 @@
  */
 
 import { defineEventHandler, getQuery, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders } from '../../../../utils/crm'
 import { isValidStaffRole } from '../../../../shared/appointmentValidation.mjs'
 
 export default defineEventHandler(async (event) => {

@@ -6,7 +6,7 @@
 import type { H3Event } from 'h3'
 import { createPublicKey, verify as cryptoVerify } from 'node:crypto'
 import { createError } from 'h3'
-import { setAdminAuthCookies, clearAdminAuthCookies } from './adminAuthCookies.ts'
+import { setAdminAuthCookies, clearAdminAuthCookies } from './adminAuthCookies'
 
 export interface SupabaseAuthConfig {
   supabaseUrl: string; supabaseServiceRoleKey?: string; serviceRoleKey?: string; anonKey?: string; publishableKey?: string
@@ -94,10 +94,12 @@ async function verifyViaUserEndpoint(token: string, config: SupabaseAuthConfig):
 export async function getClaims(token: string, supabaseUrl: string, config?: SupabaseAuthConfig): Promise<UserClaims | null> {
   if (!token || typeof token !== 'string') return null
   const parts = token.split('.')
-  if (parts.length !== 3) return null
+  if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null
+  const [part0, part1, part2] = parts
+
   try {
-    const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'))
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+    const header = JSON.parse(Buffer.from(part0, 'base64url').toString('utf8'))
+    const payload = JSON.parse(Buffer.from(part1, 'base64url').toString('utf8'))
     if (!header || typeof header !== 'object' || !payload || typeof payload !== 'object' || !payload.sub) return null
     const nowSec = Math.floor(Date.now() / 1000)
     if (!payload.exp || typeof payload.exp !== 'number' || payload.exp <= nowSec) return null
@@ -118,7 +120,7 @@ export async function getClaims(token: string, supabaseUrl: string, config?: Sup
 
     const publicKey = createPublicKey({ key: matchingKey, format: 'jwk' })
     const isEc = header.alg === 'ES256' || matchingKey.kty === 'EC'
-    const isVerified = cryptoVerify('SHA256', Buffer.from(`${parts[0]}.${parts[1]}`), isEc ? { key: publicKey, dsaEncoding: 'ieee-p1363' } : publicKey, Buffer.from(parts[2], 'base64url'))
+    const isVerified = cryptoVerify('SHA256', Buffer.from(`${part0}.${part1}`), isEc ? { key: publicKey, dsaEncoding: 'ieee-p1363' } : publicKey, Buffer.from(part2, 'base64url'))
     return isVerified ? { id: payload.sub, email: payload.email, role: payload.role } : null
   } catch (err: any) {
     if (err?.statusCode === 503) throw err

@@ -4,7 +4,7 @@ import {
   normalizeEmail,
   normalizeCpfCnpj
 } from '../shared/crmValidation.mjs'
-import { getSupabaseHeaders, type SupabaseConfig } from './crm.ts'
+import { getSupabaseHeaders, type SupabaseConfig } from './crm'
 
 export interface DuplicateClientResult {
   id: string

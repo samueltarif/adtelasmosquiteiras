@@ -57,7 +57,7 @@ async function handleDelete(mId: string) {
 
   isDeletingId.value = mId
   try {
-    await $fetch(`/api/admin/crm/work-orders/${props.workOrderId}/items/${props.itemId}/measurements/${mId}`, {
+    await ($fetch as any)(`/api/admin/crm/work-orders/${props.workOrderId}/items/${props.itemId}/measurements/${mId}`, {
       method: 'DELETE'
     })
     emit('measurementsChanged')

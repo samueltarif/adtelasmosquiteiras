@@ -143,7 +143,7 @@ export default defineEventHandler(async (event) => {
     }> = {}
 
     for (const v of humanViews) {
-      const spDateStr = new Date(new Date(v.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0]
+      const spDateStr = new Date(new Date(v.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0] || ''
       if (!dailyMap[spDateStr]) {
         dailyMap[spDateStr] = {
           date: spDateStr,
@@ -154,22 +154,27 @@ export default defineEventHandler(async (event) => {
           whatsapp: 0
         }
       }
-      dailyMap[spDateStr].pageviews++
-      if (v.session_id) dailyMap[spDateStr].sessions.add(v.session_id)
-      if (v.visitor_id) dailyMap[spDateStr].unique_visitors.add(v.visitor_id)
+      const dayView = dailyMap[spDateStr]
+      if (dayView) {
+        dayView.pageviews++
+        if (v.session_id) dayView.sessions.add(v.session_id)
+        if (v.visitor_id) dayView.unique_visitors.add(v.visitor_id)
+      }
     }
 
     for (const c of humanClicks) {
-      const spDateStr = new Date(new Date(c.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0]
-      if (dailyMap[spDateStr] && c.tipo === 'whatsapp') {
-        dailyMap[spDateStr].whatsapp++
+      const spDateStr = new Date(new Date(c.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0] || ''
+      const dayClick = spDateStr ? dailyMap[spDateStr] : null
+      if (dayClick && c.tipo === 'whatsapp') {
+        dayClick.whatsapp++
       }
     }
 
     for (const l of realLeads) {
-      const spDateStr = new Date(new Date(l.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0]
-      if (dailyMap[spDateStr]) {
-        dailyMap[spDateStr].leads++
+      const spDateStr = new Date(new Date(l.created_at).getTime() - 3 * 3600 * 1000).toISOString().split('T')[0] || ''
+      const dayLead = spDateStr ? dailyMap[spDateStr] : null
+      if (dayLead) {
+        dayLead.leads++
       }
     }
 
@@ -186,10 +191,10 @@ export default defineEventHandler(async (event) => {
     const deviceMap: Record<string, number> = { Mobile: 0, Desktop: 0, Tablet: 0, Outros: 0 }
     for (const v of humanViews) {
       const d = (v.device_type || '').toLowerCase()
-      if (d === 'mobile') deviceMap.Mobile++
-      else if (d === 'desktop') deviceMap.Desktop++
-      else if (d === 'tablet') deviceMap.Tablet++
-      else deviceMap.Outros++
+      if (d === 'mobile') deviceMap.Mobile = (deviceMap.Mobile || 0) + 1
+      else if (d === 'desktop') deviceMap.Desktop = (deviceMap.Desktop || 0) + 1
+      else if (d === 'tablet') deviceMap.Tablet = (deviceMap.Tablet || 0) + 1
+      else deviceMap.Outros = (deviceMap.Outros || 0) + 1
     }
 
     const devices = Object.entries(deviceMap)

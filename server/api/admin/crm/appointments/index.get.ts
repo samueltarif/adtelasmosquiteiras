@@ -9,8 +9,8 @@
  */
 
 import { defineEventHandler, getQuery, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders } from '../../../../utils/crm'
 import {
   isValidAppointmentDateRange,
   isValidAppointmentStatus,
@@ -18,7 +18,7 @@ import {
   isValidRfc3339,
   isValidUUID
 } from '../../../../shared/appointmentValidation.mjs'
-import { APPOINTMENT_CALENDAR_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
+import { APPOINTMENT_CALENDAR_SELECT } from '../../../../utils/crmAppointmentHelpers'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)

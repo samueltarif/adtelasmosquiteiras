@@ -76,8 +76,8 @@ function formatDate(iso: string) {
   return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-function getCategoryBadge(cat: string) {
-  return categories.find(c => c.value === cat) || categories[0]
+function getCategoryBadge(cat: string): { value: string; label: string; color: string } {
+  return (categories.find(c => c.value === cat) || categories[0])!
 }
 
 onMounted(() => {

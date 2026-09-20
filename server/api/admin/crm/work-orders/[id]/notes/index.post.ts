@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
 
     // 2. Registro de Auditoria
     if (note) {
-      await logCrmActivity(config, {
+      await logCrmActivity({ url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey }, {
         clientId: wo.client_id,
         workOrderId: id,
         entityType: 'note',

@@ -4,8 +4,8 @@
  */
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm'
 import { isValidStaffRole } from '../../../../shared/appointmentValidation.mjs'
 
 export default defineEventHandler(async (event) => {

@@ -15,8 +15,8 @@ import {
   computeOverviewData,
   formatRecentActivityEvents,
   PHASE_B_START_ISO
-} from '../../../utils/adminAnalytics.ts'
-import { requireActiveAdmin } from '../../../utils/adminAuth.ts'
+} from '../../../utils/adminAnalytics'
+import { requireActiveAdmin } from '../../../utils/adminAuth'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)

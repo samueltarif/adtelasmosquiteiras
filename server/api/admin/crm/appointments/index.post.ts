@@ -4,11 +4,11 @@
  */
 
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders } from '../../../../utils/crm'
 import { isValidAppointmentType, isValidIsoDateTime, isValidUUID, isValidRfc3339 } from '../../../../shared/appointmentValidation.mjs'
-import { handleRpcError } from '../../../../utils/crmAppointmentErrors.ts'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers.ts'
+import { handleRpcError } from '../../../../utils/crmAppointmentErrors'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../utils/crmAppointmentHelpers'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)

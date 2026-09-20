@@ -5,10 +5,10 @@
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders, normalizePhone, normalizeEmail } from '../../../../utils/crm'
 import { isValidStaffRole, isStrictBoolean } from '../../../../shared/appointmentValidation.mjs'
-import { handleRpcError } from '../../../../utils/crmAppointmentErrors.ts'
+import { handleRpcError } from '../../../../utils/crmAppointmentErrors'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)

@@ -7,7 +7,7 @@
  * - ACTIVE_INSTALLATION_GUARD_FAILURE_POLICY=FAIL_CLOSED_ALL_PATHS
  */
 
-import { getSupabaseHeaders } from './crm.ts'
+import { getSupabaseHeaders } from './crm'
 import { createError } from 'h3'
 
 export interface SupabaseConfig {

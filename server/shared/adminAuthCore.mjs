@@ -26,6 +26,10 @@ export function parseAdminAuthCookies(cookieHeader) {
   return null
 }
 
+/**
+ * @param {string|null|undefined} [cookieHeader]
+ * @returns {string|null}
+ */
 export function parseAdminRefreshCookie(cookieHeader) {
   if (!cookieHeader || typeof cookieHeader !== 'string') return null
   const cookies = cookieHeader.split(';')
@@ -39,6 +43,12 @@ export function parseAdminRefreshCookie(cookieHeader) {
   return null
 }
 
+/**
+ * @param {string|null|undefined} [authHeader]
+ * @param {string|null|undefined} [cookieHeader]
+ * @param {string|null|undefined} [cookieToken]
+ * @returns {string|null}
+ */
 export function extractAuthToken(authHeader, cookieHeader, cookieToken = null) {
   if (cookieToken && typeof cookieToken === 'string' && cookieToken.trim()) return cookieToken.trim()
   if (authHeader && typeof authHeader === 'string' && authHeader.trim().toLowerCase().startsWith('bearer ')) {
@@ -54,6 +64,11 @@ export function extractAuthToken(authHeader, cookieHeader, cookieToken = null) {
   return null
 }
 
+/**
+ * @param {string|null|undefined} [cookieHeader]
+ * @param {string|null|undefined} [cookieRefreshToken]
+ * @returns {string|null}
+ */
 export function extractRefreshToken(cookieHeader, cookieRefreshToken = null) {
   if (cookieRefreshToken && typeof cookieRefreshToken === 'string' && cookieRefreshToken.trim()) return cookieRefreshToken.trim()
   if (cookieHeader && typeof cookieHeader === 'string') {
@@ -105,6 +120,16 @@ export function verifyActiveAdmin(supabaseUser, adminRecords, allowedRoles = ALL
   }
 }
 
+/**
+ * @param {string|null|undefined} [originHeader]
+ * @param {string|null|undefined} [refererHeader]
+ * @param {string|null|undefined} [hostHeader]
+ * @param {boolean} [isDev]
+ * @param {string|null|undefined} [authorizationHeader]
+ * @param {boolean} [hasAdminCookies]
+ * @param {string} [protocol]
+ * @returns {{ allowed: boolean, statusCode: number, message: string }}
+ */
 export function validateMutationOrigin(
   originHeader,
   refererHeader,

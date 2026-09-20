@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const now = new Date()
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0] || ''
 
   try {
     // Busca todas as ordens de serviço ativas para agregação precisa e segura

@@ -4,8 +4,8 @@
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders, isValidDiscount } from '../../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth'
+import { getSupabaseHeaders, isValidDiscount } from '../../../../../utils/crm'
 import { isValidUUID, isValidRfc3339, isStrictBoolean } from '../../../../../shared/appointmentValidation.mjs'
 
 export default defineEventHandler(async (event) => {

@@ -86,9 +86,9 @@ export default defineEventHandler(async (event) => {
     const svcMap: Record<string, number> = { 'Redes de Proteção': 0, 'Telas Mosquiteiras': 0, 'Outros': 0 }
     realLeads.forEach(l => {
       const s = (l.servico || '').toLowerCase()
-      if (s.includes('rede')) svcMap['Redes de Proteção']++
-      else if (s.includes('tela') || s.includes('mosquiteira')) svcMap['Telas Mosquiteiras']++
-      else svcMap['Outros']++
+      if (s.includes('rede')) svcMap['Redes de Proteção'] = (svcMap['Redes de Proteção'] || 0) + 1
+      else if (s.includes('tela') || s.includes('mosquiteira')) svcMap['Telas Mosquiteiras'] = (svcMap['Telas Mosquiteiras'] || 0) + 1
+      else svcMap['Outros'] = (svcMap['Outros'] || 0) + 1
     })
     const serviceDistribution = Object.entries(svcMap).map(([name, count]) => ({
       name, count, percentage: totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0

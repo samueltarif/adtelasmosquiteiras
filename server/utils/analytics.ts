@@ -234,6 +234,6 @@ export function isIdempotentRequest(id: string | null | undefined): boolean {
 }
 
 export function generateIpHash(ipRaw: string): string {
-  const cleanIp = (ipRaw || '0.0.0.0').split(',')[0].trim()
+  const cleanIp = ((ipRaw || '0.0.0.0').split(',')[0] || '0.0.0.0').trim()
   return createHash('sha256').update(cleanIp + 'adt-salt-2026').digest('hex').substring(0, 16)
 }

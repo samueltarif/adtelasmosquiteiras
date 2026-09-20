@@ -14,7 +14,7 @@ const props = defineProps<{
   loading?: boolean
 }>()
 
-const eventConfig = (tipo: string) => {
+const eventConfig = (tipo: string): { icon: string; bg: string; border: string; color: string } => {
   const cfg: Record<string, { icon: string; bg: string; border: string; color: string }> = {
     visita:            { icon: 'lucide:eye',            bg: 'bg-cyan-500/10',    border: 'border-cyan-500/20',    color: 'text-cyan-400' },
     whatsapp:          { icon: 'lucide:message-circle', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', color: 'text-emerald-400' },
@@ -23,7 +23,7 @@ const eventConfig = (tipo: string) => {
     formulario_submit: { icon: 'lucide:file-text',     bg: 'bg-amber-500/10',  border: 'border-amber-500/20',  color: 'text-amber-400' },
     internal_cta:      { icon: 'lucide:arrow-right',   bg: 'bg-violet-500/10', border: 'border-violet-500/20', color: 'text-violet-400' }
   }
-  return cfg[tipo] || cfg['visita']
+  return (cfg[tipo] || cfg['visita'])!
 }
 
 const timeAgo = (dateStr: string) => {

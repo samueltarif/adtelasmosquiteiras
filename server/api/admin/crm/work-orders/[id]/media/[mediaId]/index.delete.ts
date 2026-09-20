@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     )
     const leadRange = leadRefs.headers.get('content-range') || ''
     if (leadRange.includes('/')) {
-      leadReferencesCount = parseInt(leadRange.split('/')[1], 10) || 0
+      leadReferencesCount = parseInt(leadRange.split('/')[1] || '0', 10) || 0
     }
 
     const woRefs = await fetch(
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     )
     const woRange = woRefs.headers.get('content-range') || ''
     if (woRange.includes('/')) {
-      woReferencesCount = parseInt(woRange.split('/')[1], 10) || 0
+      woReferencesCount = parseInt(woRange.split('/')[1] || '0', 10) || 0
     }
   } catch (refErr: any) {
     console.error('[SafeDelete] Erro ao consultar referências do storage_key:', refErr?.message || refErr)
@@ -121,7 +121,7 @@ export default defineEventHandler(async (event) => {
 
   // 4. Registro de Auditoria
   if (clientId) {
-    await logCrmActivity(config, {
+    await logCrmActivity({ url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey }, {
       clientId,
       workOrderId: id,
       entityType: 'media',

@@ -15,19 +15,19 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Busca as 5 visitas mais recentes (com contexto Phase B+)
-    const viewsRes: any[] = await $fetch(
+    const viewsRes = await $fetch<any[]>(
       `${config.supabaseUrl}/rest/v1/page_views?select=id,created_at,path,visitor_id,session_id,channel,device_type,is_bot&order=created_at.desc&limit=5`,
       { headers }
     ).catch(() => [])
 
     // Busca os 5 cliques mais recentes (com serviço e CTA)
-    const clicksRes: any[] = await $fetch(
+    const clicksRes = await $fetch<any[]>(
       `${config.supabaseUrl}/rest/v1/lead_clicks?select=id,created_at,tipo,origem,cta_location,service_key,service_name,visitor_id,channel,device_type&order=created_at.desc&limit=5`,
       { headers }
     ).catch(() => [])
 
     // Busca os 5 leads mais recentes
-    const leadsRes: any[] = await $fetch(
+    const leadsRes = await $fetch<any[]>(
       `${config.supabaseUrl}/rest/v1/leads?select=id,created_at,nome,servico,cidade,bairro,origem,session_channel,landing_path&order=created_at.desc&limit=5`,
       { headers }
     ).catch(() => [])

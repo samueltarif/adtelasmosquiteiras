@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<{
   loading: false
 })
 
-const themeClasses = computed(() => {
+const themeClasses = computed<{ bgGlow: string; borderHover: string; iconBg: string; iconBorder: string; iconColor: string; badgeColor: string }>(() => {
   const map: Record<string, { bgGlow: string; borderHover: string; iconBg: string; iconBorder: string; iconColor: string; badgeColor: string }> = {
     cyan: {
       bgGlow: 'bg-cyan-500/10 group-hover:bg-cyan-500/20',
@@ -66,7 +66,7 @@ const themeClasses = computed(() => {
       badgeColor: 'bg-rose-400/10 text-rose-400'
     }
   }
-  return map[props.theme] || map.indigo
+  return (map[props.theme] || map.indigo)!
 })
 
 const formattedValue = computed(() => {

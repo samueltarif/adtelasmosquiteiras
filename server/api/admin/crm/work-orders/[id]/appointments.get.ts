@@ -4,10 +4,10 @@
  */
 
 import { defineEventHandler, getRouterParam, getQuery, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders } from '../../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth'
+import { getSupabaseHeaders } from '../../../../../utils/crm'
 import { isValidUUID } from '../../../../../shared/appointmentValidation.mjs'
-import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers.ts'
+import { APPOINTMENT_DETAIL_SELECT } from '../../../../../utils/crmAppointmentHelpers'
 
 export default defineEventHandler(async (event) => {
   await requireActiveAdmin(event)

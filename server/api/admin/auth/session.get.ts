@@ -1,5 +1,5 @@
 import { defineEventHandler, createError } from 'h3'
-import { requireActiveAdmin } from '../../../utils/adminAuth.ts'
+import { requireActiveAdmin } from '../../../utils/adminAuth'
 
 /**
  * GET /api/admin/auth/session

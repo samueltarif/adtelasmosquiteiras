@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     const contentRange = response.headers.get('content-range')
     let total = 0
     if (contentRange && contentRange.includes('/')) {
-      total = parseInt(contentRange.split('/')[1], 10) || 0
+      total = parseInt(contentRange.split('/')[1] || '0', 10) || 0
     }
 
     const activities = await response.json()

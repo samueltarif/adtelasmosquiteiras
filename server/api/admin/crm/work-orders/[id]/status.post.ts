@@ -4,17 +4,17 @@
  */
 
 import { defineEventHandler, getRouterParam, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../../utils/adminAuth.ts'
+import { requireActiveAdmin } from '../../../../../utils/adminAuth'
 import {
   getSupabaseHeaders,
   logCrmActivity,
   isValidStatusTransition,
   TERMINAL_WORK_ORDER_STATUSES,
   ALLOWED_WORK_ORDER_STATUSES
-} from '../../../../../utils/crm.ts'
+} from '../../../../../utils/crm'
 import { isValidRfc3339, isValidUUID } from '../../../../../shared/appointmentValidation.mjs'
-import { hasActiveInstallation, hasAnyActiveAppointment } from '../../../../../utils/crmAppointmentHelpers.ts'
-import { handleRpcError } from '../../../../../utils/crmAppointmentErrors.ts'
+import { hasActiveInstallation, hasAnyActiveAppointment } from '../../../../../utils/crmAppointmentHelpers'
+import { handleRpcError } from '../../../../../utils/crmAppointmentErrors'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)

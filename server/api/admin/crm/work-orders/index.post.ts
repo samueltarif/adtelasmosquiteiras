@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { requireActiveAdmin } from '../../../../utils/adminAuth.ts'
-import { getSupabaseHeaders, logCrmActivity, ALLOWED_OS_CATEGORIAS } from '../../../../utils/crm.ts'
+import { requireActiveAdmin } from '../../../../utils/adminAuth'
+import { getSupabaseHeaders, logCrmActivity, ALLOWED_OS_CATEGORIAS } from '../../../../utils/crm'
 
 export default defineEventHandler(async (event) => {
   const admin = await requireActiveAdmin(event)

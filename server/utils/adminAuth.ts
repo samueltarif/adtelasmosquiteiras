@@ -16,12 +16,12 @@ import {
   setAdminAuthCookies,
   clearAdminAuthCookies,
   enforceMutationCsrf
-} from './adminAuthCookies.ts'
+} from './adminAuthCookies'
 
 import {
   resolveSupabaseUser,
   fetchAdminUserSingleFlight
-} from './adminAuthSession.ts'
+} from './adminAuthSession'
 
 export {
   ADMIN_AUTH_COOKIE_NAME,

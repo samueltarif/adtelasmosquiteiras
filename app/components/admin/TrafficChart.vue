@@ -58,20 +58,25 @@ const points = computed(() => {
 
 const linePath = computed(() => {
   const pts = points.value
-  if (pts.length < 2) return ''
+  if (pts.length < 2 || !pts[0]) return ''
   let d = `M ${pts[0].x},${pts[0].y}`
   for (let i = 0; i < pts.length - 1; i++) {
+    const curr = pts[i]
+    const next = pts[i + 1]
+    if (!curr || !next) continue
     const t = 0.35
-    const dx = pts[i + 1].x - pts[i].x
-    d += ` C ${pts[i].x + dx * t},${pts[i].y} ${pts[i + 1].x - dx * t},${pts[i + 1].y} ${pts[i + 1].x},${pts[i + 1].y}`
+    const dx = next.x - curr.x
+    d += ` C ${curr.x + dx * t},${curr.y} ${next.x - dx * t},${next.y} ${next.x},${next.y}`
   }
   return d
 })
 
 const areaPath = computed(() => {
   const pts = points.value
-  if (!linePath.value || !pts.length) return ''
-  return `${linePath.value} L ${pts[pts.length - 1].x},${cH - pB} L ${pts[0].x},${cH - pB} Z`
+  const first = pts[0]
+  const last = pts[pts.length - 1]
+  if (!linePath.value || !first || !last) return ''
+  return `${linePath.value} L ${last.x},${cH - pB} L ${first.x},${cH - pB} Z`
 })
 
 const yTicks = computed(() => {
@@ -85,14 +90,14 @@ const yTicks = computed(() => {
   return t
 })
 
-const colorConfig = computed(() => {
+const colorConfig = computed<{ stroke: string; glow: string; fillStop: string; badge: string; label: string }>(() => {
   const map: Record<string, { stroke: string; glow: string; fillStop: string; badge: string; label: string }> = {
     visitors: { stroke: '#06b6d4', glow: '#67e8f9', fillStop: '#06b6d4', badge: 'bg-cyan-500/20 text-cyan-300', label: 'Visitantes Únicos' },
     sessions: { stroke: '#8b5cf6', glow: '#a78bfa', fillStop: '#8b5cf6', badge: 'bg-violet-500/20 text-violet-300', label: 'Sessões' },
     pageviews: { stroke: '#3b82f6', glow: '#60a5fa', fillStop: '#3b82f6', badge: 'bg-blue-500/20 text-blue-300', label: 'Pageviews' },
     leads: { stroke: '#10b981', glow: '#34d399', fillStop: '#10b981', badge: 'bg-emerald-500/20 text-emerald-300', label: 'Leads Reais' }
   }
-  return map[chartMode.value] || map.visitors
+  return (map[chartMode.value] || map.visitors)!
 })
 
 const hoveredPoint = computed(() => {

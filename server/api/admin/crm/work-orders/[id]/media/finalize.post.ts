@@ -184,7 +184,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 7. Registro de Auditoria
-  await logCrmActivity(config, {
+  await logCrmActivity({ url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey }, {
     clientId: wo.client_id,
     workOrderId: id,
     entityType: 'media',
