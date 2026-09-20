@@ -10,6 +10,7 @@ import TableCell from '../ui/table/TableCell.vue'
 import Badge from '../ui/badge/Badge.vue'
 import AdminKpiCard from './AdminKpiCard.vue'
 import LandingComparisonCard from './LandingComparisonCard.vue'
+import MarketingChangeTimeline from './MarketingChangeTimeline.vue'
 
 const props = defineProps<{
   data: GoogleAdsOverviewResponse | null
@@ -352,6 +353,9 @@ const emit = defineEmits<{
       :selected-channel="landingComparisonChannel || 'google_ads'"
       @change-channel="(ch) => emit('change-comparison-channel', ch)"
     />
+
+    <!-- HISTÓRICO DE MUDANÇAS DA CAMPANHA E ANOTAÇÕES DE MARKETING -->
+    <MarketingChangeTimeline />
 
     <!-- TABELA DE CAMPANHAS GOOGLE ADS -->
     <Card class="p-5">
