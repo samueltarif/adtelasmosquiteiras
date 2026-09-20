@@ -35,6 +35,8 @@ const {
   funnel,
   recentActivity,
   googleAds,
+  landingComparison,
+  landingComparisonChannel,
   isLoadingOverview,
   isLoadingAcquisition,
   isLoadingPages,
@@ -42,6 +44,8 @@ const {
   isLoadingFunnel,
   isLoadingActivity,
   isLoadingGoogleAds,
+  isLoadingLandingComparison,
+  fetchLandingComparison,
   fetchAll
 } = useAdminAnalytics()
 
@@ -293,7 +297,11 @@ onMounted(() => {
         <TabsContent value="google-ads" class="mt-4">
           <GoogleAdsSection 
             :data="googleAds" 
+            :landing-comparison-data="landingComparison"
+            :landing-comparison-channel="landingComparisonChannel"
             :loading="isLoadingGoogleAds" 
+            :loading-comparison="isLoadingLandingComparison"
+            @change-comparison-channel="fetchLandingComparison"
           />
         </TabsContent>
       </Tabs>

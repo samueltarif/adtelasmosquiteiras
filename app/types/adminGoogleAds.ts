@@ -103,3 +103,122 @@ export interface GoogleAdsOverviewResponse {
   keywords: GoogleAdsKeywordMetric[]
   ctas: GoogleAdsCtaMetric[]
 }
+
+export interface CohortMetrics {
+  landing_unique_visitors: number
+  sessions: number
+  pageviews: number
+  contact_intent_unique_visitors: number
+  whatsapp_unique_visitors: number
+  whatsapp_clicks: number
+  form_start_unique_visitors: number
+  form_starts: number
+  quote_cta_unique_visitors: number
+  quote_cta_clicks: number
+  real_lead_unique_visitors: number
+  real_leads_count: number
+  taxa_intencao_num: number
+  taxa_intencao: string
+  taxa_whatsapp_num: number
+  taxa_whatsapp: string
+  taxa_form_start_num: number
+  taxa_form_start: string
+  taxa_lead_num: number
+  taxa_lead: string
+}
+
+export interface MetricDeltaCount {
+  diff: number
+  formatted: string
+  is_positive: boolean
+  is_neutral: boolean
+}
+
+export interface MetricDeltaRate {
+  diff_pp: number
+  formatted: string
+  is_positive: boolean
+  is_neutral: boolean
+}
+
+export interface LandingComparisonDelta {
+  landing_unique_visitors: MetricDeltaCount
+  sessions: MetricDeltaCount
+  pageviews: MetricDeltaCount
+  contact_intent_unique_visitors: MetricDeltaCount
+  whatsapp_unique_visitors: MetricDeltaCount
+  form_start_unique_visitors: MetricDeltaCount
+  real_lead_unique_visitors: MetricDeltaCount
+  taxa_intencao: MetricDeltaRate
+  taxa_whatsapp: MetricDeltaRate
+  taxa_form_start: MetricDeltaRate
+  taxa_lead: MetricDeltaRate
+}
+
+export interface DeviceComparisonData {
+  visitors: number
+  intent_visitors: number
+  leads: number
+  taxa_intencao: string
+  taxa_lead: string
+}
+
+export interface DeviceComparisonRow {
+  device: string
+  label: string
+  before: DeviceComparisonData
+  after: DeviceComparisonData
+  delta: {
+    visitors: MetricDeltaCount
+    intent_visitors: MetricDeltaCount
+    leads: MetricDeltaCount
+    taxa_intencao: MetricDeltaRate
+    taxa_lead: MetricDeltaRate
+  }
+}
+
+export interface LandingComparisonWindow {
+  cutoffAtIso: string
+  durationMs: number
+  durationHours: number
+  durationFormatted: string
+  beforeStartUtc: string
+  beforeEndUtc: string
+  afterStartUtc: string
+  afterEndUtc: string
+  isSymmetric: boolean
+  isPendingMaturity: boolean
+  maturityBufferMinutes: number
+}
+
+export interface LandingComparisonSampleQuality {
+  level: 'very_small' | 'small' | 'moderate' | 'large'
+  label: string
+  description: string
+  minSampleSize: number
+}
+
+export interface LandingComparisonData {
+  cutoffAt: string
+  label?: string
+  landing_first_seen_at?: string
+  cutoffExplanation?: string
+  channelFilter: 'google_ads' | 'all'
+  window: LandingComparisonWindow
+  sampleQuality: LandingComparisonSampleQuality
+  before: CohortMetrics
+  after: CohortMetrics
+  delta: LandingComparisonDelta
+  deviceBreakdown: Record<string, DeviceComparisonRow>
+  config: {
+    landing_path: string
+    previous_path_prefixes: string[]
+  }
+}
+
+export interface LandingComparisonResponse {
+  success: boolean
+  data?: LandingComparisonData
+  error?: string
+}
+

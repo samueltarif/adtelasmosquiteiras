@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GoogleAdsOverviewResponse } from '../../types/adminGoogleAds'
+import type { GoogleAdsOverviewResponse, LandingComparisonData } from '../../types/adminGoogleAds'
 import Card from '../ui/card/Card.vue'
 import Table from '../ui/table/Table.vue'
 import TableHeader from '../ui/table/TableHeader.vue'
@@ -9,10 +9,18 @@ import TableHead from '../ui/table/TableHead.vue'
 import TableCell from '../ui/table/TableCell.vue'
 import Badge from '../ui/badge/Badge.vue'
 import AdminKpiCard from './AdminKpiCard.vue'
+import LandingComparisonCard from './LandingComparisonCard.vue'
 
 const props = defineProps<{
   data: GoogleAdsOverviewResponse | null
+  landingComparisonData?: LandingComparisonData | null
+  landingComparisonChannel?: 'google_ads' | 'all'
   loading?: boolean
+  loadingComparison?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'change-comparison-channel', channel: 'google_ads' | 'all'): void
 }>()
 </script>
 
@@ -336,6 +344,14 @@ const props = defineProps<{
         </div>
       </div>
     </Card>
+
+    <!-- COMPARADOR ANTES X DEPOIS DA NOVA LANDING PAGE -->
+    <LandingComparisonCard
+      :data="landingComparisonData || null"
+      :loading="loadingComparison"
+      :selected-channel="landingComparisonChannel || 'google_ads'"
+      @change-channel="(ch) => emit('change-comparison-channel', ch)"
+    />
 
     <!-- TABELA DE CAMPANHAS GOOGLE ADS -->
     <Card class="p-5">

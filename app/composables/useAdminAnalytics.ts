@@ -3,7 +3,7 @@
  * Arquivo: app/composables/useAdminAnalytics.ts
  */
 
-import type { GoogleAdsOverviewResponse } from '../types/adminGoogleAds'
+import type { GoogleAdsOverviewResponse, LandingComparisonData } from '../types/adminGoogleAds'
 
 export function useAdminAnalytics() {
   const { queryString } = useAdminDateFilter()
@@ -15,6 +15,8 @@ export function useAdminAnalytics() {
   const funnel = ref<any>(null)
   const recentActivity = ref<any>(null)
   const googleAds = ref<GoogleAdsOverviewResponse | null>(null)
+  const landingComparison = ref<LandingComparisonData | null>(null)
+  const landingComparisonChannel = ref<'google_ads' | 'all'>('google_ads')
 
   const isLoadingOverview = ref(false)
   const isLoadingAcquisition = ref(false)
@@ -23,6 +25,7 @@ export function useAdminAnalytics() {
   const isLoadingFunnel = ref(false)
   const isLoadingActivity = ref(false)
   const isLoadingGoogleAds = ref(false)
+  const isLoadingLandingComparison = ref(false)
 
   const errorOverview = ref<string | null>(null)
   const errorAcquisition = ref<string | null>(null)
@@ -31,6 +34,7 @@ export function useAdminAnalytics() {
   const errorFunnel = ref<string | null>(null)
   const errorActivity = ref<string | null>(null)
   const errorGoogleAds = ref<string | null>(null)
+  const errorLandingComparison = ref<string | null>(null)
 
   async function fetchOverview() {
     isLoadingOverview.value = true
@@ -151,6 +155,27 @@ export function useAdminAnalytics() {
     }
   }
 
+  async function fetchLandingComparison(channel?: 'google_ads' | 'all') {
+    if (channel) {
+      landingComparisonChannel.value = channel
+    }
+    isLoadingLandingComparison.value = true
+    errorLandingComparison.value = null
+    try {
+      const channelParam = landingComparisonChannel.value
+      const data = await $fetch<any>(`/api/admin/analytics/google-ads/landing-comparison?${queryString.value}&channel=${channelParam}`)
+      if (data?.success) {
+        landingComparison.value = data.data
+      } else {
+        errorLandingComparison.value = data?.error || 'Erro ao carregar comparador da landing'
+      }
+    } catch (e: any) {
+      errorLandingComparison.value = e?.message || 'Erro de conexão'
+    } finally {
+      isLoadingLandingComparison.value = false
+    }
+  }
+
   async function fetchAll() {
     await Promise.all([
       fetchOverview(),
@@ -159,7 +184,8 @@ export function useAdminAnalytics() {
       fetchServices(),
       fetchFunnel(),
       fetchRecentActivity(),
-      fetchGoogleAds()
+      fetchGoogleAds(),
+      fetchLandingComparison()
     ])
   }
 
@@ -176,6 +202,8 @@ export function useAdminAnalytics() {
     funnel,
     recentActivity,
     googleAds,
+    landingComparison,
+    landingComparisonChannel,
     isLoadingOverview,
     isLoadingAcquisition,
     isLoadingPages,
@@ -183,6 +211,7 @@ export function useAdminAnalytics() {
     isLoadingFunnel,
     isLoadingActivity,
     isLoadingGoogleAds,
+    isLoadingLandingComparison,
     errorOverview,
     errorAcquisition,
     errorPages,
@@ -190,6 +219,7 @@ export function useAdminAnalytics() {
     errorFunnel,
     errorActivity,
     errorGoogleAds,
+    errorLandingComparison,
     fetchOverview,
     fetchAcquisition,
     fetchPages,
@@ -197,6 +227,8 @@ export function useAdminAnalytics() {
     fetchFunnel,
     fetchRecentActivity,
     fetchGoogleAds,
+    fetchLandingComparison,
     fetchAll
   }
 }
+
