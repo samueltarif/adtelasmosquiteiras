@@ -54,20 +54,29 @@ export {
   minimizePiiPayload
 }
 
+import { createError } from 'h3'
+
 export interface SupabaseConfig {
   url: string
   serviceRoleKey: string
 }
 
-export function getSupabaseHeaders(serviceRoleKey: string) {
+export function getSupabaseHeaders(serviceRoleKey: string | undefined): { apikey: string; Authorization: string; 'Content-Type': string } {
+  if (!serviceRoleKey || typeof serviceRoleKey !== 'string' || !serviceRoleKey.trim()) {
+    throw createError({
+      statusCode: 500,
+      message: 'Chave de serviço Supabase não configurada no servidor.'
+    })
+  }
+  const cleanKey = serviceRoleKey.trim()
   return {
-    'apikey': serviceRoleKey,
-    'Authorization': `Bearer ${serviceRoleKey}`,
+    'apikey': cleanKey,
+    'Authorization': `Bearer ${cleanKey}`,
     'Content-Type': 'application/json'
   }
 }
 
-import { findDuplicateClients } from './crmDuplicateSearch.ts'
+import { findDuplicateClients } from './crmDuplicateSearch'
 
 export { findDuplicateClients }
 

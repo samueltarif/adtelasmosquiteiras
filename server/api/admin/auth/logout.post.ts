@@ -1,5 +1,5 @@
 import { defineEventHandler, getCookie, getHeader } from 'h3'
-import { clearAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuthCookies.ts'
+import { clearAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuthCookies'
 import { ADMIN_AUTH_COOKIE_NAME } from '../../../shared/adminAuthCore.mjs'
 
 /**
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   enforceMutationCsrf(event)
 
   const config = useRuntimeConfig()
-  const grantKey = config?.supabasePublishableKey || config?.supabaseAnonKey
+  const grantKey = (config?.supabasePublishableKey || config?.supabaseAnonKey) as string | undefined
 
   // 2. Extrai access token da sessão ativa
   let accessToken = getCookie(event, ADMIN_AUTH_COOKIE_NAME)

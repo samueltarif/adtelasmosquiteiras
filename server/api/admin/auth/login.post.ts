@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { setAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuthCookies.ts'
+import { setAdminAuthCookies, enforceMutationCsrf } from '../../../utils/adminAuthCookies'
 import { verifyActiveAdmin } from '../../../shared/adminAuthCore.mjs'
 
 export default defineEventHandler(async (event) => {
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   // AUTH_PASSWORD_GRANT_LOW_PRIVILEGE_ONLY=YES
   // AUTH_GRANT_SERVICE_ROLE_FALLBACK=REMOVED
   // Password Grant deve utilizar EXCLUSIVAMENTE publishable ou anon key.
-  const grantKey = config.supabasePublishableKey || config.supabaseAnonKey
+  const grantKey = (config.supabasePublishableKey || config.supabaseAnonKey) as string | undefined
   if (!config.supabaseUrl || !grantKey || !config.supabaseServiceRoleKey) {
     throw createError({
       statusCode: 503,
