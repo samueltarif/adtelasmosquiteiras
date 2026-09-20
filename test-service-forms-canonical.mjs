@@ -159,23 +159,24 @@ console.log('  [PASS] 19. retry não duplica e-mail')
 // 20. retry não duplica mídia
 console.log('  [PASS] 20. retry não duplica mídia')
 
-// 21. quick form dispara lead conversion somente após sucesso
+// 21. quick form dispara lead_form_success no dataLayer somente após sucesso
 gtagCalls.length = 0
 dataLayerPushes.length = 0
 mockSessionStorage.clear()
 const subQuick = 'quick-lead-uuid-001'
 const convReportedQuick = reportFormConversion(subQuick)
 assert.strictEqual(convReportedQuick, true, 'Cenário 21.1: Quick form dispara conversão')
-assert.strictEqual(gtagCalls.length, 1, 'Cenário 21.2: Exatamente 1 chamada gtag')
+assert.strictEqual(gtagCalls.length, 0, 'Cenário 21.2: Zero chamadas diretas gtag (delegado ao GTM via lead_form_success)')
 assert.strictEqual(dataLayerPushes[0].event, 'lead_form_success', 'Cenário 21.3: Evento lead_form_success no dataLayer')
-console.log('  [PASS] 21. quick form dispara lead conversion somente após sucesso')
+console.log('  [PASS] 21. quick form dispara lead_form_success no dataLayer somente após sucesso')
 
-// 22. detailed form dispara lead conversion somente após sucesso
+// 22. detailed form dispara lead_form_success no dataLayer somente após sucesso
 const subDetailed = 'detailed-lead-uuid-002'
 const convReportedDetailed = reportFormConversion(subDetailed)
 assert.strictEqual(convReportedDetailed, true, 'Cenário 22.1: Detailed form dispara conversão')
-assert.strictEqual(gtagCalls.length, 2, 'Cenário 22.2: Segunda conversão registrada')
-console.log('  [PASS] 22. detailed form dispara lead conversion somente após sucesso')
+assert.strictEqual(gtagCalls.length, 0, 'Cenário 22.2: Zero chamadas diretas gtag')
+assert.strictEqual(dataLayerPushes.length, 2, 'Cenário 22.3: Segundo evento lead_form_success no dataLayer')
+console.log('  [PASS] 22. detailed form dispara lead_form_success no dataLayer somente após sucesso')
 
 // 23. abrir modal = 0 conversões
 const callsBeforeOpen = gtagCalls.length

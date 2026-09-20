@@ -1,5 +1,5 @@
-// GA4 + Google Ads via gtag.js
-// Carregado separadamente do GTM para garantir conversões mesmo sem container configurado
+// GA4 via gtag.js
+// Carregado para medição direta do Google Analytics 4
 export default defineNuxtPlugin(() => {
   if (import.meta.client) {
     window.dataLayer = window.dataLayer || []
@@ -19,6 +19,5 @@ export default defineNuxtPlugin(() => {
 
     gtag('js', new Date())
     gtag('config', 'G-S0038L1Q6R')
-    gtag('config', 'AW-17981093809')
   }
 })

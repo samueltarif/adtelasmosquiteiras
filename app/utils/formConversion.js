@@ -31,7 +31,7 @@ export function markConversionAsReported(submissionId) {
 }
 
 /**
- * Dispara conversão do Google Ads e evento canônico no dataLayer
+ * Dispara evento canônico lead_form_success no dataLayer (consumido pelo GTM)
  * garantindo idempotência estrita por submission_id (Single Source of Truth).
  *
  * @param {string} submissionId UUID da submissão
@@ -46,14 +46,7 @@ export function reportFormConversion(submissionId) {
     return false
   }
 
-  // 1. Google Ads Conversion
-  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', 'conversion', {
-      'send_to': 'AW-17981093809/4GwPCPCPWSjoccELHvhv5C'
-    })
-  }
-
-  // 2. dataLayer Canonical Event
+  // 1. dataLayer Canonical Event (GTM aciona a conversão oficial AW-473885322)
   if (typeof window !== 'undefined') {
     window.dataLayer = window.dataLayer || []
     window.dataLayer.push({
@@ -62,7 +55,7 @@ export function reportFormConversion(submissionId) {
     })
   }
 
-  // 3. Registrar na sessionStorage (sem PII)
+  // 2. Registrar na sessionStorage (sem PII)
   markConversionAsReported(submissionId)
   return true
 }

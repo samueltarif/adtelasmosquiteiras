@@ -131,7 +131,7 @@ export function useFormSubmit() {
         }
       }
 
-      // 3. Registrar conversão Google Ads (Single Source of Truth: APÓS confirmação real de sucesso da API)
+      // 3. Disparar evento canônico lead_form_success para o GTM (Single Source of Truth: APÓS confirmação real de sucesso da API)
       const submittedId = payload.submission_id
       reportFormConversion(submittedId)
 
