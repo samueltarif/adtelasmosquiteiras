@@ -31,7 +31,7 @@ export const ACTION_TYPES = [
 
 export type ActionType = typeof ACTION_TYPES[number]
 
-export const SERVICE_TAXONOMY: Record<string, { key: string; name: string }> = {
+export const SERVICE_TAXONOMY = {
   // Telas Mosquiteiras
   telas_janelas: { key: 'telas_janelas', name: 'Telas Mosquiteiras para Janelas' },
   telas_portas: { key: 'telas_portas', name: 'Telas Mosquiteiras para Portas' },
@@ -61,11 +61,11 @@ export const SERVICE_TAXONOMY: Record<string, { key: string; name: string }> = {
 
   // Vidraçaria
   vidracaria: { key: 'vidracaria', name: 'Serviços de Vidraçaria' }
-}
+} as const
 
 export function getServiceMetadata(key: string | null | undefined): { key: string; name: string } | null {
   if (!key) return null
-  return SERVICE_TAXONOMY[key] || null
+  return (SERVICE_TAXONOMY as Record<string, { key: string; name: string }>)[key] || null
 }
 
 export function getServiceFromPath(path: string | null | undefined): { key: string; name: string } | null {

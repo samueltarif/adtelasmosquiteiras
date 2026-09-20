@@ -11,6 +11,7 @@ import Badge from '../ui/badge/Badge.vue'
 import AdminKpiCard from './AdminKpiCard.vue'
 import LandingComparisonCard from './LandingComparisonCard.vue'
 import MarketingChangeTimeline from './MarketingChangeTimeline.vue'
+import WhatsappAttributionSection from './WhatsappAttributionSection.vue'
 
 const props = defineProps<{
   data: GoogleAdsOverviewResponse | null
@@ -356,6 +357,9 @@ const emit = defineEmits<{
 
     <!-- HISTÓRICO DE MUDANÇAS DA CAMPANHA E ANOTAÇÕES DE MARKETING -->
     <MarketingChangeTimeline />
+
+    <!-- FILA DE ATRIBUIÇÃO WHATSAPP (FASE 1.1 PARTE 3A) -->
+    <WhatsappAttributionSection />
 
     <!-- TABELA DE CAMPANHAS GOOGLE ADS -->
     <Card class="p-5">

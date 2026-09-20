@@ -69,7 +69,59 @@ export default defineEventHandler(async (event) => {
   const path = (origem === '/' || origem === '') ? 'Home (/)' : origem
 
   try {
-    // Grava na tabela lead_clicks com validação e saneamento server-side
+    // Para cliques de WhatsApp com short_code, executa a RPC atômica (lead_clicks + whatsapp_attributions)
+    if (canonicalActionType === 'whatsapp' && body.short_code && /^[23456789ABCDEFGHJKMNPQRSTVWXYZ]{8}$/i.test(String(body.short_code).trim())) {
+      const rpcResult = await $fetch<any>(`${config.supabaseUrl}/rest/v1/rpc/create_whatsapp_click_attribution_atomic`, {
+        method: 'POST',
+        headers: {
+          'apikey': config.supabaseServiceRoleKey,
+          'Authorization': `Bearer ${config.supabaseServiceRoleKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: {
+          p_event_id: event_id || null,
+          p_short_code: String(body.short_code).trim().toUpperCase(),
+          p_visitor_id: visitor_id || null,
+          p_session_id: session_id || null,
+          p_origem: path,
+          p_cta_location: validatedCtaLocation,
+          p_service_key: canonicalServiceKey,
+          p_service_name: canonicalServiceName,
+          p_landing_path: landing_path || path,
+          p_device_type: deviceType,
+          p_google_device: google_device || null,
+          p_is_bot: botInfo.isBot,
+          p_bot_name: botInfo.botName,
+          p_user_agent: userAgent.substring(0, 500),
+          p_ip_hash: ipHash,
+          p_channel: channel || null,
+          p_utm_source: utm_source || null,
+          p_utm_medium: utm_medium || null,
+          p_utm_campaign: utm_campaign || null,
+          p_utm_content: utm_content || null,
+          p_utm_term: utm_term || null,
+          p_google_campaign_id: google_campaign_id || null,
+          p_google_adgroup_id: google_adgroup_id || null,
+          p_google_creative_id: google_creative_id || null,
+          p_google_match_type: google_match_type || null,
+          p_google_network: google_network || null,
+          p_google_target_id: google_target_id || null,
+          p_gclid: gclid || null,
+          p_gbraid: gbraid || null,
+          p_wbraid: wbraid || null,
+          p_referrer: referrer || null,
+          p_clicked_at: new Date().toISOString()
+        }
+      })
+
+      return {
+        success: true,
+        idempotent: rpcResult?.idempotent || false,
+        attribution_id: rpcResult?.attribution_id || null
+      }
+    }
+
+    // Para cliques de outros tipos (quote_cta, telefone, etc.), preserva o fluxo padrão
     await $fetch(`${config.supabaseUrl}/rest/v1/lead_clicks`, {
       method: 'POST',
       headers: {

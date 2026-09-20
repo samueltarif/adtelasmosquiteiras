@@ -1,18 +1,70 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import ClientDuplicateAlert from '~/components/admin/crm/ClientDuplicateAlert.vue'
+import type { WhatsappAttributionItem } from '~/types/adminWhatsappAttribution'
 
 definePageMeta({
   layout: 'admin'
 })
 
 const router = useRouter()
+const route = useRoute()
 const isSaving = ref(false)
 const errorMessage = ref<string | null>(null)
 const duplicateCandidates = ref<any[]>([])
 
-const form = ref({
+const refWhatsapp = ref<string>(typeof route.query.ref === 'string' ? route.query.ref.trim().toUpperCase() : '')
+const whatsappPreview = ref<WhatsappAttributionItem | null>(null)
+const isLoadingWhatsappPreview = ref(false)
+
+async function fetchWhatsappPreview(code: string) {
+  if (!code || !/^[23456789ABCDEFGHJKMNPQRSTVWXYZ]{8}$/.test(code)) {
+    whatsappPreview.value = null
+    return
+  }
+  isLoadingWhatsappPreview.value = true
+  try {
+    const res = await $fetch<any>(`/api/admin/marketing/whatsapp-attributions/by-code/${code}`)
+    if (res?.success && res.attribution) {
+      whatsappPreview.value = res.attribution
+    } else {
+      whatsappPreview.value = null
+    }
+  } catch (err) {
+    whatsappPreview.value = null
+  } finally {
+    isLoadingWhatsappPreview.value = false
+  }
+}
+
+onMounted(() => {
+  if (refWhatsapp.value) {
+    fetchWhatsappPreview(refWhatsapp.value)
+  }
+})
+
+watch(refWhatsapp, (newCode) => {
+  if (newCode && newCode.length === 8) {
+    fetchWhatsappPreview(newCode)
+  } else if (!newCode) {
+    whatsappPreview.value = null
+  }
+})
+
+const form = ref<{
+  nome: string
+  tipo_cliente: string
+  telefone_principal: string
+  telefone_secundario: string
+  email: string
+  cpf_cnpj: string
+  nome_fantasia: string
+  razao_social: string
+  observacoes: string
+  confirmPossibleDuplicate: boolean
+  ref_whatsapp?: string
+}>({
   nome: '',
   tipo_cliente: 'pessoa_fisica',
   telefone_principal: '',
@@ -22,7 +74,8 @@ const form = ref({
   nome_fantasia: '',
   razao_social: '',
   observacoes: '',
-  confirmPossibleDuplicate: false
+  confirmPossibleDuplicate: false,
+  ref_whatsapp: refWhatsapp.value || undefined
 })
 
 async function handleCreateClient(overrideDuplicate = false) {
@@ -42,6 +95,8 @@ async function handleCreateClient(overrideDuplicate = false) {
   if (overrideDuplicate) {
     form.value.confirmPossibleDuplicate = true
   }
+
+  form.value.ref_whatsapp = refWhatsapp.value ? refWhatsapp.value.trim().toUpperCase() : undefined
 
   try {
     const res = await $fetch<any>('/api/admin/crm/clients', {
@@ -104,9 +159,80 @@ function handleOpenExisting(clientId: string) {
       @open-client="handleOpenExisting"
     />
 
+    <!-- Card de Contexto de Atribuição WhatsApp (Fase 1.1 Parte 3A) -->
+    <div v-if="whatsappPreview" class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs sm:text-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 font-bold text-emerald-400">
+          <Icon name="lucide:message-circle" class="w-5 h-5" />
+          <span>Atribuição WhatsApp Detectada — Ref: <span class="font-mono bg-emerald-900/60 px-2 py-0.5 rounded text-white">{{ whatsappPreview.short_code }}</span></span>
+        </div>
+        <button
+          type="button"
+          @click="refWhatsapp = ''; whatsappPreview = null"
+          class="text-xs text-emerald-400/80 hover:text-emerald-200 underline"
+        >
+          Remover vínculo
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-1 border-t border-emerald-500/20">
+        <div>
+          <span class="text-slate-400">Campanha:</span>
+          <span class="font-semibold text-white ml-1">{{ whatsappPreview.campaign_name || 'Google Ads' }}</span>
+        </div>
+        <div>
+          <span class="text-slate-400">Click ID:</span>
+          <span class="font-semibold ml-1" :class="whatsappPreview.has_click_id ? 'text-emerald-400' : 'text-slate-400'">
+            {{ whatsappPreview.has_click_id ? `capturado (${whatsappPreview.click_id_type?.toUpperCase()})` : 'não detectado' }}
+          </span>
+        </div>
+        <div>
+          <span class="text-slate-400">Landing Page:</span>
+          <span class="font-mono text-slate-200 ml-1">{{ whatsappPreview.landing_path || '/' }}</span>
+        </div>
+        <div>
+          <span class="text-slate-400">Horário do Clique:</span>
+          <span class="text-slate-200 ml-1">{{ new Date(whatsappPreview.clicked_at).toLocaleString('pt-BR') }}</span>
+        </div>
+      </div>
+      <p class="text-[11px] text-emerald-400/90 italic">
+        Ao cadastrar, este cliente será associado com status "Atribuição confirmada por referência".
+      </p>
+    </div>
+
     <!-- Formulário de Cadastro -->
     <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-sm">
       <form @submit.prevent="() => handleCreateClient(false)" class="space-y-5">
+        <!-- Ref WhatsApp manual ou pré-carregada -->
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-white/10">
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+            Ref. WhatsApp (Código do Lead)
+          </label>
+          <div class="flex items-center gap-3">
+            <input
+              v-model="refWhatsapp"
+              type="text"
+              maxlength="8"
+              class="w-40 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-white font-mono uppercase text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+              placeholder="Ex: 8K3M7QFA"
+            />
+            <span v-if="isLoadingWhatsappPreview" class="text-xs text-slate-400 flex items-center gap-1">
+              <Icon name="lucide:loader-2" class="w-3.5 h-3.5 animate-spin" />
+              Buscando clique...
+            </span>
+            <span v-else-if="whatsappPreview" class="text-xs text-emerald-400 flex items-center gap-1">
+              <Icon name="lucide:check-circle" class="w-3.5 h-3.5" />
+              Clique localizado
+            </span>
+            <span v-else-if="refWhatsapp && refWhatsapp.length === 8" class="text-xs text-amber-400 flex items-center gap-1">
+              <Icon name="lucide:alert-triangle" class="w-3.5 h-3.5" />
+              Código não encontrado
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">
+            Se o contato veio pelo WhatsApp com "Ref: CÓDIGO", informe aqui para herdar o rastreamento do Google Ads.
+          </p>
+        </div>
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1.5">
             Nome Completo / Identificação <span class="text-red-400">*</span>

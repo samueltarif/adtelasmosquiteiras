@@ -116,7 +116,40 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: err?.message || 'Erro ao criar cliente.' })
   }
 
-  // 4. Log de auditoria (com compensação defensiva se falhar)
+  // 4. Vínculo com Atribuição WhatsApp se houver ref_whatsapp (Fase 1.1 Parte 3A)
+  const rawRef = typeof body.ref_whatsapp === 'string' ? body.ref_whatsapp.trim().toUpperCase() : ''
+  if (rawRef && /^[23456789ABCDEFGHJKMNPQRSTVWXYZ]{8}$/.test(rawRef)) {
+    try {
+      const attrRes = await $fetch<any[]>(`${config.supabaseUrl}/rest/v1/whatsapp_attributions?short_code=eq.${rawRef}`, {
+        headers
+      })
+
+      if (Array.isArray(attrRes) && attrRes.length > 0) {
+        const attr = attrRes[0]
+        if (attr.attribution_status === 'unassigned') {
+          const nowIso = new Date().toISOString()
+          await $fetch(`${config.supabaseUrl}/rest/v1/whatsapp_attributions?id=eq.${attr.id}`, {
+            method: 'PATCH',
+            headers: { ...headers, 'Prefer': 'return=minimal' },
+            body: {
+              client_id: createdClient.id,
+              attribution_status: 'assigned',
+              confidence_level: 'confirmed',
+              match_method: 'exact_code',
+              assigned_by: admin.userId,
+              assigned_at: nowIso,
+              notes: 'Vinculado automaticamente no cadastro do cliente por código de referência exato.',
+              updated_at: nowIso
+            }
+          })
+        }
+      }
+    } catch (attrErr) {
+      console.error('[clients/create] Falha ao vincular atribuição WhatsApp:', attrErr)
+    }
+  }
+
+  // 5. Log de auditoria (com compensação defensiva se falhar)
   try {
     await logCrmActivity(
       { url: config.supabaseUrl, serviceRoleKey: config.supabaseServiceRoleKey },
@@ -125,8 +158,12 @@ export default defineEventHandler(async (event) => {
         entityType: 'client',
         entityId: createdClient.id,
         acao: 'client_created',
-        descricaoHumana: `Cliente ${nome} cadastrado manualmente.`,
-        dadosNovos: { client_id: createdClient.id, tipo_cliente: tipoCliente },
+        descricaoHumana: `Cliente ${nome} cadastrado manualmente${rawRef ? ` (Ref. WhatsApp: ${rawRef})` : ''}.`,
+        dadosNovos: { 
+          client_id: createdClient.id, 
+          tipo_cliente: tipoCliente,
+          ref_whatsapp: rawRef || null
+        },
         actorId: admin.userId
       }
     )
