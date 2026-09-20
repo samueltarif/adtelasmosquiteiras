@@ -17,6 +17,13 @@ export interface FirstTouchContext {
   first_touch_utm_campaign: string | null
   first_touch_utm_content: string | null
   first_touch_utm_term: string | null
+  first_touch_google_campaign_id?: string | null
+  first_touch_google_adgroup_id?: string | null
+  first_touch_google_creative_id?: string | null
+  first_touch_google_match_type?: string | null
+  first_touch_google_network?: string | null
+  first_touch_google_device?: string | null
+  first_touch_google_target_id?: string | null
   first_touch_gclid: string | null
   first_touch_gbraid: string | null
   first_touch_wbraid: string | null
@@ -110,6 +117,13 @@ export function useAnalyticsIdentity() {
           first_touch_utm_campaign: context.first_touch_utm_campaign || null,
           first_touch_utm_content: context.first_touch_utm_content || null,
           first_touch_utm_term: context.first_touch_utm_term || null,
+          first_touch_google_campaign_id: context.first_touch_google_campaign_id || null,
+          first_touch_google_adgroup_id: context.first_touch_google_adgroup_id || null,
+          first_touch_google_creative_id: context.first_touch_google_creative_id || null,
+          first_touch_google_match_type: context.first_touch_google_match_type || null,
+          first_touch_google_network: context.first_touch_google_network || null,
+          first_touch_google_device: context.first_touch_google_device || null,
+          first_touch_google_target_id: context.first_touch_google_target_id || null,
           first_touch_gclid: context.first_touch_gclid || null,
           first_touch_gbraid: context.first_touch_gbraid || null,
           first_touch_wbraid: context.first_touch_wbraid || null,
@@ -141,6 +155,13 @@ export function useAnalyticsIdentity() {
       first_touch_utm_campaign: null,
       first_touch_utm_content: null,
       first_touch_utm_term: null,
+      first_touch_google_campaign_id: null,
+      first_touch_google_adgroup_id: null,
+      first_touch_google_creative_id: null,
+      first_touch_google_match_type: null,
+      first_touch_google_network: null,
+      first_touch_google_device: null,
+      first_touch_google_target_id: null,
       first_touch_gclid: null,
       first_touch_gbraid: null,
       first_touch_wbraid: null,

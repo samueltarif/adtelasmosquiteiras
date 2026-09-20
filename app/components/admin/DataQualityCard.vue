@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GoogleAdsDataQuality } from '../../types/adminGoogleAds'
+
 const props = defineProps<{
   quality: {
     missing_visitor_id: number
@@ -10,6 +12,7 @@ const props = defineProps<{
     automated_test_leads: number
     manual_validation_leads: number
   } | null
+  googleAdsQuality?: GoogleAdsDataQuality | null
   loading?: boolean
 }>()
 </script>
@@ -84,6 +87,24 @@ const props = defineProps<{
           {{ quality.automated_test_leads + quality.manual_validation_leads }}
         </span>
         <span class="text-[10px] text-slate-600">Histórico técnico</span>
+      </div>
+
+      <!-- Google Ads Quality Row -->
+      <div v-if="googleAdsQuality && googleAdsQuality.total_google_ads_sessions > 0" class="col-span-2 sm:col-span-3 pt-2 mt-1 border-t border-white/[0.04] grid grid-cols-2 gap-2">
+        <div class="p-2.5 rounded-xl bg-indigo-500/[0.03] border border-indigo-500/10 flex flex-col">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Click ID Ads</span>
+          <span class="text-sm font-bold text-emerald-400 mt-0.5 tabular-nums">
+            {{ googleAdsQuality.pct_with_click_id }}
+          </span>
+          <span class="text-[10px] text-slate-500">{{ googleAdsQuality.sessions_with_click_id }} de {{ googleAdsQuality.total_google_ads_sessions }} sessões</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-indigo-500/[0.03] border border-indigo-500/10 flex flex-col">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Atribuição de Leads</span>
+          <span class="text-sm font-bold text-cyan-400 mt-0.5 tabular-nums">
+            {{ googleAdsQuality.pct_leads_with_attribution }}
+          </span>
+          <span class="text-[10px] text-slate-500">{{ googleAdsQuality.leads_with_attribution }} de {{ googleAdsQuality.total_real_leads }} leads</span>
+        </div>
       </div>
     </div>
   </div>

@@ -10,6 +10,11 @@ export interface SessionAttribution {
   utm_term: string | null
   campaign_id?: string | null
   adgroup_id?: string | null
+  creative?: string | null
+  matchtype?: string | null
+  network?: string | null
+  device?: string | null
+  target_id?: string | null
   gclid: string | null
   gbraid: string | null
   wbraid: string | null
@@ -79,7 +84,10 @@ export function useAttribution() {
     const query = route.query || {}
     const hasParamsInUrl = !!(
       query.utm_source || query.utm_medium || query.utm_campaign || query.utm_term || query.utm_content ||
-      query.campaign_id || query.adgroup_id ||
+      query.campaign_id || query.google_campaign_id || query.adgroup_id || query.google_adgroup_id ||
+      query.creative || query.google_creative_id || query.matchtype || query.google_match_type ||
+      query.network || query.google_network || query.device || query.google_device ||
+      query.target_id || query.targetid || query.google_target_id ||
       query.gclid || query.gbraid || query.wbraid || query.fbclid || query.msclkid
     )
 
@@ -102,8 +110,13 @@ export function useAttribution() {
         utm_campaign: (query.utm_campaign as string) || attributionCookie.value?.utm_campaign || null,
         utm_content: (query.utm_content as string) || attributionCookie.value?.utm_content || null,
         utm_term: (query.utm_term as string) || attributionCookie.value?.utm_term || null,
-        campaign_id: (query.campaign_id as string) || attributionCookie.value?.campaign_id || null,
-        adgroup_id: (query.adgroup_id as string) || attributionCookie.value?.adgroup_id || null,
+        campaign_id: (query.campaign_id as string) || (query.google_campaign_id as string) || attributionCookie.value?.campaign_id || null,
+        adgroup_id: (query.adgroup_id as string) || (query.google_adgroup_id as string) || attributionCookie.value?.adgroup_id || null,
+        creative: (query.creative as string) || (query.google_creative_id as string) || attributionCookie.value?.creative || null,
+        matchtype: (query.matchtype as string) || (query.google_match_type as string) || attributionCookie.value?.matchtype || null,
+        network: (query.network as string) || (query.google_network as string) || attributionCookie.value?.network || null,
+        device: (query.device as string) || (query.google_device as string) || attributionCookie.value?.device || null,
+        target_id: (query.target_id as string) || (query.targetid as string) || (query.google_target_id as string) || attributionCookie.value?.target_id || null,
         gclid: (query.gclid as string) || attributionCookie.value?.gclid || null,
         gbraid: (query.gbraid as string) || attributionCookie.value?.gbraid || null,
         wbraid: (query.wbraid as string) || attributionCookie.value?.wbraid || null,
@@ -125,6 +138,11 @@ export function useAttribution() {
       utm_term: null,
       campaign_id: null,
       adgroup_id: null,
+      creative: null,
+      matchtype: null,
+      network: null,
+      device: null,
+      target_id: null,
       gclid: null,
       gbraid: null,
       wbraid: null,

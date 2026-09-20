@@ -1,4 +1,13 @@
 // Re-exporta a implementação canônica única de server/shared/adminAnalyticsCore.mjs com tipagem TypeScript
+import { fetchAllPaginated as _fetchAllPaginated } from '../shared/adminAnalyticsCore.mjs'
+
+export const fetchAllPaginated = _fetchAllPaginated as <T = any>(
+  supabaseUrl: string,
+  table: string,
+  queryParams: string,
+  headers: Record<string, string>
+) => Promise<T[]>
+
 export {
   PHASE_B_START_ISO,
   KNOWN_MANUAL_VALIDATION_RECORD_IDS,
@@ -8,7 +17,6 @@ export {
   getChannelLabel,
   getIdentityStartUtc,
   getSaoPauloDateRange,
-  fetchAllPaginated,
   safeRate,
   safeRateNum,
   computeOverviewData,

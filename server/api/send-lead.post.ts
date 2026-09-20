@@ -6,11 +6,13 @@ import {
   isEmailConfigured
 } from '../utils/emailService'
 import { createMediaUploadToken } from '../utils/mediaAuth'
+import { classifyDevice } from '../utils/analytics'
 
 export default defineEventHandler(async (event) => {
   const t0_requestReceived = performance.now()
   const config = useRuntimeConfig()
   const body = await readBody(event) || {}
+  const headers = getHeaders(event)
 
   const {
     submission_id,
@@ -28,6 +30,13 @@ export default defineEventHandler(async (event) => {
     first_touch_utm_campaign,
     first_touch_utm_content,
     first_touch_utm_term,
+    first_touch_google_campaign_id,
+    first_touch_google_adgroup_id,
+    first_touch_google_creative_id,
+    first_touch_google_match_type,
+    first_touch_google_network,
+    first_touch_google_device,
+    first_touch_google_target_id,
     first_touch_gclid,
     first_touch_gbraid,
     first_touch_wbraid,
@@ -38,6 +47,13 @@ export default defineEventHandler(async (event) => {
     utm_campaign,
     utm_content,
     utm_term,
+    google_campaign_id,
+    google_adgroup_id,
+    google_creative_id,
+    google_match_type,
+    google_network,
+    google_device,
+    google_target_id,
     gclid,
     gbraid,
     wbraid,
@@ -103,12 +119,20 @@ export default defineEventHandler(async (event) => {
         session_channel: session_channel || channel || null,
 
         // Atribuição de Sessão Atual
+        device_type: classifyDevice(headers['user-agent'] || ''),
         referrer: referrer || null,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
         utm_content: utm_content || null,
         utm_term: utm_term || null,
+        google_campaign_id: google_campaign_id || null,
+        google_adgroup_id: google_adgroup_id || null,
+        google_creative_id: google_creative_id || null,
+        google_match_type: google_match_type || null,
+        google_network: google_network || null,
+        google_device: google_device || null,
+        google_target_id: google_target_id || null,
         gclid: gclid || null,
         gbraid: gbraid || null,
         wbraid: wbraid || null,
@@ -124,6 +148,13 @@ export default defineEventHandler(async (event) => {
         first_touch_utm_campaign: first_touch_utm_campaign || null,
         first_touch_utm_content: first_touch_utm_content || null,
         first_touch_utm_term: first_touch_utm_term || null,
+        first_touch_google_campaign_id: first_touch_google_campaign_id || null,
+        first_touch_google_adgroup_id: first_touch_google_adgroup_id || null,
+        first_touch_google_creative_id: first_touch_google_creative_id || null,
+        first_touch_google_match_type: first_touch_google_match_type || null,
+        first_touch_google_network: first_touch_google_network || null,
+        first_touch_google_device: first_touch_google_device || null,
+        first_touch_google_target_id: first_touch_google_target_id || null,
         first_touch_gclid: first_touch_gclid || null,
         first_touch_gbraid: first_touch_gbraid || null,
         first_touch_wbraid: first_touch_wbraid || null,

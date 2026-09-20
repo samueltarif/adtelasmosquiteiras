@@ -31,6 +31,13 @@ export default defineEventHandler(async (event) => {
     utm_campaign,
     utm_content,
     utm_term,
+    google_campaign_id,
+    google_adgroup_id,
+    google_creative_id,
+    google_match_type,
+    google_network,
+    google_device,
+    google_target_id,
     gclid,
     gbraid,
     wbraid,
@@ -48,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
   const userAgent = headers['user-agent'] || ''
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
-  const rawIp = Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim()
+  const rawIp = (Array.isArray(forwarded) ? (forwarded[0] || '0.0.0.0') : (forwarded.split(',')[0] || '0.0.0.0')).trim()
   const ipHash = generateIpHash(rawIp)
 
   const deviceType = classifyDevice(userAgent)
@@ -83,6 +90,7 @@ export default defineEventHandler(async (event) => {
         service_name: canonicalServiceName,
         landing_path: landing_path || path,
         device_type: deviceType,
+        google_device: google_device || null,
         is_bot: botInfo.isBot,
         bot_name: botInfo.botName,
         user_agent: userAgent.substring(0, 500),
@@ -93,6 +101,12 @@ export default defineEventHandler(async (event) => {
         utm_campaign: utm_campaign || null,
         utm_content: utm_content || null,
         utm_term: utm_term || null,
+        google_campaign_id: google_campaign_id || null,
+        google_adgroup_id: google_adgroup_id || null,
+        google_creative_id: google_creative_id || null,
+        google_match_type: google_match_type || null,
+        google_network: google_network || null,
+        google_target_id: google_target_id || null,
         gclid: gclid || null,
         gbraid: gbraid || null,
         wbraid: wbraid || null,

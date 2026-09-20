@@ -78,7 +78,7 @@ onUnmounted(() => visibilityObserver?.disconnect())
     <header class="bg-white border-b border-[#E5EDF8]" data-cta-location="lp_header">
       <div class="max-w-6xl mx-auto px-5 h-16 sm:h-[72px] flex items-center justify-between gap-4">
         <img src="/images/logo-adt-lp.png" alt="AD Telas e Redes" width="112" height="56" class="w-28 h-14 object-contain" fetchpriority="high" />
-        <a href="#orcamento-telas" class="lp-link text-sm font-bold" @click.prevent="quote('lp_header')">Pedir orçamento</a>
+        <a href="#orcamento-telas" class="lp-link text-sm font-bold" data-track-type="quote_cta" data-cta-location="lp_header" @click.prevent="quote('lp_header')">Pedir orçamento</a>
       </div>
     </header>
 
@@ -93,7 +93,7 @@ onUnmounted(() => visibilityObserver?.disconnect())
             <span class="inline-flex items-center gap-1.5"><Icon name="lucide:check" class="h-4 w-4" />Orçamento gratuito</span>
             <span class="inline-flex items-center gap-1.5"><Icon name="lucide:award" class="h-4 w-4" />Certificado INMETRO</span>
           </div>
-          <a id="lp-hero-quote" href="#orcamento-telas" class="lp-primary mt-4 sm:mt-5 w-full sm:w-auto" @click.prevent="quote('lp_hero')">Pedir orçamento gratuito</a>
+          <a id="lp-hero-quote" href="#orcamento-telas" class="lp-primary mt-4 sm:mt-5 w-full sm:w-auto" data-track-type="quote_cta" data-cta-location="lp_hero" @click.prevent="quote('lp_hero')">Pedir orçamento gratuito</a>
           <div class="mt-2 flex flex-col items-start">
             <a href="#lp-services" class="lp-link text-sm font-semibold underline underline-offset-4" @click.prevent="scrollTo('lp-services')">Ver modelos de telas ↓</a>
             <a :href="whatsappUrl" target="_blank" rel="noopener noreferrer" class="lp-link gap-2 text-sm font-semibold"><WhatsappIcon class="h-5 w-5" />Falar pelo WhatsApp</a>
@@ -152,7 +152,7 @@ onUnmounted(() => visibilityObserver?.disconnect())
     </footer>
 
     <div v-show="heroCtaPassed && !formVisible && !formFocused" class="lp-sticky sm:hidden fixed inset-x-0 bottom-0 border-t border-[#E5EDF8] bg-white px-4 pt-2 z-30" data-cta-location="lp_sticky">
-      <a href="#orcamento-telas" class="lp-primary w-full" @click.prevent="quote('lp_sticky')">Pedir orçamento gratuito</a>
+      <a href="#orcamento-telas" class="lp-primary w-full" data-track-type="quote_cta" data-cta-location="lp_sticky" @click.prevent="quote('lp_sticky')">Pedir orçamento gratuito</a>
     </div>
   </div>
 </template>

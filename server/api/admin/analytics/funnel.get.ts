@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
       const vTime = new Date(v.created_at).getTime()
       if (v.visitor_id && vTime >= activePeriodStartMs) {
         stageAllVisitors.add(v.visitor_id)
-        if (v.path && (v.path.startsWith('/servicos') || v.path.startsWith('/areas-atendidas'))) {
+        if (v.path && (v.path.startsWith('/servicos') || v.path.startsWith('/areas-atendidas') || v.path.startsWith('/lp'))) {
           stageServiceVisitors.add(v.visitor_id)
         }
       }

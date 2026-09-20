@@ -40,7 +40,8 @@ const activeMediaId = ref<string | null>(null)
 const {
   thumbnailCache,
   loadPhotoThumbnails,
-  retryPhotoThumbnail
+  retryPhotoThumbnail,
+  requestSignedUrl
 } = useLeadJourneyMedia(toRef(props, 'leadId'))
 
 async function fetchJourney(id: string) {
@@ -155,6 +156,51 @@ async function openMediaPreview(media: any) {
 function closeLightbox() {
   isLightboxOpen.value = false
   activeMediaId.value = null
+}
+
+// Seção Google Ads no Drawer
+const isGoogleAdsDetailsOpen = ref(true)
+const isCopiedGclid = ref(false)
+
+async function copyGclid(gclid?: string | null) {
+  if (!gclid) return
+  try {
+    await navigator.clipboard.writeText(gclid)
+    isCopiedGclid.value = true
+    setTimeout(() => {
+      isCopiedGclid.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Falha ao copiar GCLID', err)
+  }
+}
+
+function formatMatchType(type?: string | null) {
+  if (!type) return '-'
+  const lower = type.toLowerCase()
+  if (lower === 'e') return 'Exata (e)'
+  if (lower === 'p') return 'Frase (p)'
+  if (lower === 'b') return 'Ampla (b)'
+  return type
+}
+
+function formatNetwork(net?: string | null) {
+  if (!net) return '-'
+  const lower = net.toLowerCase()
+  if (lower === 'g') return 'Pesquisa Google (g)'
+  if (lower === 's') return 'Parceiros de Pesquisa (s)'
+  if (lower === 'd') return 'Rede de Display (d)'
+  if (lower === 'y') return 'YouTube (y)'
+  return net
+}
+
+function formatGoogleDevice(dev?: string | null) {
+  if (!dev) return '-'
+  const lower = dev.toLowerCase()
+  if (lower === 'm') return 'Mobile (m)'
+  if (lower === 'c') return 'Computador (c)'
+  if (lower === 't') return 'Tablet (t)'
+  return dev
 }
 </script>
 
@@ -271,13 +317,154 @@ function closeLightbox() {
         <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
           <div class="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Origem / Canal</span>
-            <span class="text-xs font-semibold text-slate-200 block truncate">{{ journeyData.attribution?.channel || journeyData.attribution?.first_touch?.channel || 'Direto' }}</span>
+            <span class="text-xs font-semibold text-slate-200 block truncate">{{ journeyData.attribution?.session_touch?.channel || journeyData.attribution?.channel || journeyData.attribution?.first_touch?.channel || 'Direto' }}</span>
             <span class="text-[10px] text-slate-400 truncate block mt-0.5">{{ journeyData.attribution?.landingPath || journeyData.lead.landing_path || '/' }}</span>
           </div>
           <div class="p-3 sm:p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
             <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Serviço Solicitado</span>
             <span class="text-xs font-semibold text-indigo-400 block truncate">{{ journeyData.lead.servico || 'Não especificado' }}</span>
             <span class="text-[10px] text-slate-400 truncate block mt-0.5">{{ [journeyData.lead.bairro, journeyData.lead.cidade].filter(Boolean).join(', ') || 'SP' }}</span>
+          </div>
+        </div>
+
+        <!-- SEÇÃO COLAPSÁVEL: ORIGEM GOOGLE ADS & TELEMETRIA -->
+        <div class="rounded-2xl bg-white/[0.02] border border-indigo-500/20 overflow-hidden">
+          <button 
+            type="button"
+            @click="isGoogleAdsDetailsOpen = !isGoogleAdsDetailsOpen"
+            class="w-full p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left hover:bg-white/[0.02] transition-colors cursor-pointer"
+          >
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
+                <Icon name="lucide:target" class="w-4 h-4 text-indigo-400" />
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold text-white">Origem Google Ads</span>
+                  <span 
+                    v-if="journeyData.lead.gclid || journeyData.attribution?.session_touch?.gclid || journeyData.lead.gbraid || journeyData.lead.wbraid" 
+                    class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1"
+                  >
+                    <Icon name="lucide:check" class="w-3 h-3" />
+                    {{ journeyData.lead.gclid ? 'GCLID capturado ✓' : journeyData.lead.gbraid ? 'GBRAID capturado ✓' : 'WBRAID capturado ✓' }}
+                  </span>
+                  <span 
+                    v-else 
+                    class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400 border border-slate-500/20"
+                  >
+                    Click ID não disponível
+                  </span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">
+                  {{ journeyData.lead.utm_campaign || journeyData.attribution?.session_touch?.utm_campaign || 'Campanha não identificada' }}
+                </p>
+              </div>
+            </div>
+
+            <Icon 
+              :name="isGoogleAdsDetailsOpen ? 'lucide:chevron-up' : 'lucide:chevron-down'" 
+              class="w-4 h-4 text-slate-400 shrink-0" 
+            />
+          </button>
+
+          <div v-if="isGoogleAdsDetailsOpen" class="p-3.5 sm:p-4 pt-0 border-t border-white/[0.04] space-y-3 mt-1">
+            <!-- Click ID & Botão Copiar com 1 Clique -->
+            <div 
+              v-if="journeyData.lead.gclid || journeyData.attribution?.session_touch?.gclid"
+              class="p-2.5 rounded-xl bg-black/40 border border-white/[0.06] flex items-center justify-between gap-2"
+            >
+              <div class="min-w-0 flex-1">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">GCLID Oficial</span>
+                <span class="text-xs font-mono text-emerald-400 truncate block select-all">
+                  {{ journeyData.lead.gclid || journeyData.attribution?.session_touch?.gclid }}
+                </span>
+              </div>
+              <button
+                type="button"
+                @click="copyGclid(journeyData.lead.gclid || journeyData.attribution?.session_touch?.gclid)"
+                class="px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                :class="isCopiedGclid ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-white/10 hover:bg-white/15 text-slate-200 border border-white/10'"
+              >
+                <Icon :name="isCopiedGclid ? 'lucide:check' : 'lucide:copy'" class="w-3.5 h-3.5" />
+                <span>{{ isCopiedGclid ? 'Copiado!' : 'Copiar' }}</span>
+              </button>
+            </div>
+
+            <!-- Grid de Detalhes ValueTrack -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Campanha</span>
+                <span class="text-xs font-semibold text-white truncate block mt-0.5">
+                  {{ journeyData.lead.utm_campaign || journeyData.attribution?.session_touch?.utm_campaign || '-' }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">ID da Campanha</span>
+                <span class="text-xs font-mono text-indigo-300 truncate block mt-0.5">
+                  {{ journeyData.lead.google_campaign_id || journeyData.attribution?.session_touch?.google_campaign_id || '-' }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">ID Grupo Anúncio</span>
+                <span class="text-xs font-mono text-indigo-300 truncate block mt-0.5">
+                  {{ journeyData.lead.google_adgroup_id || journeyData.attribution?.session_touch?.google_adgroup_id || '-' }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Palavra-chave Google Ads</span>
+                <span class="text-xs font-mono text-amber-300 truncate block mt-0.5">
+                  {{ journeyData.lead.utm_term || journeyData.attribution?.session_touch?.utm_term || '-' }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">ID do Criativo</span>
+                <span class="text-xs font-mono text-slate-300 truncate block mt-0.5">
+                  {{ journeyData.lead.google_creative_id || journeyData.attribution?.session_touch?.google_creative_id || '-' }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Correspondência</span>
+                <span class="text-xs font-medium text-slate-300 truncate block mt-0.5">
+                  {{ formatMatchType(journeyData.lead.google_match_type || journeyData.attribution?.session_touch?.google_match_type) }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Rede Google</span>
+                <span class="text-xs font-medium text-slate-300 truncate block mt-0.5">
+                  {{ formatNetwork(journeyData.lead.google_network || journeyData.attribution?.session_touch?.google_network) }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Dispositivo Google</span>
+                <span class="text-xs font-medium text-slate-300 truncate block mt-0.5">
+                  {{ formatGoogleDevice(journeyData.lead.google_device || journeyData.attribution?.session_touch?.google_device) }}
+                </span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Dispositivo Usuário</span>
+                <span class="text-xs font-medium text-slate-300 truncate block mt-0.5">
+                  {{ journeyData.lead.device_type || journeyData.attribution?.session_touch?.device_type || '-' }}
+                </span>
+              </div>
+
+              <div 
+                v-if="journeyData.lead.google_target_id || journeyData.attribution?.session_touch?.google_target_id" 
+                class="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] col-span-2 sm:col-span-3"
+              >
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Google Target ID</span>
+                <span class="text-xs font-mono text-cyan-300 truncate block mt-0.5">
+                  {{ journeyData.lead.google_target_id || journeyData.attribution?.session_touch?.google_target_id }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -329,7 +516,7 @@ function closeLightbox() {
                   <!-- Thumbnail Imagem Real -->
                   <img
                     v-else-if="thumbnailCache[m.id]?.url"
-                    :src="thumbnailCache[m.id].url"
+                    :src="thumbnailCache[m.id]!.url"
                     :alt="m.safe_filename || 'Foto do Lead'"
                     loading="lazy"
                     decoding="async"

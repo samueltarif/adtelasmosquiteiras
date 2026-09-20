@@ -16,6 +16,7 @@ import DataQualityCard from '../../components/admin/DataQualityCard.vue'
 import AcquisitionSection from '../../components/admin/AcquisitionSection.vue'
 import ServicesSection from '../../components/admin/ServicesSection.vue'
 import CommercialFunnel from '../../components/admin/CommercialFunnel.vue'
+import GoogleAdsSection from '../../components/admin/GoogleAdsSection.vue'
 
 definePageMeta({ layout: 'admin' })
 
@@ -33,12 +34,14 @@ const {
   services,
   funnel,
   recentActivity,
+  googleAds,
   isLoadingOverview,
   isLoadingAcquisition,
   isLoadingPages,
   isLoadingServices,
   isLoadingFunnel,
   isLoadingActivity,
+  isLoadingGoogleAds,
   fetchAll
 } = useAdminAnalytics()
 
@@ -97,7 +100,7 @@ onMounted(() => {
 
       <!-- RADIX/SHADCN TABS NAVIGATION (2x2 Grid on Mobile, Flex on Desktop) -->
       <Tabs v-model="activeTab" class="w-full">
-        <TabsList class="grid grid-cols-2 lg:flex lg:w-auto h-auto p-1.5 gap-1.5 w-full">
+        <TabsList class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:w-auto h-auto p-1.5 gap-1.5 w-full">
           <TabsTrigger value="overview" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:layout-grid" class="w-4 h-4 shrink-0" />
             <span>Visão Geral</span>
@@ -116,6 +119,11 @@ onMounted(() => {
           <TabsTrigger value="funnel" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:filter" class="w-4 h-4 shrink-0" />
             <span>Funil Comercial</span>
+          </TabsTrigger>
+
+          <TabsTrigger value="google-ads" class="gap-2 justify-center py-2 text-xs w-full">
+            <Icon name="lucide:target" class="w-4 h-4 shrink-0 text-indigo-400" />
+            <span>Google Ads</span>
           </TabsTrigger>
         </TabsList>
 
@@ -244,7 +252,8 @@ onMounted(() => {
 
             <DataQualityCard 
               :quality="overview?.data_quality || null"
-              :loading="isLoadingOverview"
+              :google-ads-quality="googleAds?.data_quality || null"
+              :loading="isLoadingOverview || isLoadingGoogleAds"
             />
           </div>
 
@@ -277,6 +286,14 @@ onMounted(() => {
           <CommercialFunnel 
             :funnel-data="funnel" 
             :loading="isLoadingFunnel"
+          />
+        </TabsContent>
+
+        <!-- TAB 5: GOOGLE ADS -->
+        <TabsContent value="google-ads" class="mt-4">
+          <GoogleAdsSection 
+            :data="googleAds" 
+            :loading="isLoadingGoogleAds" 
           />
         </TabsContent>
       </Tabs>

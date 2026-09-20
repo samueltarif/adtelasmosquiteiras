@@ -8,6 +8,9 @@ export default defineNuxtPlugin(() => {
   const identity = useAnalyticsIdentity()
   const attribution = useAttribution()
 
+  let lastClickTime = 0
+  let lastClickKey = ''
+
   function getCtaLocation(target: HTMLElement): string {
     // 1. Explicit data-cta-location attribute on target or closest ancestor
     const explicitLocation = target.closest('[data-cta-location]')?.getAttribute('data-cta-location')
@@ -50,19 +53,24 @@ export default defineNuxtPlugin(() => {
   }
 
   document.addEventListener('click', (e) => {
-    const target = (e.target as HTMLElement)?.closest('a, button') as HTMLElement | null
+    const target = (e.target as HTMLElement)?.closest('a, button, [data-track-type]') as HTMLElement | null
     if (!target) return
 
     const href = target.getAttribute('href') || ''
     const text = (target.textContent || '').toLowerCase().trim()
     const gtm = target.getAttribute('data-gtm') || ''
+    const trackType = target.getAttribute('data-track-type') || target.closest('[data-track-type]')?.getAttribute('data-track-type') || ''
     const path = window.location.pathname
     if (path.startsWith('/admin')) return
 
     let tipo = ''
 
-    // 1. Links de WhatsApp (wa.me ou api.whatsapp.com ou whatsapp no text/gtm)
-    if (
+    // 1. Atributo declarativo explícito (ex: data-track-type="quote_cta")
+    if (trackType === 'quote_cta') {
+      tipo = 'quote_cta'
+    }
+    // 2. Links de WhatsApp (wa.me ou api.whatsapp.com ou whatsapp no text/gtm)
+    else if (
       href.includes('wa.me') || 
       href.includes('whatsapp.com') || 
       href.includes('whatsapp') || 
@@ -71,23 +79,33 @@ export default defineNuxtPlugin(() => {
     ) {
       tipo = 'whatsapp'
     }
-    // 2. Links de telefone (tel:)
+    // 3. Links de telefone (tel:)
     else if (href.startsWith('tel:')) {
       tipo = 'telefone'
     }
-    // 3. Links para a página de contato ou orçamento (CTAs internos)
+    // 4. Links para a página de contato ou orçamento (CTAs internos)
     else if (href.includes('/contato') || href.includes('/orcamento')) {
       tipo = 'internal_cta'
     }
 
     // Se identificou um tipo de clique de intenção de contato rastreável, grava
     if (tipo) {
+      const now = Date.now()
+      const ctaLocation = getCtaLocation(target)
+      const dedupeKey = `${tipo}:${ctaLocation}:${path}`
+
+      // Trava de deduplicação de 700ms para cliques repetidos acidentais
+      if (dedupeKey === lastClickKey && (now - lastClickTime) < 700) {
+        return
+      }
+      lastClickKey = dedupeKey
+      lastClickTime = now
+
       const visitorId = identity.getOrCreateVisitorId()
       const { sessionId } = identity.getOrCreateSessionId(path)
       const landingPath = identity.getSessionLandingPath(path)
       const attr = attribution.getOrInitAttribution()
       const eventId = identity.generateUUID()
-      const ctaLocation = getCtaLocation(target)
       const { serviceKey, serviceName } = getServiceContext(target, e.target as HTMLElement)
 
       $fetch('/api/track-click', {
@@ -107,6 +125,13 @@ export default defineNuxtPlugin(() => {
           utm_campaign: attr.utm_campaign,
           utm_content: attr.utm_content,
           utm_term: attr.utm_term,
+          google_campaign_id: attr.campaign_id || null,
+          google_adgroup_id: attr.adgroup_id || null,
+          google_creative_id: attr.creative || null,
+          google_match_type: attr.matchtype || null,
+          google_network: attr.network || null,
+          google_device: attr.device || null,
+          google_target_id: attr.target_id || null,
           gclid: attr.gclid,
           gbraid: attr.gbraid,
           wbraid: attr.wbraid,
