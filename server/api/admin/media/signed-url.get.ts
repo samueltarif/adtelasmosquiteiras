@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig()
   const query = getQuery(event)
-  const mediaId = (query.media_id || query.mediaId) as string
-  const leadId = (query.lead_id || query.leadId as string) || null
+  const mediaId = typeof query.media_id === 'string' ? query.media_id : (typeof query.mediaId === 'string' ? query.mediaId : '')
+  const leadId = typeof query.lead_id === 'string' ? query.lead_id : (typeof query.leadId === 'string' ? query.leadId : null)
 
   if (!mediaId) {
     throw createError({ statusCode: 400, message: 'media_id é obrigatório' })

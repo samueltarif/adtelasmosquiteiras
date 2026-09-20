@@ -61,10 +61,10 @@ export default defineEventHandler(async (event) => {
 
   // 4. Validação de media_type e mime_type
   const typeCheck = validateMediaTypeAndMime(media_type, mime_type)
-  if (!typeCheck.valid) {
+  if (!typeCheck.valid || !typeCheck.mimeType || !typeCheck.mediaType) {
     throw createError({
       statusCode: 400,
-      message: typeCheck.error
+      message: typeCheck.error || 'Tipo de mídia inválido'
     })
   }
 

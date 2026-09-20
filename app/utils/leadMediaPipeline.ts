@@ -135,6 +135,7 @@ export async function runConcurrentLeadUploads(
   const enqueue = (): Promise<void> => {
     if (currentIndex >= itemsToUpload.length) return Promise.resolve()
     const item = itemsToUpload[currentIndex++]
+    if (!item) return Promise.resolve()
 
     item.status = 'waiting'
     const p = uploadSingleLeadMedia(item, uploadToken, signal)

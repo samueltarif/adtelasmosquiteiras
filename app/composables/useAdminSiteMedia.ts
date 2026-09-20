@@ -26,7 +26,7 @@ export function useAdminSiteMedia() {
   })
 
   const currentService = computed(() => {
-    return ALL_SERVICES_MAP[selectedServiceKey.value] || {
+    return (ALL_SERVICES_MAP as Record<string, any>)[selectedServiceKey.value] || {
       key: selectedServiceKey.value,
       name: selectedServiceKey.value,
       family: selectedFamilyId.value
@@ -36,7 +36,7 @@ export function useAdminSiteMedia() {
   const currentServiceName = computed(() => currentService.value.name)
 
   watch(selectedServiceKey, (newKey) => {
-    const info = ALL_SERVICES_MAP[newKey]
+    const info = (ALL_SERVICES_MAP as Record<string, any>)[newKey]
     if (info && info.family !== selectedFamilyId.value) {
       selectedFamilyId.value = info.family as any
     }
@@ -48,7 +48,7 @@ export function useAdminSiteMedia() {
     const family = SERVICE_FAMILIES.find((f) => f.id === familyId)
     if (family && family.services.length > 0) {
       const alreadyInFamily = family.services.some((s) => s.key === selectedServiceKey.value)
-      if (!alreadyInFamily) {
+      if (!alreadyInFamily && family.services[0]) {
         selectedServiceKey.value = family.services[0].key
       }
     }
@@ -138,6 +138,8 @@ export function useAdminSiteMedia() {
 
     const currentItem = mediaList.value[currentIndex]
     const targetItem = mediaList.value[targetIndex]
+    if (!currentItem || !targetItem) return
+
     const newCurrentOrder = targetItem.sort_order
     const newTargetOrder = currentItem.sort_order
     const finalCurrentOrder = newCurrentOrder === newTargetOrder ? (direction === 'up' ? Math.max(0, newCurrentOrder - 1) : newCurrentOrder + 1) : newCurrentOrder

@@ -106,8 +106,10 @@ export function useLightboxZoom(
       isPinching.value = true
       isDragging.value = false
       const [p1, p2] = Array.from(activePointers.values())
-      initialPinchDistance = getDistance(p1, p2)
-      initialPinchScale = scale.value
+      if (p1 && p2) {
+        initialPinchDistance = getDistance(p1, p2)
+        initialPinchScale = scale.value
+      }
     }
   }
 
@@ -117,11 +119,13 @@ export function useLightboxZoom(
 
     if (isPinching.value && activePointers.size === 2) {
       const [p1, p2] = Array.from(activePointers.values())
-      const currentDist = getDistance(p1, p2)
-      const center = getCenter(p1, p2)
-      if (initialPinchDistance > 0) {
-        const ratio = currentDist / initialPinchDistance
-        setZoom(initialPinchScale * ratio, center.x, center.y)
+      if (p1 && p2) {
+        const currentDist = getDistance(p1, p2)
+        const center = getCenter(p1, p2)
+        if (initialPinchDistance > 0) {
+          const ratio = currentDist / initialPinchDistance
+          setZoom(initialPinchScale * ratio, center.x, center.y)
+        }
       }
     } else if (isDragging.value && activePointers.size === 1) {
       const dx = e.clientX - lastPointerPos.x
@@ -142,7 +146,9 @@ export function useLightboxZoom(
       if (scale.value > 1) {
         isDragging.value = true
         const remaining = Array.from(activePointers.values())[0]
-        lastPointerPos = { x: remaining.x, y: remaining.y }
+        if (remaining) {
+          lastPointerPos = { x: remaining.x, y: remaining.y }
+        }
       }
     }
   }

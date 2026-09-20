@@ -153,7 +153,7 @@ onMounted(() => {
         <button
           v-for="family in SERVICE_FAMILIES"
           :key="family.id"
-          @click="setFamily(family.id)"
+          @click="setFamily(family.id as 'telas' | 'redes' | 'vidracaria')"
           class="flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all min-h-[44px] cursor-pointer"
           :class="selectedFamilyId === family.id ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'"
         >

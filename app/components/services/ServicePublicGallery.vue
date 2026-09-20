@@ -88,11 +88,13 @@ const remainingCount = computed(() => {
       <!-- ---------------------------------------------------- -->
       <!-- CASO 1: EXATAMENTE 1 MÍDIA CADASTRADA -->
       <!-- ---------------------------------------------------- -->
-      <div v-if="visibleMediaList.length === 1" class="max-w-3xl mx-auto">
+      <!-- CASO 1: APENAS 1 MÍDIA CADASTRADA (HERO CARD) -->
+      <!-- ---------------------------------------------------- -->
+      <div v-if="visibleMediaList.length === 1 && visibleMediaList[0]" class="max-w-3xl mx-auto">
         <div
           role="button"
           tabindex="0"
-          :aria-label="`Ver foto ampliada: ${visibleMediaList[0].alt_text}`"
+          :aria-label="`Ver foto ampliada: ${visibleMediaList[0]?.alt_text}`"
           @click="openLightbox(0)"
           @keydown.enter="openLightbox(0)"
           @keydown.space.prevent="openLightbox(0)"
@@ -101,21 +103,21 @@ const remainingCount = computed(() => {
           <div class="relative aspect-video sm:aspect-16/10 bg-slate-900 overflow-hidden">
             <!-- Foto -->
             <img
-              v-if="visibleMediaList[0].media_type === 'photo'"
-              :src="visibleMediaList[0].publicUrl"
-              :alt="visibleMediaList[0].alt_text || 'Instalação realizada'"
-              :width="visibleMediaList[0].width || 1280"
-              :height="visibleMediaList[0].height || 720"
+              v-if="visibleMediaList[0]?.media_type === 'photo'"
+              :src="visibleMediaList[0]?.publicUrl"
+              :alt="visibleMediaList[0]?.alt_text || 'Instalação realizada'"
+              :width="visibleMediaList[0]?.width || 1280"
+              :height="visibleMediaList[0]?.height || 720"
               loading="lazy"
               decoding="async"
               class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-              @error="onImageError(visibleMediaList[0].id)"
+              @error="visibleMediaList[0] && onImageError(visibleMediaList[0].id)"
             />
 
             <!-- Vídeo Preview -->
             <div v-else class="relative w-full h-full">
               <video
-                :src="visibleMediaList[0].publicUrl"
+                :src="visibleMediaList[0]?.publicUrl"
                 preload="metadata"
                 muted
                 playsinline
@@ -139,17 +141,17 @@ const remainingCount = computed(() => {
 
           <!-- Legenda e Título sob a imagem -->
           <div
-            v-if="visibleMediaList[0].title || visibleMediaList[0].caption || visibleMediaList[0].alt_text"
+            v-if="visibleMediaList[0]?.title || visibleMediaList[0]?.caption || visibleMediaList[0]?.alt_text"
             class="p-4 sm:p-5 bg-white border-t border-[#E5EDF8]"
           >
-            <h3 v-if="visibleMediaList[0].title" class="text-base font-bold text-[#22345F] mb-1">
-              {{ visibleMediaList[0].title }}
+            <h3 v-if="visibleMediaList[0]?.title" class="text-base font-bold text-[#22345F] mb-1">
+              {{ visibleMediaList[0]?.title }}
             </h3>
-            <p v-if="visibleMediaList[0].caption" class="text-sm text-gray-600 leading-relaxed">
-              {{ visibleMediaList[0].caption }}
+            <p v-if="visibleMediaList[0]?.caption" class="text-sm text-gray-600 leading-relaxed">
+              {{ visibleMediaList[0]?.caption }}
             </p>
-            <p v-else class="text-xs text-gray-500">
-              {{ visibleMediaList[0].alt_text }}
+            <p v-else-if="visibleMediaList[0]?.alt_text" class="text-xs text-gray-500">
+              {{ visibleMediaList[0]?.alt_text }}
             </p>
           </div>
         </div>

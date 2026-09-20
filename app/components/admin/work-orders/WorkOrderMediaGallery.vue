@@ -46,8 +46,9 @@ const tabCounts = computed(() => {
     laudo: 0
   }
   for (const m of props.media) {
-    if (counts[m.etapa] !== undefined) {
-      counts[m.etapa]++
+    const current = counts[m.etapa]
+    if (current !== undefined) {
+      counts[m.etapa] = current + 1
     }
   }
   return counts

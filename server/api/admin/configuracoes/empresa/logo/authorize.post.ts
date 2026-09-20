@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const mimeType = body.mime_type || body.mimeType
   const fileSize = parseInt(body.file_size_bytes || body.fileSizeBytes, 10)
 
-  if (!mimeType || !ALLOWED_MIME_TYPES.includes(mimeType)) {
+  if (!mimeType || !ALLOWED_MIME_TYPES.photo.includes(mimeType)) {
     throw createError({
       statusCode: 400,
       message: 'Formato de imagem inválido. Formatos aceitos: JPEG, PNG, WebP.'
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Gera storage_key padronizada e segura no prefixo branding/company/
-  const ext = MIME_TO_EXT[mimeType] || 'png'
+  const ext = (MIME_TO_EXT as Record<string, string>)[mimeType] || 'png'
   const timestamp = Date.now()
   const randomSuffix = Math.random().toString(36).substring(2, 8)
   const storageKey = `branding/company/logo_${timestamp}_${randomSuffix}.${ext}`

@@ -67,7 +67,7 @@ export function useLeadMediaUploadQueue(props: {
     const idx = mediaItems.value.findIndex(m => m.id === id)
     if (idx !== -1) {
       const item = mediaItems.value[idx]
-      if (item.previewUrl) {
+      if (item?.previewUrl) {
         try { URL.revokeObjectURL(item.previewUrl) } catch {}
       }
       mediaItems.value.splice(idx, 1)

@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Chave de armazenamento inválida.' })
   }
 
-  if (!mimeType || !ALLOWED_MIME_TYPES.includes(mimeType)) {
+  if (!mimeType || !ALLOWED_MIME_TYPES.photo.includes(mimeType)) {
     throw createError({ statusCode: 400, message: 'Formato MIME inválido.' })
   }
 
@@ -44,8 +44,8 @@ export default defineEventHandler(async (event) => {
 
   // 2. Valida magic bytes reais do buffer no R2
   const buffer = await getSiteObjectMagicBytes(storageKey)
-  const magicCheck = validateSiteMediaMagicBytes(buffer, mimeType)
-  if (!magicCheck.valid) {
+  const isMagicValid = validateSiteMediaMagicBytes(buffer, mimeType)
+  if (!isMagicValid) {
     await deleteSiteObjectFromR2(storageKey).catch(() => {})
     throw createError({ statusCode: 400, message: 'Assinatura binária do arquivo incompatível com a extensão.' })
   }

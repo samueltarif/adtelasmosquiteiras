@@ -63,10 +63,11 @@ export function useLeadJourneyMedia(leadIdRef: Ref<string | null>) {
     await Promise.allSettled(
       photos.map(async (photo) => {
         const url = await requestSignedUrl(photo.id)
-        if (url && thumbnailCache.value[photo.id]) {
-          thumbnailCache.value[photo.id].url = url
-          thumbnailCache.value[photo.id].loading = false
-          thumbnailCache.value[photo.id].error = false
+        const item = thumbnailCache.value[photo.id]
+        if (url && item) {
+          item.url = url
+          item.loading = false
+          item.error = false
         }
       })
     )

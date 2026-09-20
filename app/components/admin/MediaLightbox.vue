@@ -90,6 +90,12 @@ async function loadMediaUrl(mediaId: string) {
   }
 }
 
+function handleImageError() {
+  isImageLoading.value = false
+  hasError.value = true
+  errorMessage.value = 'Falha ao renderizar a mídia selecionada.'
+}
+
 function prevMedia() {
   if (!hasPrev.value) return
   currentIndex.value--

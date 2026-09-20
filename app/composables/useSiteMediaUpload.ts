@@ -77,8 +77,8 @@ export function useSiteMediaUpload(
           const compressed = await compressImage(item.file, { maxWidth: 1920, format: 'image/webp', quality: 0.85 })
           finalBlob = compressed.blob
           finalMime = compressed.type || 'image/webp'
-          finalWidth = compressed.width || null
-          finalHeight = compressed.height || null
+          finalWidth = (compressed as any).width || null
+          finalHeight = (compressed as any).height || null
           item.finalSize = compressed.size
         } catch {
           finalBlob = item.file
@@ -162,7 +162,10 @@ export function useSiteMediaUpload(
   function removeQueueItem(id: string) {
     const index = uploadQueue.value.findIndex((i) => i.id === id)
     if (index !== -1) {
-      try { URL.revokeObjectURL(uploadQueue.value[index].previewUrl) } catch {}
+      const item = uploadQueue.value[index]
+      if (item?.previewUrl) {
+        try { URL.revokeObjectURL(item.previewUrl) } catch {}
+      }
       uploadQueue.value.splice(index, 1)
     }
   }
