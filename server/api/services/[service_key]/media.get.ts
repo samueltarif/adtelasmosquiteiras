@@ -1,4 +1,5 @@
 import { validateServiceKey, buildPublicMediaUrl } from '../../../utils/r2SiteStorage'
+import { getLocalMediaForService } from '../../../shared/localServiceMediaCatalog.mjs'
 
 /**
  * ======================================================================
@@ -11,7 +12,7 @@ import { validateServiceKey, buildPublicMediaUrl } from '../../../utils/r2SiteSt
  *
  * REGRAS DE SEGURANÇA E PERFORMANCE:
  * 1. Valida service_key canônica contra allowlist estrita (404 se inválida).
- * 2. Retorna apenas registros com is_active = true.
+ * 2. Retorna registros com is_active = true e cataloga mídias locais canônicas.
  * 3. Ordenação canônica: is_featured DESC, sort_order ASC, created_at ASC.
  * 4. Sanitização total: NUNCA expõe created_by ou dados administrativos internos.
  * 5. Cache HTTP otimizado com stale-while-revalidate.
@@ -31,12 +32,16 @@ export default defineEventHandler(async (event) => {
   // Cache HTTP público balanceado (60s browser, 300s edge CDN, 600s stale)
   setHeader(event, 'Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600')
 
+  const localMedia = getLocalMediaForService(serviceKey)
   const config = useRuntimeConfig()
+
   if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
-    throw createError({
-      statusCode: 500,
-      message: 'Configuração de banco de dados indisponível'
-    })
+    return {
+      success: true,
+      serviceKey,
+      count: localMedia.length,
+      media: localMedia
+    }
   }
 
   const dbHeaders = {
@@ -66,17 +71,33 @@ export default defineEventHandler(async (event) => {
       publicUrl: buildPublicMediaUrl(config.public?.r2SiteMediaPublicBaseUrl, rec.storage_key)
     }))
 
+    const combined = [...formatted]
+    for (const item of localMedia) {
+      if (!combined.some(c => c.storage_key === item.storage_key || c.publicUrl === item.publicUrl)) {
+        combined.push(item)
+      }
+    }
+
+    combined.sort((a, b) => {
+      if (a.is_featured && !b.is_featured) return -1
+      if (!a.is_featured && b.is_featured) return 1
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0)
+    })
+
     return {
       success: true,
       serviceKey,
-      count: formatted.length,
-      media: formatted
+      count: combined.length,
+      media: combined
     }
   } catch (err: any) {
-    console.error(`Erro ao consultar mídias públicas do serviço ${serviceKey}:`, err?.message || err)
-    throw createError({
-      statusCode: 500,
-      message: 'Falha ao consultar galeria de mídias do serviço'
-    })
+    console.warn(`Aviso: Falha ao consultar Supabase para ${serviceKey}, utilizando catálogo local:`, err?.message || err)
+    return {
+      success: true,
+      serviceKey,
+      count: localMedia.length,
+      media: localMedia
+    }
   }
 })
+

@@ -15,6 +15,7 @@ const local = computed<PublicMediaItem[]>(() => props.service.gallery.map((image
   width: image.width, height: image.height, file_size_bytes: 0, created_at: '', publicUrl: image.src
 })))
 const media = computed(() => (registered.value.length ? registered.value : local.value).filter(item => !broken.value.includes(item.id)))
+const hasVideo = computed(() => media.value.some(m => m.media_type === 'video'))
 const preview = computed(() => media.value.slice(0,5))
 const expanded = ref(false)
 const selected = ref(0)
@@ -33,11 +34,38 @@ async function close() {
 <template>
   <section v-if="media.length" id="projetos" class="td-section td-tint">
     <div class="td-wrap">
-      <div class="td-section-heading"><div><p class="td-eyebrow">{{ registered.length ? 'Galeria de instalações' : 'Galeria de modelos e aplicações' }}</p><h2>{{ service.name }}</h2><p>{{ registered.length ? 'Veja trabalhos cadastrados pela nossa equipe.' : 'Veja detalhes e exemplos de aplicação deste serviço.' }}</p></div><button class="td-button td-outline" @click="open(0,$event)">Ampliar fotos <Icon name="lucide:expand" /></button></div>
+      <div class="td-section-heading">
+        <div>
+          <p class="td-eyebrow">
+            {{ hasVideo ? 'Galeria de fotos e vídeos' : (registered.length ? 'Galeria de instalações' : 'Galeria de modelos e aplicações') }}
+          </p>
+          <h2>{{ service.name }}</h2>
+          <p>
+            {{ hasVideo ? 'Veja vídeos e fotos de instalações reais realizadas pela nossa equipe.' : (registered.length ? 'Veja trabalhos cadastrados pela nossa equipe.' : 'Veja detalhes e exemplos de aplicação deste serviço.') }}
+          </p>
+        </div>
+        <button class="td-button td-outline" @click="open(0,$event)">
+          Ver galeria <Icon name="lucide:expand" />
+        </button>
+      </div>
       <div class="td-mosaic" :data-count="preview.length" :class="{ 'td-mosaic-single': preview.length === 1 }">
         <button v-for="(item,index) in preview" :key="item.id" class="td-project" :aria-label="`Ampliar: ${item.alt_text}`" @click="open(index,$event)">
           <img v-if="item.media_type === 'photo'" :src="item.publicUrl" :alt="item.alt_text" :width="item.width || 800" :height="item.height || 600" loading="lazy" decoding="async" @error="broken.push(item.id)" />
-          <span v-else class="td-video-placeholder"><Icon name="lucide:play" /> Ver vídeo da instalação</span>
+          <div v-else class="relative w-full h-full">
+            <video
+              :src="item.publicUrl"
+              preload="metadata"
+              muted
+              playsinline
+              class="w-full h-full object-cover pointer-events-none"
+            ></video>
+            <div class="absolute inset-0 bg-black/35 flex items-center justify-center">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#22345F]/90 text-white text-xs font-semibold shadow-lg backdrop-blur-xs border border-white/20">
+                <Icon name="lucide:play" class="w-4 h-4 fill-white" />
+                <span>Assistir vídeo</span>
+              </span>
+            </div>
+          </div>
           <span class="td-project-caption"><strong>{{ item.title || item.alt_text }}</strong><small v-if="item.caption">{{ item.caption }}</small></span>
         </button>
       </div>

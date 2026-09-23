@@ -35,6 +35,8 @@ const visibleMediaList = computed(() => {
   return mediaList.value.filter((m) => !brokenMap.value[m.id])
 })
 
+const hasVideos = computed(() => visibleMediaList.value.some((m) => m.media_type === 'video'))
+
 // Estado do Lightbox
 const isLightboxOpen = ref(false)
 const selectedMediaIndex = ref(0)
@@ -71,8 +73,8 @@ const remainingCount = computed(() => {
       <!-- CABEÇALHO DA SEÇÃO (Linguagem natural para clientes) -->
       <div class="max-w-3xl mb-8 sm:mb-10">
         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#22345F]/10 text-[#22345F] mb-3">
-          <Icon name="lucide:camera" class="w-3.5 h-3.5 text-[#F49A1A]" />
-          <span>Galeria de Fotos Reais</span>
+          <Icon :name="hasVideos ? 'lucide:film' : 'lucide:camera'" class="w-3.5 h-3.5 text-[#F49A1A]" />
+          <span>{{ hasVideos ? 'Galeria de Fotos e Vídeos Reais' : 'Galeria de Fotos Reais' }}</span>
         </div>
         <h2
           id="gallery-section-title"
@@ -81,7 +83,7 @@ const remainingCount = computed(() => {
           Instalações realizadas
         </h2>
         <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
-          Veja alguns exemplos dos nossos serviços executados com acabamento de alto padrão e materiais certificados.
+          {{ hasVideos ? 'Veja vídeos e fotos dos nossos serviços executados com acabamento de alto padrão e materiais certificados.' : 'Veja alguns exemplos dos nossos serviços executados com acabamento de alto padrão e materiais certificados.' }}
         </p>
       </div>
 

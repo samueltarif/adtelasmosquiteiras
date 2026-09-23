@@ -1,5 +1,7 @@
 <script setup>
+import { computed, ref, onMounted } from 'vue'
 import { useServicos } from '~/composables/useServicos'
+import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
 
 const route = useRoute()
 const { getServicoBySlug, getWhatsAppUrl, GOOGLE_REVIEWS_URL } = useServicos()
@@ -15,6 +17,26 @@ const servico = getServicoBySlug(
 if (!servico) {
   navigateTo('/servicos')
 }
+
+const canonicalServiceKey = computed(() => {
+  const f = String(route.params.familia || '')
+  const s = String(route.params.servico || '')
+  if (f === 'telas') {
+    if (s === 'janelas') return 'telas_janelas'
+    if (s === 'portas') return 'telas_portas'
+    if (s === 'sacadas' || s === 'varandas') return 'telas_sacadas'
+    if (s === 'removivel') return 'telas_removiveis'
+    if (s === 'restaurantes') return 'telas_restaurantes'
+    if (s === 'pets' || s === 'pet-screen') return 'pet_screen'
+  } else if (f === 'redes') {
+    if (s === 'janelas') return 'redes_janelas'
+    if (s === 'sacadas' || s === 'varandas') return 'redes_sacadas'
+    if (s === 'escadas' || s === 'mezaninos') return 'redes_escadas'
+    if (s === 'criancas') return 'redes_criancas'
+    if (s === 'gatos' || s === 'cachorros' || s === 'animais') return 'redes_pets'
+  }
+  return null
+})
 
 useHead({
   title: servico.metaTitle,
@@ -217,6 +239,10 @@ const openFormModal = () => { showFormModal.value = true }
       </div>
     </section>
 
+    <!-- Galeria Pública de Mídias Reais do Serviço -->
+    <Suspense v-if="canonicalServiceKey">
+      <ServicePublicGallery :service-key="canonicalServiceKey" />
+    </Suspense>
 
     <!-- ============================================ -->
     <!-- 3. ESPECIFICAÇÕES TÉCNICAS -->

@@ -25,7 +25,7 @@
 .telas-detail .td-header { background:var(--td-navy); color:white; }
 .telas-detail .td-header-inner { min-height:68px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .telas-detail .td-logo { display:flex; align-items:center; gap:8px; color:white; font-size:13px; font-weight:800; line-height:1.2; }
-.telas-detail .td-logo img { width:74px; height:46px; object-fit:contain; background:white; border-radius:4px; }
+.telas-detail .td-logo img { width:74px; height:46px; object-fit:contain; }
 .telas-detail .td-logo small { display:block; font-size:8px; letter-spacing:.09em; font-weight:500; margin-top:4px; }
 .telas-detail .td-header .td-logo span { display:none; }
 .telas-detail .td-header-cta { font-size:12px; min-height:44px; padding:10px 12px; margin-left:auto; }
@@ -152,15 +152,15 @@
  .telas-detail .td-desktop-nav a { padding-block:14px; }
  .telas-detail .td-menu-toggle,.telas-detail #td-mobile-nav { display:none; }
  .telas-detail .td-header-cta { margin-left:0; font-size:13px; }
- .telas-detail .td-hero-grid { grid-template-columns:1fr 1fr; max-width:1440px; min-height:450px; }
- .telas-detail .td-hero-copy { padding:36px 32px 36px max(28px,calc((100vw - 1200px)/2)); display:flex; flex-direction:column; justify-content:center; }
- .telas-detail h1 { font-size:clamp(35px,3.1vw,46px); max-width:590px; }
- .telas-detail .td-hero-description { font-size:15px; }
- .telas-detail .td-hero-photo { height:auto; min-height:450px; }
- .telas-detail .td-hero-photo>img { position:absolute; inset:0; }
+ .telas-detail .td-hero-grid { grid-template-columns:1.15fr 1fr; gap:40px; min-height:480px; padding-block:28px; align-items:center; }
+ .telas-detail .td-hero-copy { padding:0; display:flex; flex-direction:column; justify-content:center; }
+ .telas-detail h1 { font-size:clamp(34px,3.2vw,44px); max-width:600px; }
+ .telas-detail .td-hero-description { font-size:15px; margin-top:16px; }
+ .telas-detail .td-hero-photo { height:460px; min-height:460px; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px #142b4618; }
+ .telas-detail .td-hero-photo>img { position:absolute; inset:0; border-radius:12px; }
  .telas-detail .td-hero-benefits { margin-top:25px; }
- .telas-detail .td-hero-benefits li { font-size:11px; }
- .telas-detail .td-actions .td-button { font-size:13px; padding-inline:15px; }
+ .telas-detail .td-hero-benefits li { font-size:12px; }
+ .telas-detail .td-actions .td-button { font-size:13px; padding-inline:18px; }
  .telas-detail .td-trust-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
  .telas-detail .td-trust-grid>div+div { border-left:1px solid #ffffff40; padding-left:22px; }
  .telas-detail .td-trust .iconify { width:30px; height:30px; }
