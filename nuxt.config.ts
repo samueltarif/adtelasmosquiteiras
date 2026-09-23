@@ -54,6 +54,14 @@ export default defineNuxtConfig({
     r2SiteMediaSecretAccessKey: process.env.R2_SITE_MEDIA_SECRET_ACCESS_KEY,
     r2SiteMediaBucketName: process.env.R2_SITE_MEDIA_BUCKET_NAME,
     r2SiteMediaEndpoint: process.env.R2_SITE_MEDIA_ENDPOINT,
+
+    // Motor Fiscal (Servidor Nitro Privado — Zero Segredos no Navegador)
+    fiscalProvider: process.env.FISCAL_PROVIDER || 'mock_sandbox',
+    fiscalApiToken: process.env.FISCAL_API_TOKEN,
+    fiscalEnvironment: process.env.FISCAL_ENVIRONMENT || 'homologacao',
+    fiscalWebhookAuthType: process.env.FISCAL_WEBHOOK_AUTH_TYPE || 'header_token',
+    fiscalWebhookAuthSecret: process.env.FISCAL_WEBHOOK_AUTH_SECRET,
+    r2FiscalBucketName: process.env.R2_FISCAL_BUCKET_NAME,
     
     // Público (cliente e servidor)
     public: {

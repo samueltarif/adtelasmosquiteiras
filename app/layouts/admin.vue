@@ -83,6 +83,15 @@ const handleLogout = async () => {
         </NuxtLink>
 
         <NuxtLink 
+          to="/admin/fiscal" 
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
+          :class="route.path.startsWith('/admin/fiscal') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
+        >
+          <Icon name="lucide:receipt" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Notas Fiscais</span>
+        </NuxtLink>
+
+        <NuxtLink 
           to="/admin/agenda" 
           class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
           :class="route.path.startsWith('/admin/agenda') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'"
@@ -200,6 +209,16 @@ const handleLogout = async () => {
         >
           <Icon name="lucide:clipboard-list" class="w-5 h-5 shrink-0" />
           <span class="text-sm">Ordens de Serviço</span>
+        </NuxtLink>
+
+        <NuxtLink 
+          to="/admin/fiscal" 
+          @click="closeMobileMenu"
+          class="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 min-h-[48px]"
+          :class="route.path.startsWith('/admin/fiscal') ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:receipt" class="w-5 h-5 shrink-0" />
+          <span class="text-sm">Notas Fiscais</span>
         </NuxtLink>
 
         <NuxtLink 

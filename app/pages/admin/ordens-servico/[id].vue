@@ -12,6 +12,7 @@ import WorkOrderMediaGallery from '~/components/admin/work-orders/WorkOrderMedia
 import WorkOrderNotesManager from '~/components/admin/work-orders/WorkOrderNotesManager.vue'
 import WorkOrderActivityTimeline from '~/components/admin/work-orders/WorkOrderActivityTimeline.vue'
 import WorkOrderAppointmentsSection from '~/components/admin/work-orders/WorkOrderAppointmentsSection.vue'
+import WorkOrderFiscalSection from '~/components/admin/work-orders/WorkOrderFiscalSection.vue'
 import { formatDateOnly } from '~/utils/crmDateTime'
 
 definePageMeta({
@@ -31,7 +32,7 @@ const isItemsLoading = ref(false)
 const isMediaLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
-const activeTab = ref<'geral' | 'itens' | 'orcamentos' | 'midias' | 'notas' | 'agendamentos' | 'historico'>('geral')
+const activeTab = ref<'geral' | 'itens' | 'orcamentos' | 'midias' | 'notas' | 'agendamentos' | 'historico' | 'fiscal'>('geral')
 
 const isStatusModalOpen = ref(false)
 const isEditModalOpen = ref(false)
@@ -214,6 +215,15 @@ onMounted(() => {
           <Icon name="lucide:history" class="w-4 h-4" />
           <span>Histórico</span>
         </button>
+
+        <button
+          @click="activeTab = 'fiscal'"
+          class="px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer min-h-[44px]"
+          :class="activeTab === 'fiscal' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+        >
+          <Icon name="lucide:receipt" class="w-4 h-4" />
+          <span>Fiscal (NF-e / NFS-e)</span>
+        </button>
       </div>
 
       <!-- Conteúdo da Aba Ativa -->
@@ -372,6 +382,13 @@ onMounted(() => {
         <div v-else-if="activeTab === 'historico'">
           <WorkOrderActivityTimeline
             :work-order-id="workOrderId"
+          />
+        </div>
+
+        <!-- 8. Aba Fiscal (NF-e / NFS-e) -->
+        <div v-else-if="activeTab === 'fiscal'">
+          <WorkOrderFiscalSection
+            :work-order="workOrder"
           />
         </div>
       </div>

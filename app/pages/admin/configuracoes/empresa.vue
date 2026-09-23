@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import CompanyLogoUploader from '~/components/admin/company/CompanyLogoUploader.vue'
 import CompanyDocumentPreview from '~/components/admin/company/CompanyDocumentPreview.vue'
+import CompanyFiscalSettingsTab from '~/components/admin/company/CompanyFiscalSettingsTab.vue'
 
 definePageMeta({
   layout: 'admin'
@@ -405,7 +406,10 @@ onMounted(() => {
         </div>
       </form>
 
-      <!-- 3. Live Preview do Cabeçalho de Documentos -->
+      <!-- 3. Parâmetros e Configurações Fiscais (NF-e / NFS-e) -->
+      <CompanyFiscalSettingsTab />
+
+      <!-- 4. Live Preview do Cabeçalho de Documentos -->
       <CompanyDocumentPreview
         :profile="profile"
       />

@@ -54,12 +54,18 @@ export function normalizePhone(phone) {
   return phone.replace(/\D/g, '')
 }
 
-/**
- * Normaliza CPF ou CNPJ removendo pontuações.
- */
-export function normalizeCpfCnpj(doc) {
-  if (!doc || typeof doc !== 'string') return ''
-  return doc.replace(/\D/g, '')
+import {
+  normalizeCpfCnpj,
+  isValidCpf,
+  isValidCnpj,
+  isValidCpfCnpj
+} from './cpfCnpjValidation.mjs'
+
+export {
+  normalizeCpfCnpj,
+  isValidCpf,
+  isValidCnpj,
+  isValidCpfCnpj
 }
 
 /**
@@ -78,14 +84,6 @@ export function normalizeEmail(email) {
 export function isValidBrazilianPhone(phone) {
   const digits = normalizePhone(phone)
   return digits.length === 10 || digits.length === 11
-}
-
-/**
- * Valida formato de CNPJ (14 dígitos) ou CPF (11 dígitos).
- */
-export function isValidCpfCnpj(doc) {
-  const digits = normalizeCpfCnpj(doc)
-  return digits.length === 11 || digits.length === 14
 }
 
 /**
