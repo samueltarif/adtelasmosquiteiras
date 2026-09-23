@@ -3,14 +3,16 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useServicos } from '~/composables/useServicos'
 
 const { WHATSAPP_NUMBER } = useServicos()
-const route = useRoute()
+definePageMeta({ layout: false })
+const heroVisible = ref(true)
+const menuOpen = ref(false)
 const quoteVisible = ref(true)
 let quoteObserver = null
 function openQuoteForm() {
   const formEl = document.getElementById('orcamento-telas')
   const nameInput = document.getElementById('quote-name')
   if (formEl) {
-    formEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    formEl.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
     setTimeout(() => {
       nameInput?.focus({ preventScroll: true })
     }, 450)
@@ -136,311 +138,113 @@ const getTelasDetailPath = (slug) => {
   return map[slug] || null
 }
 
-// Hero carousel & Card image indices
-const heroImages = [
-  { src: '/images/tela_mosquiteira.png',        alt: 'Tela mosquiteira para janela' },
-  { src: '/images/mosquiteira_janela.png',      alt: 'Mosquiteira janela' },
-  { src: '/images/telas_para_varandas.jpg',     alt: 'Telas para varanda' },
-  { src: '/images/telas_para_portas.jpeg',      alt: 'Telas para portas' },
-  { src: '/images/mosquiteira_removivel.png',   alt: 'Mosquiteira removível' },
-  { src: '/images/telas_de_correr.jpg',         alt: 'Telas de correr' },
+// Public Google profile checked on 2026-09-22; curated snapshot, not a live feed.
+const googleReviewsUrl = 'https://share.google/FZ810y9akHJ1iFS9q'
+const googleReviews = { rating: '5,0', count: 49, checkedAt: '22/09/2026' }
+const reviews = [
+ {name:'Valter Jose', text:'Excelente serviço. Muito bem feito. Recomendo!!'},
+ {name:'Giovana Naomi', text:'A instalação ficou perfeita, atendimento também. Recomendo o serviço, foram super pontuais e profissionais.'},
+ {name:'Edna Oliveira', text:'Profissional pontual, orçamento certo, serviço limpo e de qualidade, recomendo 👍🏾'}
 ]
-const heroIndex = ref(0)
-const cardImageIndex = ref(0)
-let heroTimer = null
-let cardTimer = null
-
-onMounted(() => { 
-  const quote = document.getElementById('orcamento-telas')
-  if (quote) {
-    quoteObserver = new IntersectionObserver(([entry]) => { quoteVisible.value = entry.isIntersecting })
-    quoteObserver.observe(quote)
+const benefits = [
+ {icon:'lucide:ruler',title:'Produtos sob medida',text:'Telas feitas para as medidas do seu ambiente.'},
+ {icon:'lucide:wrench',title:'Instalação profissional',text:'Cuidado na montagem e no acabamento.'},
+ {icon:'lucide:wind',title:'Conforto no dia a dia',text:'Proteção contra insetos com ventilação.'},
+ {icon:'lucide:map-pin',title:'São Paulo e região',text:'Atendimento no local da instalação.'}
+]
+const faqs = [
+ {q:'Vocês atendem em quais regiões?',a:'Atendemos São Paulo e região. Informe o CEP da instalação para confirmar o atendimento no seu endereço.'},
+ {q:'As telas são realmente sob medida?',a:'Sim. O modelo e as medidas são definidos de acordo com as janelas, portas ou vãos do seu ambiente.'},
+ {q:'Quanto tempo leva para instalar?',a:'O prazo depende do modelo, das medidas e da quantidade de telas. Nossa equipe confirma o prazo no orçamento.'},
+ {q:'Posso escolher a cor da tela?',a:'Fale com nossa equipe para consultar as opções de acabamento disponíveis para o modelo escolhido.'},
+ {q:'Como faço a limpeza?',a:'Os cuidados variam conforme o modelo. As telas removíveis facilitam a retirada para limpeza; nossa equipe orienta sobre a manutenção.'}
+]
+onMounted(() => {
+ quoteObserver = new IntersectionObserver(entries => {
+  for (const entry of entries) {
+   if (entry.target.id === 'telas-hero') heroVisible.value = entry.isIntersecting
+   else quoteVisible.value = entry.isIntersecting
   }
-  heroTimer = setInterval(() => { heroIndex.value = (heroIndex.value + 1) % heroImages.length }, 3500)
-  cardTimer = setInterval(() => { cardImageIndex.value = (cardImageIndex.value + 1) % 2 }, 3000)
+ })
+ for (const id of ['telas-hero','orcamento-telas']) {
+  const el = document.getElementById(id)
+  if (el) quoteObserver.observe(el)
+ }
 })
-onUnmounted(() => { 
-  quoteObserver?.disconnect()
-  clearInterval(heroTimer)
-  clearInterval(cardTimer)
-})
+onUnmounted(() => quoteObserver?.disconnect())
 </script>
 
 <template>
-  <div class="min-h-screen bg-white">
-
-    <!-- Breadcrumb -->
-    <Breadcrumb :path="route.path" />
-
-    <!-- Hero -->
-    <section class="relative w-full overflow-hidden" data-cta-location="hero">
-      <img
-        v-for="(img, i) in heroImages"
-        :key="img.src"
-        :src="img.src"
-        :alt="img.alt"
-        :loading="i === 0 ? 'eager' : 'lazy'"
-        :fetchpriority="i === 0 ? 'high' : 'auto'"
-        class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-        :class="heroIndex === i ? 'opacity-100' : 'opacity-0'"
-      />
-      <div class="absolute inset-0 bg-gradient-to-t from-[#22345F]/90 via-[#22345F]/60 to-[#22345F]/30"></div>
-      <div class="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-12 items-center px-4 py-8 md:py-10">
-      <div class="text-center lg:text-left">
-        <span class="inline-block bg-[#F49A1A] text-white text-xs font-bold px-4 py-1.5 rounded-full mb-4 tracking-wide">🦟 Telas Sob Medida</span>
-        <h1 class="text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-3">
-          Telas Mosquiteiras em São Paulo
-        </h1>
-        <p class="text-white/90 text-base md:text-lg max-w-2xl">
-          Instalação profissional sob medida para residências e comércios em São Paulo
-        </p>
-        <div class="flex gap-3 mt-6 flex-wrap justify-center lg:justify-start">
-          <a
-            href="#orcamento-telas"
-            @click.prevent="openQuoteForm"
-            class="flex items-center gap-2 bg-[#F49A1A] text-[#22345F] font-bold px-6 py-3 rounded-xl hover:bg-[#e78b0e] shadow-lg transition-colors cursor-pointer"
-          >
-            Solicitar orçamento gratuito
-          </a>
-        </div>
-        <div class="flex gap-4 mt-4 flex-wrap justify-center lg:justify-start text-sm">
-          <a
-            href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Telas+Mosquiteiras.+Vim+pelo+site.&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-2 text-white underline underline-offset-4 py-2"
-          >
-            <Icon name="lucide:message-circle" class="w-5 h-5" />
-            Prefere conversar? WhatsApp
-          </a>
-          <a
-            href="tel:+5511983586611"
-            class="flex items-center gap-2 text-white underline underline-offset-4 py-2"
-          >
-            <Icon name="lucide:phone" class="w-5 h-5" />
-            Ligar Agora
-          </a>
-        </div>
-      </div>
-      <LandingQuoteForm />
-      </div>
-    </section>
-
-    <!-- Faixa de benefícios com Certificado INMETRO -->
-    <div class="bg-[#22345F] py-3.5 border-y border-[#2d4377]/60">
-      <div class="max-w-5xl mx-auto px-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 text-white text-xs sm:text-sm">
-        <span class="flex items-center gap-1.5 font-medium tracking-wide">
-          <Icon name="lucide:award" class="w-4 h-4 text-[#F49A1A] shrink-0" />
-          Certificado INMETRO
-        </span>
-        <span class="hidden sm:inline text-white/30 font-bold">·</span>
-        <span class="flex items-center gap-1.5 font-medium tracking-wide">
-          <Icon name="lucide:ruler" class="w-4 h-4 text-[#F49A1A] shrink-0" />
-          Instalação Sob Medida
-        </span>
-        <span class="hidden sm:inline text-white/30 font-bold">·</span>
-        <span class="flex items-center gap-1.5 font-medium tracking-wide">
-          <Icon name="lucide:check-circle" class="w-4 h-4 text-[#F49A1A] shrink-0" />
-          Orçamento Gratuito
-        </span>
-        <span class="hidden sm:inline text-white/30 font-bold">·</span>
-        <span class="flex items-center gap-1.5 font-medium tracking-wide">
-          <Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A] shrink-0" />
-          São Paulo e Região
-        </span>
-      </div>
+ <div class="telas-page">
+  <a class="skip-link" href="#conteudo-telas">Ir para o conteúdo</a>
+  <header class="site-header" data-cta-location="header">
+   <div class="wrap header-inner">
+    <NuxtLink to="/" aria-label="AD Telas — início"><img src="/images/logo-adt-lp.png" width="112" height="56" alt="AD Telas e Redes" /></NuxtLink>
+    <nav aria-label="Navegação da página" class="desktop-nav"><a href="#solucoes">Serviços</a><a href="#galeria">Galeria</a><a href="#diferenciais">Sobre nós</a><a href="#avaliacoes">Avaliações</a><a href="#duvidas">Dúvidas</a></nav>
+    <a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green header-cta" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> <span>Orçamento <span class="desktop-word">pelo WhatsApp</span></span></a>
+    <button class="menu-toggle" :aria-expanded="menuOpen" aria-controls="telas-menu" aria-label="Abrir navegação" @click="menuOpen = !menuOpen"><Icon :name="menuOpen ? 'lucide:x' : 'lucide:menu'" /></button>
+   </div>
+   <nav v-if="menuOpen" id="telas-menu" class="mobile-nav" aria-label="Navegação mobile" @click="menuOpen = false"><a href="#solucoes">Serviços</a><a href="#galeria">Galeria</a><a href="#avaliacoes">Avaliações</a><a href="#duvidas">Dúvidas</a><a href="#orcamento-telas">Orçamento</a></nav>
+  </header>
+  <main id="conteudo-telas">
+   <section id="telas-hero" class="hero" data-cta-location="hero" data-service-key="telas" data-service-name="Telas Mosquiteiras">
+    <picture class="hero-photo"><source media="(max-width: 767px)" srcset="/images/telas-instalacao-640.jpg" /><img src="/images/telas-instalacao-1440.jpg" width="1440" height="960" alt="Imagem ilustrativa de instalação de tela mosquiteira em uma janela" fetchpriority="high" /></picture>
+    <div class="wrap hero-inner"><div class="hero-copy">
+     <p class="eyebrow">Mais conforto para o seu dia a dia</p>
+     <h1>Telas Mosquiteiras <span>Sob Medida em São Paulo</span></h1>
+     <p class="hero-description">Proteja sua família de insetos com soluções sob medida para janelas, portas e sacadas. Instalação profissional, com acabamento discreto para sua casa.</p>
+     <div class="hero-actions"><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Pedir orçamento pelo WhatsApp <span aria-hidden="true">→</span></a><a href="#orcamento-telas" class="button secondary" @click.prevent="openQuoteForm"><Icon name="lucide:clipboard-list" /> Receber orçamento pelo formulário</a></div>
+     <ul class="hero-benefits"><li><Icon name="lucide:shield-check" /> Proteção contra insetos</li><li><Icon name="lucide:wind" /> Mais ventilação</li><li><Icon name="lucide:ruler" /> Feito sob medida</li></ul>
+    </div></div>
+   </section>
+   <section id="solucoes" class="section wrap">
+    <div class="section-heading"><p class="eyebrow">Nossos serviços</p><h2>Soluções para cada ambiente</h2><p>Telas mosquiteiras sob medida para sua casa ou empresa.</p></div>
+    <div class="services-grid">
+     <NuxtLink v-for="modelo in modelosPrincipais.slice(0,4)" :key="modelo.path" :to="modelo.path" class="service-card" data-cta-location="service_card" :data-service-key="getTelasServiceKey(modelo.path.split('/').pop())" :data-service-name="modelo.titulo" :aria-label="'Saiba mais: ' + modelo.titulo">
+      <img :src="modelo.img" :alt="modelo.titulo" width="480" height="360" loading="lazy" /><div class="card-body"><h3>{{ modelo.titulo }}</h3><p>{{ modelo.desc }}</p><span class="card-link">Saiba mais <span aria-hidden="true">→</span></span></div>
+     </NuxtLink>
     </div>
-
-    <!-- Navegação Direta para Páginas Específicas de Telas -->
-    <section class="py-12 bg-[#F9FAFB] border-b border-[#E5EDF8]">
-      <div class="max-w-7xl mx-auto px-4 md:px-6">
-        <div class="text-center max-w-2xl mx-auto mb-8">
-          <h2 class="text-2xl md:text-3xl font-bold text-[#22345F] mb-2">Páginas de Modelos Específicos</h2>
-          <p class="text-gray-600 text-sm">Conheça detalhes sobre cada tipo de tela mosquiteira e sua aplicação ideal:</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NuxtLink
-            v-for="modelo in modelosPrincipais"
-            :key="modelo.path"
-            :to="modelo.path"
-            class="group bg-white p-5 rounded-2xl border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all hover:shadow-lg flex items-start gap-4"
-          >
-            <div class="w-12 h-12 rounded-xl bg-[#22345F]/10 flex items-center justify-center shrink-0 group-hover:bg-[#F49A1A]/20 transition-colors">
-              <Icon :name="modelo.icon" class="w-6 h-6 text-[#22345F] group-hover:text-[#F49A1A] transition-colors" />
-            </div>
-            <div>
-              <h3 class="font-bold text-[#22345F] text-base group-hover:text-[#F49A1A] transition-colors flex items-center gap-1.5">
-                {{ modelo.titulo }}
-                <Icon name="lucide:arrow-right" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </h3>
-              <p class="text-gray-600 text-xs mt-1">{{ modelo.desc }}</p>
-            </div>
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
-
-    <!-- Seções de serviços por categoria -->
-    <template v-for="(categoria, ci) in categorias" :key="categoria.slug">
-      <section
-        class="py-14 md:py-20"
-        :class="ci % 2 === 0 ? 'bg-white' : 'bg-[#F9FAFB]'"
-      >
-        <div class="max-w-7xl mx-auto px-4 md:px-6">
-
-          <!-- Cabeçalho da categoria -->
-          <div class="flex items-center gap-3 mb-8">
-            <div class="w-12 h-12 rounded-2xl bg-[#22345F] flex items-center justify-center shrink-0">
-              <Icon :name="categoria.iconName" class="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 class="text-2xl md:text-3xl font-bold text-[#22345F]">{{ categoria.titulo }}</h2>
-              <p class="text-[#4B5563] text-sm">{{ categoria.descricao }}</p>
-            </div>
-          </div>
-
-          <!-- Grid de serviços -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            <div
-              v-for="servico in categoria.servicos"
-              :key="servico.slug"
-              class="group bg-white rounded-2xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
-            >
-              <!-- Área clicável do Serviço (Foto + Título + Descrição) -->
-              <NuxtLink
-                v-if="getTelasDetailPath(servico.slug)"
-                :to="getTelasDetailPath(servico.slug)"
-                :aria-label="`Ver detalhes sobre ${servico.titulo}`"
-                class="flex flex-col flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F49A1A] rounded-t-2xl"
-              >
-                <!-- Imagem com hover interativo -->
-                <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
-                  <img
-                    v-for="(imgSrc, imgIdx) in (servico.imagens || [servico.imagem])"
-                    :key="imgSrc"
-                    :src="imgSrc"
-                    :alt="servico.titulo"
-                    class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 group-hover:scale-105"
-                    :class="cardImageIndex % (servico.imagens?.length || 1) === imgIdx ? 'opacity-100' : 'opacity-0'"
-                    loading="lazy"
-                  />
-                  <!-- Badge destaque -->
-                  <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
-                    {{ servico.destaque }}
-                  </div>
-                  <!-- Overlay hover "Ver Detalhes" -->
-                  <div class="absolute inset-0 bg-[#22345F]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div class="flex items-center gap-2 bg-[#22345F] text-white font-bold px-4 py-2 rounded-xl shadow-lg text-sm">
-                      <Icon name="lucide:arrow-right" class="w-4 h-4 text-[#F49A1A]" />
-                      Ver Detalhes
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Conteúdo textual -->
-                <div class="p-4 flex flex-col flex-1">
-                  <h3 class="text-[15px] font-bold text-[#22345F] group-hover:text-[#F49A1A] transition-colors mb-1 leading-snug flex items-center justify-between">
-                    <span>{{ servico.titulo }}</span>
-                    <Icon name="lucide:chevron-right" class="w-4 h-4 text-[#F49A1A] opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                  </h3>
-                  <p class="text-xs text-[#4B5563] mb-3 flex-1">{{ servico.descricaoCurta }}</p>
-                  <div class="flex items-center text-[11px] text-[#4B5563] gap-1 mt-auto">
-                    <Icon name="lucide:check-circle" class="w-3 h-3 text-[#F49A1A]" /> Sob Medida
-                  </div>
-                </div>
-              </NuxtLink>
-
-              <!-- Fallback quando card não possui detailPath -->
-              <div v-else class="flex flex-col flex-1">
-                <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
-                  <img
-                    :src="servico.imagem"
-                    :alt="servico.titulo"
-                    class="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
-                    {{ servico.destaque }}
-                  </div>
-                </div>
-                <div class="p-4 flex flex-col flex-1">
-                  <h3 class="text-[15px] font-bold text-[#22345F] mb-1 leading-snug">{{ servico.titulo }}</h3>
-                  <p class="text-xs text-[#4B5563] mb-3 flex-1">{{ servico.descricaoCurta }}</p>
-                  <div class="flex items-center text-[11px] text-[#4B5563] gap-1 mt-auto">
-                    <Icon name="lucide:check-circle" class="w-3 h-3 text-[#F49A1A]" /> Sob Medida
-                  </div>
-                </div>
-              </div>
-
-              <!-- Barra de Ações (WhatsApp CTA Isolado) -->
-              <div class="px-4 pb-4 pt-2 border-t border-[#E5EDF8]/60 bg-gray-50/50 mt-auto flex items-center justify-between gap-2">
-                <NuxtLink
-                  v-if="getTelasDetailPath(servico.slug)"
-                  :to="getTelasDetailPath(servico.slug)"
-                  class="text-xs font-semibold text-[#22345F] hover:text-[#F49A1A] flex items-center gap-1 transition-colors focus:outline-none focus-visible:underline"
-                  :aria-label="`Saiba mais sobre ${servico.titulo}`"
-                >
-                  Saiba mais &rarr;
-                </NuxtLink>
-                <span v-else class="text-xs text-gray-500">Instalação SP</span>
-
-                <a
-                  :href="getWhatsappUrl(servico.titulo)"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-cta-location="service_card"
-                  :data-service-key="getTelasServiceKey(servico.slug)"
-                  :data-service-name="servico.titulo"
-                  :aria-label="`Solicitar orçamento de ${servico.titulo} pelo WhatsApp`"
-                  class="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1fb854] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all hover:scale-105 active:scale-95 z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]"
-                  @click.stop
-                >
-                  <Icon name="lucide:message-circle" class="w-3.5 h-3.5" />
-                  WhatsApp
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </template>
-
-    <!-- CTA Final -->
-    <section class="py-16 bg-gradient-to-br from-[#22345F] to-[#1a2847]">
-      <div class="max-w-3xl mx-auto px-4 text-center">
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-3">
-          Não encontrou o que procura?
-        </h2>
-        <p class="text-white/80 mb-8 text-base">
-          Fale com nossos especialistas. Atendemos qualquer necessidade!
-        </p>
-        <div class="flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Preciso+de+ajuda+com+Telas+Mosquiteiras.+Vim+pelo+site.&type=phone_number&app_absent=0"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all shadow-lg"
-          >
-            <WhatsappIcon class="w-6 h-6" />
-            Falar com Especialista
-          </a>
-          <a
-            href="tel:+5511983586611"
-            class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/15 text-white rounded-xl font-bold text-lg hover:bg-white/25 transition-all border border-white/30"
-          >
-            <Icon name="lucide:phone" class="w-6 h-6" />
-            (11) 98358-6611
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Mobile CTA -->
-    <MobileUnifiedCTA
-      v-if="!quoteVisible"
-      servico-atual="Telas Mosquiteiras"
-      @open-form="openQuoteForm"
-    />
-
-  </div>
+    <details class="more-services"><summary>Ver mais modelos e aplicações <span aria-hidden="true">＋</span></summary><div class="extra-services"><div v-for="categoria in categorias" :key="categoria.slug"><h3>{{ categoria.titulo }}</h3><div v-for="servico in categoria.servicos" :key="servico.slug" class="extra-row" data-cta-location="service_card" :data-service-key="getTelasServiceKey(servico.slug)" :data-service-name="servico.titulo"><NuxtLink :to="getTelasDetailPath(servico.slug)">{{ servico.titulo }} →</NuxtLink><a :href="getWhatsappUrl(servico.titulo)" target="_blank" rel="noopener noreferrer" :aria-label="'Orçamento pelo WhatsApp: ' + servico.titulo"><WhatsappIcon /></a></div></div></div></details>
+   </section>
+   <section id="galeria" class="gallery-section"><div class="wrap gallery-layout"><div><p class="eyebrow">Modelos e aplicações</p><h2>Veja as telas de perto</h2><p>Acabamentos discretos e soluções que se adaptam ao seu ambiente.</p><a href="#solucoes" class="text-link">Encontrar meu modelo →</a></div><div class="gallery-grid"><figure v-for="modelo in modelosPrincipais.slice(0,4)" :key="modelo.path"><img :src="modelo.img" :alt="modelo.titulo" width="360" height="420" loading="lazy" /><figcaption>{{ modelo.titulo }}</figcaption></figure></div></div></section>
+   <section id="diferenciais" class="section wrap benefits-layout"><div><p class="eyebrow">Cuidado em cada detalhe</p><h2>Por que escolher a AD Telas?</h2></div><div class="benefits-grid"><article v-for="item in benefits" :key="item.title"><Icon :name="item.icon" /><h3>{{ item.title }}</h3><p>{{ item.text }}</p></article></div></section>
+   <section class="contact-band" data-cta-location="service_page"><div class="wrap"><p class="eyebrow">Vamos cuidar do seu projeto</p><h2>Solicite seu orçamento agora mesmo</h2><p>Conte o que você precisa. Nossa equipe ajuda a encontrar a tela para o seu ambiente.</p><div class="band-actions"><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Quero falar no WhatsApp →</a><a class="button secondary" href="#orcamento-telas" @click.prevent="openQuoteForm">Preencher formulário</a></div><p class="band-note">✓ Atendimento no local <span>✓ Orçamento gratuito</span></p></div></section>
+   <section id="avaliacoes" class="section wrap"><div class="section-heading"><p class="eyebrow">Quem já escolheu a AD Telas</p><h2>O que nossos clientes dizem</h2><p>Depoimentos de clientes no Google.</p></div><div class="google-review-summary"><a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer" class="google-rating"><span class="stars" aria-hidden="true">★★★★★</span><strong>{{ googleReviews.rating }} de 5 no Google</strong><span>{{ googleReviews.count }} avaliações ↗</span></a><p>Dados conferidos em {{ googleReviews.checkedAt }}.</p></div><div class="reviews-grid"><article v-for="review in reviews" :key="review.name" class="review"><span class="stars" aria-label="5 estrelas">★★★★★</span><blockquote>“{{ review.text }}”</blockquote><div class="review-person"><span class="avatar" aria-hidden="true">{{ review.name.charAt(0) }}</span><div><strong>{{ review.name }}</strong><a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer">Ver avaliações no Google ↗</a></div></div></article></div></section>
+   <section class="process-section wrap"><div class="section-heading"><h2>Como funciona</h2><p>Do primeiro contato à instalação.</p></div><ol class="process-grid"><li v-for="(step,index) in [{title:'Faça seu contato',text:'Pelo WhatsApp ou formulário.',icon:'lucide:message-circle'},{title:'Conte sobre seu espaço',text:'Avaliamos o modelo e as medidas.',icon:'lucide:ruler'},{title:'Receba seu orçamento',text:'Uma proposta para o seu projeto.',icon:'lucide:clipboard-list'},{title:'Agende a instalação',text:'Com a nossa equipe profissional.',icon:'lucide:wrench'}]" :key="step.title"><span class="step-number">{{ index + 1 }}</span><Icon :name="step.icon" /><h3>{{ step.title }}</h3><p>{{ step.text }}</p></li></ol></section>
+   <section id="duvidas" class="faq-section"><div class="wrap faq-layout"><div><p class="eyebrow">Pode perguntar</p><h2>Dúvidas frequentes</h2><p>Saiba mais sobre nossas telas mosquiteiras.</p></div><div><details v-for="faq in faqs" :key="faq.q" class="faq"><summary>{{ faq.q }}<span aria-hidden="true">＋</span></summary><p>{{ faq.a }}</p></details></div></div></section>
+   <section class="section wrap quote-layout" data-cta-location="quote_form"><div><p class="eyebrow">Seu projeto começa aqui</p><h2>Mais conforto para sua casa.</h2><p>Preencha seus dados para receber um orçamento. Se preferir, converse diretamente com nossa equipe.</p><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Chamar no WhatsApp</a><a href="tel:+5511983586611" class="phone-link"><Icon name="lucide:phone" /> (11) 98358-6611</a></div><LandingQuoteForm :show-trust-badges="false" /></section>
+  </main>
+  <footer data-cta-location="footer"><div class="wrap footer-grid"><div><NuxtLink to="/" class="footer-brand">AD TELAS<span>MOSQUITEIRAS SOB MEDIDA</span></NuxtLink><p>Mais conforto para você e sua família.</p></div><div><h2>Navegue</h2><NuxtLink to="/">Início</NuxtLink><a href="#galeria">Galeria</a><a href="#duvidas">Dúvidas</a><a href="#orcamento-telas">Orçamento</a></div><div><h2>Serviços</h2><NuxtLink v-for="modelo in modelosPrincipais" :key="modelo.path" :to="modelo.path">{{ modelo.titulo }}</NuxtLink></div><div><h2>Atendimento</h2><a :href="getWhatsappUrl('Telas Mosquiteiras')" target="_blank" rel="noopener noreferrer">Fale no WhatsApp ↗</a><a href="tel:+5511983586611">(11) 98358-6611</a><p>São Paulo e região</p></div></div><div class="wrap footer-bottom"><span>© {{ new Date().getFullYear() }} AD Telas. Todos os direitos reservados.</span><NuxtLink to="/politica-de-privacidade">Política de Privacidade</NuxtLink></div></footer>
+  <a
+    :href="getWhatsappUrl('Telas Mosquiteiras')"
+    class="floating-whatsapp"
+    :class="{ 'above-sticky': !heroVisible && !quoteVisible }"
+    data-cta-location="floating_whatsapp"
+    data-service-key="telas"
+    data-service-name="Telas Mosquiteiras"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Pedir orçamento pelo WhatsApp"
+    title="Pedir orçamento pelo WhatsApp"
+  ><WhatsappIcon aria-hidden="true" /><span>Falar no WhatsApp</span></a>
+  <div v-show="!heroVisible && !quoteVisible" class="mobile-sticky" data-cta-location="service_page"><a class="button green" href="#orcamento-telas" @click.prevent="openQuoteForm">Pedir orçamento gratuito <span aria-hidden="true">→</span></a></div>
+ </div>
 </template>
+
+<style scoped>
+.google-review-summary{text-align:center;margin:-8px 0 25px}.google-rating{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px;min-height:48px;padding:10px 18px;border:1px solid #dce5ef;border-radius:8px;background:#f2f5f9;font-size:14px}.google-rating strong{color:var(--brand-blue)}.google-rating>span:last-child{text-decoration:underline;text-underline-offset:3px}.google-review-summary p{font-size:12px;margin-top:8px}
+
+.floating-whatsapp{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:21;display:flex;align-items:center;justify-content:center;gap:10px;width:56px;height:56px;border-radius:999px;background:#087c38;color:#fff;box-shadow:0 4px 18px #12232f40;border:2px solid #fff}
+.floating-whatsapp:hover{background:#06662e}
+.floating-whatsapp :deep(svg){width:28px;height:28px;flex-shrink:0}
+.floating-whatsapp span{display:none}
+@media(max-width:767px){.floating-whatsapp.above-sticky{bottom:calc(88px + env(safe-area-inset-bottom,0px))}}
+@media(min-width:768px){.floating-whatsapp{right:24px;bottom:24px;width:auto;padding:0 20px}.floating-whatsapp span{display:inline;font-size:14px;font-weight:700}}
+
+.telas-page :deep(.iconify){width:24px;height:24px;flex-shrink:0}.benefits-grid :deep(.iconify){width:30px;height:30px;color:var(--brand-blue);margin-bottom:12px}.process-grid :deep(.iconify){width:27px;height:27px;margin-bottom:12px;color:var(--brand-blue)}
+.telas-page{--brand-blue:#234b73;--brand-gold:#f2bd16;--whatsapp:#087c38;--ink:#182f49;color:var(--ink);background:#fff;font-family:inherit;line-height:1.5;padding-bottom:calc(80px + env(safe-area-inset-bottom))}.wrap{width:min(1200px,calc(100% - 40px));margin-inline:auto}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.15;letter-spacing:-.035em}h2{font-size:clamp(27px,3vw,36px);font-weight:800}h3{font-size:19px;font-weight:750}p{color:#52616b}a,button,summary{-webkit-tap-highlight-color:transparent}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #234b73;outline-offset:4px}section[id],:deep(#orcamento-telas){scroll-margin-top:24px}.button{min-height:48px;padding:12px 18px;display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:7px;font-size:14px;font-weight:700;text-align:center;line-height:1.4}.button svg,.button :deep(svg){width:21px;height:21px;flex-shrink:0}.green{color:white;background:var(--whatsapp);border:1px solid var(--whatsapp)}.green:hover{background:#06662e}.secondary{background:#f1f6f7;color:var(--ink);border:1px solid #d5e0e5}.eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--brand-blue);margin-bottom:12px}.section{padding-block:46px}.section-heading{text-align:center;margin-bottom:25px}.section-heading p:last-child{margin-top:10px;font-size:14px}.site-header{border-bottom:1px solid #e8edef;background:white;position:relative;z-index:2}.header-inner{display:flex;align-items:center;justify-content:space-between;gap:10px;height:72px}.header-inner img{width:105px;height:auto}.desktop-nav{display:none}.header-cta{font-size:12px;min-height:44px;padding:9px 11px}.desktop-word{display:none}.menu-toggle{display:grid;place-items:center;min-width:44px;min-height:44px}.mobile-nav{display:grid;padding:8px 20px 16px;border-top:1px solid #eee}.mobile-nav a{padding:12px}.skip-link{position:absolute;left:16px;top:-100px;z-index:10;background:white;padding:12px}.skip-link:focus{top:10px}.hero{display:flex;flex-direction:column;background:#f1f5fa;position:relative}.hero-inner{order:0}.hero-copy{padding:30px 0 25px}.hero h1{font-size:clamp(34px,8.7vw,48px);font-weight:800;max-width:650px}.hero h1 span{display:block;color:var(--brand-blue)}.hero-description{font-size:15px;margin-top:18px;max-width:540px}.hero-actions{display:grid;gap:10px;margin-top:22px}.hero-benefits{display:flex;gap:14px;margin:23px 0 0;padding:0;list-style:none;font-size:11px;font-weight:600}.hero-benefits li{flex:1;display:flex;align-items:center;gap:7px}.hero-benefits :deep(svg){width:24px;height:24px;flex-shrink:0;color:var(--brand-blue)}.hero-photo{order:1;height:230px;overflow:hidden}.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:65% 45%}.services-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.service-card{overflow:hidden;border:1px solid #e0e7eb;border-radius:8px;background:white;display:flex;flex-direction:column;box-shadow:0 4px 14px #12232f06}.service-card:hover{border-color:#7894b0}.service-card>img{width:100%;height:135px;object-fit:cover}.card-body{padding:13px 11px;display:flex;flex:1;flex-direction:column}.card-body h3{font-size:17px;letter-spacing:-.025em}.card-body p{font-size:12px;margin:9px 0 14px;line-height:1.5}.card-link{margin-top:auto;display:flex;justify-content:space-between;align-items:center;min-height:44px;font-size:12px;font-weight:700;color:var(--brand-blue);border-top:1px solid #edf1f2}.more-services{margin-top:22px;border-bottom:1px solid #e2e8e6}.more-services summary,.faq summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:50px;cursor:pointer;list-style:none;font-size:14px;font-weight:650}.more-services summary::-webkit-details-marker,.faq summary::-webkit-details-marker{display:none}.more-services[open]>summary span,.faq[open]>summary span{transform:rotate(45deg)}.extra-services{display:grid;gap:24px;padding:20px 0}.extra-services h3{font-size:16px;margin-bottom:8px}.extra-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #edf1f2;font-size:13px}.extra-row a{padding:12px 0;min-height:44px}.extra-row a:last-child{min-width:44px;display:grid;place-items:center;color:var(--brand-blue)}.extra-row :deep(svg){width:21px;height:21px}.gallery-section{padding:36px 0;background:#f2f5f9}.gallery-layout>div>p:not(.eyebrow){margin-top:14px;font-size:14px}.text-link{display:inline-flex;min-height:44px;align-items:center;font-size:14px;font-weight:650;color:var(--brand-blue);margin-top:12px}.gallery-grid{display:grid;grid-template-columns:repeat(4,155px);gap:12px;overflow:auto;margin-top:24px;padding-bottom:10px;scroll-snap-type:x proximity}.gallery-grid figure{margin:0;scroll-snap-align:start}.gallery-grid img{width:100%;height:190px;object-fit:cover;border-radius:7px}.gallery-grid figcaption{font-size:12px;padding-top:8px}.benefits-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;margin-top:26px}.benefits-grid article>:deep(svg){width:30px;height:30px;color:var(--brand-blue);margin-bottom:12px}.benefits-grid h3{font-size:16px;letter-spacing:-.02em}.benefits-grid p{font-size:13px;margin-top:8px}.contact-band{padding:42px 0;background:linear-gradient(90deg,#132c4aed,#172f4cdc),url('/images/telas-instalacao-1440.jpg') center 53%/cover;text-align:center;color:white}.contact-band p{color:#e0e8f2;margin-top:14px}.contact-band .eyebrow{color:#f2bd16}.band-actions{display:grid;gap:10px;margin-top:24px}.band-note{font-size:12px;display:flex;justify-content:center;gap:20px}.reviews-grid{display:grid;gap:15px}.review{border:1px solid #e1e8eb;border-radius:8px;padding:22px;display:flex;flex-direction:column}.stars{color:#a96a00;letter-spacing:2px;font-size:17px}.review blockquote{font-size:14px;margin:12px 0 22px;line-height:1.6}.review-person{display:flex;align-items:center;gap:12px;margin-top:auto;font-size:13px}.avatar{background:#edf3fa;color:var(--brand-blue);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700}.review-person a{display:flex;align-items:center;font-size:11px;min-height:44px;text-decoration:underline;text-underline-offset:3px}.process-section{padding-bottom:46px}.process-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 18px;list-style:none;padding:0;margin:0}.process-grid li{position:relative;padding:15px 0 0 12px;border-left:1px solid #e2e8e6}.process-grid :deep(svg){width:27px;height:27px;margin-bottom:12px;color:var(--brand-blue)}.process-grid h3{font-size:15px;letter-spacing:-.02em}.process-grid p{font-size:13px;margin-top:8px}.step-number{position:absolute;right:10px;top:8px;font-size:25px;color:#bdcde0;font-weight:800}.faq-section{background:#f5f7fa;padding:40px 0}.faq-layout>div>p:last-child{margin-top:12px;font-size:14px}.faq-layout>div:last-child{margin-top:22px}.faq{border-bottom:1px solid #dfe6e4}.faq summary{padding:12px 0}.faq summary span{font-size:20px;color:var(--brand-blue)}.faq>p{padding:0 20px 18px 0;font-size:14px}.quote-layout>div>p:not(.eyebrow){margin:18px 0 22px;font-size:15px}.phone-link{display:flex;align-items:center;gap:10px;min-height:48px;margin-top:12px;font-weight:650;font-size:15px}.quote-layout>:deep(#orcamento-telas){margin-top:25px}.quote-layout :deep(button[type=submit]){background:var(--brand-gold);color:var(--ink)}.quote-layout :deep(input),.quote-layout :deep(select){font-size:16px}footer{background:#142b46;color:#fff;padding:40px 0 20px}.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px 20px}.footer-grid>div:first-child{grid-column:1/-1}.footer-grid h2{font-size:16px;letter-spacing:0;margin-bottom:12px}.footer-grid a:not(.footer-brand){display:flex;align-items:center;min-height:44px;font-size:13px;color:#dce5ef}.footer-grid p{color:#bacadc;font-size:13px;margin-top:12px}.footer-brand{font-size:26px;font-weight:800;letter-spacing:-.04em}.footer-brand span{display:block;font-size:10px;letter-spacing:.13em;font-weight:500}.footer-bottom{border-top:1px solid #ffffff20;margin-top:32px;padding-top:18px;font-size:11px;color:#bacadc;display:flex;flex-direction:column;gap:12px}.footer-bottom a{min-height:44px;display:flex;align-items:center}.mobile-sticky{position:fixed;bottom:0;inset-inline:0;padding:10px 20px calc(10px + env(safe-area-inset-bottom));background:#ffffffef;border-top:1px solid #dce5ef;z-index:20}.mobile-sticky .button{width:100%}
+@media(min-width:768px){.telas-page{padding-bottom:0}.wrap{width:min(1200px,calc(100% - 64px))}.header-inner{height:80px}.header-inner img{width:120px}.desktop-word{display:inline}.menu-toggle,.mobile-nav,.mobile-sticky{display:none!important}.desktop-nav{display:flex;gap:22px;font-size:13px}.desktop-nav a{padding:14px 0}.header-cta{font-size:13px;padding-inline:16px}.hero{min-height:560px;display:block;color:white;background:#142b46}.hero-photo{position:absolute;inset:0;height:auto}.hero-photo img{object-position:center 45%}.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#11253df5 0%,#18324fe6 28%,#18324f80 53%,transparent 79%)}.hero-inner{position:relative;z-index:1}.hero-copy{padding:68px 0;max-width:620px}.hero h1{font-size:clamp(40px,4.1vw,57px)}.hero h1 span{color:#f2bd16}.hero .eyebrow{color:#c6d5e6}.hero-description{color:#f0f4fa;font-size:17px;max-width:510px}.hero-actions{display:flex;flex-wrap:wrap;max-width:580px}.hero .secondary,.contact-band .secondary{background:#ffffff0d;color:white;border-color:#c1cfdf}.hero-benefits{font-size:12px;max-width:500px;margin-top:30px}.hero-benefits :deep(svg){color:#f2bd16}.section{padding-block:56px}.services-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}.service-card>img{height:190px}.card-body{padding:19px}.card-body h3{font-size:19px}.card-body p{font-size:14px}.card-link{font-size:13px;background:#f2f6f6;border:1px solid #e2e9ea;padding-inline:13px;border-radius:5px}.extra-services{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery-layout{display:grid;grid-template-columns:250px 1fr;gap:35px;align-items:center}.gallery-grid{margin:0;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;overflow:visible}.gallery-grid img{height:220px}.benefits-layout{display:grid;grid-template-columns:240px 1fr;gap:35px;align-items:center}.benefits-grid{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:0;gap:20px}.benefits-grid article{border-left:1px solid #e4ebe7;padding-left:20px}.band-actions{display:flex;justify-content:center}.contact-band{padding-block:50px}.reviews-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.process-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.faq-layout{display:grid;grid-template-columns:1fr 1.7fr;gap:70px}.faq-layout>div:last-child{margin-top:0}.quote-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}.quote-layout>:deep(#orcamento-telas){margin-top:0}.footer-grid{grid-template-columns:1.5fr 1fr 1fr 1.2fr}.footer-grid>div:first-child{grid-column:auto}.footer-bottom{flex-direction:row;align-items:center;justify-content:space-between}}
+.mobile-sticky .green{background:var(--brand-gold);border-color:var(--brand-gold);color:var(--ink)}
+.mobile-sticky .green:hover,.quote-layout :deep(button[type=submit]):hover{background:#dfab08}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>

@@ -76,7 +76,14 @@ async function runAllTests() {
     ]
 
     for (const mapping of pageMappings) {
-      const content = fs.readFileSync(path.resolve(process.cwd(), mapping.file), 'utf8')
+      let content = fs.readFileSync(path.resolve(process.cwd(), mapping.file), 'utf8')
+      if (content.includes('TelasServicePage')) {
+        const slug = path.basename(mapping.file, '.vue')
+        const config = fs.readFileSync(path.resolve('app/data/telas', slug + '.ts'), 'utf8')
+        assert.ok(config.includes('"key": "' + mapping.key + '"'))
+        assert.ok(content.includes('~/data/telas/' + slug))
+        continue
+      }
       assert.ok(
         content.includes(`service-key="${mapping.key}"`) || content.includes(`serviceKey="${mapping.key}"`),
         `Página ${mapping.file} não contém a chave ${mapping.key}`
@@ -146,15 +153,15 @@ async function runAllTests() {
   // 12. alt_text rendered
   test(12, 'Imagens utilizam rigorosamente alt_text cadastrado sem keyword stuffing', () => {
     const galleryContent = fs.readFileSync(path.resolve(process.cwd(), 'app/components/services/ServicePublicGallery.vue'), 'utf8')
-    assert.ok(galleryContent.includes(':alt="visibleMediaList[0].alt_text'))
+    assert.ok(galleryContent.includes(':alt="visibleMediaList[0]?.alt_text'))
     assert.ok(galleryContent.includes(':alt="media.alt_text'))
   })
 
   // 13. width/height rendered
   test(13, 'Imagens possuem width e height explícitos para prevenção de Layout Shift (CLS)', () => {
     const galleryContent = fs.readFileSync(path.resolve(process.cwd(), 'app/components/services/ServicePublicGallery.vue'), 'utf8')
-    assert.ok(galleryContent.includes(':width="visibleMediaList[0].width || 1280"'))
-    assert.ok(galleryContent.includes(':height="visibleMediaList[0].height || 720"'))
+    assert.ok(galleryContent.includes(':width="visibleMediaList[0]?.width || 1280"'))
+    assert.ok(galleryContent.includes(':height="visibleMediaList[0]?.height || 720"'))
   })
 
   // 14. lazy loading
@@ -207,7 +214,7 @@ async function runAllTests() {
     const lightboxContent = fs.readFileSync(path.resolve(process.cwd(), 'app/components/services/ServicePublicLightbox.vue'), 'utf8')
     assert.ok(lightboxContent.includes('function nextMedia()'))
     assert.ok(lightboxContent.includes('currentIndex.value++'))
-    assert.ok(lightboxContent.includes('resetTransform()'))
+    assert.ok(lightboxContent.includes('resetZoom()'))
   })
 
   // 21. previous
@@ -237,9 +244,9 @@ async function runAllTests() {
   // 24. focus restore
   test(24, 'Foco do teclado é preservado e restaurado após fechamento do Lightbox', () => {
     const lightboxContent = fs.readFileSync(path.resolve(process.cwd(), 'app/components/services/ServicePublicLightbox.vue'), 'utf8')
-    assert.ok(lightboxContent.includes('savePreviousFocus()'))
-    assert.ok(lightboxContent.includes('restorePreviousFocus()'))
-    assert.ok(lightboxContent.includes('setupFocusTrap()'))
+    assert.ok(lightboxContent.includes('previousActiveElement = document.activeElement'))
+    assert.ok(lightboxContent.includes('previousActiveElement.focus()'))
+    assert.ok(lightboxContent.includes("case 'Tab':"))
   })
 
   // 25. zoom
@@ -256,7 +263,7 @@ async function runAllTests() {
     assert.ok(lightboxContent.includes('handlePointerDown'))
     assert.ok(lightboxContent.includes('handlePointerMove'))
     assert.ok(lightboxContent.includes('handlePointerUp'))
-    assert.ok(lightboxContent.includes('initialPinchDistance'))
+    assert.ok(fs.readFileSync(path.resolve('app/composables/useLightboxZoom.ts'), 'utf8').includes('initialPinchDistance'))
   })
 
   // 27. broken media safe
@@ -301,8 +308,11 @@ async function runAllTests() {
   // 32. CTA unchanged
   test(32, 'CTAs originais de WhatsApp e Pedir Contato permanecem intactos', () => {
     const janelasContent = fs.readFileSync(path.resolve(process.cwd(), 'app/pages/servicos/telas/janelas.vue'), 'utf8')
-    assert.ok(janelasContent.includes('Solicitar Orçamento no WhatsApp'))
-    assert.ok(janelasContent.includes('Pedir Contato'))
+    const hero = fs.readFileSync(path.resolve('app/components/telas/ServiceHero.vue'), 'utf8')
+    assert.ok(janelasContent.includes('TelasServicePage'))
+    assert.ok(hero.includes(':href="service.whatsappUrl"'))
+    assert.ok(hero.includes('Orçamento no WhatsApp'))
+    assert.ok(hero.includes('href="#orcamento-servico"'))
   })
 
   // 33. WhatsApp tracking unchanged
@@ -320,7 +330,9 @@ async function runAllTests() {
   // 35. canonical unchanged
   test(35, 'URLs canônicas e metatags das 12 páginas permanecem intactas', () => {
     const janelasContent = fs.readFileSync(path.resolve(process.cwd(), 'app/pages/servicos/telas/janelas.vue'), 'utf8')
-    assert.ok(janelasContent.includes("title: 'Tela Mosquiteira para Janelas em SP | AD Telas e Redes'"))
+    assert.ok(janelasContent.includes('~/data/telas/janelas'))
+    const config = fs.readFileSync(path.resolve('app/data/telas/janelas.ts'), 'utf8')
+    assert.ok(config.includes('"title": "Tela Mosquiteira para Janelas em SP | AD Telas e Redes"'))
   })
 
   console.log('\n--- GRUPO 7: RESPONSIVIDADE, MOBILE E INTEGRAÇÃO REAL ---')

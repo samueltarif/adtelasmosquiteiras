@@ -98,6 +98,20 @@ function nextMedia() {
 function handleKeydown(e: KeyboardEvent) {
   if (!props.isOpen) return
   switch (e.key) {
+    case 'Tab': {
+      const controls = Array.from(lightboxRef.value?.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], [tabindex="0"], video[controls]') || [])
+        .filter(element => element.getClientRects().length > 0)
+      const first = controls[0]
+      const last = controls[controls.length - 1]
+      if (e.shiftKey && (document.activeElement === first || !lightboxRef.value?.contains(document.activeElement))) {
+        e.preventDefault()
+        last?.focus()
+      } else if (!e.shiftKey && (document.activeElement === last || !lightboxRef.value?.contains(document.activeElement))) {
+        e.preventDefault()
+        first?.focus()
+      }
+      break
+    }
     case 'Escape':
       e.preventDefault()
       handleClose()

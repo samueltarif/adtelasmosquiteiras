@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, useId } from 'vue'
 import { useRoute } from 'vue-router'
 import { useFormSubmit } from '~/composables/useFormSubmit'
 import { getServiceFromPath } from '~/utils/ctaTaxonomy'
@@ -20,6 +20,7 @@ const props = defineProps({
   }
 })
 
+const fieldPrefix = useId()
 const route = useRoute()
 const { isSubmitting, redirectToThankYou } = useFormSubmit()
 const submitError = ref(false)
@@ -185,11 +186,12 @@ const submitLead = async () => {
       <div v-show="currentStep === 1" class="space-y-4">
         <!-- Nome -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-nome'" class="block text-sm font-medium text-gray-700 mb-1">
             Nome <span class="text-red-500">*</span>
           </label>
           <input
             v-model="formData.nome"
+            :id="fieldPrefix + '-nome'" autocomplete="name"
             type="text"
             placeholder="Digite seu nome completo"
             required
@@ -199,12 +201,14 @@ const submitLead = async () => {
 
         <!-- Telefone / WhatsApp -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-telefone'" class="block text-sm font-medium text-gray-700 mb-1">
             WhatsApp / Telefone <span class="text-red-500">*</span>
           </label>
           <input
             v-model="formData.telefone"
+            :id="fieldPrefix + '-telefone'"
             type="tel"
+            inputmode="tel" autocomplete="tel"
             placeholder="(11) 98765-4321"
             required
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
@@ -213,11 +217,12 @@ const submitLead = async () => {
 
         <!-- Cidade -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-cidade'" class="block text-sm font-medium text-gray-700 mb-1">
             Cidade <span class="text-red-500">*</span>
           </label>
           <input
             v-model="formData.cidade"
+            :id="fieldPrefix + '-cidade'" autocomplete="address-level2"
             type="text"
             placeholder="Ex: São Paulo, Santo André, Campinas..."
             required
@@ -268,11 +273,12 @@ const submitLead = async () => {
 
         <!-- E-mail -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-email'" class="block text-sm font-medium text-gray-700 mb-1">
             E-mail <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <input
             v-model="formData.email"
+            :id="fieldPrefix + '-email'" autocomplete="email"
             type="email"
             placeholder="seuemail@exemplo.com"
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
@@ -281,11 +287,12 @@ const submitLead = async () => {
 
         <!-- Região / Endereço / Bairro -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-bairro'" class="block text-sm font-medium text-gray-700 mb-1">
             Bairro ou Região <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <input
             v-model="formData.bairro"
+            :id="fieldPrefix + '-bairro'"
             type="text"
             placeholder="Ex: Moema, Pinheiros, Centro..."
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
@@ -294,11 +301,12 @@ const submitLead = async () => {
 
         <!-- Tipo de Serviço -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-servico'" class="block text-sm font-medium text-gray-700 mb-1">
             Tipo de Serviço <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <select
             v-model="formData.servico"
+            :id="fieldPrefix + '-servico'"
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base bg-white"
           >
             <option value="">Selecione um serviço</option>
@@ -321,11 +329,12 @@ const submitLead = async () => {
 
         <!-- Mensagem / Observações -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label :for="fieldPrefix + '-mensagem'" class="block text-sm font-medium text-gray-700 mb-1">
             Mensagem ou observações <span class="text-gray-400 text-xs">(opcional)</span>
           </label>
           <textarea
             v-model="formData.mensagem"
+            :id="fieldPrefix + '-mensagem'"
             rows="3"
             maxlength="1500"
             placeholder="Conte um pouco sobre o que você precisa, medidas aproximadas, quantidade de janelas..."

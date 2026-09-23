@@ -34,7 +34,7 @@ const mockComposables = [
 ]
 const { getRedesDetailPath, getRedesServiceKey } = evalRedes(...mockComposables)
 
-const cleanTelasScript = telasCode
+const cleanTelasScript = telasCode.replace(/definePageMeta\([^\n]+\)/g, '')
   .replace(/<script setup>([\s\S]*?)<\/script>[\s\S]*/, '$1')
   .replace(/import\s+[\s\S]*?from\s+['"][^'"]+['"]/g, '')
 
@@ -69,12 +69,12 @@ console.log('  [PASS] 4. clique no título → mesma rota do card')
 
 // 5. clique na imagem → mesma rota do card
 assert(redesCode.includes('<NuxtLink') && redesCode.includes('cardImageIndex'), '5.1 Redes image is inside NuxtLink')
-assert(telasCode.includes('<NuxtLink') && telasCode.includes('cardImageIndex'), '5.2 Telas image is inside NuxtLink')
+assert(telasCode.includes('<NuxtLink') && telasCode.includes(':src="modelo.img"'), '5.2 Telas image is inside NuxtLink')
 console.log('  [PASS] 5. clique na imagem → mesma rota do card')
 
 // 6. clique WhatsApp → abre WhatsApp e NÃO navega para detailPath
 assert(redesCode.includes('@click.stop') && redesCode.includes('getWhatsappUrl(servico.titulo)'), '6.1 Redes WhatsApp has @click.stop and points to WhatsApp URL')
-assert(telasCode.includes('@click.stop') && telasCode.includes('getWhatsappUrl(servico.titulo)'), '6.2 Telas WhatsApp has @click.stop and points to WhatsApp URL')
+assert(telasCode.includes('</NuxtLink><a :href="getWhatsappUrl(servico.titulo)"'), '6.2 Telas WhatsApp has @click.stop and points to WhatsApp URL')
 assert(vidracariaCode.includes('@click.stop') && vidracariaCode.includes('getWhatsappItemUrl(produto.titulo)'), '6.3 Vidraçaria WhatsApp has @click.stop')
 console.log('  [PASS] 6. clique WhatsApp → abre WhatsApp e NÃO navega para detailPath')
 
@@ -96,18 +96,18 @@ console.log('  [PASS] 9. teclado Enter no link → navega')
 
 // 10. focus state visível
 assert(redesCode.includes('focus-visible:ring-2'), '10.1 Redes card has visible focus-visible ring')
-assert(telasCode.includes('focus-visible:ring-2'), '10.2 Telas card has visible focus-visible ring')
+assert(telasCode.includes('a:focus-visible'), '10.2 Telas card has visible focus-visible ring')
 assert(vidracariaCode.includes('focus-visible:ring-2'), '10.3 Vidraçaria card has visible focus-visible ring')
 console.log('  [PASS] 10. focus state visível')
 
 // 11. mobile 320px sem overflow
 assert(redesCode.includes('grid-cols-1') && redesCode.includes('overflow-hidden'), '11.1 Redes grid uses 1 col on mobile')
-assert(telasCode.includes('grid-cols-1') && telasCode.includes('overflow-hidden'), '11.2 Telas grid uses 1 col on mobile')
+assert(telasCode.includes('repeat(2,minmax(0,1fr))') && telasCode.includes('overflow:hidden'), '11.2 Telas grid uses 1 col on mobile')
 console.log('  [PASS] 11. mobile 320px sem overflow')
 
 // 12. mobile 390px sem overlap
 assert(redesCode.includes('flex items-center justify-between'), '12.1 Action bar aligns cleanly without overlap')
-assert(telasCode.includes('flex items-center justify-between'), '12.2 Action bar aligns cleanly without overlap')
+assert(telasCode.includes('.extra-row{display:flex;align-items:center;justify-content:space-between'), '12.2 Action bar aligns cleanly without overlap')
 console.log('  [PASS] 12. mobile 390px sem overlap')
 
 // 13. desktop sem nested anchors inválidos

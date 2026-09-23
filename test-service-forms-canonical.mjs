@@ -1,3 +1,4 @@
+import { stripTypeScriptTypes } from 'node:module'
 import assert from 'node:assert'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -39,15 +40,7 @@ globalThis.window = {
 
 // -------------------------------------------------------------
 // Testar resolução de caminhos
-const cleanTaxonomyCode = taxonomyCode
-  .replace(/export\s+type\s+[^\r\n;]+;?/g, '')
-  .replace(/type\s+[^\r\n;]+;?/g, '')
-  .replace(/export /g, '')
-  .replace(/as const/g, '')
-  .replace(/:\s*Record<string,\s*\{[\s\S]*?\}\s*>/g, '')
-  .replace(/:\s*typeof\s+[^\r\n;]+/g, '')
-  .replace(/:\s*string\s*\|\s*null\s*\|\s*undefined/g, '')
-  .replace(/:\s*\{\s*key:\s*string;\s*name:\s*string\s*\}\s*\|\s*null/g, '')
+const cleanTaxonomyCode = stripTypeScriptTypes(taxonomyCode).replace(/export /g, '')
 
 const evalTaxonomy = new Function(
   `
