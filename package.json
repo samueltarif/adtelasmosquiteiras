@@ -3,6 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "test:finance": "node scripts/test-finance.mjs",
+    "test:finance:browser": "node scripts/test-finance-browser.mjs",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
@@ -26,6 +28,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@iconify-json/lucide": "^1.2.126",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@types/nodemailer": "^7.0.11",

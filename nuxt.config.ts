@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     gaApiSecret: process.env.GA_API_SECRET,
     gmailEmail: process.env.GMAIL_EMAIL,
     gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
+    cronSecret: process.env.CRON_SECRET,
     leadNotificationEmail: process.env.LEAD_NOTIFICATION_EMAIL,
     resendApiKey: process.env.RESEND_API_KEY,
     supabaseUrl: process.env.SUPABASE_URL,

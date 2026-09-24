@@ -34,7 +34,7 @@ const handleLogout = async () => {
 <template>
   <div class="flex min-h-screen min-h-[100dvh] w-full max-w-full bg-slate-950 font-sans text-slate-100 antialiased">
     <!-- Sidebar Desktop (>= 768px) -->
-    <aside class="hidden md:flex flex-col h-full py-6 px-4 bg-slate-900/95 fixed h-full w-[260px] lg:w-[280px] left-0 top-0 border-r border-white/10 z-40">
+    <aside class="hidden md:flex flex-col h-full overflow-y-auto py-6 px-4 bg-slate-900/95 fixed h-full w-[260px] lg:w-[280px] left-0 top-0 border-r border-white/10 z-40">
       <div class="flex items-center gap-3 mb-8 px-2">
         <div class="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center shrink-0 text-indigo-400 shadow-md">
           <Icon name="lucide:shield" class="w-6 h-6" />
@@ -46,6 +46,9 @@ const handleLogout = async () => {
       </div>
       
       <nav class="flex flex-col gap-1.5 flex-1">
+        <NuxtLink to="/admin/financeiro" class="flex items-center gap-3 px-3.5 py-3 rounded-xl min-h-[44px]" :class="route.path === '/admin/financeiro' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'">
+          <Icon name="lucide:wallet" class="w-5 h-5 shrink-0" /><span class="text-sm">Contas a pagar e receber</span>
+        </NuxtLink>
         <NuxtLink 
           to="/admin/dashboard" 
           class="flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 min-h-[44px]"
@@ -148,7 +151,7 @@ const handleLogout = async () => {
 
     <!-- Sidebar Mobile Drawer (Sheet pattern) -->
     <aside 
-      class="fixed inset-y-0 left-0 w-[280px] max-w-[85vw] bg-slate-900 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 z-50 flex flex-col border-r border-white/10 transform transition-transform duration-300 md:hidden shadow-2xl"
+      class="fixed inset-y-0 left-0 w-[280px] max-w-[85vw] overflow-y-auto bg-slate-900 pt-[calc(1.5rem+env(safe-area-inset-top,0px))] pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] px-4 z-50 flex flex-col border-r border-white/10 transform transition-transform duration-300 md:hidden shadow-2xl"
       :class="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
       <div class="flex items-center justify-between mb-8 px-2">
@@ -171,6 +174,9 @@ const handleLogout = async () => {
       </div>
 
       <nav class="flex flex-col gap-2 flex-1">
+        <NuxtLink to="/admin/financeiro" class="flex items-center gap-3 px-4 py-3.5 rounded-xl min-h-[48px]" :class="route.path === '/admin/financeiro' ? 'bg-indigo-600 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'" @click="closeMobileMenu">
+          <Icon name="lucide:wallet" class="w-5 h-5 shrink-0" /><span class="text-sm">Contas a pagar e receber</span>
+        </NuxtLink>
         <NuxtLink 
           to="/admin/dashboard" 
           @click="closeMobileMenu"
@@ -289,6 +295,7 @@ const handleLogout = async () => {
             Administração <span class="mx-1 text-slate-600">/</span> 
             <span class="text-white font-semibold">
               {{ 
+                route.path.startsWith('/admin/financeiro') ? 'Contas a pagar e receber' :
                 route.path.startsWith('/admin/clientes') ? 'Clientes' : 
                 route.path.startsWith('/admin/ordens-servico') ? 'Ordens de Serviço' :
                 route.path.startsWith('/admin/agenda') ? 'Agenda & Agendamentos' :
