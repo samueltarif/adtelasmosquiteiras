@@ -1,5 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const route = useRoute()
+const isHomePage = computed(() => route.path === '/')
 
 // Estado do menu mobile
 const isMobileMenuOpen = ref(false)
@@ -15,6 +18,15 @@ const menuItems = [
   { label: 'FAQ', id: 'faq', type: 'scroll' },
   { label: 'Orçamento', id: '/orcamento', type: 'link', highlight: true },
   { label: 'Contato', id: '/contato', type: 'link' }
+]
+
+// Itens do menu desktop estilo IM Esquadrias
+const desktopMenuItems = [
+  { label: 'Início', id: 'hero', type: 'scroll' },
+  { label: 'Serviços', id: 'services', type: 'scroll' },
+  { label: 'Avaliações', id: 'reviews', type: 'scroll' },
+  { label: 'FAQ', id: 'faq', type: 'scroll' },
+  { label: 'Contato', id: '/contato', type: 'link', isBox: true }
 ]
 
 // Função para alternar menu mobile
@@ -77,120 +89,156 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Header Desktop (>= 768px) -->
+  <!-- Header Desktop (>= 768px) Transparente sobre a foto na Home -->
   <header 
     data-cta-location="header"
-    class="hidden md:block fixed top-0 left-0 right-0 border-b border-gray-200 z-40 shadow-sm transition-all duration-300"
-    :class="isScrolled ? 'bg-white/80 backdrop-blur-md' : 'bg-white'"
+    class="hidden md:block fixed top-0 left-0 right-0 z-40 transition-all duration-300"
+    :class="[
+      (isScrolled || !isHomePage)
+        ? 'bg-[#22345F]/95 backdrop-blur-md shadow-lg border-b border-white/10'
+        : 'bg-transparent'
+    ]"
   >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-24">
-        <!-- Logo -->
+      <div class="flex justify-between items-center h-20">
+        <!-- Logo Desktop (Emblema Circular como na referência) -->
         <button 
           @click="goToHome"
-          class="flex items-center justify-center p-1 cursor-pointer hover:opacity-80 transition-opacity min-h-[48px] h-16"
+          class="flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
           aria-label="Ir para página inicial AD Telas e Redes"
         >
-          <img 
-            src="/images/logo_adt_telas_nova.png" 
-            alt="AD Telas e Redes" 
-            class="h-14 lg:h-16 w-auto max-h-16 object-contain"
-          />
+          <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center p-1.5 shadow-lg border border-white/30">
+            <img 
+              src="/images/logo_adt_telas_nova.png" 
+              alt="AD Telas e Redes" 
+              class="h-10 w-auto object-contain"
+            />
+          </div>
         </button>
 
-        <!-- Menu de Navegação Desktop -->
-        <nav class="flex items-center space-x-4 lg:space-x-6">
+        <!-- Menu de Navegação Desktop estilo referência IM Esquadrias -->
+        <nav class="flex items-center space-x-6 lg:space-x-8">
+          <template v-for="item in desktopMenuItems" :key="item.id">
+            <button
+              v-if="!item.isBox"
+              @click="scrollToSection(item)"
+              class="text-sm font-semibold transition-colors duration-200 cursor-pointer text-white/90 hover:text-[#00D2FF]"
+            >
+              {{ item.label }}
+            </button>
+            <button
+              v-else
+              @click="scrollToSection(item)"
+              class="text-sm font-semibold transition-all duration-200 cursor-pointer text-white px-3.5 py-1 rounded border border-white/40 bg-black/20 hover:bg-white/20"
+            >
+              {{ item.label }}
+            </button>
+          </template>
+        </nav>
+
+        <!-- Ações Direita Desktop (Telefone + Botão Orçamento estilo referência) -->
+        <div class="flex items-center gap-4 lg:gap-6">
+          <a
+            href="https://wa.me/5511983586611?text=Ol%C3%A1%21%20Vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento."
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-white transition-colors"
+          >
+            <Icon name="lucide:phone" class="w-4 h-4 text-white" />
+            <span>(11) 98358-6611</span>
+          </a>
+
+          <NuxtLink
+            to="/orcamento"
+            class="px-5 py-2 rounded-lg border border-white/80 hover:border-white text-white hover:bg-white hover:text-[#22345F] text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer bg-black/10"
+          >
+            Solicitar Orçamento
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Header Mobile (< 768px) Transparente sobre as fotos -->
+  <header 
+    data-cta-location="header" 
+    class="md:hidden fixed top-0 left-0 right-0 z-50 px-4 py-3 transition-all duration-300"
+    :class="[
+      (isScrolled || isMobileMenuOpen || !isHomePage)
+        ? 'bg-[#22345F]/95 backdrop-blur-md shadow-lg border-b border-white/10'
+        : 'bg-transparent'
+    ]"
+  >
+    <div class="flex items-center justify-between w-full">
+      <!-- Logo Mobile em Emblema Circular -->
+      <button @click="goToHome" class="flex items-center cursor-pointer hover:opacity-90 transition-opacity">
+        <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center p-1 shadow-lg border border-white/30">
+          <img
+            src="/images/logo_adt_telas_nova.png"
+            alt="AD Telas e Redes"
+            class="h-9 w-auto object-contain"
+          />
+        </div>
+      </button>
+
+      <!-- Botão Menu Hamburger (3 barrinhas) -->
+      <button
+        @click="toggleMobileMenu"
+        class="flex items-center justify-center w-12 h-12 text-white hover:text-white/80 transition-all active:scale-90 cursor-pointer"
+        aria-label="Menu"
+      >
+        <svg v-if="!isMobileMenuOpen" class="w-8 h-8 text-white drop-shadow-md" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg v-else class="w-8 h-8 text-white drop-shadow-md" stroke="currentColor" fill="none" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Backdrop escuro para fechar ao tocar fora -->
+    <div 
+      v-if="isMobileMenuOpen" 
+      @click="isMobileMenuOpen = false" 
+      class="fixed inset-0 top-[70px] z-[-1] bg-black/60 backdrop-blur-xs"
+    ></div>
+
+    <!-- Menu Mobile Dropdown Drawer -->
+    <transition name="slide-dropdown">
+      <div
+        v-show="isMobileMenuOpen"
+        class="mt-3 bg-[#22345F]/98 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-2"
+      >
+        <nav class="space-y-1">
           <button
             v-for="item in menuItems"
             :key="item.id"
             @click="scrollToSection(item)"
             :class="[
-              'px-4 py-2.5 text-sm font-medium transition-colors duration-200 cursor-pointer min-h-[44px] h-[44px] min-w-[44px] flex items-center justify-center',
+              'w-full text-left py-3 px-4 text-sm font-semibold rounded-xl transition-all min-h-[44px] flex items-center justify-between',
               item.highlight 
-                ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white rounded-xl font-bold shadow-md hover:shadow-lg min-h-[44px] h-[44px]' 
-                : 'text-gray-700 hover:text-blue-600 min-h-[44px]'
+                ? 'bg-[#F49A1A] hover:bg-[#e08910] text-white font-bold my-1 shadow-md' 
+                : 'text-white hover:bg-white/10 active:bg-white/20'
             ]"
           >
-            {{ item.label }}
+            <span>{{ item.label }}</span>
+            <Icon v-if="!item.highlight" name="lucide:chevron-right" class="w-4 h-4 text-white/50" />
+            <Icon v-else name="lucide:sparkles" class="w-4 h-4 text-white" />
           </button>
         </nav>
       </div>
-    </div>
-  </header>
-
-  <!-- Header Mobile (< 768px) -->
-  <header data-cta-location="header" class="md:hidden fixed top-0 left-0 right-0 z-40 px-2 sm:px-4 py-2">
-    <div
-      class="flex items-center justify-between bg-white rounded-2xl shadow-lg px-2.5 sm:px-3 h-14 w-full transition-all duration-300 border border-gray-100"
-      :class="isScrolled ? 'shadow-xl bg-white/95 backdrop-blur-md' : 'shadow-md'"
-    >
-      <!-- Logo Mobile -->
-      <button @click="goToHome" class="flex items-center py-1 pr-1.5 hover:opacity-80 transition-opacity min-h-[44px] min-w-[44px] cursor-pointer shrink-0">
-        <img
-          src="/images/logo_adt_telas_nova.png"
-          alt="AD Telas e Redes"
-          class="h-7 sm:h-8 w-auto max-w-[105px] sm:max-w-[120px] object-contain"
-        />
-      </button>
-
-      <!-- Ações Direita Mobile (CTA Orçamento + WhatsApp + Hamburger) -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <!-- Botão Orçamento Compacto -->
-        <NuxtLink
-          to="/orcamento"
-          class="px-2.5 sm:px-3 py-2 bg-[#F49A1A] hover:bg-[#e08910] text-white text-[11px] sm:text-xs font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1 min-h-[44px] min-w-[44px] whitespace-nowrap cursor-pointer"
-        >
-          <span>Orçamento</span>
-        </NuxtLink>
-
-        <!-- WhatsApp Direto -->
-        <a
-          href="https://wa.me/5511983586611?text=Ol%C3%A1%21%20Vim%20pelo%20site%20e%20gostaria%20de%20um%20or%C3%A7amento.%20Podem%20me%20ajudar%20a%20escolher%20o%20servi%C3%A7o%3F"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex items-center justify-center w-11 h-11 bg-[#25D366] hover:bg-[#20B858] text-white rounded-xl transition-all active:scale-95 shrink-0 cursor-pointer min-h-[44px] min-w-[44px]"
-          title="WhatsApp Direto"
-        >
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.700"/>
-          </svg>
-        </a>
-
-        <!-- Botão Menu Hamburger -->
-        <button
-          @click="toggleMobileMenu"
-          class="flex items-center justify-center w-11 h-11 text-gray-700 hover:text-[#22345F] bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors min-h-[44px] min-w-[44px] shrink-0 cursor-pointer"
-          aria-label="Menu"
-        >
-          <svg class="h-5 w-5" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-            <path :class="{'hidden': isMobileMenuOpen, 'inline-flex': !isMobileMenuOpen}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
-            <path :class="{'hidden': !isMobileMenuOpen, 'inline-flex': isMobileMenuOpen}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Menu Mobile Dropdown Drawer -->
-    <div
-      v-show="isMobileMenuOpen"
-      class="mt-2 bg-white/98 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-gray-100 transition-all"
-    >
-      <nav class="px-4 py-2 space-y-1">
-        <button
-          v-for="item in menuItems"
-          :key="item.id"
-          @click="scrollToSection(item)"
-          :class="[
-            'block w-full text-left py-3 px-3 text-sm font-semibold rounded-xl transition-all min-h-[44px] flex items-center justify-between',
-            item.highlight 
-              ? 'bg-[#F49A1A] text-white font-bold my-1' 
-              : 'text-gray-800 hover:bg-gray-50 hover:text-[#22345F]'
-          ]"
-        >
-          <span>{{ item.label }}</span>
-          <Icon v-if="!item.highlight" name="lucide:chevron-right" class="w-4 h-4 text-gray-400" />
-        </button>
-      </nav>
-    </div>
+    </transition>
   </header>
 </template>
+
+<style scoped>
+.slide-dropdown-enter-active,
+.slide-dropdown-leave-active {
+  transition: all 0.25s ease-out;
+}
+.slide-dropdown-enter-from,
+.slide-dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+</style>

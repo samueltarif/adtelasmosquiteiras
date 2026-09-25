@@ -21,228 +21,94 @@ function goTo(i) {
   currentIndex.value = i
 }
 
+function scrollToServices() {
+  const el = document.getElementById('services') || document.getElementById('servicos')
+  if (el) {
+    const headerHeight = 70
+    const top = el.getBoundingClientRect().top + window.scrollY - headerHeight
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+}
+
 onMounted(() => { timer = setInterval(next, 3500) })
 onUnmounted(() => { clearInterval(timer) })
 </script>
 
 <template>
-  <section data-cta-location="hero" class="mt-16 md:mt-28 bg-white relative overflow-hidden">
+  <section data-cta-location="hero" class="relative min-h-[100dvh] flex flex-col justify-end overflow-hidden bg-black">
     <h1 class="sr-only">Telas Mosquiteiras e Redes de Proteção em São Paulo</h1>
 
-    <!-- ===== MOBILE (< 768px) ===== -->
-    <div class="block md:hidden">
+    <!-- Carrossel de fundo full-screen cobrindo todo o topo e passando por trás do menu -->
+    <div class="absolute inset-0 w-full h-full overflow-hidden">
+      <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
+        <img
+          v-for="(img, i) in carouselImages"
+          v-show="currentIndex === i"
+          :key="img.src"
+          :src="img.src"
+          :alt="img.alt"
+          :loading="i === 0 ? 'eager' : 'lazy'"
+          :fetchpriority="i === 0 ? 'high' : 'auto'"
+          class="absolute inset-0 w-full h-full object-cover"
+        />
+      </transition-group>
 
-      <!-- Carrossel full-width com overlay de headline -->
-      <div class="relative w-full aspect-[4/3] overflow-hidden">
-        <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
-          <img
-            v-for="(img, i) in carouselImages"
-            v-show="currentIndex === i"
-            :key="img.src"
-            :src="img.src"
-            :alt="img.alt"
-            :loading="i === 0 ? 'eager' : 'lazy'"
-            :fetchpriority="i === 0 ? 'high' : 'auto'"
-            class="absolute inset-0 w-full h-full object-cover"
-          />
-        </transition-group>
-
-        <!-- Gradiente inferior -->
-        <div class="absolute inset-0 bg-gradient-to-t from-[#22345F]/80 via-transparent to-transparent"></div>
-
-        <!-- Headline sobre a imagem -->
-        <div class="absolute bottom-0 left-0 right-0 px-5 pb-5">
-          <p class="text-[28px] leading-[1.15] font-bold text-white tracking-tight drop-shadow">
-            Telas Mosquiteiras e<br>Redes de Proteção<br>em São Paulo
-          </p>
-          <p class="text-white/90 text-sm mt-1">Telas, redes e vidraçaria sob medida</p>
-        </div>
-
-        <!-- Dots -->
-        <div class="absolute top-4 right-4 flex gap-1.5">
-          <button
-            v-for="(img, i) in carouselImages"
-            :key="i"
-            :aria-label="`Ver imagem: ${img.alt}`"
-            @click="goTo(i)"
-            class="w-2 h-2 rounded-full transition-all"
-            :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
-          />
-        </div>
-      </div>
-
-      <!-- Conteúdo abaixo do carrossel -->
-      <div class="px-5 pt-5 pb-10">
-
-        <!-- Trust badges compactos -->
-        <div class="flex items-center justify-around py-3 mb-5 bg-gray-50 rounded-2xl">
-          <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#F49A1A] font-bold text-base">5.0 ★</span>
-            <span class="text-gray-500 text-[11px]">487 avaliações</span>
-          </div>
-          <div class="w-px h-8 bg-gray-200"></div>
-          <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#22345F] font-bold text-base">+5 Mil</span>
-            <span class="text-gray-500 text-[11px]">clientes</span>
-          </div>
-          <div class="w-px h-8 bg-gray-200"></div>
-          <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#22345F] font-bold text-base">10+</span>
-            <span class="text-gray-500 text-[11px]">anos</span>
-          </div>
-          <div class="w-px h-8 bg-gray-200"></div>
-          <div class="flex flex-col items-center gap-0.5">
-            <span class="text-[#22345F] font-bold text-base">48h</span>
-            <span class="text-gray-500 text-[11px]">instalação</span>
-          </div>
-        </div>
-
-        <!-- CTAs: telas e redes em destaque -->
-        <div class="grid grid-cols-2 gap-2 mb-2">
-          <NuxtLink
-            to="/servicos/telas"
-            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
-          >
-            <Icon name="lucide:grid" class="w-5 h-5" />
-            <span>Telas Mosquiteiras</span>
-          </NuxtLink>
-          <NuxtLink
-            to="/servicos/redes"
-            class="flex flex-col items-center justify-center gap-1 h-16 bg-[#22345F] text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all shadow-md"
-          >
-            <Icon name="lucide:shield" class="w-5 h-5" />
-            <span>Redes de Proteção</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Acesso ao terceiro serviço -->
-        <div class="flex justify-center">
-          <NuxtLink
-            to="/servicos/vidracaria"
-            class="inline-flex items-center gap-1.5 px-6 py-2.5 bg-[#F49A1A] text-white rounded-xl font-semibold text-sm active:scale-[0.97] transition-all"
-          >
-            <Icon name="lucide:panels-top-left" class="w-4 h-4 shrink-0" />
-            Vidraçaria sob medida
-          </NuxtLink>
-        </div>
-
-      </div>
+      <!-- Gradientes escuros com vinheta idêntica à referência IM Esquadrias -->
+      <!-- Desktop: gradiente lateral esquerdo para texto legível -->
+      <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/70 to-transparent hidden md:block"></div>
+      <!-- Mobile e base: gradiente vertical que deixa os 60% superiores limpos e a base bem escura -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/90 via-40% to-transparent"></div>
     </div>
 
-    <!-- ===== DESKTOP (>= 768px) ===== -->
-    <div class="hidden md:block py-16 lg:py-20 bg-gradient-to-b from-gray-50 to-white">
-      <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <!-- Conteúdo do Hero colado embaixo exatamente como na referência IM Esquadrias -->
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex-1 flex flex-col justify-end pb-7 sm:pb-10 lg:pb-12 pt-20">
+      
+      <!-- Pill Badge: visível no desktop onde existe na referência -->
+      <div class="hidden sm:inline-flex items-center gap-2 self-start px-4 py-1.5 bg-black/40 text-white rounded-full text-xs sm:text-sm font-semibold mb-5 border border-white/20 backdrop-blur-md uppercase tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
+        Especialistas em Telas e Redes
+      </div>
 
-          <!-- Coluna esquerda: conteúdo -->
-          <div>
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#22345F] rounded-full text-sm font-medium mb-6 border-2 border-[#22345F]/10 shadow-sm">
-              <svg class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              Instalação profissional sob medida
-            </div>
+      <!-- Headline -->
+      <h2 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.15] tracking-tight drop-shadow-lg mb-3 sm:mb-4 max-w-3xl">
+        Sua Casa Protegida de<br>
+        <span class="text-[#00D2FF]">Mosquitos Todos os Dias</span>
+      </h2>
 
-            <!-- Headline -->
-            <p aria-hidden="true" class="text-4xl md:text-5xl lg:text-5xl font-bold text-[#22345F] mb-4 leading-tight tracking-tight">
-              Telas Mosquiteiras e Redes de Proteção<br>
-              <span class="text-[#F49A1A]">em São Paulo</span>
-            </p>
+      <!-- Subheadline -->
+      <p class="text-white/85 text-sm sm:text-lg lg:text-xl leading-relaxed drop-shadow-sm mb-6 sm:mb-8 max-w-2xl font-normal">
+        Telas mosquiteiras sob medida para janelas e portas, com instalação rápida e acabamento profissional.
+      </p>
 
-            <!-- Subheadline -->
-            <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-lg">
-              Redes para janelas, sacadas e pets, telas contra insetos e serviços de vidraçaria. Escolha o serviço para conhecer as opções e solicitar seu orçamento.
-            </p>
+      <!-- Botões de Ação estilo referência IM Esquadrias -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto">
+        <!-- Botão Primário Verde com seta -->
+        <NuxtLink
+          to="/orcamento"
+          class="inline-flex items-center justify-center gap-2.5 py-4 px-8 bg-[#25D366] hover:bg-[#20b858] text-white font-bold text-base sm:text-lg rounded-full shadow-xl shadow-green-500/25 active:scale-[0.98] transition-all text-center"
+        >
+          <span>Solicitar Orçamento</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </NuxtLink>
 
-            <!-- Trust badges desktop -->
-            <div class="flex flex-wrap items-center gap-6 mb-10">
-              <div class="flex items-center gap-2">
-                <div class="flex gap-0.5">
-                  <svg v-for="i in 5" :key="i" class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                  </svg>
-                </div>
-                <span class="text-sm font-semibold text-[#22345F]">5.0</span>
-                <span class="text-sm text-gray-500">(487 avaliações)</span>
-              </div>
-              <div class="w-px h-5 bg-gray-200"></div>
-              <span class="text-sm text-gray-600 font-medium">+5 Mil Clientes</span>
-              <div class="w-px h-5 bg-gray-200"></div>
-              <span class="text-sm text-gray-600 font-medium">10+ Anos de experiência</span>
-            </div>
-
-            <!-- CTAs -->
-            <div class="flex flex-col gap-4">
-              <!-- Telas e Redes em destaque -->
-              <div class="flex gap-4">
-                <NuxtLink
-                  to="/servicos/telas"
-                  class="flex-1 inline-flex items-center justify-center gap-2.5 px-6 py-4 bg-[#22345F] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#1a2a4f] transition-all"
-                >
-                  <Icon name="lucide:grid" class="w-5 h-5" />
-                  Telas Mosquiteiras
-                </NuxtLink>
-                <NuxtLink
-                  to="/servicos/redes"
-                  class="flex-1 inline-flex items-center justify-center gap-2.5 px-6 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg hover:bg-[#e08a10] transition-all"
-                >
-                  <Icon name="lucide:shield" class="w-5 h-5" />
-                  Redes de Proteção
-                </NuxtLink>
-              </div>
-              <!-- Vidraçaria abaixo -->
-              <NuxtLink
-                to="/servicos/vidracaria"
-                class="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-[#F49A1A] text-white rounded-2xl font-semibold text-base shadow-lg shadow-[#F49A1A]/20 hover:bg-[#e08a10] transition-all"
-              >
-                <Icon name="lucide:panels-top-left" class="w-5 h-5 shrink-0" />
-                Vidraçaria sob medida
-              </NuxtLink>
-            </div>
-          </div>
-
-          <!-- Coluna direita: carrossel -->
-          <div class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-gray-100">
-            <div class="relative w-full h-[520px]">
-              <transition-group name="fade-carousel" tag="div" class="relative w-full h-full">
-                <img
-                  v-for="(img, i) in carouselImages"
-                  v-show="currentIndex === i"
-                  :key="img.src"
-                  :src="img.src"
-                  :alt="img.alt"
-                  :loading="i === 0 ? 'eager' : 'lazy'"
-                  :fetchpriority="i === 0 ? 'high' : 'auto'"
-                  class="absolute inset-0 w-full h-full object-cover"
-                />
-              </transition-group>
-
-              <!-- Dots desktop -->
-              <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                <button
-                  v-for="(img, i) in carouselImages"
-                  :key="i"
-                  :aria-label="`Ver imagem: ${img.alt}`"
-                  @click="goTo(i)"
-                  class="w-2.5 h-2.5 rounded-full transition-all"
-                  :class="currentIndex === i ? 'bg-white scale-125' : 'bg-white/40'"
-                />
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <!-- Botão Secundário Preto Translúcido com borda branca -->
+        <button
+          @click="scrollToServices"
+          class="inline-flex items-center justify-center gap-2 py-4 px-8 bg-black/40 hover:bg-black/60 text-white font-semibold text-base sm:text-lg rounded-full border border-white/50 backdrop-blur-md active:scale-[0.98] transition-all text-center cursor-pointer"
+        >
+          <span>Ver Serviços</span>
+        </button>
       </div>
     </div>
-
   </section>
 </template>
 
 <style scoped>
 .fade-carousel-enter-active,
 .fade-carousel-leave-active {
-  transition: opacity 0.7s ease;
+  transition: opacity 0.8s ease-in-out;
   position: absolute;
   inset: 0;
 }
