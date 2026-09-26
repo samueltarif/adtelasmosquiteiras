@@ -39,3 +39,8 @@ artifacts/
 # Local Review Packages
 *.zip
 *.sha256
+
+# Playwright MCP
+.playwright-mcp/
+tools/
+

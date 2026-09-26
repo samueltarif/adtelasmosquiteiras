@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "node",
+      "args": [
+        "d:\\ADT\\tools\\playwright-mcp\\cli.js",
+        "--headless"
+      ]
+    }
+  }
+}

@@ -4,7 +4,7 @@ export default {
   "slug": "portas",
   "key": "telas_portas",
   "name": "Telas Mosquiteiras para Portas",
-  "title": "Tela Mosquiteira para Portas em São Paulo",
+  "title": "Tela Mosquiteira para Portas Sob Medida em São Paulo",
   "eyebrow": "Passagens e Acessos Externos",
   "description": "Mantenha portas abertas para ventilação contínua com proteção contra mosquitos e pernilongos. Modelos sob medida para portas de giro e portas balcão em São Paulo e região.",
   "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Portas.+Vim+pelo+site.&type=phone_number&app_absent=0",
