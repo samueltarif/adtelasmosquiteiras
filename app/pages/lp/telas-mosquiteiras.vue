@@ -222,7 +222,7 @@ onUnmounted(() => {
               @click="track('whatsapp_cta_click', { cta_location: 'lp_hero' })"
             >
               <WhatsappIcon />
-              <span>PEDIR ORÇAMENTO NO WHATSAPP →</span>
+              <span>Fale agora pelo Whatsapp</span>
             </a>
           </div>
         </div>
@@ -310,7 +310,7 @@ onUnmounted(() => {
               @click="track('whatsapp_cta_click', { cta_location: 'gallery_card', service: item.title })"
             >
               <WhatsappIcon class="cta-wa-icon" />
-              <span>Falar com consultor</span>
+              <span>Fale agora pelo Whatsapp</span>
               <span aria-hidden="true" class="cta-arrow">→</span>
             </a>
           </div>
@@ -352,7 +352,7 @@ onUnmounted(() => {
               @click="track('whatsapp_cta_click', { cta_location: 'quick_models', model: model.name })"
             >
               <WhatsappIcon />
-              <span>Pedir para {{ model.name }} →</span>
+              <span>Fale agora pelo Whatsapp</span>
             </a>
           </article>
         </div>
@@ -523,10 +523,10 @@ onUnmounted(() => {
       data-service-name="Telas Mosquiteiras"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Falar agora no WhatsApp"
-      title="Falar agora no WhatsApp"
+      aria-label="Fale agora pelo Whatsapp"
+      title="Fale agora pelo Whatsapp"
       @click="track('whatsapp_cta_click', { cta_location: 'floating_whatsapp' })"
-    ><WhatsappIcon aria-hidden="true" /><span>Falar agora no WhatsApp</span></a>
+    ><WhatsappIcon aria-hidden="true" /><span>Fale agora pelo Whatsapp</span></a>
   </div>
 </template>
 
