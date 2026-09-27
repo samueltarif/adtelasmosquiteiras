@@ -16,8 +16,6 @@ function getWhatsappUrl(text) {
 }
 
 const showForm = ref(false)
-const heroPassed = ref(false)
-let heroObserver = null
 function toggleForm() {
   showForm.value = !showForm.value
   if (showForm.value) {
@@ -42,28 +40,42 @@ useHead({
 // Fotos reais de instalações feitas pela AD Telas
 const realInstallations = [
   {
+    title: 'Telas pra Janelas',
+    desc: 'Acabamento discreto integrado à esquadria existente.',
+    img: '/images/tela-para-janela.jpeg',
+    tag: 'Janela'
+  },
+  {
     title: 'Janela de Correr em Alumínio',
     desc: 'Vedação impecável sem alterar a fachada.',
-    img: '/images/telas_com_aluminio.jpg',
+    img: '/images/janela_correr_aluminio_1.png',
+    images: [
+      '/images/janela_correr_aluminio_1.png',
+      '/images/janela_correr_aluminio_2.png',
+      '/images/janela_correr_aluminio_3.png'
+    ],
     tag: 'Janela'
   },
   {
     title: 'Porta Balcão de Correr',
     desc: 'Deslizamento suave para acesso à sacada.',
-    img: '/images/mosquiteira_porta_de_correr.png',
+    img: '/images/porta_balcao_correr_1.png',
+    images: [
+      '/images/porta_balcao_correr_1.png',
+      '/images/porta_balcao_correr_2.png',
+      '/images/porta_balcao_correr_3.png'
+    ],
     tag: 'Porta'
   },
   {
     title: 'Sacada Envidraçada',
     desc: 'Proteção total mantendo a ventilação e a vista.',
-    img: '/images/telas_para_sacadas.jpg',
+    img: '/images/sacada_envidracada_1.png',
+    images: [
+      '/images/sacada_envidracada_1.png',
+      '/images/sacada_envidracada_2.png'
+    ],
     tag: 'Sacada'
-  },
-  {
-    title: 'Janela Residencial Sob Medida',
-    desc: 'Acabamento discreto integrado à esquadria existente.',
-    img: '/images/tela-para-janela.jpeg',
-    tag: 'Janela'
   },
   {
     title: 'Tela Pet Screen Reforçada',
@@ -111,17 +123,34 @@ const quickModels = [
   }
 ]
 
-function handleScroll() {
-  heroPassed.value = window.scrollY > 300
-}
+const activeSlides = ref({})
+let carouselInterval = null
 
 onMounted(() => {
   track('landing_view')
-  window.addEventListener('scroll', handleScroll, { passive: true })
+
+  // Inicializa os índices de slides para todos os cards que possuem múltiplas fotos
+  realInstallations.forEach((item, index) => {
+    if (item.images?.length) {
+      activeSlides.value[index] = 0
+    }
+  })
+
+  // Alterna as fotos a cada 3 segundos como carrossel para os cards com múltiplas fotos
+  carouselInterval = setInterval(() => {
+    realInstallations.forEach((item, index) => {
+      if (item.images?.length) {
+        activeSlides.value[index] = ((activeSlides.value[index] || 0) + 1) % item.images.length
+      }
+    })
+  }, 3000)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  if (carouselInterval) {
+    clearInterval(carouselInterval)
+    carouselInterval = null
+  }
 })
 </script>
 
@@ -137,15 +166,7 @@ onUnmounted(() => {
             <small>TELAS MOSQUITEIRAS</small>
           </div>
         </NuxtLink>
-        <a
-          :href="getWhatsappUrl('Olá! Vim pela página de anúncios e gostaria de tirar uma dúvida.')"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="lp-header-cta"
-          @click="track('whatsapp_cta_click', { cta_location: 'lp_header' })"
-        >
-          <WhatsappIcon /> <span>Falar no WhatsApp</span>
-        </a>
+
       </div>
     </header>
 
@@ -173,24 +194,7 @@ onUnmounted(() => {
               Proteja sua casa contra mosquitos sem perder ventilação.
             </p>
 
-            <ul class="hero-checklist">
-              <li><Icon name="lucide:check-circle-2" class="check-icon" /> <span><strong>Fabricação sob medida</strong> para qualquer vão</span></li>
-              <li><Icon name="lucide:check-circle-2" class="check-icon" /> <span><strong>Instalação profissional</strong> com vedação total</span></li>
-              <li><Icon name="lucide:check-circle-2" class="check-icon" /> <span><strong>Atendimento em São Paulo e região</strong></span></li>
-            </ul>
 
-            <!-- Google Rating Badge -->
-            <a
-              :href="googleReviewsUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hero-google-badge"
-              title="Ver avaliações no Google"
-            >
-              <span class="stars" aria-hidden="true">★★★★★</span>
-              <strong>{{ googleReviews.rating }} no Google</strong>
-              <span>({{ googleReviews.count }} avaliações) ↗</span>
-            </a>
           </div>
 
           <!-- Hero CTA Button -->
@@ -201,6 +205,10 @@ onUnmounted(() => {
               rel="noopener noreferrer"
               class="button green hero-cta-btn"
               data-cta-location="lp_hero"
+              data-gtm="lp-whatsapp-hero"
+              data-track-type="whatsapp"
+              data-service-key="telas-mosquiteiras"
+              data-service-name="Telas Mosquiteiras"
               @click="track('whatsapp_cta_click', { cta_location: 'lp_hero' })"
             >
               <WhatsappIcon />
@@ -209,9 +217,172 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Rodapé Compacto do Hero: 2 frases lado a lado e 1 centralizada embaixo -->
+      <div class="hero-footer-bar">
+        <div class="wrap hero-benefits-box">
+          <div class="hero-benefits-row-top">
+            <div class="hero-benefit-item">
+              <Icon name="lucide:check-circle-2" class="check-icon" />
+              <span><strong>Fabricação sob medida</strong><span class="benefit-sub"> para qualquer vão</span></span>
+            </div>
+            <div class="hero-benefit-item">
+              <Icon name="lucide:check-circle-2" class="check-icon" />
+              <span><strong>Instalação profissional</strong><span class="benefit-sub"> com vedação total</span></span>
+            </div>
+          </div>
+          <div class="hero-benefits-row-bottom">
+            <div class="hero-benefit-item">
+              <Icon name="lucide:check-circle-2" class="check-icon" />
+              <span><strong>Atendimento em São Paulo e região</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- Seção de Ação Rápida: Envie uma foto e informe seu CEP -->
+    <!-- 1. Galeria de Fotos REAIS de Instalações Feitas pela AD Telas -->
+    <section class="section wrap" aria-labelledby="gallery-title">
+      <div class="section-heading">
+        <p class="eyebrow">INSTALAÇÕES REAIS AD TELAS</p>
+        <h2 id="gallery-title">Fotos de Serviços Realizados</h2>
+        <p>Veja como as telas ficam discretas, elegantes e perfeitamente integradas às esquadrias de alumínio.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <article v-for="(item, cIndex) in realInstallations" :key="item.title" class="gallery-card">
+          <div class="card-img-wrap" :class="{ 'has-carousel': item.images?.length }">
+            <template v-if="item.images && item.images.length">
+              <div
+                v-for="(imgSrc, sIndex) in item.images"
+                :key="imgSrc"
+                class="carousel-slide"
+                :class="{ active: (activeSlides[cIndex] ?? 0) === sIndex }"
+              >
+                <img
+                  :src="imgSrc"
+                  :alt="`${item.title} - Foto ${sIndex + 1}`"
+                  width="480"
+                  height="600"
+                  :loading="sIndex === 0 ? 'eager' : 'lazy'"
+                />
+              </div>
+              <div class="carousel-dots" :aria-label="`Fotos de ${item.title}`">
+                <button
+                  v-for="(imgSrc, sIndex) in item.images"
+                  :key="sIndex"
+                  type="button"
+                  class="carousel-dot"
+                  :class="{ active: (activeSlides[cIndex] ?? 0) === sIndex }"
+                  :aria-label="`Ver foto ${sIndex + 1}`"
+                  @click.stop.prevent="activeSlides[cIndex] = sIndex"
+                />
+              </div>
+            </template>
+            <template v-else>
+              <img :src="item.img" :alt="item.title" width="480" height="600" loading="lazy" />
+            </template>
+            <span class="card-badge">{{ item.tag }}</span>
+          </div>
+          <div class="card-body">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.desc }}</p>
+            <a
+              :href="getWhatsappUrl(`Olá! Gostei da foto de ${item.title} e gostaria de falar com um consultor para um orçamento.`)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="card-cta-link pulse-subtle"
+              data-cta-location="gallery_card"
+              data-gtm="lp-whatsapp-gallery"
+              data-track-type="whatsapp"
+              data-service-key="telas-mosquiteiras"
+              data-service-name="Telas Mosquiteiras"
+              @click="track('whatsapp_cta_click', { cta_location: 'gallery_card', service: item.title })"
+            >
+              <WhatsappIcon class="cta-wa-icon" />
+              <span>Falar com consultor</span>
+              <span aria-hidden="true" class="cta-arrow">→</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 2. Modelos Objetivos: Janela | Porta | Sacada | Removível -->
+    <section class="section bg-light" aria-labelledby="models-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">ONDE VOCÊ PRECISA INSTALAR?</p>
+          <h2 id="models-title">Janela · Porta · Sacada · Removível</h2>
+          <p>Você não precisa estudar modelos complexos. Escolha o ambiente e nossa equipe indica a melhor opção.</p>
+        </div>
+
+        <div class="models-grid">
+          <article v-for="model in quickModels" :key="model.name" class="model-box">
+            <div class="model-box-top">
+              <div class="model-icon">
+                <Icon :name="model.icon" />
+              </div>
+              <div>
+                <span class="model-tag">{{ model.name }}</span>
+                <h3>{{ model.title }}</h3>
+              </div>
+            </div>
+            <p class="model-desc">{{ model.desc }}</p>
+            <a
+              :href="getWhatsappUrl(model.msg)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="button outline-btn pulse-subtle"
+              data-cta-location="quick_models"
+              data-gtm="lp-whatsapp-models"
+              data-track-type="whatsapp"
+              data-service-key="telas-mosquiteiras"
+              data-service-name="Telas Mosquiteiras"
+              @click="track('whatsapp_cta_click', { cta_location: 'quick_models', model: model.name })"
+            >
+              <WhatsappIcon />
+              <span>Pedir para {{ model.name }} →</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Depoimentos Reais de Clientes (Google Reviews) -->
+    <section class="section wrap" aria-labelledby="reviews-title">
+      <div class="section-heading">
+        <p class="eyebrow">DEPOIMENTOS REAIS NO GOOGLE</p>
+        <h2 id="reviews-title">Quem já confiou na AD Telas, recomenda</h2>
+        <div class="google-badge-inline">
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <strong>Nota {{ googleReviews.rating }} de 5,0</strong>
+          <span>· {{ googleReviews.count }} avaliações reais conferidas</span>
+        </div>
+      </div>
+
+      <div class="reviews-grid">
+        <article v-for="rev in reviews" :key="rev.name" class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <blockquote>“{{ rev.text }}”</blockquote>
+          <div class="review-author">
+            <div class="author-avatar">{{ rev.name.charAt(0) }}</div>
+            <div>
+              <strong>{{ rev.name }}</strong>
+              <small>Cliente verificado no Google</small>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="text-center mt-6">
+        <a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer" class="link-muted">
+          Conferir todas as avaliações no Google Reviews ↗
+        </a>
+      </div>
+    </section>
+
+    <!-- 4. Seção de Ação Rápida: Envie uma foto e informe seu CEP (Agora posicionada APÓS os depoimentos) -->
     <section class="quick-quote-band" aria-labelledby="quick-quote-title">
       <div class="wrap quick-quote-card">
         <div class="quick-quote-header">
@@ -249,6 +420,11 @@ onUnmounted(() => {
             target="_blank"
             rel="noopener noreferrer"
             class="button green pulse-btn"
+            data-cta-location="quick_photo_band"
+            data-gtm="lp-whatsapp-quick-band"
+            data-track-type="whatsapp"
+            data-service-key="telas-mosquiteiras"
+            data-service-name="Telas Mosquiteiras"
             @click="track('whatsapp_cta_click', { cta_location: 'quick_photo_band' })"
           >
             <WhatsappIcon />
@@ -258,108 +434,7 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- Galeria de Fotos REAIS de Instalações Feitas pela AD Telas -->
-    <section class="section wrap" aria-labelledby="gallery-title">
-      <div class="section-heading">
-        <p class="eyebrow">INSTALAÇÕES REAIS AD TELAS</p>
-        <h2 id="gallery-title">Fotos de Serviços Realizados</h2>
-        <p>Veja como as telas ficam discretas, elegantes e perfeitamente integradas às esquadrias de alumínio.</p>
-      </div>
-
-      <div class="gallery-grid">
-        <article v-for="item in realInstallations" :key="item.title" class="gallery-card">
-          <div class="card-img-wrap">
-            <img :src="item.img" :alt="item.title" width="480" height="360" loading="lazy" />
-            <span class="card-badge">{{ item.tag }}</span>
-          </div>
-          <div class="card-body">
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.desc }}</p>
-            <a
-              :href="getWhatsappUrl(`Olá! Gostei da foto de ${item.title} e gostaria de um orçamento parecido.`)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="card-cta-link"
-              @click="track('whatsapp_cta_click', { cta_location: 'gallery_card', service: item.title })"
-            >
-              <span>Quero igual no WhatsApp</span>
-              <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- Modelos Objetivos: Janela | Porta | Sacada | Removível -->
-    <section class="section bg-light" aria-labelledby="models-title">
-      <div class="wrap">
-        <div class="section-heading">
-          <p class="eyebrow">ONDE VOCÊ PRECISA INSTALAR?</p>
-          <h2 id="models-title">Janela · Porta · Sacada · Removível</h2>
-          <p>Você não precisa estudar modelos complexos. Escolha o ambiente e nossa equipe indica a melhor opção.</p>
-        </div>
-
-        <div class="models-grid">
-          <article v-for="model in quickModels" :key="model.name" class="model-box">
-            <div class="model-box-top">
-              <div class="model-icon">
-                <Icon :name="model.icon" />
-              </div>
-              <div>
-                <span class="model-tag">{{ model.name }}</span>
-                <h3>{{ model.title }}</h3>
-              </div>
-            </div>
-            <p class="model-desc">{{ model.desc }}</p>
-            <a
-              :href="getWhatsappUrl(model.msg)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="button outline-btn"
-              @click="track('whatsapp_cta_click', { cta_location: 'quick_models', model: model.name })"
-            >
-              <WhatsappIcon />
-              <span>Pedir para {{ model.name }} →</span>
-            </a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Depoimentos Reais de Clientes -->
-    <section class="section wrap" aria-labelledby="reviews-title">
-      <div class="section-heading">
-        <p class="eyebrow">DEPOIMENTOS REAIS NO GOOGLE</p>
-        <h2 id="reviews-title">Quem já confiou na AD Telas, recomenda</h2>
-        <div class="google-badge-inline">
-          <span class="stars" aria-hidden="true">★★★★★</span>
-          <strong>Nota {{ googleReviews.rating }} de 5,0</strong>
-          <span>· {{ googleReviews.count }} avaliações reais conferidas</span>
-        </div>
-      </div>
-
-      <div class="reviews-grid">
-        <article v-for="rev in reviews" :key="rev.name" class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <blockquote>“{{ rev.text }}”</blockquote>
-          <div class="review-author">
-            <div class="author-avatar">{{ rev.name.charAt(0) }}</div>
-            <div>
-              <strong>{{ rev.name }}</strong>
-              <small>Cliente verificado no Google</small>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="text-center mt-6">
-        <a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer" class="link-muted">
-          Conferir todas as avaliações no Google Reviews ↗
-        </a>
-      </div>
-    </section>
-
-    <!-- CTA Final de Conversão -->
+    <!-- 5. CTA Final de Conversão -->
     <section class="final-cta-section">
       <div class="wrap final-cta-box">
         <p class="eyebrow text-gold">ATENDIMENTO IMEDIATO</p>
@@ -374,6 +449,11 @@ onUnmounted(() => {
             target="_blank"
             rel="noopener noreferrer"
             class="button green final-btn pulse-btn"
+            data-cta-location="final_cta"
+            data-gtm="lp-whatsapp-final"
+            data-track-type="whatsapp"
+            data-service-key="telas-mosquiteiras"
+            data-service-name="Telas Mosquiteiras"
             @click="track('whatsapp_cta_click', { cta_location: 'final_cta' })"
           >
             <WhatsappIcon />
@@ -422,24 +502,15 @@ onUnmounted(() => {
       </div>
     </footer>
 
-    <!-- Barra Fixa Inferior no Celular (WhatsApp Always Sticky) -->
-    <aside v-show="heroPassed" class="mobile-sticky-bar" aria-label="Ação rápida no celular">
-      <a
-        :href="getWhatsappUrl('Olá! Estou no site e quero enviar uma foto para orçamento de telas mosquiteiras.')"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="mobile-whatsapp-btn"
-        @click="track('whatsapp_cta_click', { cta_location: 'mobile_sticky_bottom' })"
-      >
-        <WhatsappIcon />
-        <span>Falar no WhatsApp Agora</span>
-      </a>
-    </aside>
     <!-- Botão Flutuante Piscando: Falar agora no WhatsApp -->
     <a
       :href="getWhatsappUrl('Olá! Gostaria de falar com um especialista sobre telas mosquiteiras.')"
       class="floating-whatsapp"
       data-cta-location="floating_whatsapp"
+      data-gtm="lp-whatsapp-floating"
+      data-track-type="whatsapp"
+      data-service-key="telas-mosquiteiras"
+      data-service-name="Telas Mosquiteiras"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar agora no WhatsApp"
@@ -464,18 +535,17 @@ onUnmounted(() => {
   background: #fff;
   font-family: inherit;
   line-height: 1.5;
-  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-}
-
-@media (min-width: 768px) {
-  .lp-container {
-    padding-bottom: 0;
-  }
+  padding-bottom: 0;
 }
 
 .wrap {
-  width: min(1200px, calc(100% - 36px));
+  width: min(1240px, calc(100% - 24px));
   margin-inline: auto;
+}
+@media (max-width: 480px) {
+  .wrap {
+    width: calc(100% - 16px);
+  }
 }
 
 h1, h2, h3, p {
@@ -522,7 +592,7 @@ p {
 }
 
 .section {
-  padding-block: 46px;
+  padding-block: 48px;
 }
 
 @media (min-width: 768px) {
@@ -556,7 +626,7 @@ p {
 .lp-header-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
   height: 72px;
 }
@@ -574,7 +644,10 @@ p {
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
 }
 
-@media (max-width: 420px) { .lp-brand-text { display: none; } }
+@media (max-width: 420px) {
+  .lp-brand-text { display: none; }
+}
+
 .lp-brand-text {
   display: flex;
   flex-direction: column;
@@ -676,8 +749,8 @@ p {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 0 28px;
-  max-width: 480px;
+  padding: 85px 0 20px;
+  max-width: 500px;
   width: 100%;
   text-align: left;
 }
@@ -711,31 +784,6 @@ p {
   margin-top: 6px;
   color: #dbe7f5;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-.hero-checklist {
-  list-style: none;
-  padding: 0;
-  margin: 12px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 12.5px;
-  color: #f1f6fc;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
-}
-
-.hero-checklist li {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.check-icon {
-  width: 16px;
-  height: 16px;
-  color: #25d366;
-  flex-shrink: 0;
 }
 
 .hero-google-badge {
@@ -816,10 +864,90 @@ p {
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
 }
 
+/* Rodapé Compacto do Hero: 2 frases lado a lado e 1 centralizada embaixo */
+.hero-footer-bar {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  background: rgba(8, 20, 36, 0.90);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 10px 0;
+  margin-top: auto;
+}
+
+.hero-benefits-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.hero-benefits-row-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.hero-benefits-row-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.hero-benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #f1f6fc;
+  line-height: 1.25;
+}
+
+.hero-benefit-item .check-icon {
+  width: 15px;
+  height: 15px;
+  color: #25d366;
+  flex-shrink: 0;
+}
+
+.benefit-sub {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .benefit-sub {
+    display: inline;
+  }
+  .hero-footer-bar {
+    padding: 11px 0;
+  }
+  .hero-benefits-box {
+    gap: 6px;
+  }
+  .hero-benefits-row-top {
+    gap: 36px;
+  }
+  .hero-benefit-item {
+    font-size: 13.5px;
+    gap: 8px;
+  }
+  .hero-benefit-item .check-icon {
+    width: 17px;
+    height: 17px;
+  }
+}
+
 @media (min-width: 768px) {
   .lp-hero {
     min-height: 640px;
-    display: block;
+    display: flex;
+    flex-direction: column;
     padding-top: 80px;
   }
   .lp-hero-photo img {
@@ -831,10 +959,13 @@ p {
   .lp-hero-inner {
     padding: 0;
     display: block;
+    margin-top: auto;
   }
+  /* Posicionamento do bloco ~2cm (75px) mais para a direita no desktop e trazido mais para baixo */
   .lp-hero-copy {
-    padding: 60px 0 72px;
-    max-width: 600px;
+    padding: 120px 0 36px;
+    margin-left: 75px;
+    max-width: 640px;
     display: block;
   }
   .lp-hero h1 {
@@ -850,147 +981,20 @@ p {
     font-size: 15px;
     margin-top: 8px;
   }
-  .hero-checklist {
-    font-size: 13.5px;
-    margin-top: 16px;
-    gap: 8px;
-  }
   .hero-cta-btn {
     width: auto;
     min-height: 56px;
     padding: 14px 28px;
     font-size: 16px;
   }
+
 }
 
-/* Seção de Ação Rápida: Envie foto e CEP */
-.quick-quote-band {
-  background: #ffffff;
-  padding: 32px 0 12px;
-  margin-top: -16px;
-  position: relative;
-  z-index: 10;
-}
-
-.quick-quote-card {
-  background: linear-gradient(135deg, #f7faff 0%, #eaf2fc 100%);
-  border: 2px solid #c8dcf2;
-  border-radius: 16px;
-  padding: 24px 20px;
-  box-shadow: 0 10px 30px rgba(18, 35, 47, 0.08);
-}
-
-.quick-quote-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.icon-camera-bubble {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--brand-blue);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-
-.icon-camera-bubble :deep(svg) {
-  width: 26px;
-  height: 26px;
-}
-
-.pill-accent {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  color: var(--brand-blue);
-  background: #d4e5f7;
-  padding: 3px 8px;
-  border-radius: 4px;
-  margin-bottom: 6px;
-}
-
-.quick-quote-header h2 {
-  font-size: clamp(19px, 2.8vw, 24px);
-  color: var(--brand-blue);
-  line-height: 1.25;
-}
-
-.quick-quote-header p {
-  font-size: 13.5px;
-  margin-top: 6px;
-  color: #435465;
-}
-
-.quick-steps-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin: 20px 0;
-}
-
-@media (min-width: 640px) {
-  .quick-steps-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.step-card {
-  background: #fff;
-  border: 1px solid #d8e5f2;
-  border-radius: 10px;
-  padding: 14px;
-  position: relative;
-}
-
-.step-num {
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--brand-gold);
-  color: #0d1d30;
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.step-card strong {
-  display: block;
-  font-size: 14px;
-  color: var(--brand-blue);
-}
-
-.step-card p {
-  font-size: 12px;
-  margin-top: 4px;
-  line-height: 1.35;
-}
-
-.quick-cta-row {
-  text-align: center;
-  margin-top: 12px;
-}
-
-.quick-cta-row .button {
-  width: min(420px, 100%);
-  min-height: 52px;
-  font-size: 14.5px;
-  font-weight: 800;
-  border-radius: 9px;
-  box-shadow: 0 4px 16px rgba(8, 124, 56, 0.4);
-}
-
-/* Galeria de Fotos Reais */
+/* Galeria de Fotos Reais - Verticalmente Aumentadas */
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
 }
 
 @media (min-width: 768px) {
@@ -1016,16 +1020,17 @@ p {
   box-shadow: 0 12px 24px rgba(18, 35, 47, 0.12);
 }
 
+/* Altura verticalmente aumentada conforme solicitação */
 .card-img-wrap {
   position: relative;
   background: #e8eef5;
-  height: 160px;
+  height: 280px;
   overflow: hidden;
 }
 
 @media (min-width: 640px) {
   .card-img-wrap {
-    height: 220px;
+    height: 380px;
   }
 }
 
@@ -1033,17 +1038,74 @@ p {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   transition: transform 0.35s ease;
 }
 
 .gallery-card:hover .card-img-wrap img {
-  transform: scale(1.06);
+  transform: scale(1.05);
+}
+
+/* Carrossel de Fotos nos Cards */
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+  pointer-events: none;
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 5;
+  background: rgba(13, 29, 48, 0.55);
+  backdrop-filter: blur(4px);
+  padding: 4px 7px;
+  border-radius: 999px;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.25s ease, width 0.25s ease, border-radius 0.25s ease;
+}
+
+.carousel-dot.active {
+  background: #25d366;
+  width: 15px;
+  border-radius: 4px;
 }
 
 .card-badge {
   position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 6;
   background: rgba(13, 29, 48, 0.85);
   color: var(--brand-gold);
   font-size: 10.5px;
@@ -1054,41 +1116,98 @@ p {
 }
 
 .card-body {
-  padding: 14px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
 .card-body h3 {
-  font-size: 15px;
+  font-size: 15.5px;
   margin-bottom: 4px;
 }
 
 .card-body p {
   font-size: 12.5px;
   line-height: 1.4;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .card-cta-link {
   margin-top: auto;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  background: #f0f6fa;
-  border-radius: 6px;
-  font-size: 12px;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  border-radius: 7px;
+  font-size: 11.5px;
   font-weight: 750;
-  color: var(--brand-blue);
   text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.card-cta-link:hover {
-  background: var(--brand-blue);
-  color: #fff;
+.card-cta-link .cta-wa-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.card-cta-link .cta-arrow {
+  margin-left: 2px;
+}
+
+@media (min-width: 640px) {
+  .card-cta-link {
+    font-size: 13px;
+    padding: 11px 14px;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  .card-cta-link .cta-wa-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .card-cta-link .cta-arrow {
+    margin-left: auto;
+  }
+}
+
+/* Animação que Pisca Levemente nos Botões de Ação dos Cards */
+.pulse-subtle {
+  animation: pulse-subtle-glow 2.2s infinite ease-in-out;
+  border: 1.5px solid #087c38 !important;
+  background: #f0faf3 !important;
+  color: #087c38 !important;
+  font-weight: 750 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.pulse-subtle:hover {
+  background: #087c38 !important;
+  color: #fff !important;
+  transform: scale(1.03);
+}
+
+@keyframes pulse-subtle-glow {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6), 0 2px 8px rgba(8, 124, 56, 0.15);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 8px rgba(37, 211, 102, 0), 0 4px 16px rgba(8, 124, 56, 0.35);
+    filter: brightness(1.08);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 2px 8px rgba(8, 124, 56, 0.15);
+    filter: brightness(1);
+  }
 }
 
 /* Modelos Objetivos: Janela | Porta | Sacada | Removível */
@@ -1162,23 +1281,18 @@ p {
   min-height: 42px;
   font-size: 12.5px;
   font-weight: 750;
-  border: 1.5px solid var(--brand-blue);
-  color: var(--brand-blue);
-  background: transparent;
   padding: 8px 12px;
   border-radius: 6px;
   text-decoration: none;
-}
-
-.outline-btn:hover {
-  background: var(--brand-blue);
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .outline-btn :deep(svg) {
   width: 17px;
   height: 17px;
-  color: #25d366;
 }
 
 /* Depoimentos */
@@ -1276,6 +1390,134 @@ p {
   color: var(--brand-blue);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Seção de Ação Rápida: Envie foto e CEP (Posicionada Após Depoimentos) */
+.quick-quote-band {
+  background: #f1f6fb;
+  padding: 48px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.quick-quote-card {
+  background: #ffffff;
+  border: 2px solid #c8dcf2;
+  border-radius: 16px;
+  padding: 26px 20px;
+  box-shadow: 0 10px 30px rgba(18, 35, 47, 0.08);
+}
+
+@media (min-width: 768px) {
+  .quick-quote-card {
+    padding: 32px 28px;
+  }
+}
+
+.quick-quote-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.icon-camera-bubble {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--brand-blue);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.icon-camera-bubble :deep(svg) {
+  width: 26px;
+  height: 26px;
+}
+
+.pill-accent {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--brand-blue);
+  background: #d4e5f7;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.quick-quote-header h2 {
+  font-size: clamp(19px, 2.8vw, 24px);
+  color: var(--brand-blue);
+  line-height: 1.25;
+}
+
+.quick-quote-header p {
+  font-size: 13.5px;
+  margin-top: 6px;
+  color: #435465;
+}
+
+.quick-steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 22px 0;
+}
+
+@media (min-width: 640px) {
+  .quick-steps-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.step-card {
+  background: #f8fbfe;
+  border: 1px solid #d8e5f2;
+  border-radius: 10px;
+  padding: 16px 14px;
+  position: relative;
+}
+
+.step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand-gold);
+  color: #0d1d30;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.step-card strong {
+  display: block;
+  font-size: 14px;
+  color: var(--brand-blue);
+}
+
+.step-card p {
+  font-size: 12.5px;
+  margin-top: 4px;
+  line-height: 1.35;
+}
+
+.quick-cta-row {
+  text-align: center;
+  margin-top: 14px;
+}
+
+.quick-cta-row .button {
+  width: min(440px, 100%);
+  min-height: 52px;
+  font-size: 14.5px;
+  font-weight: 800;
+  border-radius: 9px;
+  box-shadow: 0 4px 16px rgba(8, 124, 56, 0.4);
 }
 
 /* Final CTA */
@@ -1419,48 +1661,7 @@ p {
   color: #6a7d8d;
 }
 
-/* Barra Fixa Inferior no Mobile */
-.mobile-sticky-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  background: rgba(13, 29, 48, 0.94);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
-}
-
-@media (min-width: 768px) {
-  .mobile-sticky-bar {
-    display: none;
-  }
-}
-
-.mobile-whatsapp-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 48px;
-  width: 100%;
-  border-radius: 999px;
-  background: #25d366;
-  color: #fff;
-  font-size: 14.5px;
-  font-weight: 800;
-  text-decoration: none;
-  box-shadow: 0 3px 12px rgba(8, 124, 56, 0.4);
-}
-
-.mobile-whatsapp-btn :deep(svg) {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-}
-
+/* Botão Flutuante Piscando: Falar agora no WhatsApp */
 .floating-whatsapp {
   position: fixed;
   right: calc(16px + env(safe-area-inset-right, 0px));
@@ -1481,21 +1682,25 @@ p {
   animation: pulse-whatsapp 2s infinite ease-in-out;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
+
 .floating-whatsapp:hover {
   background: #06662e;
   transform: scale(1.04);
 }
+
 .floating-whatsapp :deep(svg) {
   width: 26px;
   height: 26px;
   flex-shrink: 0;
 }
+
 .floating-whatsapp span {
   display: inline-block;
   font-size: 13.5px;
   font-weight: 700;
   white-space: nowrap;
 }
+
 @media (min-width: 768px) {
   .floating-whatsapp {
     right: 24px;
@@ -1507,10 +1712,10 @@ p {
     font-size: 14.5px;
   }
 }
+
 @keyframes pulse-whatsapp {
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.8), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
   50% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(37, 211, 102, 0), 0 8px 24px rgba(8, 124, 56, 0.55); filter: brightness(1.12); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
 }
-
 </style>

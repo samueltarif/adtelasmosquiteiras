@@ -16,6 +16,50 @@ export function useLandingTracking() {
       adgroup_id: attr.adgroup_id || undefined,
       ...properties
     })
+
+    // Disparo de tags para Google Tag Manager e Google Ads (Leads)
+    if (typeof window !== 'undefined') {
+      window.dataLayer = window.dataLayer || []
+      
+      if (event === 'whatsapp_cta_click') {
+        // Formatos canônicos consumidos por tags do GTM e campanhas do Google Ads
+        window.dataLayer.push({
+          event: 'contact_click',
+          method: 'whatsapp',
+          page_path: route.path,
+          gclid: attr.gclid || undefined,
+          campaign_id: attr.campaign_id || undefined,
+          ...properties
+        })
+
+        window.dataLayer.push({
+          event: 'whatsapp_click',
+          page_path: route.path,
+          gclid: attr.gclid || undefined,
+          ...properties
+        })
+
+        window.dataLayer.push({
+          event: 'generate_lead',
+          value: 1.0,
+          currency: 'BRL',
+          lead_type: 'whatsapp',
+          source: 'landing_page',
+          page_path: route.path,
+          gclid: attr.gclid || undefined,
+          ...properties
+        })
+
+        if (window.gtag) {
+          window.gtag('event', 'generate_lead', {
+            event_category: 'engagement',
+            event_label: properties.cta_location || 'whatsapp_lead',
+            value: 1.0,
+            currency: 'BRL'
+          })
+        }
+      }
+    }
   }
 
   function startForm(event) {
