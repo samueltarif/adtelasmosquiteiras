@@ -40,9 +40,14 @@ useHead({
 // Fotos reais de instalações feitas pela AD Telas
 const realInstallations = [
   {
-    title: 'Telas pra Janelas',
+    title: 'Telas Mosquiteiras para janelas',
     desc: 'Acabamento discreto integrado à esquadria existente.',
-    img: '/images/tela-para-janela.jpeg',
+    img: '/images/telas_para_banheiro.jpg',
+    images: [
+      '/images/telas_para_banheiro.jpg',
+      '/images/tela_paraJanela.png',
+      '/images/telas_para_banheiro_especificacoes.jpg'
+    ],
     tag: 'Janela'
   },
   {
@@ -81,6 +86,11 @@ const realInstallations = [
     title: 'Tela Pet Screen Reforçada',
     desc: 'Malha de alta resistência contra arranhões de pets.',
     img: '/images/telas_pet_screen_especificacoes.jpg',
+    images: [
+      '/images/telas_pet_screen_especificacoes.jpg',
+      '/images/telas_pet_screen_cores.jpg',
+      '/images/telas_pet_screen_rolo.jpg'
+    ],
     tag: 'Pet Screen'
   },
   {
