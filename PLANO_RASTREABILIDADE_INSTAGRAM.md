@@ -166,9 +166,8 @@ A auditoria identificou arquivos críticos que já excedem esses limites. Para c
 | `meta_placement` | `TEXT` | SIM | Posicionamento dinâmico Meta (`{{placement}}`: Feed, Stories, Reels). | Nenhum. |
 | `ttclid` | `TEXT` | SIM | TikTok Click ID para validação e atribuição. | Nenhum. |
 | `tiktok_campaign_id` | `TEXT` | SIM | ID numérico da campanha no TikTok (`__CAMPAIGN_ID__`). | Nenhum. |
-| `tiktok_adgroup_id` | `TEXT` | SIM | ID numérico do grupo de anúncios no TikTok (`__AID__`). | Nenhum. |
-| `tiktok_ad_id` | `TEXT` | SIM | ID numérico do anúncio no TikTok (`__CID__`). | Nenhum. |
-| `tiktok_creative_id` | `TEXT` | SIM | ID do criativo no TikTok. | Nenhum. |
+| `tiktok_ad_id` | `TEXT` | SIM | ID numérico do anúncio no TikTok (`__ADID_V2__` no Smart+ atualizado; omitido no TikTok Standard). | Nenhum. |
+| `tiktok_creative_id` | `TEXT` | SIM | ID do criativo no TikTok (`__CID__`). | Nenhum. |
 | `tiktok_placement` | `TEXT` | SIM | Posicionamento dinâmico TikTok (`__PLACEMENT__`). | Nenhum. |
 
 ### 4.2 Avaliação Crítica de Índices
@@ -488,7 +487,8 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
   - **Identificação de Campanha & Conteúdo:** Campos de texto validados para nome de campanha, adset/grupo e criativo.
   - **Templates / Macros Oficiais das Plataformas:**
     - **Meta Ads:** `utm_source={{site_source_name}}&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}&meta_placement={{placement}}&meta_campaign_id={{campaign.id}}&meta_adset_id={{adset.id}}&meta_ad_id={{ad.id}}`
-    - **TikTok Ads:** `utm_source=tiktok&utm_medium=paid_social&utm_campaign=__CAMPAIGN_NAME__&utm_content=__CID_NAME__&utm_term=__AID_NAME__&tiktok_placement=__PLACEMENT__&tiktok_campaign_id=__CAMPAIGN_ID__&tiktok_adgroup_id=__AID__&tiktok_ad_id=__CID__`
+    - **TikTok Ads Standard:** `utm_source=tiktok&utm_medium=paid_social&utm_campaign=__CAMPAIGN_NAME__&utm_term=__AID_NAME__&utm_content=__CID_NAME__&tiktok_campaign_id=__CAMPAIGN_ID__&tiktok_adgroup_id=__AID__&tiktok_creative_id=__CID__&tiktok_placement=__PLACEMENT__`
+    - **TikTok Ads Smart+:** `utm_source=tiktok&utm_medium=paid_social&utm_campaign=__CAMPAIGN_NAME__&utm_term=__AID_NAME__&utm_content=__CID_NAME__&tiktok_campaign_id=__CAMPAIGN_ID__&tiktok_adgroup_id=__AID__&tiktok_ad_id=__ADID_V2__&tiktok_creative_id=__CID__&tiktok_placement=__PLACEMENT__`
   - **Regra Estrita de Click IDs:** O gerador **NUNCA** deve inventar ou permitir preenchimento manual de `gclid`, `fbclid` ou `ttclid`. Esses Click IDs automáticos continuam sendo gerados e injetados exclusivamente pelas plataformas no momento do clique do visitante.
   - **Contrato Canônico do TikTok no Gerador:**
     - `ttclid` (automático da plataforma)

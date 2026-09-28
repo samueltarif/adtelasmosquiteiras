@@ -77,8 +77,10 @@ Todos os arquivos foram criados com estrito respeito aos limites de linhas do pr
 | `app/utils/trackingLinkBuilder.ts` | Funções puras: sanitização, montagem de query e validação estática | 172 | 200 | **CONFORME** |
 | `app/components/admin/tracking/TrackingLinkTesterModal.vue` | Modal de pré-visualização, auditoria e simulação segura | 200 | 500 | **CONFORME** |
 | `app/components/admin/TrackingLinkGenerator.vue` | Interface visual do gerador (seletores, inputs, feedback, preview) | 430 | 500 | **CONFORME** |
-| `app/pages/admin/dashboard.vue` | Integração da aba `tracking-links` e suporte a `?tab=tracking-links` | 338 | 500 | **CONFORME** |
-| `scripts/test_tracking_link_generator.mjs` | Suíte de testes unitários automatizados (LINK-01 a LINK-16) | 332 | - | **CONFORME** |
+| `scripts/test_tracking_link_generator.mjs` | Orquestrador da suíte de testes de links | 14 | 200 | **CONFORME** |
+| `scripts/test_tracking_link_cases.mjs` | Casos de teste LINK-01 a LINK-16 | 184 | 200 | **CONFORME** |
+| `scripts/test_tracking_link_helpers.mjs` | Helpers e asserções puras de teste | 36 | 200 | **CONFORME** |
+| `test_phase1_classification.mjs` | Validação de regressão das 27 regras de classificação (Fase 1) | 74 | 200 | **CONFORME** |
 
 ---
 
@@ -174,9 +176,10 @@ Conforme as regras do projeto, todas as medições de tela e interações visuai
 ## 7. Regressões do Sistema
 
 Todas as suítes de regressão canônicas existentes foram validadas:
+- `scripts/test_tracking_link_generator.mjs` (modularizado): **16 PASS | 0 FAIL**
+- `test_phase1_classification.mjs`: **27 PASS | 0 FAIL**
 - `test-service-forms-canonical.mjs`: **26 PASS | 0 FAIL**
 - `test-google-ads-tracking.mjs`: **7/7 grupos PASS**
-- `scripts/test_tracking_link_generator.mjs`: **16 PASS | 0 FAIL**
 - Compilação de Produção (`npm run build`): **Exit Code 0 (✨ Build complete!)**
 
 ---
