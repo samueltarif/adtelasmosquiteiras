@@ -326,7 +326,7 @@ A rota `/api/admin/analytics/lead-journey` e a busca por código de WhatsApp `/a
 ### 8.2 Logs Estruturados de Telemetria no Nuxt Server
 Emissão de logs prefixados padronizados para rápida filtragem no console do servidor:
 - `[tracking:visit] session_id=${sid} channel=${channel} path=${path}`
-- `[tracking:whatsapp:v2] short_code=${code} channel=${channel} fbclid=${hasFbclid}`
+- `[tracking:whatsapp:v3] short_code=${code} channel=${channel} fbclid=${hasFbclid}`
 - `[tracking:idempotency] event_id=${eid} duplicata_ignorada`
 
 ---
@@ -834,9 +834,12 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
    - `test_spa_referrer_real_browser.cjs`: 5 PASS | 0 FAIL.
    - `npm run build`: Exit Code 0 (✨ Build complete!).
 9. **Proteção de Dados, Higiene e Auditoria Forense:**
-   - Auditoria forense dos +14 `page_views` gerados durante a janela de testes da Fase 5: 100% comprovados como fixtures Playwright (User-Agent `HeadlessChrome`, sessões SPA-REF-01..05, click IDs `FB_TEST`, `GCL_TEST`, `FB_INITIAL`, `FB_NEW`).
+   - Auditoria forense dos 14 `page_views` sintéticos gerados durante a janela de testes da Fase 5: 100% comprovados como fixtures Playwright (User-Agent `HeadlessChrome`, sessões SPA-REF-01..05, click IDs `FB_TEST`, `GCL_TEST`, `FB_INITIAL`, `FB_NEW`).
    - Todos os 14 registros identificados foram removidos pelos seus IDs específicos (`668e08e2...` a `44fc2578...`).
-   - Zero tráfego real impactado. Contagem final de `page_views` restabelecida para 509 (idêntica ao baseline).
+   - Contagem final: `page_views = 510` (Baseline: 509).
+   - Fixtures F5 remanescentes: 0.
+   - Delta real: +1 visita real de Google Ads (`/lp/telas-mosquiteiras`, GCLID real, browser real) ocorrida após o encerramento dos testes.
+   - Zero tráfego real removido ou impactado.
    - Fixtures remanescentes em todas as 4 tabelas: `page_views` = 0, `lead_clicks` = 0, `whatsapp_attributions` = 0, `leads` = 0.
    - Nenhuma nova migration criada e nenhuma alteração de schema realizada.
    - Chave de serviço `SUPABASE_SERVICE_ROLE_KEY` estritamente privada no backend Nitro.

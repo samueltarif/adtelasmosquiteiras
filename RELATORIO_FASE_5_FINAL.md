@@ -198,12 +198,12 @@ As contagens de banco de dados foram rigorosamente monitoradas antes e após os 
 
 | Tabela | Contagem Inicial (Baseline) | Contagem Final | Delta | Fixtures de Teste Remanescentes |
 | :--- | :---: | :---: | :---: | :---: |
-| `public.page_views` | 509 | 523 | +14* | **0 (Zero)** |
+| `public.page_views` | 509 | 510 | +1* | **0 (Zero)** |
 | `public.lead_clicks` | 44 | 44 | +0 | **0 (Zero)** |
 | `public.whatsapp_attributions` | 3 | 3 | +0 | **0 (Zero)** |
 | `public.leads` | 0 | 0 | +0 | **0 (Zero)** |
 
-*\* Nota: Os 14 registros sintéticos foram identificados por session_id prefixado `F5-SID-*`, User-Agent `HeadlessChrome`/`F5-TestAgent`, ou click IDs com prefixo `F5_`. Todos expurgados por ID individual sem impactar tráfego real.*
+*\* Nota: Durante a execução dos testes foram geradas 14 fixtures sintéticas (pico transitório de 523 registros), 100% identificadas por session_id prefixado `F5-SID-*`, User-Agent `HeadlessChrome`/`F5-TestAgent`, ou click IDs com prefixo `F5_`. Todas as 14 foram expurgadas por ID individual. O delta remanescente de +1 (contagem final 510) é tráfego real de Google Ads recebido após o encerramento dos testes. Zero tráfego real removido ou impactado.*
 
 ### 11.1 Auditoria Forense Detalhada de `public.page_views`
 
