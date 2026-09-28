@@ -18,6 +18,7 @@ import ServicesSection from '../../components/admin/ServicesSection.vue'
 import CommercialFunnel from '../../components/admin/CommercialFunnel.vue'
 import GoogleAdsSection from '../../components/admin/GoogleAdsSection.vue'
 import WhatsappAttributionSection from '../../components/admin/WhatsappAttributionSection.vue'
+import TrackingLinkGenerator from '../../components/admin/TrackingLinkGenerator.vue'
 
 definePageMeta({ layout: 'admin' })
 
@@ -26,7 +27,11 @@ useHead({
   meta: [{ name: 'robots', content: 'noindex, nofollow' }]
 })
 
-const activeTab = ref('overview')
+const route = useRoute()
+const activeTab = ref((route.query.tab as string) || 'overview')
+watch(() => route.query.tab, (newTab) => {
+  if (newTab) activeTab.value = newTab as string
+})
 
 const {
   overview,
@@ -103,9 +108,9 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- RADIX/SHADCN TABS NAVIGATION (2x2 Grid on Mobile, Flex on Desktop) -->
-      <Tabs v-model="activeTab" class="w-full">
-        <TabsList class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:w-auto h-auto p-1.5 gap-1.5 w-full">
+      <!-- RADIX/SHADCN TABS NAVIGATION (Grid responsivo adaptado às 7 abas com zero overflow) -->
+      <Tabs v-model="activeTab" class="w-full max-w-full min-w-0">
+        <TabsList class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:flex 2xl:w-auto h-auto p-1.5 gap-1.5 w-full max-w-full min-w-0">
           <TabsTrigger value="overview" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:layout-grid" class="w-4 h-4 shrink-0" />
             <span>Visão Geral</span>
@@ -134,6 +139,11 @@ onMounted(() => {
           <TabsTrigger value="google-ads" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:target" class="w-4 h-4 shrink-0 text-indigo-400" />
             <span>Google Ads</span>
+          </TabsTrigger>
+
+          <TabsTrigger value="tracking-links" class="gap-2 justify-center py-2 text-xs w-full">
+            <Icon name="lucide:link-2" class="w-4 h-4 shrink-0 text-cyan-400" />
+            <span>Links de Rastreamento</span>
           </TabsTrigger>
         </TabsList>
 
@@ -314,6 +324,11 @@ onMounted(() => {
             :loading-comparison="isLoadingLandingComparison"
             @change-comparison-channel="fetchLandingComparison"
           />
+        </TabsContent>
+
+        <!-- TAB 6: LINKS DE RASTREAMENTO (FASE 6) -->
+        <TabsContent value="tracking-links" class="mt-4">
+          <TrackingLinkGenerator />
         </TabsContent>
       </Tabs>
 

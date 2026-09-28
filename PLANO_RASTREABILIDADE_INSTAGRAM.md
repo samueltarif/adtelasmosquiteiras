@@ -3,9 +3,9 @@
 **Projeto:** AD Telas e Redes  
 **Domínio Oficial:** `https://www.adtelasmosquiteiras.com.br`  
 **Ambiente:** Nuxt 4 (Vue 3, TypeScript) + Supabase (PostgreSQL 17) + Cloudflare R2  
-**Data da Revisão:** 27 de Setembro de 2026  
-**Versão do Documento:** 5.0 (Fase 5 Concluída com Sucesso)  
-**Status:** FASE 5 CONCLUÍDA COM 100% DE SUCESSO — HOMOLOGAÇÃO MULTICANAL COMPLETA — AGUARDANDO APROVAÇÃO (FASE 6 NÃO INICIADA)
+**Data da Revisão:** 28 de Setembro de 2026  
+**Versão do Documento:** 6.0 (Fase 6 Concluída com Sucesso)  
+**Status:** FASE 6 CONCLUÍDA COM 100% DE SUCESSO — GERADOR DE LINKS DE RASTREAMENTO OPERACIONAL NO ADMIN — AGUARDANDO APROVAÇÃO (FASE 7 NÃO INICIADA)
 
 ---
 
@@ -449,13 +449,13 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
 
 ### FASE 6: Gerador de Links de Rastreamento no Admin + Preparação dos Links Reais de Produção
 
-> [!IMPORTANT]
-> **DIRETRIZ DE ESCOPO DA FASE 6:** A Fase 6 está apenas **documentada e planejada**, com **ZERO código implementado** nesta etapa de fechamento da Fase 5.
+> [!NOTE]
+> **STATUS DA FASE 6:** A Fase 6 foi **CONCLUÍDA E HOMOLOGADA COM 100% DE SUCESSO** em 28/09/2026.
 >
 > **Separação Obrigatória de Responsabilidades:**
-> - **A) No Painel Administrativo:** Gerar, validar, testar e copiar o link parametrizado.
-> - **B) Fora do Sistema (Manual):** Aplicar manualmente o link copiado nas plataformas externas (gerenciador de anúncios Meta, TikTok Ads Manager, Bio do perfil, etc.).
-> - **NÃO há integração via API externa:** Nesta primeira versão do gerador, **NÃO** serão criadas integrações com Meta Ads API, TikTok Ads API ou Instagram Graph API. Nenhum token externo ou credencial de API é necessário.
+> - **A) No Painel Administrativo:** Gerador de links operacional em `/admin/dashboard?tab=tracking-links`, com validação segura local, cópia com 1 clique e preservação estrita de macros oficiais.
+> - **B) Fora do Sistema (Manual):** Aplicação dos links nas plataformas externas (gerenciador de anúncios Meta, TikTok Ads Manager, Bio do perfil, etc.) aguardando autorização do usuário para ativação.
+> - **Zero Integração Externa:** Nenhuma API externa chamada, nenhum token solicitado, zero alterações em schema ou migrations.
 
 - **Objetivo Principal:**
   Criar no painel administrativo uma área dedicada em:
@@ -844,11 +844,46 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
    - Nenhuma nova migration criada e nenhuma alteração de schema realizada.
    - Chave de serviço `SUPABASE_SERVICE_ROLE_KEY` estritamente privada no backend Nitro.
 
+---
+
+### Status: 🟢 FASE 6 CONCLUÍDA COM 100% DE SUCESSO (28/09/2026)
+
+**Objetivo:** Gerador de Links de Rastreamento no Admin + Preparação dos Links Reais de Produção.
+
+1. **Arquitetura Modular Limpa:**
+   - Tipos e interfaces em `app/types/trackingLinks.ts` (58 linhas $\le 200$).
+   - Presets oficiais em `app/utils/trackingLinkPresets.ts` (133 linhas $\le 200$).
+   - Funções puras em `app/utils/trackingLinkBuilder.ts` (172 linhas $\le 200$).
+   - Modal de validação segura em `app/components/admin/tracking/TrackingLinkTesterModal.vue` (200 linhas $\le 500$).
+   - Interface do gerador em `app/components/admin/TrackingLinkGenerator.vue` (430 linhas $\le 500$).
+   - Aba integrada no Dashboard em `app/pages/admin/dashboard.vue` (338 linhas $\le 500$).
+2. **Conformidade com Documentação Oficial Meta e TikTok:**
+   - Meta Ads: macros dinâmicas preservadas literalmente (`{{site_source_name}}`, `{{campaign.name}}`, etc.).
+   - TikTok Ads: separação canônica entre Standard (`tiktok_creative_id=__CID__` sem ad_id) e Smart+ (`tiktok_ad_id=__ADID_V2__`).
+3. **Ausência de Click IDs Fabricados:**
+   - Zero campos para `gclid`/`fbclid`/`ttclid`/`msclkid`.
+   - Informação visual explícita de injeção automática pelas plataformas.
+4. **Validação Segura ("Testar Link"):**
+   - Modal estático client-side. Zero escritas no banco e zero poluição analítica.
+5. **Responsividade Estrita via Playwright MCP:**
+   - Auditado em Desktop (1440x900, 1280x800), Tablet (768x1024) e Mobile (390x844, 375x667).
+   - Zero overflow horizontal (`overflowDelta = 0` em todos os viewports).
+6. **Suíte de Testes Automatizados:**
+   - `scripts/test_tracking_link_generator.mjs`: 16 PASS | 0 FAIL.
+   - `test-service-forms-canonical.mjs`: 26 PASS | 0 FAIL.
+   - `test-google-ads-tracking.mjs`: 7/7 grupos PASS.
+   - Compilação de Produção (`npm run build`): Exit Code 0 (✨ Build complete!).
+7. **Integridade de Dados e Segurança:**
+   - Zero migrations criadas.
+   - Zero alterações de schema ou RPCs.
+   - Zero alterações no tracking central.
+   - Acesso restrito ao painel admin protegido pelo middleware global.
+
 **Declaração Mandatória:**
-- A **FASE 6 NÃO FOI INICIADA**.
-- Nenhuma campanha externa configurada.
-- Nenhum link real alterado.
-- Sistema aguardando aprovação formal do usuário.
+- **NENHUMA CAMPANHA EXTERNA FOI ALTERADA OU ATIVADA.**
+- **NENHUMA FASE 7 FOI INICIADA.**
+- O sistema aguarda aprovação formal do usuário antes da aplicação dos links nas plataformas externas.
+
 
 
 
