@@ -2,7 +2,7 @@
  * Mapeamento e Apresentação Consistente dos Canais de Tráfego
  * Arquivo: app/utils/channelDisplay.ts
  *
- * Suporta os 11 canais canônicos e identificação explícita de registros legados.
+ * Suporta os 13 canais canônicos e identificação explícita de registros legados.
  */
 
 export function normalizeChannel(rawChannel?: string | null): string {
