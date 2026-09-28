@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
     match_method: matchMethod,
     client_id: clientId,
     lead_id: leadId,
-    assigned_by: admin.userId,
+    assigned_by: admin.adminId || admin.userId,
     assigned_at: assignedAt,
     notes: body.notes?.trim() || currentAttr.notes || null,
     updated_at: assignedAt

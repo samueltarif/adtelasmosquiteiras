@@ -15,21 +15,46 @@ export interface WhatsappAttributionItem {
   session_id: string | null
   clicked_at: string
 
-  // Snapshot de Marketing
-  gclid: string | null
-  gbraid: string | null
-  wbraid: string | null
-  google_campaign_id: string | null
-  google_adgroup_id: string | null
-  google_creative_id: string | null
-  campaign_name: string | null
+  // Snapshot Multicanal & Atribuição
+  channel: string | null
+  utm_source: string | null
+  utm_medium: string | null
+  utm_campaign: string | null
+  utm_content: string | null
   utm_term: string | null
+  campaign_name: string | null
   landing_path: string | null
   cta_location: string | null
 
+  // Click IDs
+  gclid: string | null
+  gbraid: string | null
+  wbraid: string | null
+  fbclid: string | null
+  msclkid: string | null
+
+  // Google Ads IDs
+  google_campaign_id: string | null
+  google_adgroup_id: string | null
+  google_creative_id: string | null
+
+  // Meta / Instagram / Facebook IDs
+  meta_campaign_id: string | null
+  meta_adset_id: string | null
+  meta_ad_id: string | null
+  meta_placement: string | null
+
+  // TikTok Ads IDs
+  ttclid: string | null
+  tiktok_campaign_id: string | null
+  tiktok_adgroup_id: string | null
+  tiktok_ad_id: string | null
+  tiktok_creative_id: string | null
+  tiktok_placement: string | null
+
   // Helpers derivados de Click ID
   has_click_id: boolean
-  click_id_type: 'gclid' | 'gbraid' | 'wbraid' | null
+  click_id_type: 'gclid' | 'gbraid' | 'wbraid' | 'fbclid' | 'msclkid' | 'ttclid' | null
   click_id_value: string | null
 
   // Vínculos com CRM

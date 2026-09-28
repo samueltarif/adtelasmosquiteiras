@@ -23,6 +23,7 @@ const isVisible = computed(() => {
       href="https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20um%20or%C3%A7amento%20para%20telas%20mosquiteiras.%20Vim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br&type=phone_number&app_absent=0"
       target="_blank"
       rel="noopener noreferrer"
+      data-cta-location="floating_whatsapp"
       title="WhatsApp: Solicitar Orçamento"
       class="relative flex items-center gap-2 bg-[#25D366] hover:bg-[#1fb854] text-white rounded-full shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 pl-3 pr-4 py-2.5 sm:py-3 wpp-bounce cursor-pointer min-h-[44px]"
     >

@@ -82,14 +82,24 @@ export function normalizeChannel(rawChannel) {
 export function getChannelLabel(channel) {
   const norm = normalizeChannel(channel)
   const labels = {
-    google_organic: 'Google (Orgânico)',
-    google_ads: 'Google Ads (Pago)',
+    google_ads: 'Google Ads',
+    microsoft_ads: 'Microsoft Ads',
+    tiktok_ads: 'TikTok Ads',
+    tiktok_organic: 'TikTok Orgânico',
+    instagram_ads: 'Instagram Ads',
+    instagram_organic: 'Instagram Orgânico',
+    facebook_ads: 'Facebook Ads',
+    facebook_organic: 'Facebook Orgânico',
+    meta_ads: 'Meta Ads',
+    google_organic: 'Google Orgânico',
+    direct: 'Direto',
+    referral: 'Referência',
+    other_paid: 'Outro Pago',
+    // Casos especiais / legados preservados
+    whatsapp: 'WhatsApp Direto',
     instagram: 'Instagram',
     facebook: 'Facebook',
-    direct: 'Tráfego Direto',
-    referral: 'Outros Sites (Referral)',
-    whatsapp: 'WhatsApp Direto',
-    unknown_legacy: 'Não atribuído / Histórico'
+    unknown_legacy: 'Legado / Canal não registrado'
   }
   return labels[norm] || norm
 }

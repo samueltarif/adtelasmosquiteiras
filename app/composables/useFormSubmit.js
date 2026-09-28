@@ -33,7 +33,37 @@ export function useFormSubmit() {
       const { sessionId } = identity.getOrCreateSessionId(currentPath)
       const landingPath = identity.getSessionLandingPath(currentPath)
       const attr = attribution.getOrInitAttribution()
-      const ftContext = identity.getFirstTouchContext()
+      const savedFt = identity.getFirstTouchContext()
+
+      // Snapshot atômico First Touch (preserva campos null se já existir; inicializa se não existir)
+      const ftSnapshot = savedFt || {
+        first_touch_channel: attr.channel || 'direct',
+        first_touch_landing_path: landingPath || null,
+        first_touch_referrer: attr.referrer || null,
+        first_touch_utm_source: attr.utm_source || null,
+        first_touch_utm_medium: attr.utm_medium || null,
+        first_touch_utm_campaign: attr.utm_campaign || null,
+        first_touch_utm_content: attr.utm_content || null,
+        first_touch_utm_term: attr.utm_term || null,
+        first_touch_google_campaign_id: attr.campaign_id || null,
+        first_touch_google_adgroup_id: attr.adgroup_id || null,
+        first_touch_google_creative_id: attr.creative || null,
+        first_touch_google_match_type: attr.matchtype || null,
+        first_touch_google_network: attr.network || null,
+        first_touch_google_device: attr.device || null,
+        first_touch_google_target_id: attr.target_id || null,
+        first_touch_gclid: attr.gclid || null, first_touch_gbraid: attr.gbraid || null, first_touch_wbraid: attr.wbraid || null,
+        first_touch_fbclid: attr.fbclid || null, first_touch_msclkid: attr.msclkid || null, first_touch_ttclid: attr.ttclid || null,
+        first_touch_tiktok_campaign_id: attr.tiktok_campaign_id || null,
+        first_touch_tiktok_adgroup_id: attr.tiktok_adgroup_id || null,
+        first_touch_tiktok_ad_id: attr.tiktok_ad_id || null,
+        first_touch_tiktok_creative_id: attr.tiktok_creative_id || null,
+        first_touch_tiktok_placement: attr.tiktok_placement || null
+      }
+
+      if (!savedFt) {
+        identity.setFirstTouchContextOnce(ftSnapshot)
+      }
 
       // Reutiliza o mesmo submission_id em caso de retries
       if (!activeSubmissionId) {
@@ -46,6 +76,7 @@ export function useFormSubmit() {
         session_id: sessionId,
         landing_path: landingPath,
         conversion_path: currentPath,
+        channel: attr.channel,
         session_channel: attr.channel,
         referrer: attr.referrer,
         utm_source: attr.utm_source,
@@ -60,34 +91,42 @@ export function useFormSubmit() {
         google_network: attr.network || null,
         google_device: attr.device || null,
         google_target_id: attr.target_id || null,
-        gclid: attr.gclid,
-        gbraid: attr.gbraid,
-        wbraid: attr.wbraid,
-        fbclid: attr.fbclid,
-        msclkid: attr.msclkid,
+        gclid: attr.gclid, gbraid: attr.gbraid, wbraid: attr.wbraid,
+        fbclid: attr.fbclid, msclkid: attr.msclkid,
+        meta_campaign_id: attr.meta_campaign_id || null,
+        meta_adset_id: attr.meta_adset_id || null,
+        meta_ad_id: attr.meta_ad_id || null,
+        meta_placement: attr.meta_placement || null,
+        ttclid: attr.ttclid || null,
+        tiktok_campaign_id: attr.tiktok_campaign_id || null,
+        tiktok_adgroup_id: attr.tiktok_adgroup_id || null,
+        tiktok_ad_id: attr.tiktok_ad_id || null,
+        tiktok_creative_id: attr.tiktok_creative_id || null,
+        tiktok_placement: attr.tiktok_placement || null,
 
-        // Contexto First Touch Completo
-        first_touch_channel: ftContext.first_touch_channel || attr.channel,
-        first_touch_landing_path: ftContext.first_touch_landing_path || landingPath,
-        first_touch_referrer: ftContext.first_touch_referrer || attr.referrer,
-        first_touch_utm_source: ftContext.first_touch_utm_source || attr.utm_source,
-        first_touch_utm_medium: ftContext.first_touch_utm_medium || attr.utm_medium,
-        first_touch_utm_campaign: ftContext.first_touch_utm_campaign || attr.utm_campaign,
-        first_touch_utm_content: ftContext.first_touch_utm_content || attr.utm_content,
-        first_touch_utm_term: ftContext.first_touch_utm_term || attr.utm_term,
-        first_touch_google_campaign_id: ftContext.first_touch_google_campaign_id || attr.campaign_id || null,
-        first_touch_google_adgroup_id: ftContext.first_touch_google_adgroup_id || attr.adgroup_id || null,
-        first_touch_google_creative_id: ftContext.first_touch_google_creative_id || attr.creative || null,
-        first_touch_google_match_type: ftContext.first_touch_google_match_type || attr.matchtype || null,
-        first_touch_google_network: ftContext.first_touch_google_network || attr.network || null,
-        first_touch_google_device: ftContext.first_touch_google_device || attr.device || null,
-        first_touch_google_target_id: ftContext.first_touch_google_target_id || attr.target_id || null,
-        first_touch_gclid: ftContext.first_touch_gclid || attr.gclid,
-        first_touch_gbraid: ftContext.first_touch_gbraid || attr.gbraid,
-        first_touch_wbraid: ftContext.first_touch_wbraid || attr.wbraid,
-        first_touch_fbclid: ftContext.first_touch_fbclid || attr.fbclid,
-        first_touch_msclkid: ftContext.first_touch_msclkid || attr.msclkid,
-
+        // Contexto First Touch Atômico (SEM fallback individual)
+        first_touch_channel: ftSnapshot.first_touch_channel,
+        first_touch_landing_path: ftSnapshot.first_touch_landing_path ?? null,
+        first_touch_referrer: ftSnapshot.first_touch_referrer ?? null,
+        first_touch_utm_source: ftSnapshot.first_touch_utm_source ?? null,
+        first_touch_utm_medium: ftSnapshot.first_touch_utm_medium ?? null,
+        first_touch_utm_campaign: ftSnapshot.first_touch_utm_campaign ?? null,
+        first_touch_utm_content: ftSnapshot.first_touch_utm_content ?? null,
+        first_touch_utm_term: ftSnapshot.first_touch_utm_term ?? null,
+        first_touch_google_campaign_id: ftSnapshot.first_touch_google_campaign_id ?? null,
+        first_touch_google_adgroup_id: ftSnapshot.first_touch_google_adgroup_id ?? null,
+        first_touch_google_creative_id: ftSnapshot.first_touch_google_creative_id ?? null,
+        first_touch_google_match_type: ftSnapshot.first_touch_google_match_type ?? null,
+        first_touch_google_network: ftSnapshot.first_touch_google_network ?? null,
+        first_touch_google_device: ftSnapshot.first_touch_google_device ?? null,
+        first_touch_google_target_id: ftSnapshot.first_touch_google_target_id ?? null,
+        first_touch_gclid: ftSnapshot.first_touch_gclid ?? null, first_touch_gbraid: ftSnapshot.first_touch_gbraid ?? null, first_touch_wbraid: ftSnapshot.first_touch_wbraid ?? null,
+        first_touch_fbclid: ftSnapshot.first_touch_fbclid ?? null, first_touch_msclkid: ftSnapshot.first_touch_msclkid ?? null, first_touch_ttclid: ftSnapshot.first_touch_ttclid ?? null,
+        first_touch_tiktok_campaign_id: ftSnapshot.first_touch_tiktok_campaign_id ?? null,
+        first_touch_tiktok_adgroup_id: ftSnapshot.first_touch_tiktok_adgroup_id ?? null,
+        first_touch_tiktok_ad_id: ftSnapshot.first_touch_tiktok_ad_id ?? null,
+        first_touch_tiktok_creative_id: ftSnapshot.first_touch_tiktok_creative_id ?? null,
+        first_touch_tiktok_placement: ftSnapshot.first_touch_tiktok_placement ?? null,
         nome: fields?.nome || '',
         cidade: fields?.cidade || fields?.bairro || 'São Paulo',
         bairro: fields?.bairro || '',
@@ -98,18 +137,13 @@ export function useFormSubmit() {
         origem: fields?.origem || ('formulario_' + currentPath)
       }
 
-      // Adiciona contagem não-sensível das mídias selecionadas para o template de e-mail
       if (mediaUploaderRef?.value) {
         const uploader = mediaUploaderRef.value
         const items = uploader.mediaItems || []
         const pCount = typeof uploader.photoCount === 'number' ? uploader.photoCount : (uploader.photoCount?.value ?? items.filter(m => m.type === 'photo').length)
         const vCount = typeof uploader.videoCount === 'number' ? uploader.videoCount : (uploader.videoCount?.value ?? items.filter(m => m.type === 'video').length)
-        
         if (pCount > 0 || vCount > 0) {
-          payload.media_selection_summary = {
-            photoCount: Number(pCount) || 0,
-            videoCount: Number(vCount) || 0
-          }
+          payload.media_selection_summary = { photoCount: Number(pCount) || 0, videoCount: Number(vCount) || 0 }
         }
       }
 
@@ -122,13 +156,6 @@ export function useFormSubmit() {
 
       if (response?.success !== true || response?.leadSaved !== true || !response?.leadId) {
         throw new Error('Não foi possível confirmar o recebimento do pedido.')
-      }
-
-      const t_sendLeadResponse = performance.now()
-      const preMediaWaitMs = (t_sendLeadResponse - t_submitStart).toFixed(1)
-
-      if (import.meta.dev) {
-        console.log(`[useFormSubmit Timing] PRE_MEDIA_WAIT_MS: ${preMediaWaitMs}ms (LeadId: ${response?.leadId})`)
       }
 
       // 2. Se o cliente selecionou fotos ou vídeos e o servidor retornou uploadToken, executa upload direto

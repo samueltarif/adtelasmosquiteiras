@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   const dismissedAt = new Date().toISOString()
   const updatePayload = {
     attribution_status: 'dismissed',
-    dismissed_by: admin.userId,
+    dismissed_by: admin.adminId || admin.userId,
     dismissed_at: dismissedAt,
     notes: body.notes?.trim() || currentAttr.notes || null,
     updated_at: dismissedAt

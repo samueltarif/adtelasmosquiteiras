@@ -12,6 +12,7 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
   }
 
   const status = typeof query.status === 'string' ? query.status.trim() : 'all'
+  const channel = typeof query.channel === 'string' ? query.channel.trim() : 'all'
   const search = typeof query.search === 'string' ? query.search.trim() : ''
   const page = Math.max(1, parseInt(String(query.page || '1'), 10) || 1)
   const pageSize = Math.min(100, Math.max(1, parseInt(String(query.pageSize || '20'), 10) || 20))
@@ -28,9 +29,14 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
   }
 
   try {
-    const countsRes = await $fetch<any[]>(`${config.supabaseUrl}/rest/v1/whatsapp_attributions?select=attribution_status`, {
-      headers
-    })
+    let countsUrl = `${config.supabaseUrl}/rest/v1/whatsapp_attributions?select=attribution_status`
+    if (channel === 'legacy_null') {
+      countsUrl += '&channel=is.null'
+    } else if (channel && channel !== 'all') {
+      countsUrl += `&channel=eq.${encodeURIComponent(channel)}`
+    }
+
+    const countsRes = await $fetch<any[]>(countsUrl, { headers })
 
     if (Array.isArray(countsRes)) {
       counts.total = countsRes.length
@@ -44,9 +50,10 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
     console.error('[whatsapp-attributions] Erro ao obter contagens:', err)
   }
 
-  // 2. Query de listagem com joins em clients, leads e admin_users
+  // 2. Query de listagem com joins em lead_clicks, clients, leads e admin_users
   const selectQuery = [
     '*',
+    'lead_click:lead_clicks!whatsapp_attributions_lead_click_id_fkey(msclkid)',
     'client:clients(id,nome,telefone_principal,email)',
     'lead:leads(id,nome,telefone)',
     'assigned_admin:admin_users!whatsapp_attributions_assigned_by_fkey(id,email)',
@@ -63,6 +70,12 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
     params.set('attribution_status', `eq.${status}`)
   }
 
+  if (channel === 'legacy_null') {
+    params.set('channel', 'is.null')
+  } else if (channel && channel !== 'all') {
+    params.set('channel', `eq.${channel}`)
+  }
+
   if (search) {
     params.set('or', `(short_code.ilike.*${search}*,campaign_name.ilike.*${search}*,landing_path.ilike.*${search}*)`)
   }
@@ -76,20 +89,19 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
       const gclid = row.gclid || null
       const gbraid = row.gbraid || null
       const wbraid = row.wbraid || null
+      const fbclid = row.fbclid || null
+      const msclkid = row.lead_click?.msclkid || null
+      const ttclid = row.ttclid || null
 
-      let clickIdType: 'gclid' | 'gbraid' | 'wbraid' | null = null
+      let clickIdType: 'gclid' | 'gbraid' | 'wbraid' | 'fbclid' | 'msclkid' | 'ttclid' | null = null
       let clickIdValue: string | null = null
 
-      if (gclid) {
-        clickIdType = 'gclid'
-        clickIdValue = gclid
-      } else if (gbraid) {
-        clickIdType = 'gbraid'
-        clickIdValue = gbraid
-      } else if (wbraid) {
-        clickIdType = 'wbraid'
-        clickIdValue = wbraid
-      }
+      if (gclid) { clickIdType = 'gclid'; clickIdValue = gclid }
+      else if (gbraid) { clickIdType = 'gbraid'; clickIdValue = gbraid }
+      else if (wbraid) { clickIdType = 'wbraid'; clickIdValue = wbraid }
+      else if (ttclid) { clickIdType = 'ttclid'; clickIdValue = ttclid }
+      else if (fbclid) { clickIdType = 'fbclid'; clickIdValue = fbclid }
+      else if (msclkid) { clickIdType = 'msclkid'; clickIdValue = msclkid }
 
       return {
         id: row.id,
@@ -99,17 +111,42 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
         session_id: row.session_id,
         clicked_at: row.clicked_at,
 
-        // Snapshot de Marketing
+        // Snapshot Multicanal & Atribuição
+        channel: row.channel || null,
+        utm_source: row.utm_source || null,
+        utm_medium: row.utm_medium || null,
+        utm_campaign: row.utm_campaign || null,
+        utm_content: row.utm_content || null,
+        utm_term: row.utm_term || null,
+        campaign_name: row.campaign_name || null,
+        landing_path: row.landing_path || null,
+        cta_location: row.cta_location || null,
+
+        // Click IDs
         gclid,
         gbraid,
         wbraid,
-        google_campaign_id: row.google_campaign_id,
-        google_adgroup_id: row.google_adgroup_id,
-        google_creative_id: row.google_creative_id,
-        campaign_name: row.campaign_name,
-        utm_term: row.utm_term,
-        landing_path: row.landing_path,
-        cta_location: row.cta_location,
+        fbclid,
+        msclkid,
+        ttclid,
+
+        // Google Ads IDs
+        google_campaign_id: row.google_campaign_id || null,
+        google_adgroup_id: row.google_adgroup_id || null,
+        google_creative_id: row.google_creative_id || null,
+
+        // Meta / Instagram / Facebook IDs
+        meta_campaign_id: row.meta_campaign_id || null,
+        meta_adset_id: row.meta_adset_id || null,
+        meta_ad_id: row.meta_ad_id || null,
+        meta_placement: row.meta_placement || null,
+
+        // TikTok Ads IDs
+        tiktok_campaign_id: row.tiktok_campaign_id || null,
+        tiktok_adgroup_id: row.tiktok_adgroup_id || null,
+        tiktok_ad_id: row.tiktok_ad_id || null,
+        tiktok_creative_id: row.tiktok_creative_id || null,
+        tiktok_placement: row.tiktok_placement || null,
 
         has_click_id: !!clickIdType,
         click_id_type: clickIdType,

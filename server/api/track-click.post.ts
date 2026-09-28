@@ -1,12 +1,12 @@
 import { 
   classifyDevice, 
   classifyBot, 
-  isIdempotentRequest, 
   generateIpHash,
   validateCtaLocation,
   normalizeActionType,
   resolveCanonicalService
 } from '../utils/analytics'
+import { validateCanonicalChannel } from '../utils/channelValidation'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -18,40 +18,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const {
-    event_id,
-    visitor_id,
-    session_id,
-    tipo = 'whatsapp',
-    origem = '/',
-    cta_location,
-    service_key,
-    landing_path,
-    utm_source,
-    utm_medium,
-    utm_campaign,
-    utm_content,
-    utm_term,
-    google_campaign_id,
-    google_adgroup_id,
-    google_creative_id,
-    google_match_type,
-    google_network,
-    google_device,
-    google_target_id,
-    gclid,
-    gbraid,
-    wbraid,
-    fbclid,
-    msclkid,
-    referrer,
-    channel
+    event_id, visitor_id, session_id, tipo = 'whatsapp', origem = '/', cta_location,
+    service_key, landing_path, referrer, channel,
+    utm_source, utm_medium, utm_campaign, utm_content, utm_term,
+    google_campaign_id, google_adgroup_id, google_creative_id,
+    google_match_type, google_network, google_device, google_target_id,
+    gclid, gbraid, wbraid, fbclid, msclkid,
+    meta_campaign_id, meta_adset_id, meta_ad_id, meta_placement,
+    ttclid, tiktok_campaign_id, tiktok_adgroup_id, tiktok_ad_id, tiktok_creative_id, tiktok_placement
   } = body
-
-  // 0. VERIFICAR IDEMPOTÊNCIA DE SERVIDOR
-  if (event_id && isIdempotentRequest(event_id)) {
-    console.log(`[track-click] [IDEMPOTENCY] Clique duplicado ignorado para event_id: ${event_id}`)
-    return { success: true, idempotent: true }
-  }
 
   const userAgent = headers['user-agent'] || ''
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
@@ -60,6 +35,7 @@ export default defineEventHandler(async (event) => {
 
   const deviceType = classifyDevice(userAgent)
   const botInfo = classifyBot(userAgent)
+  const validatedChannel = validateCanonicalChannel(channel)
 
   // Validações e Resoluções Canônicas de Servidor
   const validatedCtaLocation = validateCtaLocation(cta_location)
@@ -67,11 +43,12 @@ export default defineEventHandler(async (event) => {
   const { service_key: canonicalServiceKey, service_name: canonicalServiceName } = resolveCanonicalService(service_key)
 
   const path = (origem === '/' || origem === '') ? 'Home (/)' : origem
+  const resolvedLanding = landing_path || path
 
   try {
-    // Para cliques de WhatsApp com short_code, executa a RPC atômica (lead_clicks + whatsapp_attributions)
+    // Para cliques de WhatsApp com short_code, executa a RPC atômica v3
     if (canonicalActionType === 'whatsapp' && body.short_code && /^[23456789ABCDEFGHJKMNPQRSTVWXYZ]{8}$/i.test(String(body.short_code).trim())) {
-      const rpcResult = await $fetch<any>(`${config.supabaseUrl}/rest/v1/rpc/create_whatsapp_click_attribution_atomic`, {
+      const rpcResult = await $fetch<any>(`${config.supabaseUrl}/rest/v1/rpc/create_whatsapp_click_attribution_atomic_v3`, {
         method: 'POST',
         headers: {
           'apikey': config.supabaseServiceRoleKey,
@@ -87,14 +64,14 @@ export default defineEventHandler(async (event) => {
           p_cta_location: validatedCtaLocation,
           p_service_key: canonicalServiceKey,
           p_service_name: canonicalServiceName,
-          p_landing_path: landing_path || path,
+          p_landing_path: resolvedLanding,
           p_device_type: deviceType,
           p_google_device: google_device || null,
           p_is_bot: botInfo.isBot,
           p_bot_name: botInfo.botName,
           p_user_agent: userAgent.substring(0, 500),
           p_ip_hash: ipHash,
-          p_channel: channel || null,
+          p_channel: validatedChannel,
           p_utm_source: utm_source || null,
           p_utm_medium: utm_medium || null,
           p_utm_campaign: utm_campaign || null,
@@ -110,7 +87,19 @@ export default defineEventHandler(async (event) => {
           p_gbraid: gbraid || null,
           p_wbraid: wbraid || null,
           p_referrer: referrer || null,
-          p_clicked_at: new Date().toISOString()
+          p_clicked_at: new Date().toISOString(),
+          p_fbclid: fbclid || null,
+          p_msclkid: msclkid || null,
+          p_meta_campaign_id: meta_campaign_id || null,
+          p_meta_adset_id: meta_adset_id || null,
+          p_meta_ad_id: meta_ad_id || null,
+          p_meta_placement: meta_placement || null,
+          p_ttclid: ttclid || null,
+          p_tiktok_campaign_id: tiktok_campaign_id || null,
+          p_tiktok_adgroup_id: tiktok_adgroup_id || null,
+          p_tiktok_ad_id: tiktok_ad_id || null,
+          p_tiktok_creative_id: tiktok_creative_id || null,
+          p_tiktok_placement: tiktok_placement || null
         }
       })
 
@@ -140,14 +129,14 @@ export default defineEventHandler(async (event) => {
         cta_location: validatedCtaLocation,
         service_key: canonicalServiceKey,
         service_name: canonicalServiceName,
-        landing_path: landing_path || path,
+        landing_path: resolvedLanding,
         device_type: deviceType,
         google_device: google_device || null,
         is_bot: botInfo.isBot,
         bot_name: botInfo.botName,
         user_agent: userAgent.substring(0, 500),
         ip_hash: ipHash,
-        channel: channel || null,
+        channel: validatedChannel,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
@@ -164,6 +153,16 @@ export default defineEventHandler(async (event) => {
         wbraid: wbraid || null,
         fbclid: fbclid || null,
         msclkid: msclkid || null,
+        meta_campaign_id: meta_campaign_id || null,
+        meta_adset_id: meta_adset_id || null,
+        meta_ad_id: meta_ad_id || null,
+        meta_placement: meta_placement || null,
+        ttclid: ttclid || null,
+        tiktok_campaign_id: tiktok_campaign_id || null,
+        tiktok_adgroup_id: tiktok_adgroup_id || null,
+        tiktok_ad_id: tiktok_ad_id || null,
+        tiktok_creative_id: tiktok_creative_id || null,
+        tiktok_placement: tiktok_placement || null,
         referrer: referrer || null
       }
     })

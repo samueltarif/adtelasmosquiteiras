@@ -1,5 +1,7 @@
 <script setup>
 import { useServicoData } from '~/composables/useServicoData'
+import ServicoEspecificacoes from '~/components/servicos/ServicoEspecificacoes.vue'
+import ServicoCtaFinal from '~/components/servicos/ServicoCtaFinal.vue'
 
 const route = useRoute()
 const { getServicoBySlug, getWhatsAppUrl, GOOGLE_REVIEWS_URL } = useServicoData()
@@ -32,11 +34,11 @@ const trackEvent = (eventName, params = {}) => {
   }
 }
 
-const openWhatsApp = (origem = 'hero') => {
-  const url = getWhatsAppUrl(servico, origem)
-  trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem })
-  window.open(url, '_blank')
-}
+const whatsappHeroUrl = computed(() => getWhatsAppUrl(servico, 'hero'))
+const whatsappSpecsUrl = computed(() => getWhatsAppUrl(servico, 'especificacoes'))
+const whatsappComparacaoUrl = computed(() => getWhatsAppUrl(servico, 'comparacao'))
+const whatsappFaqUrl = computed(() => getWhatsAppUrl(servico, 'faq'))
+const whatsappFinalUrl = computed(() => getWhatsAppUrl(servico, 'cta-final'))
 </script>
 
 <template>
@@ -76,7 +78,6 @@ const openWhatsApp = (origem = 'hero') => {
               </svg>
               {{ servico.destaque }}
             </div>
-
             
             <!-- Título -->
             <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
@@ -114,14 +115,18 @@ const openWhatsApp = (origem = 'hero') => {
             
             <!-- CTA Principal -->
             <div class="flex flex-col sm:flex-row gap-4">
-              <button
-                @click="openWhatsApp('hero')"
+              <a
+                :href="whatsappHeroUrl"
+                target="_blank"
+                rel="noopener noreferrer"
                 class="flex-1 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl"
+                data-cta-location="hero"
                 data-gtm="servico-hero-whatsapp"
+                @click="trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem: 'hero' })"
               >
                 <WhatsappIcon class="w-6 h-6" />
                 Orçamento Grátis para {{ servico.titulo.split(' ')[0] }}
-              </button>
+              </a>
               
               <button
                 @click="scrollToContact"
@@ -227,62 +232,12 @@ const openWhatsApp = (origem = 'hero') => {
       </div>
     </section>
 
-    <!-- Demo e Especificações -->
-    <section class="py-16 md:py-24 bg-gradient-to-b from-white to-[#F9FAFB]">
-      <div class="container mx-auto px-4 md:px-6 max-w-7xl">
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-          
-          <!-- Imagem Demo -->
-          <div class="order-2 md:order-1">
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl">
-              <img
-                :src="servico.imagemDemo"
-                :alt="`${servico.titulo} instalado`"
-                class="w-full h-auto"
-                loading="lazy"
-              />
-            </div>
-          </div>
-          
-          <!-- Especificações Técnicas -->
-          <div class="order-1 md:order-2">
-            <h2 class="text-3xl md:text-4xl font-bold text-[#22345F] mb-6">
-              Especificações Técnicas
-            </h2>
-            
-            <div class="space-y-4">
-              <div
-                v-for="(spec, index) in servico.especificacoes"
-                :key="index"
-                class="flex items-start gap-4 p-4 bg-white rounded-xl border-2 border-[#E5EDF8]"
-              >
-                <div class="w-10 h-10 bg-[#E5EDF8] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg class="w-5 h-5 text-[#22345F]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="flex-1">
-                  <p class="text-sm font-semibold text-[#4B5563] mb-1">{{ spec.label }}</p>
-                  <p class="text-base font-bold text-[#22345F]">{{ spec.valor }}</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- CTA -->
-            <button
-              @click="openWhatsApp('especificacoes')"
-              class="mt-8 w-full px-8 py-4 bg-[#F49A1A] text-white rounded-xl font-bold text-lg hover:bg-[#d88715] transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
-              data-gtm="servico-specs-whatsapp"
-            >
-              <WhatsappIcon class="w-6 h-6" />
-              Solicitar Orçamento Detalhado
-            </button>
-          </div>
-          
-        </div>
-      </div>
-    </section>
+    <!-- Demo e Especificações (Componente Modular) -->
+    <ServicoEspecificacoes
+      :servico="servico"
+      :whatsapp-url="whatsappSpecsUrl"
+      @whatsapp-click="(origem) => trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem })"
+    />
 
     <!-- Comparação -->
     <section class="py-16 md:py-24 bg-white">
@@ -330,16 +285,20 @@ const openWhatsApp = (origem = 'hero') => {
           </div>
         </div>
         
-        <!-- CTA -->
+        <!-- CTA Comparação -->
         <div class="text-center mt-8">
-          <button
-            @click="openWhatsApp('comparacao')"
+          <a
+            :href="whatsappComparacaoUrl"
+            target="_blank"
+            rel="noopener noreferrer"
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
+            data-cta-location="comparacao"
             data-gtm="servico-comparacao-whatsapp"
+            @click="trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem: 'comparacao' })"
           >
             <WhatsappIcon class="w-6 h-6" />
             Quero a Melhor Opção!
-          </button>
+          </a>
         </div>
         
       </div>
@@ -437,113 +396,36 @@ const openWhatsApp = (origem = 'hero') => {
           </details>
         </div>
         
-        <!-- CTA Dúvidas -->
+        <!-- CTA Dúvidas FAQ -->
         <div class="text-center mt-12 p-8 bg-gradient-to-br from-[#E5EDF8] to-white rounded-2xl border-2 border-[#E5EDF8]">
           <p class="text-lg font-semibold text-[#22345F] mb-4">
             Ainda tem dúvidas?
           </p>
-          <button
-            @click="openWhatsApp('faq')"
+          <a
+            :href="whatsappFaqUrl"
+            target="_blank"
+            rel="noopener noreferrer"
             class="inline-flex items-center gap-2 px-8 py-4 bg-[#25D366] text-white rounded-xl font-bold text-lg hover:bg-[#1fb854] transition-all duration-300 shadow-lg"
+            data-cta-location="faq"
             data-gtm="servico-faq-whatsapp"
+            @click="trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem: 'faq' })"
           >
             <WhatsappIcon class="w-6 h-6" />
             Fale com um Especialista
-          </button>
+          </a>
         </div>
         
       </div>
     </section>
 
-    <!-- CTA Final -->
-    <section id="contato-final" class="py-16 md:py-24 bg-gradient-to-br from-[#22345F] via-[#1a2847] to-[#22345F] text-white relative overflow-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
-      </div>
-      
-      <div class="container mx-auto px-4 md:px-6 max-w-4xl relative z-10">
-        
-        <div class="text-center">
-          <!-- Badge -->
-          <div class="inline-flex items-center gap-2 bg-[#F49A1A] px-4 py-2 rounded-full text-sm font-bold mb-6">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-            </svg>
-            Oferta por tempo limitado
-          </div>
-          
-          <!-- Título -->
-          <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-            Proteja sua família HOJE!<br/>
-            Instalação em 24h
-          </h2>
-          
-          <!-- Descrição -->
-          <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Não espere acontecer um acidente. Garanta a segurança do seu lar com {{ servico.titulo.toLowerCase() }} de qualidade premium.
-          </p>
-          
-          <!-- Benefícios Rápidos -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-3xl mx-auto">
-            <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-              <svg class="w-6 h-6 text-[#25D366]" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="font-semibold">Orçamento Grátis</span>
-            </div>
-            <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-              <svg class="w-6 h-6 text-[#25D366]" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="font-semibold">Instalação 24h</span>
-            </div>
-            <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-              <svg class="w-6 h-6 text-[#25D366]" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-              </svg>
-              <span class="font-semibold">Garantia 2 Anos</span>
-            </div>
-          </div>
-          
-          <!-- CTA Principal -->
-          <button
-            @click="openWhatsApp('cta-final')"
-            class="inline-flex items-center gap-3 px-10 py-5 bg-[#25D366] text-white rounded-2xl font-bold text-xl hover:bg-[#1fb854] transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105 mb-6"
-            data-gtm="servico-cta-final-whatsapp"
-          >
-            <WhatsappIcon class="w-7 h-7" />
-            Solicitar Orçamento GRÁTIS Agora
-          </button>
-          
-          <!-- Prova Social -->
-          <div class="flex items-center justify-center gap-6 text-sm text-white/80">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-              </svg>
-              <span>500+ clientes satisfeitos</span>
-            </div>
-            <a
-              :href="GOOGLE_REVIEWS_URL"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group"
-              data-gtm="servico-rating-clicked"
-            >
-              <span class="font-semibold group-hover:underline">Nota 5.0</span>
-              <div class="flex gap-0.5">
-                <svg v-for="s in 5" :key="s" class="w-4 h-4 text-[#F49A1A]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-              </div>
-            </a>
-          </div>
-          
-        </div>
-        
-      </div>
-    </section>
+    <!-- CTA Final (Componente Modular) -->
+    <ServicoCtaFinal
+      :servico="servico"
+      :whatsapp-url="whatsappFinalUrl"
+      :reviews-url="GOOGLE_REVIEWS_URL"
+      @whatsapp-click="(origem) => trackEvent('servico_whatsapp_clicked', { slug: servico.slug, origem })"
+      @rating-click="trackEvent('servico_rating_clicked')"
+    />
     
     <!-- Voltar para Home -->
     <section class="py-8 bg-white border-t-2 border-[#E5EDF8]">

@@ -17,6 +17,7 @@ import AcquisitionSection from '../../components/admin/AcquisitionSection.vue'
 import ServicesSection from '../../components/admin/ServicesSection.vue'
 import CommercialFunnel from '../../components/admin/CommercialFunnel.vue'
 import GoogleAdsSection from '../../components/admin/GoogleAdsSection.vue'
+import WhatsappAttributionSection from '../../components/admin/WhatsappAttributionSection.vue'
 
 definePageMeta({ layout: 'admin' })
 
@@ -113,6 +114,11 @@ onMounted(() => {
           <TabsTrigger value="acquisition" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:share-2" class="w-4 h-4 shrink-0" />
             <span>Aquisição & Canais</span>
+          </TabsTrigger>
+
+          <TabsTrigger value="whatsapp" class="gap-2 justify-center py-2 text-xs w-full">
+            <Icon name="lucide:message-square" class="w-4 h-4 shrink-0 text-emerald-400" />
+            <span>Atribuição WhatsApp</span>
           </TabsTrigger>
 
           <TabsTrigger value="services" class="gap-2 justify-center py-2 text-xs w-full">
@@ -275,6 +281,11 @@ onMounted(() => {
             :pages-data="pages"
             :loading="isLoadingAcquisition || isLoadingPages"
           />
+        </TabsContent>
+
+        <!-- TAB 3: ATRIBUIÇÃO WHATSAPP MULTICANAL -->
+        <TabsContent value="whatsapp" class="mt-4">
+          <WhatsappAttributionSection />
         </TabsContent>
 
         <!-- TAB 3: SERVIÇOS & CTAS -->

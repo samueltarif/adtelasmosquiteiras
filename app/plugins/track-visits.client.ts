@@ -50,7 +50,13 @@ export default defineNuxtPlugin(() => {
       first_touch_gbraid: attr.gbraid,
       first_touch_wbraid: attr.wbraid,
       first_touch_fbclid: attr.fbclid,
-      first_touch_msclkid: attr.msclkid
+      first_touch_msclkid: attr.msclkid,
+      first_touch_ttclid: attr.ttclid,
+      first_touch_tiktok_campaign_id: attr.tiktok_campaign_id || null,
+      first_touch_tiktok_adgroup_id: attr.tiktok_adgroup_id || null,
+      first_touch_tiktok_ad_id: attr.tiktok_ad_id || null,
+      first_touch_tiktok_creative_id: attr.tiktok_creative_id || null,
+      first_touch_tiktok_placement: attr.tiktok_placement || null
     })
 
     // Fire-and-forget com beacon/fetch keepalive
@@ -80,6 +86,16 @@ export default defineNuxtPlugin(() => {
         wbraid: attr.wbraid,
         fbclid: attr.fbclid,
         msclkid: attr.msclkid,
+        meta_campaign_id: attr.meta_campaign_id || null,
+        meta_adset_id: attr.meta_adset_id || null,
+        meta_ad_id: attr.meta_ad_id || null,
+        meta_placement: attr.meta_placement || null,
+        ttclid: attr.ttclid,
+        tiktok_campaign_id: attr.tiktok_campaign_id || null,
+        tiktok_adgroup_id: attr.tiktok_adgroup_id || null,
+        tiktok_ad_id: attr.tiktok_ad_id || null,
+        tiktok_creative_id: attr.tiktok_creative_id || null,
+        tiktok_placement: attr.tiktok_placement || null,
         channel: attr.channel
       }
     }).catch(() => {

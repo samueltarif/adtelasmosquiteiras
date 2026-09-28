@@ -7,6 +7,7 @@ import TableRow from '../ui/table/TableRow.vue'
 import TableHead from '../ui/table/TableHead.vue'
 import TableCell from '../ui/table/TableCell.vue'
 import Badge from '../ui/badge/Badge.vue'
+import { getChannelBadgeStyle } from '~/utils/channelDisplay'
 
 const props = defineProps<{
   acquisitionData: {
@@ -100,7 +101,7 @@ const props = defineProps<{
             :key="ch.channel"
           >
             <TableCell class="font-medium text-white flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span class="w-2 h-2 rounded-full shrink-0" :class="getChannelBadgeStyle(ch.channel).dot"></span>
               {{ ch.label }}
             </TableCell>
             <TableCell class="text-right font-semibold text-slate-200 tabular-nums">{{ ch.unique_visitors }}</TableCell>

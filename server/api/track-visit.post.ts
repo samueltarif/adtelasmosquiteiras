@@ -1,4 +1,5 @@
-import { classifyDevice, classifyBot, isIdempotentRequest, generateIpHash } from '../utils/analytics'
+import { classifyDevice, classifyBot, generateIpHash } from '../utils/analytics'
+import { validateCanonicalChannel } from '../utils/channelValidation'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -33,14 +34,18 @@ export default defineEventHandler(async (event) => {
     wbraid,
     fbclid,
     msclkid,
+    meta_campaign_id,
+    meta_adset_id,
+    meta_ad_id,
+    meta_placement,
+    ttclid,
+    tiktok_campaign_id,
+    tiktok_adgroup_id,
+    tiktok_ad_id,
+    tiktok_creative_id,
+    tiktok_placement,
     channel
   } = body
-
-  // 0. VERIFICAR IDEMPOTÊNCIA DE SERVIDOR
-  if (event_id && isIdempotentRequest(event_id)) {
-    console.log(`[track-visit] [IDEMPOTENCY] Pageview duplicado ignorado para event_id: ${event_id}`)
-    return { success: true, idempotent: true }
-  }
 
   const userAgent = headers['user-agent'] || ''
   const forwarded = headers['x-forwarded-for'] || headers['x-real-ip'] || '0.0.0.0'
@@ -49,6 +54,7 @@ export default defineEventHandler(async (event) => {
 
   const deviceType = classifyDevice(userAgent)
   const botInfo = classifyBot(userAgent)
+  const validatedChannel = validateCanonicalChannel(channel)
 
   try {
     await $fetch(`${config.supabaseUrl}/rest/v1/page_views`, {
@@ -72,7 +78,7 @@ export default defineEventHandler(async (event) => {
         is_bot: botInfo.isBot,
         bot_name: botInfo.botName,
         ip_hash: ipHash,
-        channel: channel || null,
+        channel: validatedChannel,
         utm_source: utm_source || null,
         utm_medium: utm_medium || null,
         utm_campaign: utm_campaign || null,
@@ -88,7 +94,17 @@ export default defineEventHandler(async (event) => {
         gbraid: gbraid || null,
         wbraid: wbraid || null,
         fbclid: fbclid || null,
-        msclkid: msclkid || null
+        msclkid: msclkid || null,
+        meta_campaign_id: meta_campaign_id || null,
+        meta_adset_id: meta_adset_id || null,
+        meta_ad_id: meta_ad_id || null,
+        meta_placement: meta_placement || null,
+        ttclid: ttclid || null,
+        tiktok_campaign_id: tiktok_campaign_id || null,
+        tiktok_adgroup_id: tiktok_adgroup_id || null,
+        tiktok_ad_id: tiktok_ad_id || null,
+        tiktok_creative_id: tiktok_creative_id || null,
+        tiktok_placement: tiktok_placement || null
       }
     })
 

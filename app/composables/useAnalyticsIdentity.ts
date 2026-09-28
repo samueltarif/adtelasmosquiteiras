@@ -29,6 +29,12 @@ export interface FirstTouchContext {
   first_touch_wbraid: string | null
   first_touch_fbclid: string | null
   first_touch_msclkid: string | null
+  first_touch_ttclid?: string | null
+  first_touch_tiktok_campaign_id?: string | null
+  first_touch_tiktok_adgroup_id?: string | null
+  first_touch_tiktok_ad_id?: string | null
+  first_touch_tiktok_creative_id?: string | null
+  first_touch_tiktok_placement?: string | null
 }
 
 export function generateUUID(): string {
@@ -51,7 +57,7 @@ export function useAnalyticsIdentity() {
   })
 
   const sessionCookie = useCookie<string | null>(SESSION_COOKIE_NAME, {
-    maxAge: 1800, // 30 minutos
+    maxAge: 1800,
     path: '/',
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production'
@@ -64,9 +70,7 @@ export function useAnalyticsIdentity() {
   })
 
   function getOrCreateVisitorId(): string {
-    if (!visitorCookie.value) {
-      visitorCookie.value = generateUUID()
-    }
+    if (!visitorCookie.value) visitorCookie.value = generateUUID()
     return visitorCookie.value
   }
 
@@ -89,21 +93,14 @@ export function useAnalyticsIdentity() {
         isNewSession = true
       }
     }
-
     return { sessionId: sessionCookie.value, isNewSession }
   }
 
   function getSessionLandingPath(currentPath: string = '/'): string {
-    if (!landingCookie.value) {
-      landingCookie.value = currentPath || '/'
-    }
+    if (!landingCookie.value) landingCookie.value = currentPath || '/'
     return landingCookie.value
   }
 
-  /**
-   * Grava o contexto completo do First Touch em localStorage para evitar enviar payload pesado em cabeçalhos HTTP.
-   * Preserva permanentemente a primeira aquisição conhecida do visitante.
-   */
   function setFirstTouchContextOnce(context: Partial<FirstTouchContext>) {
     if (import.meta.client) {
       const existing = localStorage.getItem(FIRST_TOUCH_STORAGE_KEY)
@@ -128,46 +125,36 @@ export function useAnalyticsIdentity() {
           first_touch_gbraid: context.first_touch_gbraid || null,
           first_touch_wbraid: context.first_touch_wbraid || null,
           first_touch_fbclid: context.first_touch_fbclid || null,
-          first_touch_msclkid: context.first_touch_msclkid || null
+          first_touch_msclkid: context.first_touch_msclkid || null,
+          first_touch_ttclid: context.first_touch_ttclid || null,
+          first_touch_tiktok_campaign_id: context.first_touch_tiktok_campaign_id || null,
+          first_touch_tiktok_adgroup_id: context.first_touch_tiktok_adgroup_id || null,
+          first_touch_tiktok_ad_id: context.first_touch_tiktok_ad_id || null,
+          first_touch_tiktok_creative_id: context.first_touch_tiktok_creative_id || null,
+          first_touch_tiktok_placement: context.first_touch_tiktok_placement || null
         }
         localStorage.setItem(FIRST_TOUCH_STORAGE_KEY, JSON.stringify(data))
       }
     }
   }
 
-  function getFirstTouchContext(): Partial<FirstTouchContext> {
+  function hasFirstTouchContext(): boolean {
+    return import.meta.client ? !!localStorage.getItem(FIRST_TOUCH_STORAGE_KEY) : false
+  }
+
+  function getFirstTouchContext(): FirstTouchContext | null {
     if (import.meta.client) {
       const stored = localStorage.getItem(FIRST_TOUCH_STORAGE_KEY)
       if (stored) {
         try {
-          return JSON.parse(stored)
-        } catch (e) {
-          // Fallback se JSON for inválido
-        }
+          const parsed = JSON.parse(stored)
+          if (parsed && typeof parsed === 'object' && parsed.first_touch_channel) {
+            return parsed as FirstTouchContext
+          }
+        } catch (e) {}
       }
     }
-    return {
-      first_touch_channel: 'direct',
-      first_touch_landing_path: null,
-      first_touch_referrer: null,
-      first_touch_utm_source: null,
-      first_touch_utm_medium: null,
-      first_touch_utm_campaign: null,
-      first_touch_utm_content: null,
-      first_touch_utm_term: null,
-      first_touch_google_campaign_id: null,
-      first_touch_google_adgroup_id: null,
-      first_touch_google_creative_id: null,
-      first_touch_google_match_type: null,
-      first_touch_google_network: null,
-      first_touch_google_device: null,
-      first_touch_google_target_id: null,
-      first_touch_gclid: null,
-      first_touch_gbraid: null,
-      first_touch_wbraid: null,
-      first_touch_fbclid: null,
-      first_touch_msclkid: null
-    }
+    return null
   }
 
   return {
@@ -175,6 +162,7 @@ export function useAnalyticsIdentity() {
     getOrCreateSessionId,
     getSessionLandingPath,
     setFirstTouchContextOnce,
+    hasFirstTouchContext,
     getFirstTouchContext,
     generateUUID
   }

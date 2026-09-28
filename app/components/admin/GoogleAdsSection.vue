@@ -11,7 +11,7 @@ import Badge from '../ui/badge/Badge.vue'
 import AdminKpiCard from './AdminKpiCard.vue'
 import LandingComparisonCard from './LandingComparisonCard.vue'
 import MarketingChangeTimeline from './MarketingChangeTimeline.vue'
-import WhatsappAttributionSection from './WhatsappAttributionSection.vue'
+import GoogleAdsKeywordsTable from './GoogleAdsKeywordsTable.vue'
 
 const props = defineProps<{
   data: GoogleAdsOverviewResponse | null
@@ -63,78 +63,53 @@ const emit = defineEmits<{
     <!-- 8 CARDS DE KPIS DO GOOGLE ADS -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
       <AdminKpiCard
-        title="Visitantes Únicos"
-        :value="data?.kpis.unique_visitors ?? '-'"
-        icon="lucide:users"
-        theme="cyan"
-        badge="ADS"
+        title="Visitantes Únicos" :value="data?.kpis.unique_visitors ?? '-'"
+        icon="lucide:users" theme="cyan" badge="ADS"
         formula-tooltip="Visitantes humanos únicos identificados via channel=google_ads ou Click ID"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Sessões Ads"
-        :value="data?.kpis.sessions ?? '-'"
-        icon="lucide:globe"
-        theme="violet"
+        title="Sessões Ads" :value="data?.kpis.sessions ?? '-'"
+        icon="lucide:globe" theme="violet"
         formula-tooltip="Sessões distintas com origem no Google Ads no período selecionado"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Pageviews"
-        :value="data?.kpis.pageviews ?? '-'"
-        icon="lucide:eye"
-        theme="indigo"
+        title="Pageviews" :value="data?.kpis.pageviews ?? '-'"
+        icon="lucide:eye" theme="indigo"
         formula-tooltip="Total de páginas visualizadas pelo tráfego de Google Ads"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="WhatsApp Ads"
-        :value="data?.kpis.whatsapp_clicks ?? '-'"
+        title="WhatsApp Ads" :value="data?.kpis.whatsapp_clicks ?? '-'"
         :sublabel="`${data?.kpis.whatsapp_unique_visitors ?? 0} pessoas únicas`"
-        icon="lucide:message-circle"
-        theme="emerald"
+        icon="lucide:message-circle" theme="emerald"
         formula-tooltip="Cliques em botões de WhatsApp de sessões originadas no Google Ads"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Início Formulário"
-        :value="data?.kpis.form_starts ?? '-'"
+        title="Início Formulário" :value="data?.kpis.form_starts ?? '-'"
         :sublabel="`${data?.kpis.form_starts_unique_visitors ?? 0} pessoas únicas`"
-        icon="lucide:edit-3"
-        theme="amber"
+        icon="lucide:edit-3" theme="amber"
         formula-tooltip="Visitantes que focaram/interagiram com os campos do formulário da landing"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Leads Reais"
-        :value="data?.kpis.real_leads ?? '-'"
+        title="Leads Reais" :value="data?.kpis.real_leads ?? '-'"
         :sublabel="`${data?.kpis.real_lead_unique_visitors ?? 0} pessoas únicas`"
-        icon="lucide:user-check"
-        theme="emerald"
-        badge="QUALIFICADOS"
+        icon="lucide:user-check" theme="emerald" badge="QUALIFICADOS"
         formula-tooltip="Leads comerciais reais de clientes (exclui sintéticos e testes)"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Taxa de Intenção"
-        :value="data?.kpis.contact_intent_rate ?? '0.0%'"
-        icon="lucide:zap"
-        theme="amber"
+        title="Taxa de Intenção" :value="data?.kpis.contact_intent_rate ?? '0.0%'"
+        icon="lucide:zap" theme="amber"
         formula-tooltip="União desduplicada de visitantes com intenção (CTA/WhatsApp/Form) / Visitantes Únicos"
         :loading="loading"
       />
-
       <AdminKpiCard
-        title="Taxa de Lead"
-        :value="data?.kpis.lead_conversion_rate ?? '0.0%'"
-        icon="lucide:target"
-        theme="emerald"
+        title="Taxa de Lead" :value="data?.kpis.lead_conversion_rate ?? '0.0%'"
+        icon="lucide:target" theme="emerald"
         formula-tooltip="Visitantes únicos que viraram lead real / Visitantes Únicos"
         :loading="loading"
       />
@@ -358,9 +333,6 @@ const emit = defineEmits<{
     <!-- HISTÓRICO DE MUDANÇAS DA CAMPANHA E ANOTAÇÕES DE MARKETING -->
     <MarketingChangeTimeline />
 
-    <!-- FILA DE ATRIBUIÇÃO WHATSAPP (FASE 1.1 PARTE 3A) -->
-    <WhatsappAttributionSection />
-
     <!-- TABELA DE CAMPANHAS GOOGLE ADS -->
     <Card class="p-5">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
@@ -423,66 +395,7 @@ const emit = defineEmits<{
     </Card>
 
     <!-- TABELA DE PALAVRAS-CHAVE GOOGLE ADS -->
-    <Card class="p-5">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4">
-        <div>
-          <h3 class="text-sm font-bold text-white flex items-center gap-2">
-            <Icon name="lucide:key" class="w-4 h-4 text-amber-400" />
-            Palavra-chave Google Ads
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Termos cadastrados no Google Ads capturados via ValueTrack <code class="text-amber-300 font-mono text-[10px]">{keyword}</code>
-          </p>
-        </div>
-      </div>
-
-      <div class="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Palavra-chave Google Ads</TableHead>
-              <TableHead>Campanha</TableHead>
-              <TableHead class="text-right">Visitantes</TableHead>
-              <TableHead class="text-right">Sessões</TableHead>
-              <TableHead class="text-right">WhatsApp</TableHead>
-              <TableHead class="text-right">Início Form</TableHead>
-              <TableHead class="text-right">Leads</TableHead>
-              <TableHead class="text-right">Taxa Intenção</TableHead>
-              <TableHead class="text-right">Taxa Lead</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="loading" v-for="i in 4" :key="i" class="animate-pulse">
-              <TableCell colspan="9"><div class="h-4 bg-white/[0.04] rounded"></div></TableCell>
-            </TableRow>
-            <TableRow
-              v-else-if="data && data.keywords.length > 0"
-              v-for="kw in data.keywords"
-              :key="kw.keyword"
-            >
-              <TableCell class="font-medium text-white max-w-[220px] truncate">
-                <span class="text-amber-300 font-mono text-xs">{{ kw.keyword }}</span>
-              </TableCell>
-              <TableCell class="text-xs text-slate-400 max-w-[150px] truncate">
-                {{ kw.utm_campaign || '-' }}
-              </TableCell>
-              <TableCell class="text-right font-mono font-semibold text-slate-200">{{ kw.unique_visitors }}</TableCell>
-              <TableCell class="text-right font-mono text-slate-400">{{ kw.sessions }}</TableCell>
-              <TableCell class="text-right font-mono text-emerald-400 font-semibold">{{ kw.whatsapp_clicks }}</TableCell>
-              <TableCell class="text-right font-mono text-amber-400">{{ kw.form_starts }}</TableCell>
-              <TableCell class="text-right font-mono font-bold text-emerald-400">{{ kw.leads_count }}</TableCell>
-              <TableCell class="text-right font-mono text-amber-300 font-semibold">{{ kw.contact_intent_rate }}</TableCell>
-              <TableCell class="text-right font-mono font-bold text-emerald-300">{{ kw.lead_conversion_rate }}</TableCell>
-            </TableRow>
-            <TableRow v-else>
-              <TableCell colspan="9" class="text-center py-6 text-xs text-slate-500">
-                Nenhum dado de palavra-chave capturado no período.
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    </Card>
+    <GoogleAdsKeywordsTable :keywords="data?.keywords" :loading="loading" />
 
     <!-- TABELA DE DESEMPENHO DOS CTAs DA LANDING PAGE -->
     <Card class="p-5">
