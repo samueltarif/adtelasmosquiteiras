@@ -19,6 +19,7 @@ import CommercialFunnel from '../../components/admin/CommercialFunnel.vue'
 import GoogleAdsSection from '../../components/admin/GoogleAdsSection.vue'
 import WhatsappAttributionSection from '../../components/admin/WhatsappAttributionSection.vue'
 import TrackingLinkGenerator from '../../components/admin/TrackingLinkGenerator.vue'
+import CampaignKpiDashboard from '../../components/admin/marketing/CampaignKpiDashboard.vue'
 
 definePageMeta({ layout: 'admin' })
 
@@ -144,6 +145,11 @@ onMounted(() => {
           <TabsTrigger value="tracking-links" class="gap-2 justify-center py-2 text-xs w-full">
             <Icon name="lucide:link-2" class="w-4 h-4 shrink-0 text-cyan-400" />
             <span>Links de Rastreamento</span>
+          </TabsTrigger>
+
+          <TabsTrigger value="campaign-kpis" class="gap-2 justify-center py-2 text-xs w-full">
+            <Icon name="lucide:line-chart" class="w-4 h-4 shrink-0 text-emerald-400" />
+            <span>KPIs de Campanhas</span>
           </TabsTrigger>
         </TabsList>
 
@@ -329,6 +335,11 @@ onMounted(() => {
         <!-- TAB 6: LINKS DE RASTREAMENTO (FASE 6) -->
         <TabsContent value="tracking-links" class="mt-4">
           <TrackingLinkGenerator />
+        </TabsContent>
+
+        <!-- TAB 7: KPIS DE CAMPANHAS (FASE 7) -->
+        <TabsContent value="campaign-kpis" class="mt-4">
+          <CampaignKpiDashboard />
         </TabsContent>
       </Tabs>
 

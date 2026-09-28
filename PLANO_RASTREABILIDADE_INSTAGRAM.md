@@ -4,8 +4,8 @@
 **Domínio Oficial:** `https://www.adtelasmosquiteiras.com.br`  
 **Ambiente:** Nuxt 4 (Vue 3, TypeScript) + Supabase (PostgreSQL 17) + Cloudflare R2  
 **Data da Revisão:** 28 de Setembro de 2026  
-**Versão do Documento:** 6.0 (Fase 6 Concluída com Sucesso)  
-**Status:** FASE 6 CONCLUÍDA COM 100% DE SUCESSO — GERADOR DE LINKS DE RASTREAMENTO OPERACIONAL NO ADMIN — AGUARDANDO APROVAÇÃO (FASE 7 NÃO INICIADA)
+**Versão do Documento:** 7.0 (Fase 7 Concluída com Sucesso)  
+**Status:** FASE 7 CONCLUÍDA COM 100% DE SUCESSO — GESTÃO DE CAMPANHAS E KPIS OPERACIONAL NO ADMIN — AGUARDANDO APROVAÇÃO (FASE 7A NÃO INICIADA)
 
 ---
 
@@ -879,10 +879,51 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
    - Zero alterações no tracking central.
    - Acesso restrito ao painel admin protegido pelo middleware global.
 
+**Declaração Mandatória da Fase 6:**
+- O sistema aguarda aprovação formal do usuário antes da aplicação dos links nas plataformas externas.
+
+---
+
+### Status: 🟢 FASE 7 CONCLUÍDA COM 100% DE SUCESSO (28/09/2026)
+
+**Objetivo:** Gestão de Campanhas, KPIs e Comparação com Tracking Proprietário.
+
+1. **Schema PostgreSQL Aditivo e RLS Estrito:**
+   - Tabela `public.campaign_kpi_entries` criada via migration `supabase/migrations/20260928_campaign_kpi_entries.sql` (versão aplicada: `20260928033817`).
+   - 27 colunas com tipagem segura, 3 índices estratégicos (`idx_campaign_kpi_entries_platform`, `idx_campaign_kpi_entries_utm_campaign`, `idx_campaign_kpi_entries_period`).
+   - Trigger `trg_campaign_kpi_entries_updated_at` ativo.
+   - RLS habilitado com acesso restrito a `service_role` e privilégios anon/authenticated revogados.
+2. **Camada de Cálculos Puros (Zero NaN / Infinity):**
+   - Funções puras em `app/utils/campaignKpiCalculator.ts` e `app/utils/campaignKpiGoals.ts`.
+   - Divisão segura retornando `null` em caso de denominador zero ou nulo, formatado na UI como `"Sem dados"` / `"—"`.
+   - Avaliação objetiva de metas (`achieved`, `not_achieved`, `no_goal`) sem benchmarks externos artificiais.
+3. **Endpoints REST Backend (Nitro):**
+   - CRUD completo (`index.get.ts`, `index.post.ts`, `[id].put.ts`, `[id].delete.ts`) sob proteção do guard `requireActiveAdmin`.
+   - Endpoint analítico seguro `tracking-data.get.ts` para consulta de métricas existentes sem alterar dados de tracking.
+4. **Painel Admin Modular e Responsivo:**
+   - 8ª aba integrada em `app/pages/admin/dashboard.vue` (`?tab=campaign-kpis`).
+   - Componentes modulares ($\le 500$ linhas) em `app/components/admin/marketing/` (Dashboard, Form, Cards, Funil, Histórico, Comparações, Checklist).
+5. **Auditoria de Layout via Playwright MCP:**
+   - Validado nos 4 viewports obrigatórios (1440x900, 1280x800, 390x844 e 375x667).
+   - Zero overflow horizontal (`scrollWidth === innerWidth`, delta = 0px em todos os viewports).
+6. **Regressão Global e Compilação:**
+   - `test_phase1_classification.mjs`: 27 PASS | 0 FAIL.
+   - `test-google-ads-tracking.mjs`: 7/7 grupos PASS.
+   - `test-service-forms-canonical.mjs`: 26 PASS | 0 FAIL.
+   - `scripts/test_tracking_link_generator.mjs`: 16 PASS | 0 FAIL.
+   - `scripts/test_campaign_kpi_calculator.mjs`: 16 PASS | 0 FAIL.
+   - `scripts/test_campaign_kpi_persistence.mjs`: 8 PASS | 0 FAIL.
+   - `npm run build`: Exit Code 0 (✨ Build complete!).
+7. **Higiene e Proteção de Dados:**
+   - Todas as fixtures de teste `F7_KPI_` foram removidas por IDs específicos.
+   - Tabela `campaign_kpi_entries` zerada ao final dos testes (0 registros).
+   - Tracking legado e RPCs v1/v2/v3 100% intocados.
+
 **Declaração Mandatória:**
 - **NENHUMA CAMPANHA EXTERNA FOI ALTERADA OU ATIVADA.**
-- **NENHUMA FASE 7 FOI INICIADA.**
+- **A FASE 7A (ATIVAÇÃO REAL DOS LINKS) NÃO FOI INICIADA.**
 - O sistema aguarda aprovação formal do usuário antes da aplicação dos links nas plataformas externas.
+
 
 
 
