@@ -4,8 +4,8 @@
 **Domínio Oficial:** `https://www.adtelasmosquiteiras.com.br`  
 **Ambiente:** Nuxt 4 (Vue 3, TypeScript) + Supabase (PostgreSQL 17) + Cloudflare R2  
 **Data da Revisão:** 27 de Setembro de 2026  
-**Versão do Documento:** 4.0 (Fase 4 Concluída com Sucesso)  
-**Status:** FASE 4 CONCLUÍDA COM SUCESSO — AGUARDANDO APROVAÇÃO PARA FASE 5
+**Versão do Documento:** 5.0 (Fase 5 Concluída com Sucesso)  
+**Status:** FASE 5 CONCLUÍDA COM 100% DE SUCESSO — HOMOLOGAÇÃO MULTICANAL COMPLETA — AGUARDANDO APROVAÇÃO (FASE 6 NÃO INICIADA)
 
 ---
 
@@ -56,7 +56,7 @@ O sistema opera com telemetria proprietária (*first-party tracking*), estrutura
              │     ├─ Modifica href no DOM adicionando " Ref: TBNZ9M6R" (apenas tags <a>)
              │     ├─ Enfileira em LocalStorage adt_pending_whatsapp_clicks
              │     └─ POST /api/track-click (keepalive: true)
-             │           └─► RPC: create_whatsapp_click_attribution_atomic_v2
+             │           └─► RPC: create_whatsapp_click_attribution_atomic_v3
              │                 ├─► Tabela: public.lead_clicks (tipo='whatsapp')
              │                 └─► Tabela: public.whatsapp_attributions (status='unassigned')
              │
@@ -93,12 +93,12 @@ O sistema opera com telemetria proprietária (*first-party tracking*), estrutura
 1. **Criação de Sessão:** Gerenciada em `useAnalyticsIdentity.ts` (`getOrCreateSessionId()`). Utiliza o cookie `adt_sid` (`maxAge: 1800` = 30 minutos) e sincronização com `localStorage.getItem('adt_last_activity')`. Se inativo por mais de 30 minutos, um novo UUID é gerado e o cookie `adt_landing_path` é renovado com a página de entrada.
 2. **Identificação de Visitante Único:** Gerenciada em `useAnalyticsIdentity.ts` (`getOrCreateVisitorId()`). Emite e consome o cookie `adt_vid` (`maxAge: 31536000` = 365 dias, `sameSite: 'lax'`), persistindo a identidade deste dispositivo por 1 ano.
 3. **Escopo do First Touch:** Salvo em `localStorage['adt_ft_context']`. **Definição estrita:** Representa o *"Primeiro Toque conhecido deste navegador/dispositivo específico"*. Tratado como snapshot atômico integral sem contaminação pelo Last Touch.
-4. **Captura de UTMs e Click IDs:** `useAttribution.ts` inspeciona `route.query` na montagem da rota. Lê `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `campaign_id`, `adgroup_id`, `creative`, `matchtype`, `network`, `device`, `target_id`, `meta_campaign_id`, `meta_adset_id`, `meta_ad_id`, `meta_placement`. Grava no cookie de sessão `adt_session_attribution`.
+4. **Captura de UTMs e Click IDs:** `useAttribution.ts` inspeciona `route.query` na montagem da rota. Lê `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `msclkid`, `campaign_id`, `adgroup_id`, `creative`, `matchtype`, `network`, `device`, `target_id`, `meta_campaign_id`, `meta_adset_id`, `meta_ad_id`, `meta_placement`, `ttclid`, `tiktok_campaign_id`, `tiktok_adgroup_id`, `tiktok_ad_id`, `tiktok_creative_id`, `tiktok_placement`. Grava no cookie de sessão `adt_session_attribution`.
 5. **Persistência SPA:** Em transições de página no Nuxt (`router.afterEach`), se a nova URL não contiver parâmetros, os valores do cookie de sessão `adt_session_attribution` permanecem válidos durante os 30 minutos da sessão.
 6. **Registro de Pageviews:** `track-visits.client.ts` dispara `POST /api/track-visit` com trava de 1000ms contra duplicidade client-side. O backend valida bots, calcula o hash do IP (`ip_hash`), e a idempotência é garantida no banco pelo índice único condicional `unq_page_views_event_id`, gravando em `public.page_views`.
 7. **Taxonomia de CTAs:** `track-clicks.client.ts` captura cliques globais e invoca `getCtaLocation(target)` inspecionando `data-cta-location` ou ancestrais DOM (`header`, `footer`, `hero`, `floating_whatsapp`, `sticky_mobile`, `modal`, `service_card`, fallback `other`).
 8. **Disparo WhatsApp:** `track-clicks.client.ts` detecta URLs ou textos de WhatsApp. Cria um código Base32 de 8 caracteres (`short_code`), altera o `href` do elemento injetando `Ref: XXXXXXXX`, salva em `localStorage['adt_pending_whatsapp_clicks']` e faz requisição com `fetch(..., { keepalive: true })` para `/api/track-click`.
-9. **Fila de Atribuição:** A RPC atômica `create_whatsapp_click_attribution_atomic_v2` insere atomicamente em `lead_clicks` e `whatsapp_attributions` com status inicial `unassigned` (a RPC v1 legada permanece intacta).
+9. **Fila de Atribuição:** A RPC atômica `create_whatsapp_click_attribution_atomic_v3` insere atomicamente em `lead_clicks` e `whatsapp_attributions` com status inicial `unassigned` (as RPCs legadas v1 e v2 permanecem intactas no banco para compatibilidade e histórico de migração).
 10. **Segurança e RLS no Supabase:**
     - `page_views` e `lead_clicks`: INSERT aberto para `anon`; SELECT exclusivo para `authenticated`.
     - `leads`: INSERT aberto para `anon`; SELECT/UPDATE exclusivo para `authenticated`.
@@ -150,12 +150,12 @@ A auditoria identificou arquivos críticos que já excedem esses limites. Para c
 > [!IMPORTANT]
 > **DIRETRIZ DE BANCO:** Nenhuma coluna existente será renomeada, removida ou alterada. Todos os novos campos são estritamente `NULLABLE` com valores padrão seguros.
 
-### 4.1 Expansão da Tabela `public.whatsapp_attributions`
+### 4.1 Schema Aditivo da Tabela `public.whatsapp_attributions`
 
-| Campo Proposto | Tipo | Nulo? | Justificativa Técnica | Impacto no Histórico |
+| Campo Suportado | Tipo | Nulo? | Justificativa Técnica | Impacto no Histórico |
 | :--- | :--- | :---: | :--- | :--- |
-| `channel` | `TEXT` | SIM | Canal canônico de aquisição (`google_ads`, `instagram_ads`, `instagram_organic`, `direct`, etc.). | Nenhum. Registros anteriores ficam `NULL`. |
-| `utm_source` | `TEXT` | SIM | Fonte canônica normalizada (ex: `instagram`, `google`). | Nenhum. |
+| `channel` | `TEXT` | SIM | Canal canônico de aquisição (`google_ads`, `instagram_ads`, `tiktok_ads`, `direct`, etc.). | Nenhum. Registros anteriores ficam `NULL`. |
+| `utm_source` | `TEXT` | SIM | Fonte canônica normalizada (ex: `instagram`, `tiktok`, `google`). | Nenhum. |
 | `utm_medium` | `TEXT` | SIM | Meio de aquisição (ex: `paid_social`, `organic`, `cpc`). | Nenhum. |
 | `utm_campaign` | `TEXT` | SIM | Nome da campanha original sem substituição forçada. | Nenhum. |
 | `utm_content` | `TEXT` | SIM | Conteúdo / identificador do anúncio ou criativo. | Nenhum. |
@@ -163,10 +163,16 @@ A auditoria identificou arquivos críticos que já excedem esses limites. Para c
 | `meta_campaign_id` | `TEXT` | SIM | ID numérico imutável da campanha na Meta (`{{campaign.id}}`). | Nenhum. |
 | `meta_adset_id` | `TEXT` | SIM | ID numérico do conjunto de anúncios na Meta (`{{adset.id}}`). | Nenhum. |
 | `meta_ad_id` | `TEXT` | SIM | ID numérico do anúncio individual na Meta (`{{ad.id}}`). | Nenhum. |
-| `meta_placement` | `TEXT` | SIM | Posicionamento dinâmico (`{{placement}}`: Feed, Stories, Reels). | Nenhum. |
+| `meta_placement` | `TEXT` | SIM | Posicionamento dinâmico Meta (`{{placement}}`: Feed, Stories, Reels). | Nenhum. |
+| `ttclid` | `TEXT` | SIM | TikTok Click ID para validação e atribuição. | Nenhum. |
+| `tiktok_campaign_id` | `TEXT` | SIM | ID numérico da campanha no TikTok (`__CAMPAIGN_ID__`). | Nenhum. |
+| `tiktok_adgroup_id` | `TEXT` | SIM | ID numérico do grupo de anúncios no TikTok (`__AID__`). | Nenhum. |
+| `tiktok_ad_id` | `TEXT` | SIM | ID numérico do anúncio no TikTok (`__CID__`). | Nenhum. |
+| `tiktok_creative_id` | `TEXT` | SIM | ID do criativo no TikTok. | Nenhum. |
+| `tiktok_placement` | `TEXT` | SIM | Posicionamento dinâmico TikTok (`__PLACEMENT__`). | Nenhum. |
 
 ### 4.2 Avaliação Crítica de Índices
-Não serão criados índices desnecessários para economizar IOPS e evitar overhead de gravação no PostgreSQL. Criar-se-á **apenas 1 índice justificado por query real do dashboard**:
+Não foram criados índices desnecessários para economizar IOPS e evitar overhead de gravação no PostgreSQL. Mantém-se **apenas 1 índice justificado por query real do dashboard**:
 ```sql
 -- Justificativa: Utilizado na filtragem da fila de WhatsApp por canal e status no painel administrativo
 CREATE INDEX IF NOT EXISTS idx_whatsapp_attributions_channel_status 
@@ -175,46 +181,53 @@ WHERE channel IS NOT NULL;
 ```
 
 ### 4.3 Expansão em `page_views`, `lead_clicks` e `leads`
-Adição exclusiva dos campos granulares da Meta (`meta_campaign_id`, `meta_adset_id`, `meta_ad_id`, `meta_placement` como `TEXT NULL`).
-*Nota: `fbclid` e `channel` já existem nessas tabelas no schema atual.*
+Adição aditiva dos campos granulares da Meta (`meta_campaign_id`, `meta_adset_id`, `meta_ad_id`, `meta_placement`) e do TikTok (`ttclid`, `tiktok_campaign_id`, `tiktok_adgroup_id`, `tiktok_ad_id`, `tiktok_creative_id`, `tiktok_placement` como `TEXT NULL`).
+*Nota: `gclid`, `msclkid`, `fbclid` e `channel` já existiam no schema inicial.*
 
 ---
 
 ## 5. Taxonomia Canônica Multicanal e Regras de Normalização
 
 ### 5.1 Canais Canônicos do Sistema
-O sistema adotará oficialmente estes 11 canais canônicos (incorporando formalmente o suporte existente a Microsoft Ads via `msclkid`):
+O sistema adota oficialmente **13 canais canônicos** (incorporando suporte total e validado a Google, Microsoft, Meta/Instagram/Facebook, TikTok, Orgânicos, Direto e Referral):
 1. `google_ads`
 2. `microsoft_ads`
 3. `instagram_ads`
 4. `instagram_organic`
 5. `facebook_ads`
 6. `facebook_organic`
-7. `meta_ads` (quando houver `fbclid` mas sem fonte específica identificável)
-8. `google_organic`
-9. `direct`
-10. `referral`
-11. `other_paid`
+7. `meta_ads`
+8. `tiktok_ads`
+9. `tiktok_organic`
+10. `google_organic`
+11. `direct`
+12. `referral`
+13. `other_paid`
 
 ### 5.2 Normalização de Parâmetros de Entrada
 Antes da classificação, os parâmetros de entrada são normalizados:
 - `source`: minúsculo, aparado.
-  - Se `source === 'ig'` ➔ normaliza para `'instagram'`.
-  - Se `source === 'fb'` ➔ normaliza para `'facebook'`.
+  - Se `source === 'ig'` ou `source.startsWith('instagram')` ➔ normaliza para `'instagram'`.
+  - Se `source === 'fb'` ou `source.startsWith('facebook')` ➔ normaliza para `'facebook'`.
+  - Se `source === 'tt'` ou `source.startsWith('tiktok')` ➔ normaliza para `'tiktok'`.
+  - Se `source === 'bing'` ➔ normaliza para `'bing'`.
+  - Se `source === 'google'` ➔ normaliza para `'google'`.
 - `medium`: minúsculo, aparado.
 
-### 5.3 Cascata de Classificação (Ordem Estrita em `classifyClientChannel`)
-1. **Google Ads:** Se possui `gclid`, `gbraid`, `wbraid` ou `source === 'google'` + `medium` contendo `cpc`/`paid`/`ppc` ➔ `'google_ads'`.
+### 5.3 Cascata de Classificação (Ordem Estrita e Precedência Validada em `classifyClientChannel`)
+1. **Google Ads:** Se possui `gclid`, `gbraid`, `wbraid` ou `source === 'google'` + `medium` contendo `cpc`/`paid`/`ppc` ➔ `'google_ads'` (Precedência máxima de Click IDs).
 2. **Microsoft Ads:** Se possui `msclkid` ou `source === 'bing'` + `medium` contendo `cpc`/`paid` ➔ `'microsoft_ads'`.
-3. **Instagram Ads:** Se `source === 'instagram'` E (`medium` em `['paid_social', 'cpc', 'ads', 'paid']` OU `fbclid` presente) ➔ `'instagram_ads'`.
-4. **Facebook Ads:** Se `source === 'facebook'` E (`medium` em `['paid_social', 'cpc', 'ads', 'paid']` OU `fbclid` presente) ➔ `'facebook_ads'`.
-5. **Meta Ads Genérico:** Se possui `fbclid` e a fonte não for explicitamente Instagram nem Facebook ➔ `'meta_ads'`.
-6. **Instagram Orgânico:** Se `source === 'instagram'` OU `referrer` contiver `instagram.com` / `l.instagram.com` ➔ `'instagram_organic'`.
-7. **Facebook Orgânico:** Se `source === 'facebook'` OU `referrer` contiver `facebook.com` / `m.facebook.com` ➔ `'facebook_organic'`.
-8. **Google Orgânico:** Se `source === 'google'` OU `referrer` contiver `google.com` ➔ `'google_organic'`.
-9. **Outros Pagos:** Se `medium` contiver `cpc`, `paid`, `banner`, `display` ➔ `'other_paid'`.
-10. **Direto:** Se sem `source` e sem `referrer` ➔ `'direct'`.
-11. **Referral:** Demais referrers externos ➔ `'referral'`.
+3. **TikTok Ads:** Se possui `ttclid` OU (`source === 'tiktok'` E `medium` pago) ➔ `'tiktok_ads'`.
+4. **Instagram Ads:** Se `source === 'instagram'` E (`medium` em `['paid_social', 'cpc', 'ads', 'paid']` OU `fbclid` presente) ➔ `'instagram_ads'`.
+5. **Facebook Ads:** Se `source === 'facebook'` E (`medium` em `['paid_social', 'cpc', 'ads', 'paid']` OU `fbclid` presente) ➔ `'facebook_ads'`.
+6. **Meta Ads Genérico:** Se possui `fbclid` e a fonte não for explicitamente Instagram nem Facebook ➔ `'meta_ads'`.
+7. **TikTok Orgânico:** Se `source === 'tiktok'` OU `referrer` contiver `tiktok.com` (não pago) ➔ `'tiktok_organic'`.
+8. **Instagram Orgânico:** Se `source === 'instagram'` OU `referrer` contiver `instagram.com` / `l.instagram.com` (não pago) ➔ `'instagram_organic'`.
+9. **Facebook Orgânico:** Se `source === 'facebook'` OU `referrer` contiver `facebook.com` / `m.facebook.com` (não pago) ➔ `'facebook_organic'`.
+10. **Google Orgânico:** Se `source === 'google'` OU `referrer` contiver `google.com` (não pago) ➔ `'google_organic'`.
+11. **Outros Pagos:** Se `medium` contiver `cpc`, `paid`, `banner`, `display` (sem canal prioritário mapeado acima) ➔ `'other_paid'`.
+12. **Direto:** Se sem `source`, sem `click_id` e sem `referrer` ➔ `'direct'`.
+13. **Referral:** Demais referrers externos ou source sem medium pago ➔ `'referral'`.
 
 ---
 
@@ -434,13 +447,65 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
 
 ---
 
-### FASE 6: Gerador de Links no Admin + Ativação Real nas Plataformas
-- **Objetivo:** Interface no painel administrativo para geração padronizada de URLs parametrizadas com UTMs e macros dinâmicas para Google, Meta e TikTok, e posterior ativação real nas plataformas.
-- **Ações:**
-  - Gerador de links com presets para campanhas Google, Meta e TikTok (Standard e Smart+).
-  - Atualização dos links da Bio (Instagram e TikTok).
-  - Inserção dos parâmetros dinâmicos nas campanhas oficiais.
-- **Critério de Aceite:** Criação rápida de links parametrizados no admin e primeiros acessos reais catalogados no dashboard.
+### FASE 6: Gerador de Links de Rastreamento no Admin + Preparação dos Links Reais de Produção
+
+> [!IMPORTANT]
+> **DIRETRIZ DE ESCOPO DA FASE 6:** A Fase 6 está apenas **documentada e planejada**, com **ZERO código implementado** nesta etapa de fechamento da Fase 5.
+>
+> **Separação Obrigatória de Responsabilidades:**
+> - **A) No Painel Administrativo:** Gerar, validar, testar e copiar o link parametrizado.
+> - **B) Fora do Sistema (Manual):** Aplicar manualmente o link copiado nas plataformas externas (gerenciador de anúncios Meta, TikTok Ads Manager, Bio do perfil, etc.).
+> - **NÃO há integração via API externa:** Nesta primeira versão do gerador, **NÃO** serão criadas integrações com Meta Ads API, TikTok Ads API ou Instagram Graph API. Nenhum token externo ou credencial de API é necessário.
+
+- **Objetivo Principal:**
+  Criar no painel administrativo uma área dedicada em:
+  `Marketing -> Links de Rastreamento`
+  para que os operadores de tráfego e marketing possam gerar links oficiais canônicos com UTMs e parâmetros corretos sem a necessidade de montar URLs manualmente, prevenindo erros de digitação e desvios de taxonomia.
+
+- **Canais Contemplados pelo Gerador:**
+  1. **Instagram Orgânico:**
+     - Bio (`utm_source=instagram&utm_medium=organic&utm_campaign=bio&utm_content=perfil`)
+     - Stories (`utm_source=instagram&utm_medium=organic&utm_campaign=stories&utm_content=...`)
+     - Reels (`utm_source=instagram&utm_medium=organic&utm_campaign=reels&utm_content=...`)
+  2. **Instagram Ads:**
+     - Feed, Stories, Reels com macros dinâmicas Meta
+  3. **Facebook Orgânico:**
+     - Perfil, posts
+  4. **Facebook Ads:**
+     - Anúncios com macros dinâmicas Meta
+  5. **TikTok Orgânico:**
+     - Bio
+     - Conteúdo / Vídeo quando aplicável
+  6. **TikTok Ads:**
+     - Campanhas padrão e Smart+ com macros dinâmicas TikTok
+  7. **Estrutura Extensível:**
+     - Preparada para suporte a Google Ads, Microsoft Ads e outros canais canônicos já existentes.
+
+- **Requisitos Funcionais Previstos (Documentados para Implementação Futura):**
+  - **Seleção de Plataforma:** Menu seletor (`Instagram`, `Facebook`, `TikTok`, `Google`, `Microsoft`, etc.).
+  - **Tipo de Tráfego:** Alternador `Pago (Ads)` vs. `Orgânico`.
+  - **Página de Destino:** Seletor de rotas canônicas internas (ex: `/`, `/lp/telas-mosquiteiras`, `/servicos/telas-mosquiteiras`, etc.) ou input de path customizado.
+  - **Identificação de Campanha & Conteúdo:** Campos de texto validados para nome de campanha, adset/grupo e criativo.
+  - **Templates / Macros Oficiais das Plataformas:**
+    - **Meta Ads:** `utm_source={{site_source_name}}&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}&meta_placement={{placement}}&meta_campaign_id={{campaign.id}}&meta_adset_id={{adset.id}}&meta_ad_id={{ad.id}}`
+    - **TikTok Ads:** `utm_source=tiktok&utm_medium=paid_social&utm_campaign=__CAMPAIGN_NAME__&utm_content=__CID_NAME__&utm_term=__AID_NAME__&tiktok_placement=__PLACEMENT__&tiktok_campaign_id=__CAMPAIGN_ID__&tiktok_adgroup_id=__AID__&tiktok_ad_id=__CID__`
+  - **Regra Estrita de Click IDs:** O gerador **NUNCA** deve inventar ou permitir preenchimento manual de `gclid`, `fbclid` ou `ttclid`. Esses Click IDs automáticos continuam sendo gerados e injetados exclusivamente pelas plataformas no momento do clique do visitante.
+  - **Contrato Canônico do TikTok no Gerador:**
+    - `ttclid` (automático da plataforma)
+    - `tiktok_campaign_id`
+    - `tiktok_adgroup_id`
+    - `tiktok_ad_id`
+    - `tiktok_creative_id`
+    - `tiktok_placement`
+  - **Ações na Interface:**
+    - Geração em tempo real da URL final canônica com sanitização.
+    - Botão **"Copiar URL"** com feedback visual na UI.
+    - Botão **"Testar Link"** (abre a URL gerada em nova aba para conferência).
+
+- **Critério de Aceite da Fase 6 (Quando For Implementada):**
+  - Operador gera links com 2 cliques sem digitar UTMs incorretas.
+  - Testes do link simulam parâmetros e registram visitas no banco com o canal canônico exato.
+  - Zero alteração no tracking já em produção.
 
 ---
 
@@ -726,23 +791,61 @@ Emissão de logs prefixados padronizados para rápida filtragem no console do se
 
 ---
 
-### Status: 🟡 FASE 4.5 EM ANDAMENTO (27/09/2026)
+### Status: 🟢 FASE 4.5 CONCLUÍDA E APROVADA (27/09/2026)
 
 **Objetivo:** Suporte Técnico TikTok (Taxonomia 13 Canais, TTCLID, Propagação Ponta a Ponta, Schema Aditivo, RPC v3 e Dashboard Multicanal).
+- Taxonomia canônica expandida para 13 canais canônicos oficiais.
+- Schema aditivo concluído com sucesso.
+- RPC atômica v3 criada e hardenizada para concorrência com `ON CONFLICT(event_id)` e proteção contra colisão de `short_code`.
+- 100% dos testes da Fase 4.5 aprovados com sucesso.
 
-1. **Taxonomia Canônica Expandida (11 -> 13 Canais):**
-   - Inclusão oficial de `tiktok_ads` e `tiktok_organic`.
-   - Precedência de Click IDs preservada (Google > Microsoft > TikTok / Meta).
-2. **Schema Aditivo Supabase:**
-   - Adição de `ttclid`, `tiktok_campaign_id`, `tiktok_adgroup_id`, `tiktok_ad_id`, `tiktok_creative_id`, `tiktok_placement` em `whatsapp_attributions`, `lead_clicks`, `page_views` e `leads`.
-3. **RPC Atômica v3:**
-   - Criação de `create_whatsapp_click_attribution_atomic_v3` com suporte a TikTok (RPC v1 e v2 preservadas 100% intactas).
-4. **Propagação e Auditoria:**
-   - Captura e persistência via `useAttribution.ts`, `track-visits`, `track-clicks`, `send-lead` e First Touch atômico.
-5. **Dashboard e Auditor de Jornada:**
-   - Exibição de TikTok Ads e TikTok Orgânico na fila e na timeline de sessão.
+---
 
-**Próximo Passo:** Executar testes unitários e ponta a ponta da Fase 4.5 antes de qualquer início da Fase 5.
+### Status: 🟢 FASE 5 CONCLUÍDA COM 100% DE SUCESSO (27/09/2026)
+
+**Objetivo:** Homologação Final Multicanal (Google + Microsoft + Meta + Instagram + Facebook + TikTok + Orgânico + Direto + Referral + Other Paid).
+
+1. **Matriz Principal Multicanal:**
+   - 100% dos cenários (F5-G01 a F5-R01) testados e aprovados com sucesso.
+   - Suíte canônica criada em `scripts/test_multichannel_tracking.mjs` com submódulos estritamente $\le 200$ linhas.
+2. **Precedência e Anti-Spoofing:**
+   - Precedência de Click IDs rigorosamente testada (Google > Microsoft > TikTok > Meta).
+   - Parsing de hostname real validado contra domínios maliciosos e falsos positivos.
+3. **Cross-Touch e Isolamento:**
+   - Transições de toque entre Google, Meta, Instagram e TikTok testadas com isolamento estrito de parâmetros.
+   - Navegação SPA preservando o contexto sem contaminação.
+4. **First Touch Snapshot:**
+   - Imutabilidade do First Touch preservada no banco `public.leads` através de múltiplos toques sucessivos.
+5. **Resiliência de Retry e Concorrência RPC v3:**
+   - Retry estritamente idempotente para Google Ads, Instagram Ads e TikTok Ads (zero duplicação).
+   - Suíte de concorrência RPC v3 (`test_v3_concurrency_suite.mjs`) reexecutada com 25 PASS | 0 FAIL.
+6. **Dashboard e Auditor de Jornada:**
+   - Exibição consistente dos 13 canais canônicos na fila e no dashboard de aquisição.
+   - Auditor de Jornada (`SessionJourneyDrawer`) com timeline cronológica limpa e detalhes técnicos colapsáveis.
+7. **Validação Visual e Responsividade com Playwright MCP:**
+   - Viewports Desktop (1440x900, 1280x800) e Mobile (390x844, 375x667) auditados com navegador real via Playwright MCP.
+   - Zero horizontal overflow em todos os viewports.
+   - Cliques reais de WhatsApp validados com injeção de short_code e conciliação no Supabase.
+8. **Regressões e Compilação:**
+   - `test_phase1_classification.mjs`: 27 PASS | 0 FAIL.
+   - `test-service-forms-canonical.mjs`: 26 PASS | 0 FAIL.
+   - `test-google-ads-tracking.mjs`: 7/7 grupos PASS.
+   - `test_regression_b01_b06.mjs`: 6 PASS | 0 FAIL.
+   - `test_spa_referrer_real_browser.cjs`: 5 PASS | 0 FAIL.
+   - `npm run build`: Exit Code 0 (✨ Build complete!).
+9. **Proteção de Dados, Higiene e Auditoria Forense:**
+   - Auditoria forense dos +14 `page_views` gerados durante a janela de testes da Fase 5: 100% comprovados como fixtures Playwright (User-Agent `HeadlessChrome`, sessões SPA-REF-01..05, click IDs `FB_TEST`, `GCL_TEST`, `FB_INITIAL`, `FB_NEW`).
+   - Todos os 14 registros identificados foram removidos pelos seus IDs específicos (`668e08e2...` a `44fc2578...`).
+   - Zero tráfego real impactado. Contagem final de `page_views` restabelecida para 509 (idêntica ao baseline).
+   - Fixtures remanescentes em todas as 4 tabelas: `page_views` = 0, `lead_clicks` = 0, `whatsapp_attributions` = 0, `leads` = 0.
+   - Nenhuma nova migration criada e nenhuma alteração de schema realizada.
+   - Chave de serviço `SUPABASE_SERVICE_ROLE_KEY` estritamente privada no backend Nitro.
+
+**Declaração Mandatória:**
+- A **FASE 6 NÃO FOI INICIADA**.
+- Nenhuma campanha externa configurada.
+- Nenhum link real alterado.
+- Sistema aguardando aprovação formal do usuário.
 
 
 
