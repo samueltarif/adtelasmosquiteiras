@@ -20,6 +20,7 @@ import GoogleAdsSection from '../../components/admin/GoogleAdsSection.vue'
 import WhatsappAttributionSection from '../../components/admin/WhatsappAttributionSection.vue'
 import TrackingLinkGenerator from '../../components/admin/TrackingLinkGenerator.vue'
 import CampaignKpiDashboard from '../../components/admin/marketing/CampaignKpiDashboard.vue'
+import DashboardExportButton from '../../components/admin/export/DashboardExportButton.vue'
 
 definePageMeta({ layout: 'admin' })
 
@@ -80,6 +81,9 @@ onMounted(() => {
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap w-full lg:w-auto justify-between lg:justify-end">
           <!-- Global Date Filter -->
           <AdminDateFilter />
+
+          <!-- Central de Exportação -->
+          <DashboardExportButton :current-preset="route.query.preset as string" />
 
           <!-- Refresh Button -->
           <button 
