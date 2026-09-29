@@ -39,15 +39,24 @@ export function getSaoPauloDateRange(preset = 'today', customFrom, customTo) {
       break
 
     case 'last7d':
+    case 'last7days':
       start = makeUtcFromSpDay(curYear, curMonth, curDay - 6)
       end = makeUtcFromSpDay(curYear, curMonth, curDay + 1)
       label = 'Últimos 7 dias'
       break
 
     case 'last30d':
+    case 'last30days':
       start = makeUtcFromSpDay(curYear, curMonth, curDay - 29)
       end = makeUtcFromSpDay(curYear, curMonth, curDay + 1)
       label = 'Últimos 30 dias'
+      break
+
+    case 'last90d':
+    case 'last90days':
+      start = makeUtcFromSpDay(curYear, curMonth, curDay - 89)
+      end = makeUtcFromSpDay(curYear, curMonth, curDay + 1)
+      label = 'Últimos 90 dias'
       break
 
     case 'thisMonth':
@@ -63,6 +72,7 @@ export function getSaoPauloDateRange(preset = 'today', customFrom, customTo) {
       break
 
     case 'allTime':
+    case 'all':
       start = new Date('2020-01-01T00:00:00.000Z')
       end = makeUtcFromSpDay(curYear, curMonth, curDay + 1)
       label = 'Todo o período'

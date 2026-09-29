@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
+import { useAdminDateFilter } from '../../../composables/useAdminDateFilter'
 import type { ExportFormat, ExportPeriodPreset, ExportDatasetKey, ExportRequestPayload } from '../../../types/dashboardExport'
 import DashboardExportDatasetSelector from './DashboardExportDatasetSelector.vue'
 
@@ -11,6 +12,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
+
+const { preset: dashboardPreset, customFrom: dashboardCustomFrom, customTo: dashboardCustomTo } = useAdminDateFilter()
 
 const form = reactive<{
   format: ExportFormat
@@ -26,6 +29,16 @@ const form = reactive<{
   dateTo: '',
   datasets: ['overview', 'acquisition', 'google_ads', 'whatsapp', 'leads', 'campaign_kpis'],
   includeContactDetails: false
+})
+
+// Sincronizar datas padrão para período customizado se vazio
+watch(() => form.period, (newP) => {
+  if (newP === 'custom' && (!form.dateFrom || !form.dateTo)) {
+    if (dashboardCustomFrom.value && dashboardCustomTo.value) {
+      form.dateFrom = dashboardCustomFrom.value
+      form.dateTo = dashboardCustomTo.value
+    }
+  }
 })
 
 const isExporting = ref(false)
@@ -56,16 +69,42 @@ async function handleExport() {
     return
   }
 
+  if (form.period === 'custom') {
+    if (!form.dateFrom || !form.dateTo) {
+      errorMessage.value = 'Por favor, informe a data inicial e final para o período personalizado.'
+      return
+    }
+    if (form.dateFrom > form.dateTo) {
+      errorMessage.value = 'A data inicial não pode ser posterior à data final.'
+      return
+    }
+  }
+
   isExporting.value = true
   errorMessage.value = null
   successMessage.value = null
 
   try {
+    let periodToSend = form.period
+    let dateFromToSend: string | undefined = undefined
+    let dateToToSend: string | undefined = undefined
+
+    if (form.period === 'current_dashboard') {
+      periodToSend = (dashboardPreset.value as any) || 'today'
+      if (dashboardPreset.value === 'custom') {
+        dateFromToSend = dashboardCustomFrom.value || undefined
+        dateToToSend = dashboardCustomTo.value || undefined
+      }
+    } else if (form.period === 'custom') {
+      dateFromToSend = form.dateFrom || undefined
+      dateToToSend = form.dateTo || undefined
+    }
+
     const payload: ExportRequestPayload = {
       format: form.format,
-      period: form.period === 'current_dashboard' ? ((props.currentPreset as any) || 'today') : form.period,
-      dateFrom: form.period === 'custom' ? form.dateFrom : undefined,
-      dateTo: form.period === 'custom' ? form.dateTo : undefined,
+      period: periodToSend,
+      dateFrom: dateFromToSend,
+      dateTo: dateToToSend,
       datasets: form.datasets,
       includeContactDetails: form.includeContactDetails
     }
@@ -161,6 +200,7 @@ async function handleExport() {
             <button
               v-for="opt in FORMAT_OPTIONS"
               :key="opt.id"
+              :id="'export-format-' + opt.id"
               type="button"
               @click="form.format = opt.id"
               class="flex flex-col text-left p-3 rounded-xl border transition-all"
@@ -187,6 +227,7 @@ async function handleExport() {
             <button
               v-for="p in PERIOD_OPTIONS"
               :key="p.id"
+              :id="'export-period-' + p.id"
               type="button"
               @click="form.period = p.id"
               class="px-3 py-2 rounded-xl text-xs font-medium border text-center transition-all"
@@ -203,6 +244,7 @@ async function handleExport() {
             <div>
               <label class="text-[11px] text-slate-400 block mb-1">Data Inicial (AAAA-MM-DD)</label>
               <input 
+                id="export-date-from"
                 type="date" 
                 v-model="form.dateFrom" 
                 class="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs focus:ring-1 focus:ring-indigo-500" 
@@ -211,6 +253,7 @@ async function handleExport() {
             <div>
               <label class="text-[11px] text-slate-400 block mb-1">Data Final (AAAA-MM-DD)</label>
               <input 
+                id="export-date-to"
                 type="date" 
                 v-model="form.dateTo" 
                 class="w-full px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white text-xs focus:ring-1 focus:ring-indigo-500" 
@@ -262,6 +305,7 @@ async function handleExport() {
         </button>
 
         <button
+          id="export-submit-button"
           type="button"
           @click="handleExport"
           :disabled="isExporting || form.datasets.length === 0"

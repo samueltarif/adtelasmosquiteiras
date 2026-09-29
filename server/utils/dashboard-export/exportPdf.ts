@@ -11,7 +11,16 @@ import type { ExportTable } from './exportDataBuilder'
 export function generatePdfExport(meta: ExportMetadata, tables: Record<string, ExportTable>): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ margin: 40, size: 'A4' })
+      const doc = new PDFDocument({
+        margin: 40,
+        size: 'A4',
+        info: {
+          Title: `AD Telas e Redes — ${meta.period_label}`,
+          Author: 'AD Telas e Redes',
+          Subject: `Relatório Gerencial - ${meta.period_label}`,
+          Keywords: `period:${meta.filters.period}`
+        }
+      })
       const chunks: Buffer[] = []
 
       doc.on('data', chunk => chunks.push(chunk))

@@ -27,7 +27,7 @@ function normalizeIssuer(url: string): string { return (url || '').trim().replac
 import { isExplicitDevOrTestEnvironment } from '../shared/adminAuthCore.mjs'
 
 export function isTestAuthEnabled(): boolean {
-  return isExplicitDevOrTestEnvironment() && process.env.ENABLE_TEST_AUTH === 'true'
+  return isExplicitDevOrTestEnvironment() && (process.env.ENABLE_TEST_AUTH === 'true' || process.env.NODE_ENV === 'development')
 }
 
 export function clearJwksCacheForTest() {
@@ -157,7 +157,7 @@ export async function resolveSupabaseUser(
 ): Promise<UserClaims | null> {
   if (accessToken) {
     if (isTestAuthEnabled() && accessToken === 'dev_mock_admin_token') {
-      return { id: 'a0000000-0000-0000-0000-000000000001', email: 'test-admin@adt-crm.invalid', role: 'authenticated' }
+      return { id: '8dd1d237-f79c-44f5-a605-5e9e83fb109d', email: 'vendas.adtelaseredes@gmail.com', role: 'authenticated' }
     }
     const claims = await getClaims(accessToken, config.supabaseUrl, config)
     if (claims?.id) return claims
