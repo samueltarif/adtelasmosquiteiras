@@ -4,8 +4,8 @@
  * Limite: <= 200 linhas
  */
 
-import type { ExportMetadata } from '../../../app/types/dashboardExport'
-import type { ExportTable } from './exportDataBuilder'
+import type { ExportMetadata } from '../../../app/types/dashboardExport.ts'
+import type { ExportTable } from './exportDataBuilder.ts'
 
 export function generateJsonExport(meta: ExportMetadata, tables: Record<string, ExportTable>): Buffer {
   const exportPayload: Record<string, any> = {

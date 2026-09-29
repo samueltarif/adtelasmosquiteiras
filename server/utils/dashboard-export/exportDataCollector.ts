@@ -5,9 +5,15 @@
  * Limite: <= 200 linhas
  */
 
-import { fetchAllPaginated, getSaoPauloDateRange } from '../adminAnalytics'
-import { getSupabaseHeaders } from '../crm'
-import type { ExportRequestPayload, ExportMetadata } from '../../../app/types/dashboardExport'
+import { fetchAllPaginated, getSaoPauloDateRange } from '../../shared/adminAnalyticsCore.mjs'
+import type { ExportRequestPayload, ExportMetadata } from '../../../app/types/dashboardExport.ts'
+
+function getSupabaseHeaders(serviceKey: string): Record<string, string> {
+  return {
+    'apikey': serviceKey,
+    'Authorization': `Bearer ${serviceKey}`
+  }
+}
 
 export interface CollectedExportRaw {
   rawViews: any[]
@@ -23,9 +29,11 @@ export interface CollectedExportRaw {
 export async function collectExportRawData(
   supabaseUrl: string,
   serviceKey: string,
-  payload: ExportRequestPayload
+  payload: ExportRequestPayload,
+  customFetch?: any
 ): Promise<CollectedExportRaw> {
   const headers = getSupabaseHeaders(serviceKey)
+  const fetcher = customFetch || (globalThis as any).$fetch || ((url: string, opts: any) => fetch(url, opts).then(r => r.json()))
 
   // 1. Período
   let preset = payload.period === 'current_dashboard' ? 'today' : payload.period
@@ -60,42 +68,54 @@ export async function collectExportRawData(
       supabaseUrl,
       'page_views',
       `select=*&${basePeriodQuery}${filterStr}&order=created_at.asc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ),
     // Lead clicks
     fetchAllPaginated<any>(
       supabaseUrl,
       'lead_clicks',
       `select=*&${basePeriodQuery}${filterStr}&order=created_at.asc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ),
     // Leads
     fetchAllPaginated<any>(
       supabaseUrl,
       'leads',
       `select=*&${basePeriodQuery}${filterStr}&order=created_at.asc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ),
     // Histórico para new vs returning visitors (apenas visitor_id e created_at)
     fetchAllPaginated<any>(
       supabaseUrl,
       'page_views',
       `select=visitor_id,created_at&created_at=lt.${startUtc}&order=created_at.asc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ).catch(() => [] as any[]),
     // Campaign KPI entries (Fase 7)
     fetchAllPaginated<any>(
       supabaseUrl,
       'campaign_kpi_entries',
       `select=*&order=period_start.desc,created_at.desc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ).catch(() => [] as any[]),
     // WhatsApp attributions
     fetchAllPaginated<any>(
       supabaseUrl,
       'whatsapp_attributions',
       `select=*&${basePeriodQuery}&order=created_at.asc`,
-      headers
+      headers,
+      1000,
+      fetcher
     ).catch(() => [] as any[])
   ])
 

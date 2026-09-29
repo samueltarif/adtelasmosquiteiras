@@ -4,10 +4,12 @@
  * Limite: <= 200 linhas
  */
 
-import { computeOverviewData, normalizeChannel, getChannelLabel, safeRate } from '../adminAnalytics'
+import { computeOverviewData, normalizeChannel, getChannelLabel, safeRate } from '../../shared/adminAnalyticsCore.mjs'
 import { computeGoogleAdsData } from '../../shared/adminGoogleAdsMetrics.mjs'
-import type { ExportDatasetKey, ExportRequestPayload } from '../../../app/types/dashboardExport'
-import type { CollectedExportRaw } from './exportDataCollector'
+import { buildCampaignKpisTable } from './exportCampaignKpisBuilder.ts'
+import { buildTrackingAdditionalTables } from './exportTrackingDatasetsBuilder.ts'
+import type { ExportDatasetKey, ExportRequestPayload } from '../../../app/types/dashboardExport.ts'
+import type { CollectedExportRaw } from './exportDataCollector.ts'
 
 export interface ExportTable {
   key: ExportDatasetKey
@@ -21,7 +23,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
   const includeContact = meta.filters.include_contact_details
   const tables: Partial<Record<ExportDatasetKey, ExportTable>> = {}
 
-  // 1. Overview
+  // 1. Resumo Geral (Overview)
   const overviewMetrics = computeOverviewData(rawViews, rawClicks, rawLeads, rawHistory, dateRange, payload.period)
   tables.overview = {
     key: 'overview',
@@ -39,10 +41,9 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     ]
   }
 
-
-  // 2. Acquisition (13 Canais Canônicos)
+  // 2. Aquisição por Canal (13 canais canônicos)
   const channelMap: Record<string, { sessions: Set<string>; visitors: Set<string>; pvs: number; wa: number; leads: number }> = {}
-  for (const v of rawViews) {
+  for (const v of rawViews || []) {
     if (v.is_bot) continue
     const ch = normalizeChannel(v.channel)
     if (!channelMap[ch]) channelMap[ch] = { sessions: new Set(), visitors: new Set(), pvs: 0, wa: 0, leads: 0 }
@@ -50,13 +51,13 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     if (v.visitor_id) channelMap[ch].visitors.add(v.visitor_id)
     channelMap[ch].pvs++
   }
-  for (const c of rawClicks) {
+  for (const c of rawClicks || []) {
     if (c.is_bot) continue
     const ch = normalizeChannel(c.channel)
     if (!channelMap[ch]) channelMap[ch] = { sessions: new Set(), visitors: new Set(), pvs: 0, wa: 0, leads: 0 }
     if (c.tipo === 'whatsapp') channelMap[ch].wa++
   }
-  for (const l of rawLeads) {
+  for (const l of rawLeads || []) {
     const ch = normalizeChannel(l.session_channel || l.first_touch_channel)
     if (!channelMap[ch]) channelMap[ch] = { sessions: new Set(), visitors: new Set(), pvs: 0, wa: 0, leads: 0 }
     channelMap[ch].leads++
@@ -78,7 +79,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     ])
   }
 
-  // 3. Google Ads
+  // 3. Google Ads — Métricas, Campanhas e Palavras-chave
   const gAdsMetrics = computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange)
   tables.google_ads = {
     key: 'google_ads',
@@ -88,40 +89,41 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
       ['Sessões Google Ads', gAdsMetrics.kpis.sessions, '-', 'Sessões observadas com gclid/utm'],
       ['Visitantes Únicos', gAdsMetrics.kpis.unique_visitors, '-', 'Visitantes humanos'],
       ['Pageviews', gAdsMetrics.kpis.pageviews, '-', 'Visualizações de página'],
-      ['Cliques no WhatsApp', gAdsMetrics.kpis.whatsapp_clicks, gAdsMetrics.kpis.conversion_rate_whatsapp, 'Taxa Sessão -> WhatsApp'],
-      ['Orçamentos / Formulários', gAdsMetrics.kpis.quote_clicks, gAdsMetrics.kpis.conversion_rate_quote, 'Taxa Sessão -> Orçamento'],
-      ['Leads Convertidos', gAdsMetrics.kpis.leads, gAdsMetrics.kpis.conversion_rate_leads, 'Taxa Sessão -> Lead']
+      ['Cliques no WhatsApp', gAdsMetrics.kpis.whatsapp_clicks, gAdsMetrics.kpis.whatsapp_rate, 'Taxa Sessão -> WhatsApp'],
+      ['Inícios de Formulário', gAdsMetrics.kpis.form_starts, gAdsMetrics.kpis.form_start_rate, 'Taxa Sessão -> Formulário'],
+      ['Leads Convertidos', gAdsMetrics.kpis.real_leads, gAdsMetrics.kpis.lead_conversion_rate, 'Taxa Sessão -> Lead']
     ]
   }
 
   tables.google_ads_campaigns = {
     key: 'google_ads_campaigns',
     title: 'Google Ads — Campanhas',
-    headers: ['Campanha UTM', 'ID Campanha Google', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Leads', 'Taxa Conversão'],
+    headers: ['Campanha UTM', 'ID Campanha Google', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Leads'],
     rows: (gAdsMetrics.campaigns || []).map((c: any) => [
-      c.campaign_name || c.utm_campaign || '(não definido)',
+      c.utm_campaign || '(não definido)',
       c.google_campaign_id || '-',
       c.sessions,
       c.unique_visitors,
       c.pageviews,
       c.whatsapp_clicks,
-      c.leads,
-      c.conversion_rate
+      c.form_starts,
+      c.leads_count
     ])
   }
 
   tables.google_ads_keywords = {
     key: 'google_ads_keywords',
     title: 'Google Ads — Termos e Palavras-chave',
-    headers: ['Palavra-chave / Termo', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Leads', 'Taxa'],
+    headers: ['Palavra-chave / Termo', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Leads', 'Taxa Intenção'],
     rows: (gAdsMetrics.keywords || []).map((k: any) => [
       k.keyword,
       k.sessions,
       k.unique_visitors,
       k.pageviews,
       k.whatsapp_clicks,
-      k.leads,
-      k.conversion_rate
+      k.form_starts,
+      k.leads_count,
+      k.contact_intent_rate
     ])
   }
 
@@ -130,7 +132,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     key: 'whatsapp',
     title: 'WhatsApp e Atribuições',
     headers: ['Data/Hora', 'Código Curto', 'Canal', 'Campanha', 'Origem', 'Página', 'Status Atribuição', 'Match'],
-    rows: rawWhatsappAttrs.map(w => [
+    rows: (rawWhatsappAttrs || []).map(w => [
       w.created_at || w.clicked_at || '-',
       w.short_code || '-',
       w.channel || '-',
@@ -142,12 +144,12 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     ])
   }
 
-  // 5. Leads (com proteção de privacidade)
+  // 5. Leads (com mascaramento LGPD)
   tables.leads = {
     key: 'leads',
     title: 'Leads Comerciais',
     headers: ['ID Lead', 'Data/Hora', 'Canal', 'Campanha', 'Serviço', 'Status', 'Nome', 'Telefone', 'Email'],
-    rows: rawLeads.map(l => [
+    rows: (rawLeads || []).map(l => [
       l.id,
       l.created_at,
       l.session_channel || l.first_touch_channel || '-',
@@ -160,31 +162,23 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
     ])
   }
 
-  // 6. Campaign KPIs (Fase 7)
-  tables.campaign_kpis = {
-    key: 'campaign_kpis',
-    title: 'KPIs de Campanhas (Fase 7)',
-    headers: ['Plataforma', 'Campanha', 'UTM', 'Início', 'Fim', 'Orçamento R$', 'Gasto R$', 'Cliques', 'WhatsApp', 'Leads', 'Vendas', 'Receita R$', 'ROAS', 'CPL R$'],
-    rows: rawKpis.map(k => [
-      k.platform, k.campaign_name, k.utm_campaign || '-', k.period_start, k.period_end,
-      Number(k.planned_budget || 0), Number(k.spend || 0), Number(k.clicks || 0), Number(k.whatsapp_contacts || 0),
-      Number(k.leads || 0), Number(k.sales || 0), Number(k.revenue || 0),
-      Number(k.spend) > 0 ? (Number(k.revenue) / Number(k.spend)).toFixed(2) : '-',
-      Number(k.leads) > 0 ? (Number(k.spend) / Number(k.leads)).toFixed(2) : '-'
-    ])
-  }
-
-  // 7. Pageviews & Sessões detalhadas
+  // 6. Pageviews Detalhados
   tables.page_views = {
     key: 'page_views',
     title: 'Pageviews Detalhados',
     headers: ['ID', 'Data/Hora', 'Canal', 'Página', 'Origem UTM', 'Campanha UTM', 'Dispositivo', 'GCLID', 'ID Sessão', 'ID Visitante'],
-    rows: rawViews.map(v => [
+    rows: (rawViews || []).map(v => [
       v.id, v.created_at, v.channel || '-', v.path || v.landing_path || '/', v.utm_source || '-',
       v.utm_campaign || '-', v.device_type || '-', v.gclid ? 'SIM' : '-', v.session_id || '-', v.visitor_id || '-'
     ])
   }
 
+  // 7. KPIs de Campanhas (Fase 7)
+  tables.campaign_kpis = buildCampaignKpisTable(rawKpis)
+
+  // 8. Tabelas Adicionais de Tracking (Dimensões Ads, Orgânico, Sessões, Cliques, Jornadas)
+  const additional = buildTrackingAdditionalTables(rawViews, rawClicks)
+  Object.assign(tables, additional)
+
   return tables as Record<ExportDatasetKey, ExportTable>
 }
-

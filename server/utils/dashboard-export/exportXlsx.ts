@@ -5,8 +5,8 @@
  */
 
 import ExcelJS from 'exceljs'
-import type { ExportMetadata } from '../../../app/types/dashboardExport'
-import type { ExportTable } from './exportDataBuilder'
+import type { ExportMetadata } from '../../../app/types/dashboardExport.ts'
+import type { ExportTable } from './exportDataBuilder.ts'
 
 export async function generateXlsxExport(meta: ExportMetadata, tables: Record<string, ExportTable>): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook()

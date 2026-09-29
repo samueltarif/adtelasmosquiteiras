@@ -1,7 +1,7 @@
 # Relatório Técnico: Central de Exportação Analítica Completa do Dashboard
 
 **Projeto:** AD Telas e Redes de Proteção  
-**Status:** Implementado, Validado e Aprovado  
+**Status:** Implementado, Auditado e Aprovado  
 **Data:** 29 de Setembro de 2026  
 **Ambiente:** Desenvolvimento Local e Produção (Nitro / Nuxt 4)  
 
@@ -13,17 +13,17 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 
 ---
 
-## 2. Fontes de Dados e Mapeamento Arquitetural
+## 2. Fontes de Dados e Schema Real
 
-| Seção do Dashboard | Endpoint Original | Tabela Supabase | Principais Campos Extraídos |
+| Seção do Dashboard | Endpoint Original | Tabela Supabase | Colunas Reais do Banco de Dados |
 | :--- | :--- | :--- | :--- |
-| **Resumo Geral** | `/api/admin/analytics/overview` | `page_views`, `lead_clicks`, `leads` | Visitantes únicos, novos vs recorrentes, sessões humanas, pageviews, cliques WhatsApp, inícios de formulário, leads comerciais, taxas de conversão |
+| **Resumo Geral** | `/api/admin/analytics/overview` | `page_views`, `lead_clicks`, `leads` | Visitantes únicos, novos vs recorrentes, sessões humanas, pageviews, cliques WhatsApp, inícios de formulário, leads comerciais |
 | **Aquisição por Canal** | `/api/admin/analytics/acquisition` | `page_views`, `lead_clicks`, `leads` | 13 canais canônicos, rótulos canônicos, sessões, visitantes, pageviews, conversões |
-| **Google Ads** | `/api/admin/analytics/google-ads/*` | `page_views`, `lead_clicks`, `leads` | Sessões Google Ads, gclid/wbraid/gbraid, campanhas UTM, termos/palavras-chave, criativos, ad groups, dispositivos, redes |
-| **WhatsApp & Atribuição**| `/api/admin/marketing/whatsapp-attributions` | `whatsapp_attributions` | Códigos curtos, status de atribuição, canais, confiança, correspondência, timestamps |
-| **Leads Comerciais** | `/api/admin/leads` | `leads` | IDs, canais de sessão/primeiro toque, campanhas, serviços, status comercial |
-| **KPIs de Campanhas** | `/api/admin/marketing/campaign-kpis` | `campaign_kpi_entries` | Plataforma, campanha, orçamento planejado, gasto real, cliques, contatos WhatsApp, vendas, receita, ROAS, CPL |
-| **Telemetria de Páginas**| `/api/admin/analytics/pages` | `page_views` | Paths de página, landing pages, dispositivos, timestamps cronológicos |
+| **Google Ads** | `/api/admin/analytics/google-ads/*` | `page_views`, `lead_clicks`, `leads` | `google_campaign_id`, `google_adgroup_id`, `google_creative_id`, `google_match_type`, `google_network`, `google_device`, `google_target_id`, `gclid`, `gbraid`, `wbraid`, `utm_term`, `utm_campaign` |
+| **WhatsApp & Atribuição**| `/api/admin/marketing/whatsapp-attributions` | `whatsapp_attributions` | `short_code`, `channel`, `utm_campaign`, `attribution_status`, `match_method`, `landing_path`, `created_at` |
+| **Leads Comerciais** | `/api/admin/leads` | `leads` | `id`, `created_at`, `session_channel`, `first_touch_channel`, `utm_campaign`, `servico`, `status` (PII mascarado sob LGPD) |
+| **KPIs de Campanhas** | `/api/admin/marketing/campaign-kpis` | `campaign_kpi_entries` | `platform`, `campaign_name`, `utm_campaign`, `period_start`, `period_end`, `planned_budget`, `spend`, `impressions`, `clicks`, `whatsapp_contacts`, `leads`, `sales`, `revenue`, `notes`, `target_ctr`, `target_cpc`, `target_cpl`, `target_cpa`, `target_roas`, `target_leads`, `target_sales`, `target_lead_to_sale_rate`, `target_budget` |
+| **Telemetria de Páginas**| `/api/admin/analytics/pages` | `page_views` | `id`, `created_at`, `path`, `landing_path`, `channel`, `device_type`, `session_id`, `visitor_id` |
 
 ---
 
@@ -48,17 +48,12 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
    - Zero exposição de segredos ou tokens.
 
 4. **PDF (Relatório Gerencial Executivo):**
-   - Biblioteca: `pdfkit` (^0.20.1, reutilizada do `package.json`).
+   - Biblioteca: `pdfkit` (^0.20.1, nativa do projeto).
    - Layout gerencial diagramado com branding oficial da AD Telas, capa executiva, tabelas consolidadas dos principais indicadores e notas de rodapé.
 
 5. **ZIP Completo:**
-   - Biblioteca: `jszip` (^3.10.1, licença MIT).
-   - Pacote consolidado contendo:
-     - `/consolidado.xlsx`
-     - `/resumo.pdf`
-     - `/raw/dados.json`
-     - `/csv/*.csv`
-     - `/README.txt` com metadados e documentação do lote.
+   - Biblioteca: `jszip` (^3.10.2, licença MIT).
+   - Pacote consolidado contendo: `/consolidado.xlsx`, `/resumo.pdf`, `/raw/dados.json`, `/csv/*.csv` e `/README.txt`.
 
 ---
 
@@ -72,7 +67,7 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 
 ## 5. Paginação e Grandes Volumes
 
-- As consultas ao banco Supabase utilizam o helper `fetchAllPaginated` em lotes de 1.000 registros até o esgotamento (`hasMore === false`), garantindo que exportações de "Todo o período" tragam a totalidade dos dados sem truncamento silencioso.
+- As consultas ao banco Supabase utilizam paginação server-side em lotes de 1.000 registros até o esgotamento (`hasMore === false`), garantindo que exportações de "Todo o período" tragam a totalidade dos dados sem truncamento silencioso.
 
 ---
 
@@ -83,8 +78,10 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 | `app/types/dashboardExport.ts` | Tipos TypeScript | 78 | 200 | **APROVADO** |
 | `server/utils/dashboard-export/exportSanitizer.ts` | Lógica de Sanitização | 56 | 200 | **APROVADO** |
 | `server/utils/dashboard-export/exportFilename.ts` | Nomes de Arquivo | 39 | 200 | **APROVADO** |
-| `server/utils/dashboard-export/exportDataCollector.ts`| Coletor Paginado | 136 | 200 | **APROVADO** |
-| `server/utils/dashboard-export/exportDataBuilder.ts` | Construtor de Datasets | 191 | 200 | **APROVADO** |
+| `server/utils/dashboard-export/exportDataCollector.ts`| Coletor Paginado | 156 | 200 | **APROVADO** |
+| `server/utils/dashboard-export/exportDataBuilder.ts` | Construtor de Datasets | 185 | 200 | **APROVADO** |
+| `server/utils/dashboard-export/exportCampaignKpisBuilder.ts` | Construtor KPIs Fase 7 | 67 | 200 | **APROVADO** |
+| `server/utils/dashboard-export/exportTrackingDatasetsBuilder.ts` | Construtor Datasets Ads | 165 | 200 | **APROVADO** |
 | `server/utils/dashboard-export/exportCsv.ts` | Gerador CSV | 15 | 200 | **APROVADO** |
 | `server/utils/dashboard-export/exportJson.ts` | Gerador JSON | 34 | 200 | **APROVADO** |
 | `server/utils/dashboard-export/exportXlsx.ts` | Gerador XLSX | 96 | 200 | **APROVADO** |
@@ -95,7 +92,9 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 | `app/components/admin/export/DashboardExportDialog.vue` | Componente Vue | 287 | 500 | **APROVADO** |
 | `app/components/admin/export/DashboardExportButton.vue` | Componente Vue | 37 | 500 | **APROVADO** |
 | `app/pages/admin/dashboard.vue` | Página Dashboard | 353 | 500 | **APROVADO** |
-| `scripts/test_dashboard_export.mjs` | Suíte de Testes | 187 | 200 | **APROVADO** |
+| `scripts/test_dashboard_export.mjs` | Suíte EXPORT-01..20 | 187 | 200 | **APROVADO** |
+| `scripts/test_campaign_kpis_real_export.mjs` | Teste Real Fixture KPI | 191 | 200 | **APROVADO** |
+| `scripts/test_google_export_parity.mjs` | Teste Paridade Google Ads | 112 | 200 | **APROVADO** |
 
 ---
 
@@ -124,7 +123,22 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 - **EXPORT-20:** Sem truncamento silencioso (suporte a chunks e stream) — **PASS**
 - **Total:** 20/20 PASS (0 falhas).
 
-### 7.2 Suítes de Regressão Legadas
+### 7.2 Teste Real Não-Vazio de campaign_kpis (`scripts/test_campaign_kpis_real_export.mjs`)
+- Inserção de fixture `EXPORT_KPI_SCHEMA_TEST` com 24 campos conhecidos: **PASS**
+- Exportação e parsing de CSV com spend e receita: **PASS**
+- Exportação e parsing de XLSX com todos os 24 campos e 10 KPIs calculados: **PASS**
+- Exportação e parsing de JSON: **PASS**
+- Cleanup estrito e verificação de contagem residual = 0: **PASS**
+
+### 7.3 Teste de Paridade Google Ads Dashboard vs Exportação (`scripts/test_google_export_parity.mjs`)
+- Sessões Google Ads: Dashboard = 47 | Export = 47 (**PARIDADE 100%**)
+- Visitantes Únicos: Dashboard = 46 | Export = 46 (**PARIDADE 100%**)
+- Pageviews: Dashboard = 69 | Export = 69 (**PARIDADE 100%**)
+- Cliques no WhatsApp: Dashboard = 1 | Export = 1 (**PARIDADE 100%**)
+- Inícios de Formulário: Dashboard = 0 | Export = 0 (**PARIDADE 100%**)
+- Leads Convertidos: Dashboard = 0 | Export = 0 (**PARIDADE 100%**)
+
+### 7.4 Suítes de Regressão Legadas
 - `test_phase1_classification.mjs`: 27 PASS | 0 FAIL
 - `test-google-ads-tracking.mjs`: 7/7 Grupos PASS
 - `test-service-forms-canonical.mjs`: 26 PASS | 0 FAIL
@@ -137,19 +151,11 @@ A **Central de Exportação de Dados** adiciona ao Painel Administrativo uma int
 
 ## 8. Testes Visuais e Responsividade (Playwright MCP)
 
-Testado com o servidor local Nuxt nas 4 resoluções obrigatórias:
+Testado nativamente com **Playwright MCP** nas 4 resoluções obrigatórias:
 1. **1440x900 (Desktop Large):** `scrollWidth === innerWidth === 1440` (0px overflow) — **PASS**
 2. **1280x800 (Desktop Standard):** `scrollWidth === innerWidth === 1280` (0px overflow) — **PASS**
 3. **390x844 (Mobile Modern):** `scrollWidth === innerWidth === 390` (0px overflow) — **PASS**
 4. **375x667 (Mobile Compact):** `scrollWidth === innerWidth === 375` (0px overflow) — **PASS**
-
-### Testes de Download Real no Navegador:
-- `XLSX`: HTTP 200, Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, 12.419 bytes — **PASS**
-- `CSV (múltiplos)`: HTTP 200, Content-Type `application/zip`, 1.641 bytes — **PASS**
-- `CSV (individual)`: HTTP 200, Content-Type `text/csv; charset=utf-8`, 449 bytes — **PASS**
-- `JSON`: HTTP 200, Content-Type `application/json; charset=utf-8`, 6.541 bytes — **PASS**
-- `PDF`: HTTP 200, Content-Type `application/pdf`, 4.167 bytes — **PASS**
-- `ZIP Completo`: HTTP 200, Content-Type `application/zip`, 18.620 bytes — **PASS**
 
 ---
 
