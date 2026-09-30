@@ -135,9 +135,17 @@ const quickModels = [
 
 const activeSlides = ref({})
 let carouselInterval = null
+const comparisonSection = ref(null)
+const showFloatingWhatsapp = ref(false)
+let comparisonObserver = null
 
 onMounted(() => {
   track('landing_view')
+
+  comparisonObserver = new IntersectionObserver(([entry]) => {
+    showFloatingWhatsapp.value = entry.isIntersecting || entry.boundingClientRect.top < 0
+  })
+  if (comparisonSection.value) comparisonObserver.observe(comparisonSection.value)
 
   // Inicializa os índices de slides para todos os cards que possuem múltiplas fotos
   realInstallations.forEach((item, index) => {
@@ -157,6 +165,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  comparisonObserver?.disconnect()
   if (carouselInterval) {
     clearInterval(carouselInterval)
     carouselInterval = null
@@ -207,6 +216,25 @@ onUnmounted(() => {
 
           </div>
 
+          <div class="hero-trust" aria-label="Confiança e atendimento AD Telas">
+            <a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer" class="hero-trust-item" :title="`Avaliação conferida em ${googleReviews.checkedAt}`">
+              <Icon name="lucide:star" aria-hidden="true" />
+              <span><strong>{{ googleReviews.rating }} no Google</strong><small>{{ googleReviews.count }} avaliações · {{ googleReviews.checkedAt }}</small></span>
+            </a>
+            <div class="hero-trust-item">
+              <Icon name="lucide:users" aria-hidden="true" />
+              <span><strong>Mais de 1.000</strong><small>clientes atendidos</small></span>
+            </div>
+            <div class="hero-trust-item">
+              <Icon name="lucide:shield-check" aria-hidden="true" />
+              <span><strong>2 anos de garantia</strong><small>contra defeitos de instalação</small></span>
+            </div>
+            <div class="hero-trust-item">
+              <Icon name="lucide:clock" aria-hidden="true" />
+              <span><strong>Visita em até 24h</strong><small>orçamento gratuito no local</small></span>
+            </div>
+          </div>
+
           <!-- Hero CTA Button -->
           <div class="hero-actions">
             <a
@@ -222,8 +250,10 @@ onUnmounted(() => {
               @click="track('whatsapp_cta_click', { cta_location: 'lp_hero' })"
             >
               <WhatsappIcon />
-              <span>Fale agora pelo Whatsapp</span>
+              <span>Solicitar orçamento grátis agora</span>
             </a>
+            <p class="hero-cta-note">Pelo WhatsApp · Sem compromisso</p>
+            <p class="hero-installation-note"><strong>Tempo de instalação:</strong> confirmado no orçamento, conforme o modelo e a quantidade de telas.</p>
           </div>
         </div>
       </div>
@@ -248,6 +278,56 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section ref="comparisonSection" class="section wrap comparison-section" aria-labelledby="comparison-title">
+      <div class="section-heading">
+        <p class="eyebrow">ABRA ESPAÇO PARA O CONFORTO</p>
+        <h2 id="comparison-title">Ar entrando. Insetos do lado de fora.</h2>
+        <p>Veja o que uma tela sob medida pode mudar no seu dia a dia.</p>
+      </div>
+      <div class="comparison-grid">
+        <article class="comparison-card comparison-without">
+          <div class="comparison-photo">
+            <img src="/images/lp-comparativo-mosquito.jpg" alt="Mosquito pousado em uma superfície, em foto ilustrativa" width="800" height="533" loading="lazy" decoding="async" />
+            <span>Sem tela</span>
+          </div>
+          <div class="comparison-copy">
+            <h3>Uma abertura para os insetos</h3>
+            <ul>
+              <li><Icon name="lucide:x" aria-hidden="true" />Mosquitos podem entrar pelas janelas</li>
+              <li><Icon name="lucide:x" aria-hidden="true" />Incômodo com insetos dentro de casa</li>
+              <li><Icon name="lucide:x" aria-hidden="true" />Janelas fechadas reduzem a ventilação</li>
+            </ul>
+          </div>
+        </article>
+        <article class="comparison-card comparison-with">
+          <div class="comparison-photo">
+            <img src="/images/telas/catalogo/mosquiteira-janela.webp" alt="Tela mosquiteira ajustada à esquadria de uma janela" width="800" height="600" loading="lazy" decoding="async" />
+            <span>Com tela AD Telas</span>
+          </div>
+          <div class="comparison-copy">
+            <h3>Mais conforto com a janela aberta</h3>
+            <ul>
+              <li><Icon name="lucide:check" aria-hidden="true" />Ventilação natural no ambiente</li>
+              <li><Icon name="lucide:check" aria-hidden="true" />Barreira contra a entrada de insetos</li>
+              <li><Icon name="lucide:check" aria-hidden="true" />Instalação sob medida para o seu vão</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+      <p class="comparison-caption">Imagens ilustrativas do comparativo.</p>
+      <div class="comparison-action">
+        <p><strong>Visita gratuita em até 24h.</strong> Receba seu orçamento no local, sem compromisso.</p>
+        <a :href="getWhatsappUrl()" target="_blank" rel="noopener noreferrer" class="button green" data-cta-location="lp_comparison" data-gtm="lp-whatsapp-comparison" data-track-type="whatsapp" data-service-key="telas-mosquiteiras" data-service-name="Telas Mosquiteiras" @click="track('whatsapp_cta_click', { cta_location: 'lp_comparison' })">
+          <WhatsappIcon aria-hidden="true" /><span>Solicitar orçamento grátis agora</span>
+        </a>
+      </div>
+      <div class="installation-details">
+        <p><strong>Garantia de 2 anos</strong><span>Contra defeitos de instalação.</span></p>
+        <p><strong>Durabilidade estimada de 5 anos</strong><span>Consulte os cuidados de uso e manutenção com nossa equipe.</span></p>
+        <p><strong>Instalação agendada</strong><span>O prazo depende do modelo, das medidas e da quantidade de telas. Confirmamos no orçamento.</span></p>
       </div>
     </section>
 
@@ -515,6 +595,7 @@ onUnmounted(() => {
     <!-- Botão Flutuante Piscando: Falar agora no WhatsApp -->
     <a
       :href="getWhatsappUrl('Olá! Gostaria de falar com um especialista sobre telas mosquiteiras.')"
+      v-show="showFloatingWhatsapp"
       class="floating-whatsapp"
       data-cta-location="floating_whatsapp"
       data-gtm="lp-whatsapp-floating"
@@ -545,7 +626,7 @@ onUnmounted(() => {
   background: #fff;
   font-family: inherit;
   line-height: 1.5;
-  padding-bottom: 0;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 .wrap {
@@ -1727,5 +1808,77 @@ p {
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.8), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
   50% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(37, 211, 102, 0), 0 8px 24px rgba(8, 124, 56, 0.55); filter: brightness(1.12); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
+}
+
+/* Prova de confiança próxima à decisão, sem acrescentar altura fixa. */
+.hero-trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+.hero-trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid #ffffff30;
+  border-radius: 10px;
+  background: #0d1d30d9;
+  color: #fff;
+  text-decoration: none;
+}
+.hero-trust-item > .icon { flex: 0 0 18px; width: 18px; height: 18px; color: var(--brand-gold); }
+.hero-trust-item strong { display: block; font-size: 13px; line-height: 1.3; }
+.hero-trust-item small { display: block; margin-top: 3px; font-size: 11px; line-height: 1.4; color: #dae6f3; }
+.hero-cta-note { margin-top: 7px; color: #fff; font-size: 12px; }
+.hero-installation-note { margin-top: 8px; max-width: 470px; color: #e1e9f2; font-size: 12px; line-height: 1.45; }
+.hero-trust-item:focus-visible, .comparison-action a:focus-visible { outline: 3px solid var(--brand-gold); outline-offset: 3px; }
+.comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.comparison-card { min-width: 0; overflow: hidden; border: 1px solid var(--border-light); border-radius: 16px; background: #fff; }
+.comparison-with { border-color: #91c6a5; background: #f4faf6; }
+.comparison-photo { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+.comparison-photo img { width: 100%; height: 100%; object-fit: cover; }
+.comparison-photo > span { position: absolute; left: 14px; bottom: 14px; padding: 7px 12px; background: #233449; color: #fff; font-size: 14px; font-weight: 750; border-radius: 8px; }
+.comparison-with .comparison-photo > span { background: #087c38; }
+.comparison-copy { padding: 20px; }
+.comparison-copy h3 { font-size: 19px; line-height: 1.3; }
+.comparison-copy ul { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; }
+.comparison-copy li { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; }
+.comparison-copy li .icon { flex: 0 0 18px; width: 18px; height: 18px; margin-top: 2px; color: #9a4242; }
+.comparison-with li .icon { color: #087c38; }
+.comparison-caption { margin-top: 8px; color: var(--text-muted); font-size: 11px; }
+.comparison-action { margin-top: 24px; padding: 20px; background: #edf5f0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.comparison-action p { max-width: 440px; font-size: 15px; }
+.comparison-action .button { flex-shrink: 0; }
+.comparison-action :deep(svg) { width: 24px; height: 24px; flex-shrink: 0; }
+.installation-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 24px; }
+.installation-details p { border-left: 3px solid var(--brand-gold); padding-left: 12px; font-size: 14px; }
+.installation-details strong, .installation-details span { display: block; }
+.installation-details span { margin-top: 5px; font-size: 13px; color: var(--text-muted); }
+@media (max-width: 767px) {
+  .lp-hero { min-height: 0; }
+  .lp-hero-inner { padding: 0 12px; }
+  .lp-hero-copy { max-width: none; padding: 34px 0 18px; }
+  .hero-actions { margin-top: 12px; }
+  .hero-cta-btn { width: 100%; padding-inline: 12px; font-size: 14px; }
+  .hero-trust { margin-top: 12px; gap: 6px; }
+  .hero-trust-item { padding: 8px; gap: 6px; }
+  .hero-trust-item strong { font-size: 12px; }
+  .hero-trust-item small { font-size: 10.5px; }
+  .hero-benefits-row-top { flex-wrap: wrap; gap: 6px 12px; }
+  .comparison-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .comparison-photo { aspect-ratio: 2 / 1; }
+  .comparison-copy { padding: 16px; }
+  .comparison-copy h3 { font-size: 18px; }
+  .comparison-action { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px; }
+  .comparison-action .button { width: 100%; padding-inline: 10px; }
+  .installation-details { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .floating-whatsapp { animation: none; max-width: calc(100vw - 32px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-container *, .lp-container *::before, .lp-container *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 </style>
