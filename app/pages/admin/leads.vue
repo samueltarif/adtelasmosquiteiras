@@ -9,6 +9,7 @@ import TableHead from '../../components/ui/table/TableHead.vue'
 import TableCell from '../../components/ui/table/TableCell.vue'
 import Badge from '../../components/ui/badge/Badge.vue'
 import LeadJourneyDrawer from '../../components/admin/LeadJourneyDrawer.vue'
+import WhatsappProspects from '../../components/admin/WhatsappProspects.vue'
 import { formatWhatsAppLink } from '~/utils/phone'
 
 definePageMeta({ layout: 'admin' })
@@ -119,6 +120,8 @@ onMounted(() => {
           <span>Atualizar</span>
         </button>
       </div>
+
+      <WhatsappProspects />
 
       <!-- Tab Switcher (Reais vs Histórico Técnico) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
