@@ -43,4 +43,5 @@ artifacts/
 # Playwright MCP
 .playwright-mcp/
 tools/
+after_*.png
 

@@ -135,17 +135,40 @@ const quickModels = [
 
 const activeSlides = ref({})
 let carouselInterval = null
-const comparisonSection = ref(null)
 const showFloatingWhatsapp = ref(false)
-let comparisonObserver = null
+let heroCtaObserver = null
+let inlineCtaObserver = null
+let heroCtaPassed = false
+const visibleInlineCtas = new Set()
+
+function updateFloatingWhatsapp() {
+  showFloatingWhatsapp.value = heroCtaPassed && visibleInlineCtas.size === 0
+}
 
 onMounted(() => {
   track('landing_view')
 
-  comparisonObserver = new IntersectionObserver(([entry]) => {
-    showFloatingWhatsapp.value = entry.isIntersecting || entry.boundingClientRect.top < 0
-  })
-  if (comparisonSection.value) comparisonObserver.observe(comparisonSection.value)
+  if (typeof IntersectionObserver !== 'undefined') {
+    const heroCta = document.querySelector('.hero-cta-btn')
+    if (heroCta) {
+      heroCtaObserver = new IntersectionObserver(([entry]) => {
+        heroCtaPassed = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0
+        updateFloatingWhatsapp()
+      })
+      heroCtaObserver.observe(heroCta)
+    }
+
+    inlineCtaObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visibleInlineCtas.add(entry.target)
+        else visibleInlineCtas.delete(entry.target)
+      })
+      updateFloatingWhatsapp()
+    })
+    document.querySelectorAll('a[data-track-type="whatsapp"]:not(.floating-whatsapp)').forEach((cta) => {
+      inlineCtaObserver.observe(cta)
+    })
+  }
 
   // Inicializa os índices de slides para todos os cards que possuem múltiplas fotos
   realInstallations.forEach((item, index) => {
@@ -165,7 +188,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  comparisonObserver?.disconnect()
+  heroCtaObserver?.disconnect()
+  inlineCtaObserver?.disconnect()
+  visibleInlineCtas.clear()
   if (carouselInterval) {
     clearInterval(carouselInterval)
     carouselInterval = null
@@ -281,53 +306,44 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <section ref="comparisonSection" class="section wrap comparison-section" aria-labelledby="comparison-title">
-      <div class="section-heading">
-        <p class="eyebrow">ABRA ESPAÇO PARA O CONFORTO</p>
-        <h2 id="comparison-title">Ar entrando. Insetos do lado de fora.</h2>
-        <p>Veja o que uma tela sob medida pode mudar no seu dia a dia.</p>
-      </div>
-      <div class="comparison-grid">
-        <article class="comparison-card comparison-without">
-          <div class="comparison-photo">
-            <img src="/images/lp-comparativo-mosquito.jpg" alt="Mosquito pousado em uma superfície, em foto ilustrativa" width="800" height="533" loading="lazy" decoding="async" />
-            <span>Sem tela</span>
-          </div>
-          <div class="comparison-copy">
-            <h3>Uma abertura para os insetos</h3>
-            <ul>
-              <li><Icon name="lucide:x" aria-hidden="true" />Mosquitos podem entrar pelas janelas</li>
-              <li><Icon name="lucide:x" aria-hidden="true" />Incômodo com insetos dentro de casa</li>
-              <li><Icon name="lucide:x" aria-hidden="true" />Janelas fechadas reduzem a ventilação</li>
-            </ul>
-          </div>
-        </article>
-        <article class="comparison-card comparison-with">
-          <div class="comparison-photo">
-            <img src="/images/telas/catalogo/mosquiteira-janela.webp" alt="Tela mosquiteira ajustada à esquadria de uma janela" width="800" height="600" loading="lazy" decoding="async" />
-            <span>Com tela AD Telas</span>
-          </div>
-          <div class="comparison-copy">
-            <h3>Mais conforto com a janela aberta</h3>
-            <ul>
-              <li><Icon name="lucide:check" aria-hidden="true" />Ventilação natural no ambiente</li>
-              <li><Icon name="lucide:check" aria-hidden="true" />Barreira contra a entrada de insetos</li>
-              <li><Icon name="lucide:check" aria-hidden="true" />Instalação sob medida para o seu vão</li>
-            </ul>
-          </div>
-        </article>
-      </div>
-      <p class="comparison-caption">Imagens ilustrativas do comparativo.</p>
-      <div class="comparison-action">
-        <p><strong>Visita gratuita em até 24h.</strong> Receba seu orçamento no local, sem compromisso.</p>
-        <a :href="getWhatsappUrl()" target="_blank" rel="noopener noreferrer" class="button green" data-cta-location="lp_comparison" data-gtm="lp-whatsapp-comparison" data-track-type="whatsapp" data-service-key="telas-mosquiteiras" data-service-name="Telas Mosquiteiras" @click="track('whatsapp_cta_click', { cta_location: 'lp_comparison' })">
-          <WhatsappIcon aria-hidden="true" /><span>Solicitar orçamento grátis agora</span>
-        </a>
-      </div>
-      <div class="installation-details">
-        <p><strong>Garantia de 2 anos</strong><span>Contra defeitos de instalação.</span></p>
-        <p><strong>Durabilidade estimada de 5 anos</strong><span>Consulte os cuidados de uso e manutenção com nossa equipe.</span></p>
-        <p><strong>Instalação agendada</strong><span>O prazo depende do modelo, das medidas e da quantidade de telas. Confirmamos no orçamento.</span></p>
+    <!-- Escolha do ambiente antes dos detalhes e fotos no mobile -->
+    <section class="section bg-light" aria-labelledby="models-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">ONDE VOCÊ PRECISA INSTALAR?</p>
+          <h2 id="models-title">Janela · Porta · Sacada · Removível</h2>
+          <p>Você não precisa estudar modelos complexos. Escolha o ambiente e nossa equipe indica a melhor opção.</p>
+        </div>
+
+        <div class="models-grid">
+          <article v-for="model in quickModels" :key="model.name" class="model-box">
+            <div class="model-box-top">
+              <div class="model-icon">
+                <Icon :name="model.icon" />
+              </div>
+              <div>
+                <span class="model-tag">{{ model.name }}</span>
+                <h3>{{ model.title }}</h3>
+              </div>
+            </div>
+            <p class="model-desc">{{ model.desc }}</p>
+            <a
+              :href="getWhatsappUrl(model.msg)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="button outline-btn pulse-subtle"
+              data-cta-location="quick_models"
+              data-gtm="lp-whatsapp-models"
+              data-track-type="whatsapp"
+              data-service-key="telas-mosquiteiras"
+              data-service-name="Telas Mosquiteiras"
+              @click="track('whatsapp_cta_click', { cta_location: 'quick_models', model: model.name })"
+            >
+              <WhatsappIcon />
+              <span>Fale agora pelo Whatsapp</span>
+            </a>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -398,44 +414,53 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- 2. Modelos Objetivos: Janela | Porta | Sacada | Removível -->
-    <section class="section bg-light" aria-labelledby="models-title">
-      <div class="wrap">
-        <div class="section-heading">
-          <p class="eyebrow">ONDE VOCÊ PRECISA INSTALAR?</p>
-          <h2 id="models-title">Janela · Porta · Sacada · Removível</h2>
-          <p>Você não precisa estudar modelos complexos. Escolha o ambiente e nossa equipe indica a melhor opção.</p>
-        </div>
-
-        <div class="models-grid">
-          <article v-for="model in quickModels" :key="model.name" class="model-box">
-            <div class="model-box-top">
-              <div class="model-icon">
-                <Icon :name="model.icon" />
-              </div>
-              <div>
-                <span class="model-tag">{{ model.name }}</span>
-                <h3>{{ model.title }}</h3>
-              </div>
-            </div>
-            <p class="model-desc">{{ model.desc }}</p>
-            <a
-              :href="getWhatsappUrl(model.msg)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="button outline-btn pulse-subtle"
-              data-cta-location="quick_models"
-              data-gtm="lp-whatsapp-models"
-              data-track-type="whatsapp"
-              data-service-key="telas-mosquiteiras"
-              data-service-name="Telas Mosquiteiras"
-              @click="track('whatsapp_cta_click', { cta_location: 'quick_models', model: model.name })"
-            >
-              <WhatsappIcon />
-              <span>Fale agora pelo Whatsapp</span>
-            </a>
-          </article>
-        </div>
+    <section class="section wrap comparison-section" aria-labelledby="comparison-title">
+      <div class="section-heading">
+        <p class="eyebrow">ABRA ESPAÇO PARA O CONFORTO</p>
+        <h2 id="comparison-title">Ar entrando. Insetos do lado de fora.</h2>
+        <p>Veja o que uma tela sob medida pode mudar no seu dia a dia.</p>
+      </div>
+      <div class="comparison-grid">
+        <article class="comparison-card comparison-without">
+          <div class="comparison-photo">
+            <img src="/images/lp-comparativo-mosquito.jpg" alt="Mosquito pousado em uma superfície, em foto ilustrativa" width="800" height="533" loading="lazy" decoding="async" />
+            <span>Sem tela</span>
+          </div>
+          <div class="comparison-copy">
+            <h3>Uma abertura para os insetos</h3>
+            <ul>
+              <li><Icon name="lucide:x" aria-hidden="true" />Mosquitos podem entrar pelas janelas</li>
+              <li><Icon name="lucide:x" aria-hidden="true" />Incômodo com insetos dentro de casa</li>
+              <li><Icon name="lucide:x" aria-hidden="true" />Janelas fechadas reduzem a ventilação</li>
+            </ul>
+          </div>
+        </article>
+        <article class="comparison-card comparison-with">
+          <div class="comparison-photo">
+            <img src="/images/telas/catalogo/mosquiteira-janela.webp" alt="Tela mosquiteira ajustada à esquadria de uma janela" width="800" height="600" loading="lazy" decoding="async" />
+            <span>Com tela AD Telas</span>
+          </div>
+          <div class="comparison-copy">
+            <h3>Mais conforto com a janela aberta</h3>
+            <ul>
+              <li><Icon name="lucide:check" aria-hidden="true" />Ventilação natural no ambiente</li>
+              <li><Icon name="lucide:check" aria-hidden="true" />Barreira contra a entrada de insetos</li>
+              <li><Icon name="lucide:check" aria-hidden="true" />Instalação sob medida para o seu vão</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+      <p class="comparison-caption">Imagens ilustrativas do comparativo.</p>
+      <div class="comparison-action">
+        <p><strong>Visita gratuita em até 24h.</strong> Receba seu orçamento no local, sem compromisso.</p>
+        <a :href="getWhatsappUrl()" target="_blank" rel="noopener noreferrer" class="button green" data-cta-location="lp_comparison" data-gtm="lp-whatsapp-comparison" data-track-type="whatsapp" data-service-key="telas-mosquiteiras" data-service-name="Telas Mosquiteiras" @click="track('whatsapp_cta_click', { cta_location: 'lp_comparison' })">
+          <WhatsappIcon aria-hidden="true" /><span>Solicitar orçamento grátis agora</span>
+        </a>
+      </div>
+      <div class="installation-details">
+        <p><strong>Garantia de 2 anos</strong><span>Contra defeitos de instalação.</span></p>
+        <p><strong>Durabilidade estimada de 5 anos</strong><span>Consulte os cuidados de uso e manutenção com nossa equipe.</span></p>
+        <p><strong>Instalação agendada</strong><span>O prazo depende do modelo, das medidas e da quantidade de telas. Confirmamos no orçamento.</span></p>
       </div>
     </section>
 
@@ -518,7 +543,7 @@ onUnmounted(() => {
             @click="track('whatsapp_cta_click', { cta_location: 'quick_photo_band' })"
           >
             <WhatsappIcon />
-            <span>ENVIAR FOTO E PEDIR ORÇAMENTO AGORA →</span>
+            <span>Envie uma foto e peça orçamento</span>
           </a>
         </div>
       </div>
@@ -592,7 +617,7 @@ onUnmounted(() => {
       </div>
     </footer>
 
-    <!-- Botão Flutuante Piscando: Falar agora no WhatsApp -->
+    <!-- CTA compacto, visível somente longe dos demais botões de WhatsApp -->
     <a
       :href="getWhatsappUrl('Olá! Gostaria de falar com um especialista sobre telas mosquiteiras.')"
       v-show="showFloatingWhatsapp"
@@ -604,10 +629,10 @@ onUnmounted(() => {
       data-service-name="Telas Mosquiteiras"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Fale agora pelo Whatsapp"
-      title="Fale agora pelo Whatsapp"
+      aria-label="WhatsApp: pedir orçamento"
+      title="WhatsApp: pedir orçamento"
       @click="track('whatsapp_cta_click', { cta_location: 'floating_whatsapp' })"
-    ><WhatsappIcon aria-hidden="true" /><span>Fale agora pelo Whatsapp</span></a>
+    ><WhatsappIcon aria-hidden="true" /><span>WhatsApp · Pedir orçamento</span></a>
   </div>
 </template>
 
@@ -626,7 +651,8 @@ onUnmounted(() => {
   background: #fff;
   font-family: inherit;
   line-height: 1.5;
-  padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .wrap {
@@ -1752,25 +1778,24 @@ p {
   color: #6a7d8d;
 }
 
-/* Botão Flutuante Piscando: Falar agora no WhatsApp */
+/* CTA flutuante compacto */
 .floating-whatsapp {
   position: fixed;
   right: calc(16px + env(safe-area-inset-right, 0px));
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 35;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  height: 52px;
-  padding: 0 18px;
+  min-height: 56px;
+  padding: 0 16px;
   border-radius: 999px;
   background: #087c38;
   color: #fff;
   box-shadow: 0 4px 18px rgba(8, 124, 56, 0.45);
   border: 2px solid #fff;
   text-decoration: none;
-  animation: pulse-whatsapp 2s infinite ease-in-out;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
@@ -1780,14 +1805,14 @@ p {
 }
 
 .floating-whatsapp :deep(svg) {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
 .floating-whatsapp span {
   display: inline-block;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1796,7 +1821,7 @@ p {
   .floating-whatsapp {
     right: 24px;
     bottom: 24px;
-    height: 54px;
+    min-height: 54px;
     padding: 0 22px;
   }
   .floating-whatsapp span {
@@ -1869,14 +1894,33 @@ p {
   .hero-trust-item strong { font-size: 12px; }
   .hero-trust-item small { font-size: 10.5px; }
   .hero-benefits-row-top { flex-wrap: wrap; gap: 6px 12px; }
-  .comparison-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .comparison-photo { aspect-ratio: 2 / 1; }
-  .comparison-copy { padding: 16px; }
-  .comparison-copy h3 { font-size: 18px; }
-  .comparison-action { flex-direction: column; align-items: stretch; gap: 14px; padding: 16px; }
+  .comparison-section { padding-block: 32px; }
+  .comparison-section .section-heading { margin-bottom: 20px; }
+  .comparison-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .comparison-photo { aspect-ratio: 2.7 / 1; }
+  .comparison-copy { padding: 12px 14px; }
+  .comparison-copy h3 { font-size: 17px; }
+  .comparison-copy ul { margin-top: 10px; gap: 6px; }
+  .comparison-copy li { font-size: 13px; }
+  .comparison-action { flex-direction: column; align-items: stretch; gap: 12px; margin-top: 16px; padding: 14px; }
   .comparison-action .button { width: 100%; padding-inline: 10px; }
-  .installation-details { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .floating-whatsapp { animation: none; max-width: calc(100vw - 32px); }
+  .installation-details { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 18px; }
+  .gallery-grid { gap: 8px; }
+  .card-img-wrap { height: auto; aspect-ratio: 4 / 3; }
+  .card-body { padding: 12px 10px; }
+  .card-body p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-bottom: 10px; }
+  .card-cta-link { min-height: 44px; white-space: normal; text-align: center; }
+  .model-box { padding: 12px; }
+  .model-box-top { gap: 8px; margin-bottom: 8px; }
+  .model-icon { width: 34px; height: 34px; }
+  .model-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; margin-bottom: 12px; }
+  .outline-btn { min-height: 44px; }
+  .review-card:nth-child(n + 2) { display: none; }
+  .quick-steps-grid { gap: 8px; margin: 16px 0; }
+  .step-card { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; }
+  .step-card .step-num { flex: 0 0 24px; margin-bottom: 0; }
+  .step-card p { display: none; }
+  .floating-whatsapp { left: calc(16px + env(safe-area-inset-left, 0px)); right: calc(16px + env(safe-area-inset-right, 0px)); width: auto; max-width: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .lp-container *, .lp-container *::before, .lp-container *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
