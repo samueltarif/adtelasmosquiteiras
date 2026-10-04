@@ -53,6 +53,7 @@ export function getBrandIconBuffer(): Buffer {
   if (cachedBrandIcon) return cachedBrandIcon
 
   const candidates = [
+    join(process.cwd(), 'public/images/logo-adt-lp.png'),
     join(process.cwd(), 'public/images/logo_adt_telas_nova.png'),
     join(process.cwd(), 'public/favicon.ico')
   ]
