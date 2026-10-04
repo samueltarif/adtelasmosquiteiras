@@ -133,10 +133,8 @@ export function triggerWhatsappLeadBackgroundNotification(event: H3Event, payloa
         socketTimeout: 15000
       })
 
-      const targetEmail = 'vendas.adtelaseredes@gmail.com'
-      const recipient = (config.leadNotificationEmail && !config.leadNotificationEmail.includes('avyro.com.br'))
-        ? config.leadNotificationEmail
-        : (config.gmailEmail || targetEmail)
+      // Destinatário FIXO — não depende de variável de ambiente para funcionar em produção
+      const recipient = 'vendas.adtelaseredes@gmail.com'
       const subject = `🚨 Novo Lead Recebido: ${leadData.nome || 'Cliente'} — WhatsApp`
       const html = generateWhatsappLeadEmailHTML(leadData)
       const text = `NOVO LEAD WHATSAPP: ${leadData.nome}\nTelefone: ${leadData.telefone}\nREF: ${leadData.short_code}\nPágina: ${leadData.conversion_path || '/'}`
