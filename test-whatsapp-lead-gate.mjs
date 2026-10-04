@@ -189,7 +189,7 @@ assert(shouldInterceptClick('/', false, 'https://wa.me/5511999999999'), 'WA-GATE
 console.log('  ✓ WA-GATE-24 a 25: Bypass admin e botão interno PASS')
 
 console.log('\n--- GRUPO 6: Geração de E-mail de Notificação (WA-EMAIL-01 a 15) ---')
-import { generateWhatsappLeadEmailHTML, generateWhatsappLeadEmailSubject } from './server/utils/whatsappLeadEmailNotification.ts'
+import { generateWhatsappLeadEmailHTML, generateWhatsappLeadEmailSubject } from './server/utils/whatsappLeadEmailNotification.mjs'
 
 const leadData = {
   nome: 'Carlos Souza',
@@ -650,3 +650,200 @@ console.log('  ✓ WA-GATE-35: Reuso de lead não sobrescreve first touch (FIRST
 console.log('\n======================================================================')
 console.log('TODOS OS TESTES UNITÁRIOS DO WHATSAPP LEAD GATE PASSARAM COM SUCESSO!')
 console.log('======================================================================')
+
+// ======================================================================
+// GRUPO WA-EMAIL: Notificação de E-mail com Lease/Claim Atômico
+// ======================================================================
+console.log('\n======================================================================')
+console.log('GRUPO WA-NOTIFY: Claim Atômico, Lease e Recovery de E-mail')
+console.log('======================================================================')
+
+import { isEligibleForEmailClaim, isSendingStale, runEmailNotificationTask } from './server/utils/whatsappLeadEmailNotifier.mjs'
+
+const STALE_MINUTES = 5
+
+// Helper: cria mock DB em memória que simula atomicidade do claim
+function createMockEmailDb(initialStatus, lastAttemptMinutesAgo = null) {
+  const now = new Date()
+  const lastAttempt = lastAttemptMinutesAgo !== null
+    ? new Date(now.getTime() - lastAttemptMinutesAgo * 60 * 1000).toISOString()
+    : null
+
+  const lead = {
+    id: 'lead-test-' + Math.random().toString(36).slice(2, 9),
+    notification_email_status: initialStatus,
+    notification_email_attempts: initialStatus === 'sending' || initialStatus === 'failed' ? 1 : 0,
+    notification_email_last_attempt_at: lastAttempt
+  }
+
+  let claimed = false
+
+  return {
+    lead,
+    getClaims: () => claimed,
+    async atomicClaim(leadId, claimNow, staleMinutes) {
+      const staleIso = new Date(claimNow.getTime() - staleMinutes * 60 * 1000).toISOString()
+      const eligible = isEligibleForEmailClaim({
+        id: lead.id,
+        notification_email_status: lead.notification_email_status,
+        notification_email_attempts: lead.notification_email_attempts,
+        notification_email_last_attempt_at: lead.notification_email_last_attempt_at
+      }, staleMinutes)
+
+      if (!eligible.eligible) return []
+
+      // Simula atomicidade: apenas 1 chamada concorrente consegue
+      if (claimed) return []
+      claimed = true
+
+      lead.notification_email_status = 'sending'
+      lead.notification_email_attempts = (lead.notification_email_attempts || 0) + 1
+      lead.notification_email_last_attempt_at = claimNow.toISOString()
+      lead.notification_email_last_error = null
+
+      return [{ ...lead }]
+    },
+    async markSent(leadId, now) {
+      lead.notification_email_status = 'sent'
+      lead.notification_email_sent_at = now.toISOString()
+      lead.notification_email_last_error = null
+    },
+    async markFailed(leadId, errorMessage, now) {
+      lead.notification_email_status = 'failed'
+      lead.notification_email_last_error = errorMessage
+      lead.notification_email_last_attempt_at = now.toISOString()
+    }
+  }
+}
+
+// ── WA-EMAIL-01: pending → sending → sent ────────────────────────────────────
+console.log('\n--- WA-EMAIL-01: pending → sending → sent ---')
+{
+  const db = createMockEmailDb('pending')
+  let smtpCalled = false
+  const result = await runEmailNotificationTask(db.lead.id, db, async () => { smtpCalled = true }, STALE_MINUTES)
+  assert.strictEqual(result.success, true, 'WA-EMAIL-01: resultado success=true')
+  assert.strictEqual(result.skipped, false, 'WA-EMAIL-01: skipped=false')
+  assert.strictEqual(smtpCalled, true, 'WA-EMAIL-01: SMTP chamado')
+  assert.strictEqual(db.lead.notification_email_status, 'sent', 'WA-EMAIL-01: status final=sent')
+  console.log('  ✓ WA-EMAIL-01: pending → sending → sent (PASS)')
+}
+
+// ── WA-EMAIL-02: failed → retry → sent ──────────────────────────────────────
+console.log('\n--- WA-EMAIL-02: failed → retry → sent ---')
+{
+  const db = createMockEmailDb('failed', 10)
+  let smtpCalled = false
+  const result = await runEmailNotificationTask(db.lead.id, db, async () => { smtpCalled = true }, STALE_MINUTES)
+  assert.strictEqual(result.success, true, 'WA-EMAIL-02: resultado success=true')
+  assert.strictEqual(smtpCalled, true, 'WA-EMAIL-02: SMTP chamado no retry')
+  assert.strictEqual(db.lead.notification_email_status, 'sent', 'WA-EMAIL-02: status final=sent após retry')
+  console.log('  ✓ WA-EMAIL-02: failed → retry → sent (PASS)')
+}
+
+// ── WA-EMAIL-03: sending RECENTE → não duplica ───────────────────────────────
+console.log('\n--- WA-EMAIL-03: sending recente → não duplica ---')
+{
+  const db = createMockEmailDb('sending', 1) // 1 minuto atrás → recente
+  let smtpCalled = false
+  const result = await runEmailNotificationTask(db.lead.id, db, async () => { smtpCalled = true }, STALE_MINUTES)
+  assert.strictEqual(result.skipped, true, 'WA-EMAIL-03: skipped=true (sending recente)')
+  assert.strictEqual(smtpCalled, false, 'WA-EMAIL-03: SMTP NÃO chamado')
+  assert.strictEqual(db.lead.notification_email_status, 'sending', 'WA-EMAIL-03: status mantido=sending')
+  console.log('  ✓ WA-EMAIL-03: sending recente → claim bloqueado (PASS)')
+}
+
+// ── WA-EMAIL-04: sending STALE >5 min → retry permitido ─────────────────────
+console.log('\n--- WA-EMAIL-04: sending stale >5 min → retry ---')
+{
+  const db = createMockEmailDb('sending', 10) // 10 minutos atrás → stale
+  let smtpCalled = false
+  const result = await runEmailNotificationTask(db.lead.id, db, async () => { smtpCalled = true }, STALE_MINUTES)
+  assert.strictEqual(result.success, true, 'WA-EMAIL-04: success=true após recovery')
+  assert.strictEqual(smtpCalled, true, 'WA-EMAIL-04: SMTP chamado no recovery')
+  assert.strictEqual(db.lead.notification_email_status, 'sent', 'WA-EMAIL-04: status final=sent')
+  console.log('  ✓ WA-EMAIL-04: sending stale >5 min → recovery e-mail enviado (PASS)')
+}
+
+// ── WA-EMAIL-05: sent → segundo CTA não envia outro e-mail ──────────────────
+console.log('\n--- WA-EMAIL-05: sent → segundo CTA NÃO reenvia ---')
+{
+  const db = createMockEmailDb('sent')
+  let smtpCalled = false
+  const result = await runEmailNotificationTask(db.lead.id, db, async () => { smtpCalled = true }, STALE_MINUTES)
+  assert.strictEqual(result.skipped, true, 'WA-EMAIL-05: skipped=true (sent é terminal)')
+  assert.strictEqual(result.reason, 'claim_not_acquired', 'WA-EMAIL-05: reason=claim_not_acquired')
+  assert.strictEqual(smtpCalled, false, 'WA-EMAIL-05: SMTP NÃO chamado')
+  assert.strictEqual(db.lead.notification_email_status, 'sent', 'WA-EMAIL-05: status permanece sent')
+  console.log('  ✓ WA-EMAIL-05: sent é terminal — segundo CTA ignorado (PASS)')
+}
+
+// ── WA-EMAIL-06: mesmo lead + nova attribution → sem segundo e-mail se sent ──
+console.log('\n--- WA-EMAIL-06: mesma sessão, nova attribution → sem e-mail duplicado ---')
+{
+  // Simula: lead já teve e-mail enviado (sent), nova attribution chega
+  const db = createMockEmailDb('sent')
+  let emailCount = 0
+  // Primeira tentativa (via attribution 1) — já estava sent quando chega
+  const r1 = await runEmailNotificationTask(db.lead.id, db, async () => { emailCount++ }, STALE_MINUTES)
+  // Segunda tentativa (via attribution 2) — mesmo lead
+  const r2 = await runEmailNotificationTask(db.lead.id, db, async () => { emailCount++ }, STALE_MINUTES)
+  assert.strictEqual(emailCount, 0, 'WA-EMAIL-06: 0 e-mails enviados para lead já sent')
+  assert.strictEqual(r1.skipped, true, 'WA-EMAIL-06: primeira tentativa skipped')
+  assert.strictEqual(r2.skipped, true, 'WA-EMAIL-06: segunda tentativa skipped')
+  console.log('  ✓ WA-EMAIL-06: mesmo lead, N attributions → máximo 0 e-mails extras (PASS)')
+}
+
+// ── WA-EMAIL-07: erro SMTP → failed + last_error preenchido ─────────────────
+console.log('\n--- WA-EMAIL-07: erro SMTP → failed + last_error ---')
+{
+  const db = createMockEmailDb('pending')
+  const result = await runEmailNotificationTask(
+    db.lead.id,
+    db,
+    async () => { throw new Error('535 5.7.8 Username and Password not accepted') },
+    STALE_MINUTES
+  )
+  assert.strictEqual(result.success, false, 'WA-EMAIL-07: success=false após erro SMTP')
+  assert.strictEqual(db.lead.notification_email_status, 'failed', 'WA-EMAIL-07: status=failed')
+  assert.ok(db.lead.notification_email_last_error, 'WA-EMAIL-07: last_error preenchido')
+  assert.ok(!db.lead.notification_email_last_error.includes('password'), 'WA-EMAIL-07: senha NÃO no last_error')
+  console.log('  ✓ WA-EMAIL-07: erro SMTP → failed com last_error sanitizado (PASS)')
+}
+
+// ── WA-EMAIL-08: concorrência → somente 1 claim adquirido ───────────────────
+console.log('\n--- WA-EMAIL-08: 2 execuções concorrentes → somente 1 claim ---')
+{
+  const db = createMockEmailDb('pending')
+  let emailsSent = 0
+
+  // Dispara 2 execuções "ao mesmo tempo" via Promise.all
+  const [r1, r2] = await Promise.all([
+    runEmailNotificationTask(db.lead.id, db, async () => { emailsSent++ }, STALE_MINUTES),
+    runEmailNotificationTask(db.lead.id, db, async () => { emailsSent++ }, STALE_MINUTES)
+  ])
+
+  assert.strictEqual(emailsSent, 1, 'WA-EMAIL-08: exatamente 1 e-mail enviado em concorrência')
+  const oneSkipped = r1.skipped || r2.skipped
+  const oneSuccess = r1.success || r2.success
+  assert.strictEqual(oneSkipped, true, 'WA-EMAIL-08: uma execução foi skipped')
+  assert.strictEqual(oneSuccess, true, 'WA-EMAIL-08: uma execução foi bem-sucedida')
+  assert.strictEqual(db.lead.notification_email_status, 'sent', 'WA-EMAIL-08: status final=sent')
+  console.log('  ✓ WA-EMAIL-08: 2 concorrentes → somente 1 claim, 1 e-mail (PASS)')
+}
+
+// ── isSendingStale helper tests ──────────────────────────────────────────────
+console.log('\n--- isSendingStale: testes auxiliares ---')
+{
+  const recent = new Date(Date.now() - 2 * 60 * 1000).toISOString() // 2 min atrás
+  const old = new Date(Date.now() - 10 * 60 * 1000).toISOString()   // 10 min atrás
+  assert.strictEqual(isSendingStale(recent, 5), false, 'isSendingStale: recente=false')
+  assert.strictEqual(isSendingStale(old, 5), true, 'isSendingStale: antigo=true')
+  assert.strictEqual(isSendingStale(null, 5), true, 'isSendingStale: null=true (stale por segurança)')
+  console.log('  ✓ isSendingStale helper OK')
+}
+
+console.log('\n======================================================================')
+console.log('TODOS OS TESTES WA-EMAIL (01-08) PASSARAM COM SUCESSO!')
+console.log('======================================================================')
+

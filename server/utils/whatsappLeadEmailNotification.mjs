@@ -1,41 +1,18 @@
 /**
- * whatsappLeadEmailNotification.ts
+ * whatsappLeadEmailNotification.mjs
  * =====================================================================
- * Orquestração de notificação de e-mail para leads WhatsApp Gate.
- * Integra o notifier puro com H3 event, nodemailer e Supabase REST.
- *
- * REGRAS:
- *   - 1 lead = máximo 1 e-mail enviado com sucesso (status=sent é terminal)
- *   - sending stale (>5 min) é elegível para recovery automático
- *   - failed é elegível para retry
- *   - Destinatário FIXO: vendas.adtelaseredes@gmail.com
+ * Re-export das funções puras de geração de e-mail para uso em testes
+ * unitários (.mjs) sem dependência de runtime Nitro/H3/nodemailer.
  * =====================================================================
  */
-import type { H3Event } from 'h3'
-import nodemailer from 'nodemailer'
-import { isEmailConfigured, getBrandIconBuffer } from './emailService'
-import { normalizePhoneForWhatsApp, formatDateTimeSP, escapeHtml, sanitizeEmailError } from '../shared/leadEmailCore.mjs'
-import { runEmailNotificationTask, EMAIL_SENDING_STALE_MINUTES } from './whatsappLeadEmailNotifier'
-import type { LeadEmailDbAdapter } from './whatsappLeadEmailNotifier'
+import { normalizePhoneForWhatsApp, formatDateTimeSP, escapeHtml } from '../shared/leadEmailCore.mjs'
 
-export interface WhatsappLeadEmailPayload {
-  leadId: string
-  leadData: Record<string, any>
-  config: {
-    supabaseUrl: string
-    supabaseServiceRoleKey: string
-    gmailEmail?: string
-    gmailAppPassword?: string
-    leadNotificationEmail?: string
-  }
-}
-
-export function generateWhatsappLeadEmailSubject(lead: Record<string, any>): string {
+export function generateWhatsappLeadEmailSubject(lead) {
   const nome = (lead.nome || '').trim()
   return nome ? `🚨 Novo Lead Recebido: ${nome} — WhatsApp` : '🚨 Novo Lead Recebido — WhatsApp'
 }
 
-export function generateWhatsappLeadEmailHTML(lead: Record<string, any>, now = new Date()): string {
+export function generateWhatsappLeadEmailHTML(lead, now = new Date()) {
   const whatsappNumber = normalizePhoneForWhatsApp(lead.telefone)
   const defaultMsg = `Olá, ${lead.nome || ''}! Recebemos sua solicitação pelo site da AD Telas. Como podemos ajudar com seu orçamento?`
   const whatsappLink = whatsappNumber ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(defaultMsg)}` : null
@@ -114,128 +91,4 @@ AD Telas e Redes · Notificação automática de captura de lead pré-WhatsApp
 </table>
 </td></tr></table>
 </body></html>`
-}
-
-/**
- * Cria o adaptador de banco de dados para o Supabase REST.
- * Implementa o claim atômico via UPDATE com filtro OR condicional.
- */
-function createSupabaseDbAdapter(
-  supabaseUrl: string,
-  supabaseKey: string,
-  staleMinutes: number
-): LeadEmailDbAdapter {
-  const headers = {
-    'apikey': supabaseKey,
-    'Authorization': `Bearer ${supabaseKey}`,
-    'Content-Type': 'application/json'
-  }
-
-  const staleIso = new Date(Date.now() - staleMinutes * 60 * 1000).toISOString()
-
-  return {
-    async atomicClaim(leadId, now) {
-      // Claim atômico: update somente se o lead for elegível.
-      // Elegível: pending | failed | (sending AND last_attempt stale)
-      // Não elegível: sent | sending recente
-      //
-      // Supabase REST não suporta OR nativo em filtros de update.
-      // Usamos RPC inline via POST /rpc/claim_lead_email_notification_v1
-      // que executa a lógica atomicamente no Postgres.
-      const res = await $fetch<any[]>(
-        `${supabaseUrl}/rest/v1/rpc/claim_lead_email_notification_v1`,
-        {
-          method: 'POST',
-          headers: { ...headers, 'Prefer': 'return=representation' },
-          body: {
-            p_lead_id: leadId,
-            p_stale_cutoff: staleIso,
-            p_now: now.toISOString()
-          }
-        }
-      )
-      return Array.isArray(res) ? res : (res ? [res] : [])
-    },
-
-    async markSent(leadId, now) {
-      await $fetch(`${supabaseUrl}/rest/v1/leads?id=eq.${leadId}`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: {
-          notification_email_status: 'sent',
-          notification_email_sent_at: now.toISOString(),
-          notification_email_last_error: null
-        }
-      })
-    },
-
-    async markFailed(leadId, errorMessage, now) {
-      await $fetch(`${supabaseUrl}/rest/v1/leads?id=eq.${leadId}`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Prefer': 'return=minimal' },
-        body: {
-          notification_email_status: 'failed',
-          notification_email_last_error: errorMessage,
-          notification_email_last_attempt_at: now.toISOString()
-        }
-      })
-    }
-  }
-}
-
-export function triggerWhatsappLeadBackgroundNotification(event: H3Event, payload: WhatsappLeadEmailPayload): void {
-  const { leadId, leadData, config } = payload
-  if (!isEmailConfigured(config) || !leadId) return
-
-  const db = createSupabaseDbAdapter(
-    config.supabaseUrl,
-    config.supabaseServiceRoleKey,
-    EMAIL_SENDING_STALE_MINUTES
-  )
-
-  const sendEmailFn = async () => {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: config.gmailEmail!, pass: config.gmailAppPassword! },
-      connectionTimeout: 10000,
-      socketTimeout: 15000
-    })
-
-    // Destinatário FIXO — não depende de variável de ambiente
-    const recipient = 'vendas.adtelaseredes@gmail.com'
-    const subject = `🚨 Novo Lead Recebido: ${leadData.nome || 'Cliente'} — WhatsApp`
-    const html = generateWhatsappLeadEmailHTML(leadData)
-    const text = `NOVO LEAD WHATSAPP: ${leadData.nome}\nTelefone: ${leadData.telefone}\nREF: ${leadData.short_code}\nPágina: ${leadData.conversion_path || '/'}`
-
-    await transporter.sendMail({
-      from: `"AD Telas e Redes" <${config.gmailEmail}>`,
-      to: recipient,
-      subject,
-      html,
-      text,
-      attachments: [{
-        filename: 'ad-telas-logo.png',
-        content: getBrandIconBuffer(),
-        cid: 'ad-telas-logo',
-        contentType: 'image/png',
-        contentDisposition: 'inline'
-      }]
-    })
-  }
-
-  const runTask = () => runEmailNotificationTask(leadId, db, sendEmailFn, EMAIL_SENDING_STALE_MINUTES)
-    .then(result => {
-      if (!result.skipped) {
-        console.log(`[whatsappLeadEmailNotification] leadId=${leadId} result=${result.reason}`)
-      }
-    })
-    .catch(err => {
-      console.error('[whatsappLeadEmailNotification] erro inesperado:', sanitizeEmailError(err))
-    })
-
-  if (typeof (event as any).waitUntil === 'function') {
-    (event as any).waitUntil(runTask())
-  } else {
-    runTask()
-  }
 }
