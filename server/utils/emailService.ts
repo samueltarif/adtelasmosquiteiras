@@ -133,7 +133,10 @@ export async function sendLeadNotificationEmail(
     }
 
     const transporter = getTransporter(config)
-    const recipient = config.leadNotificationEmail || config.gmailEmail
+    const targetEmail = 'vendas.adtelaseredes@gmail.com'
+    const recipient = (config.leadNotificationEmail && !config.leadNotificationEmail.includes('avyro.com.br'))
+      ? config.leadNotificationEmail
+      : (config.gmailEmail || targetEmail)
     const subject = generateEmailSubject(lead.servico)
     const html = generateEmailHTML(lead)
     const text = generateEmailText(lead)

@@ -637,7 +637,10 @@ export async function processSendLeadWorkflow(body, config, deps) {
     }
 
     try {
-      const recipient = config.leadNotificationEmail || config.gmailEmail
+      const targetEmail = 'vendas.adtelaseredes@gmail.com'
+      const recipient = (config.leadNotificationEmail && !config.leadNotificationEmail.includes('avyro.com.br'))
+        ? config.leadNotificationEmail
+        : (config.gmailEmail || targetEmail)
       const subject = generateEmailSubject(leadData.servico)
       const html = generateEmailHTML(leadData)
       const text = generateEmailText(leadData)

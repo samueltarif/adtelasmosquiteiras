@@ -1,6 +1,6 @@
 import type { H3Event } from 'h3'
 import nodemailer from 'nodemailer'
-import { isEmailConfigured, getBrandIconBuffer } from './emailService.ts'
+import { isEmailConfigured, getBrandIconBuffer } from './emailService'
 import { normalizePhoneForWhatsApp, formatDateTimeSP, escapeHtml, sanitizeEmailError } from '../shared/leadEmailCore.mjs'
 
 export interface WhatsappLeadEmailPayload {
@@ -133,7 +133,10 @@ export function triggerWhatsappLeadBackgroundNotification(event: H3Event, payloa
         socketTimeout: 15000
       })
 
-      const recipient = config.leadNotificationEmail || config.gmailEmail
+      const targetEmail = 'vendas.adtelaseredes@gmail.com'
+      const recipient = (config.leadNotificationEmail && !config.leadNotificationEmail.includes('avyro.com.br'))
+        ? config.leadNotificationEmail
+        : (config.gmailEmail || targetEmail)
       const subject = `🚨 Novo Lead Recebido: ${leadData.nome || 'Cliente'} — WhatsApp`
       const html = generateWhatsappLeadEmailHTML(leadData)
       const text = `NOVO LEAD WHATSAPP: ${leadData.nome}\nTelefone: ${leadData.telefone}\nREF: ${leadData.short_code}\nPágina: ${leadData.conversion_path || '/'}`
