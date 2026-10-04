@@ -7,7 +7,6 @@ import {
 } from '../utils/analytics'
 import { validateCanonicalChannel } from '../utils/channelValidation'
 import { validateLeadName, validateLeadPhone } from '../shared/leadEmailCore.mjs'
-import { triggerWhatsappLeadBackgroundNotification } from '../utils/whatsappLeadEmailNotification'
 import { buildRpcV4Payload } from '../utils/whatsappLeadParams'
 
 export default defineEventHandler(async (event) => {
@@ -82,29 +81,7 @@ export default defineEventHandler(async (event) => {
 
     const finalLeadId = rpcResult?.lead_id || null
 
-    if (finalLeadId) {
-      triggerWhatsappLeadBackgroundNotification(event, {
-        leadId: finalLeadId,
-        leadData: {
-          ...body,
-          id: finalLeadId,
-          nome: cleanNome,
-          telefone: cleanPhone,
-          short_code: cleanShortCode,
-          service_name: canonicalServiceName,
-          channel: validatedChannel,
-          cta_location: validatedCtaLocation,
-          conversion_path: path
-        },
-        config: {
-          supabaseUrl: config.supabaseUrl,
-          supabaseServiceRoleKey: config.supabaseServiceRoleKey,
-          gmailEmail: config.gmailEmail,
-          gmailAppPassword: config.gmailAppPassword,
-          leadNotificationEmail: config.leadNotificationEmail
-        }
-      })
-    }
+    // Notificação de e-mail desativada para WhatsApp Gate (gestão comercial direta via painel Admin)
 
     return {
       success: true,
