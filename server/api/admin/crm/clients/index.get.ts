@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
         is_archived: c.is_archived,
         created_at: c.created_at,
         updated_at: c.updated_at,
-        cidade_principal: principalAddr ? `${principalAddr.cidade || 'São Paulo'} - ${principalAddr.uf || 'SP'}` : 'Não informada',
+        cidade_principal: principalAddr && principalAddr.cidade ? `${principalAddr.cidade} - ${principalAddr.uf || 'SP'}` : 'Não informada',
         total_work_orders: Array.isArray(c.work_orders) ? c.work_orders.length : 0
       }
     })

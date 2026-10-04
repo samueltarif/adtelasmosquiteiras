@@ -128,7 +128,7 @@ export function useFormSubmit() {
         first_touch_tiktok_creative_id: ftSnapshot.first_touch_tiktok_creative_id ?? null,
         first_touch_tiktok_placement: ftSnapshot.first_touch_tiktok_placement ?? null,
         nome: fields?.nome || '',
-        cidade: fields?.cidade || fields?.bairro || 'São Paulo',
+        cidade: fields?.cidade || fields?.bairro || null,
         bairro: fields?.bairro || '',
         servico: fields?.servico || fields?.tipoServico || 'Não especificado',
         telefone: fields?.telefone || fields?.celular || '',

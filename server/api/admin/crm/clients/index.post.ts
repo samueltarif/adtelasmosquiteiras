@@ -126,7 +126,7 @@ export default defineEventHandler(async (event) => {
 
       if (Array.isArray(attrRes) && attrRes.length > 0) {
         const attr = attrRes[0]
-        if (attr.attribution_status === 'unassigned') {
+        if (attr.attribution_status === 'unassigned' || attr.attribution_status === 'lead_captured') {
           const nowIso = new Date().toISOString()
           await $fetch(`${config.supabaseUrl}/rest/v1/whatsapp_attributions?id=eq.${attr.id}`, {
             method: 'PATCH',

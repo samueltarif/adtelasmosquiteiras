@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     confidence_level: confidenceLevel,
     match_method: matchMethod,
     client_id: clientId,
-    lead_id: leadId,
+    lead_id: leadId || currentAttr.lead_id || null,
     assigned_by: admin.adminId || admin.userId,
     assigned_at: assignedAt,
     notes: body.notes?.trim() || currentAttr.notes || null,

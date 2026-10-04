@@ -73,7 +73,14 @@ function formatDatetime(iso?: string | null): string {
 
         <!-- Status Badge -->
         <span
-          v-if="item.attribution_status === 'unassigned'"
+          v-if="item.attribution_status === 'lead_captured'"
+          class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 flex items-center gap-1"
+        >
+          <Icon name="lucide:user-check" class="w-3 h-3" />
+          <span>Lead capturado — aguardando contato</span>
+        </span>
+        <span
+          v-else-if="item.attribution_status === 'unassigned'"
           class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20"
         >
           Aguardando Contato
@@ -191,6 +198,16 @@ function formatDatetime(iso?: string | null): string {
         </button>
       </div>
 
+      <!-- Se Lead Capturado: Dados do Lead -->
+      <div v-if="item.lead || item.attribution_status === 'lead_captured'" class="pt-2 mt-1 border-t border-white/5 flex items-center gap-3 text-xs flex-wrap">
+        <div class="flex items-center gap-1.5 text-teal-400 font-semibold">
+          <Icon name="lucide:user" class="w-4 h-4" />
+          <span>Lead Capturado:</span>
+          <span>{{ item.lead?.nome || 'Nome capturado' }}</span>
+        </div>
+        <span v-if="item.lead?.telefone" class="text-slate-300 font-mono">{{ item.lead.telefone }}</span>
+      </div>
+
       <!-- Se Atribuído: Informações do Cliente CRM Vinculado -->
       <div v-if="item.attribution_status === 'assigned' && item.client" class="pt-2 mt-1 border-t border-white/5 flex items-center gap-3 text-xs flex-wrap">
         <div class="flex items-center gap-1.5 text-emerald-400 font-semibold">
@@ -223,7 +240,51 @@ function formatDatetime(iso?: string | null): string {
         <span>Ver jornada</span>
       </button>
 
-      <template v-if="item.attribution_status === 'unassigned'">
+      <template v-if="item.attribution_status === 'lead_captured'">
+        <!-- Botão Ver Lead -->
+        <NuxtLink
+          :to="`/admin/leads?search=${encodeURIComponent(item.lead?.nome || item.short_code)}`"
+          class="px-3 py-2 rounded-xl bg-teal-950/60 hover:bg-teal-900/80 text-teal-300 border border-teal-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+          title="Ver Lead no painel de Leads"
+        >
+          <Icon name="lucide:user" class="w-3.5 h-3.5 text-teal-400" />
+          <span>Ver Lead</span>
+        </NuxtLink>
+
+        <!-- Botão: Criar Cliente com Ref pré-preenchida -->
+        <button
+          type="button"
+          @click="emit('create-client', item)"
+          class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+          title="Criar novo cliente e vincular este clique"
+        >
+          <Icon name="lucide:user-plus" class="w-3.5 h-3.5" />
+          <span>+ Criar Cliente</span>
+        </button>
+
+        <!-- Botão: Vincular a Cliente Existente -->
+        <button
+          type="button"
+          @click="emit('open-assign', item)"
+          class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-white/10 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+          title="Vincular a cliente já cadastrado"
+        >
+          <Icon name="lucide:link" class="w-3.5 h-3.5 text-slate-400" />
+          <span>Vincular</span>
+        </button>
+
+        <!-- Botão: Dispensar -->
+        <button
+          type="button"
+          @click="emit('open-dismiss', item)"
+          class="p-2 rounded-xl bg-slate-800 hover:bg-red-500/20 hover:text-red-300 text-slate-400 border border-white/5 text-xs transition-colors cursor-pointer"
+          title="Dispensar clique"
+        >
+          <Icon name="lucide:x" class="w-3.5 h-3.5" />
+        </button>
+      </template>
+
+      <template v-else-if="item.attribution_status === 'unassigned'">
         <!-- Botão: Criar Cliente com Ref pré-preenchida -->
         <button
           type="button"

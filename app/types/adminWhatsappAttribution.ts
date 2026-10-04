@@ -3,7 +3,7 @@
  * Arquivo: app/types/adminWhatsappAttribution.ts
  */
 
-export type WhatsappAttributionStatus = 'unassigned' | 'assigned' | 'dismissed' | 'expired'
+export type WhatsappAttributionStatus = 'unassigned' | 'lead_captured' | 'assigned' | 'dismissed' | 'expired'
 export type WhatsappAttributionConfidence = 'confirmed' | 'probable' | 'unassigned'
 export type WhatsappAttributionMatchMethod = 'exact_code' | 'manual_selection'
 
@@ -97,6 +97,7 @@ export interface WhatsappAttributionsListResponse {
   counts: {
     total: number
     unassigned: number
+    lead_captured?: number
     assigned: number
     dismissed: number
   }

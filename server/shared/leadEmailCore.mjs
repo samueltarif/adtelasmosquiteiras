@@ -146,7 +146,7 @@ function val(v) {
   return (v !== null && v !== undefined && String(v).trim() !== '') ? String(v) : 'Não informado'
 }
 
-function escapeHtml(str) {
+export function escapeHtml(str) {
   if (!str) return ''
   return String(str)
     .replace(/&/g, '&amp;')
@@ -537,7 +537,7 @@ export async function processSendLeadWorkflow(body, config, deps) {
       first_touch_msclkid: first_touch_msclkid || null,
 
       nome: cleanNome,
-      cidade: cidade || 'São Paulo',
+      cidade: (cidade && String(cidade).trim()) ? String(cidade).trim() : null,
       bairro: bairro || null,
       servico: servico || 'Não especificado',
       telefone: cleanPhone,

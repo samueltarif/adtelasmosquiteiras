@@ -101,7 +101,7 @@ export function buildLeadInsertPayload(params: BuildLeadParams): Record<string, 
     first_touch_ttclid: first_touch_ttclid || null,
 
     nome: cleanNome,
-    cidade: cidade || 'São Paulo',
+    cidade: (cidade && String(cidade).trim()) ? String(cidade).trim() : null,
     bairro: bairro || null,
     servico: servico || 'Não especificado',
     telefone: cleanPhone,

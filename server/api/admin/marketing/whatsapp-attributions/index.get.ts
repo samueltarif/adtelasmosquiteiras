@@ -24,6 +24,7 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
   const counts = {
     total: 0,
     unassigned: 0,
+    lead_captured: 0,
     assigned: 0,
     dismissed: 0
   }
@@ -42,6 +43,7 @@ export default defineEventHandler(async (event): Promise<WhatsappAttributionsLis
       counts.total = countsRes.length
       for (const row of countsRes) {
         if (row.attribution_status === 'unassigned') counts.unassigned++
+        else if (row.attribution_status === 'lead_captured') counts.lead_captured++
         else if (row.attribution_status === 'assigned') counts.assigned++
         else if (row.attribution_status === 'dismissed') counts.dismissed++
       }

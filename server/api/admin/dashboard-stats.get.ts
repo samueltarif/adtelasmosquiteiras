@@ -96,7 +96,10 @@ export default defineEventHandler(async (event) => {
 
     // 7. Top Localizações (apenas leads reais)
     const locMap: Record<string, number> = {}
-    realLeads.forEach(l => { const c = l.cidade || 'São Paulo'; locMap[c] = (locMap[c] || 0) + 1 })
+    realLeads.forEach(l => {
+      const c = (l.cidade && l.cidade.trim()) ? l.cidade.trim() : 'Não informado'
+      locMap[c] = (locMap[c] || 0) + 1
+    })
     const topLocations = Object.entries(locMap)
       .map(([name, count]) => ({ name, count, percentage: totalLeads > 0 ? Math.round((count / totalLeads) * 100) : 0 }))
       .sort((a, b) => b.count - a.count).slice(0, 4)

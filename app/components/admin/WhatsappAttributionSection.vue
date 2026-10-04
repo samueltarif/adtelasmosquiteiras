@@ -23,6 +23,7 @@ const attributions = ref<WhatsappAttributionItem[]>([])
 const counts = ref({
   total: 0,
   unassigned: 0,
+  lead_captured: 0,
   assigned: 0,
   dismissed: 0
 })
@@ -176,7 +177,25 @@ function formatDatetime(iso?: string | null): string {
     </div>
 
     <!-- Cards de Contadores e Filtros por Status -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-3">
+      <button
+        type="button"
+        @click="activeStatus = 'lead_captured'"
+        class="p-3.5 rounded-xl border text-left transition-all cursor-pointer"
+        :class="activeStatus === 'lead_captured' 
+          ? 'bg-teal-500/15 border-teal-500/40 shadow-sm shadow-teal-500/10' 
+          : 'bg-slate-900/60 border-white/5 hover:border-white/15'"
+      >
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Lead Capturado</span>
+          <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+        </div>
+        <div class="text-xl sm:text-2xl font-bold font-mono text-teal-300 mt-1">
+          {{ counts.lead_captured || 0 }}
+        </div>
+        <span class="text-[10px] text-teal-400/80 mt-0.5 block">Nome e WhatsApp salvos</span>
+      </button>
+
       <button
         type="button"
         @click="activeStatus = 'unassigned'"
@@ -187,7 +206,7 @@ function formatDatetime(iso?: string | null): string {
       >
         <div class="flex items-center justify-between text-xs text-slate-400">
           <span>Aguardando Vínculo</span>
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
         </div>
         <div class="text-xl sm:text-2xl font-bold font-mono text-amber-300 mt-1">
           {{ counts.unassigned }}

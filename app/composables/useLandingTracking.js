@@ -22,7 +22,7 @@ export function useLandingTracking() {
       window.dataLayer = window.dataLayer || []
       
       if (event === 'whatsapp_cta_click') {
-        // Formatos canônicos consumidos por tags do GTM e campanhas do Google Ads
+        // Formatos canônicos consumidos por tags do GTM (sem generate_lead prematuro)
         window.dataLayer.push({
           event: 'contact_click',
           method: 'whatsapp',
@@ -33,31 +33,11 @@ export function useLandingTracking() {
         })
 
         window.dataLayer.push({
-          event: 'whatsapp_click',
+          event: 'whatsapp_modal_open',
           page_path: route.path,
           gclid: attr.gclid || undefined,
           ...properties
         })
-
-        window.dataLayer.push({
-          event: 'generate_lead',
-          value: 1.0,
-          currency: 'BRL',
-          lead_type: 'whatsapp',
-          source: 'landing_page',
-          page_path: route.path,
-          gclid: attr.gclid || undefined,
-          ...properties
-        })
-
-        if (window.gtag) {
-          window.gtag('event', 'generate_lead', {
-            event_category: 'engagement',
-            event_label: properties.cta_location || 'whatsapp_lead',
-            value: 1.0,
-            currency: 'BRL'
-          })
-        }
       }
     }
   }

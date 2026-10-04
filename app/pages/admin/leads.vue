@@ -223,11 +223,11 @@ onMounted(() => {
           <div class="grid grid-cols-2 gap-2 text-xs py-2 border-y border-white/[0.04]">
             <div>
               <span class="text-[10px] text-slate-500 font-bold uppercase block">Serviço</span>
-              <span class="text-slate-200 font-medium truncate block">{{ lead.servico || 'Não especificado' }}</span>
+              <span class="text-slate-200 font-medium truncate block">{{ lead.origem === 'whatsapp_gate' ? 'WhatsApp — Site' : (lead.servico || 'Não especificado') }}</span>
             </div>
             <div>
               <span class="text-[10px] text-slate-500 font-bold uppercase block">Local</span>
-              <span class="text-slate-300 truncate block">{{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || 'SP' }}</span>
+              <span class="text-slate-300 truncate block">{{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || 'Não informado' }}</span>
             </div>
           </div>
 
@@ -293,7 +293,7 @@ onMounted(() => {
               </TableCell>
 
               <TableCell class="py-3.5 px-4">
-                <span class="text-slate-200 font-medium">{{ lead.servico || 'Não especificado' }}</span>
+                <span class="text-slate-200 font-medium">{{ lead.origem === 'whatsapp_gate' ? 'WhatsApp — Site' : (lead.servico || 'Não especificado') }}</span>
               </TableCell>
 
               <TableCell class="py-3.5 px-4">
@@ -303,7 +303,7 @@ onMounted(() => {
               </TableCell>
 
               <TableCell class="py-3.5 px-4 text-slate-400 text-xs">
-                {{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || '-' }}
+                {{ [lead.bairro, lead.cidade].filter(Boolean).join(', ') || 'Não informado' }}
               </TableCell>
 
               <TableCell class="py-3.5 px-4">
