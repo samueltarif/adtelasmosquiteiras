@@ -5,15 +5,15 @@ export default {
   "key": "telas_removiveis",
   "name": "Telas Mosquiteiras Removíveis",
   "title": "Tela Mosquiteira Removível em São Paulo",
-  "eyebrow": "Praticidade e Higienização Fácil",
-  "description": "Sistema prático que permite retirar o quadro a qualquer momento para limpeza ou para acessar o lado externo da janela. Fabricação sob medida em São Paulo.",
+  "eyebrow": "Limpeza e Acesso à Janela",
+  "description": "Tela mosquiteira com quadro que pode ser retirado para limpeza ou manutenção, conforme o encaixe e o acesso ao vão. Consulte a compatibilidade com sua janela. Atendimento em todo o estado de São Paulo.",
   "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+Remov%C3%ADvel.+Vim+pelo+site.&type=phone_number&app_absent=0",
   "seo": {
     "title": "Tela Mosquiteira Removível em SP | AD Telas e Redes",
     "meta": [
       {
         "name": "description",
-        "content": "Tela mosquiteira removível sob medida em São Paulo. Prática de retirar e higienizar quando necessário. Solicite seu orçamento."
+        "content": "Tela mosquiteira removível sob medida em SP. Entenda o encaixe, a retirada para limpeza e as diferenças para tela fixa. Solicite avaliação da janela."
       },
       {
         "property": "og:title",
@@ -21,7 +21,7 @@ export default {
       },
       {
         "property": "og:description",
-        "content": "Telas mosquiteiras de encaixe e remoção prática para limpeza em janelas residenciais."
+        "content": "Tela mosquiteira removível sob medida em SP. Entenda o encaixe, a retirada para limpeza e as diferenças para tela fixa. Solicite avaliação da janela."
       },
       {
         "property": "og:image",
@@ -62,7 +62,7 @@ export default {
     "width": 918,
     "height": 918,
     "smallWidth": 480,
-    "alt": "Quadros removíveis em janelas"
+    "alt": "Quadro de tela com pontos de fixação ao redor de janela"
   },
   "gallery": [
     {
@@ -71,7 +71,7 @@ export default {
       "width": 918,
       "height": 918,
       "smallWidth": 480,
-      "alt": "Quadros removíveis em janelas"
+      "alt": "Quadro de tela com pontos de fixação ao redor de janela"
     },
     {
       "src": "/images/telas/catalogo/mosquiteira-removivel.webp",
@@ -87,7 +87,7 @@ export default {
       "width": 633,
       "height": 633,
       "smallWidth": 480,
-      "alt": "Quadro de encaixe em basculante"
+      "alt": "Quadro de tela aberto para dentro em janela de banheiro"
     },
     {
       "src": "/images/telas/catalogo/telas-para-banheiro.webp",
@@ -108,9 +108,9 @@ export default {
   ],
   "models": [
     {
-      "title": "Sistema de Fácil Encaixe",
-      "description": "O modelo removível permite retirada quando necessário para limpeza ou acesso ao vão.",
-      "highlight": "Solução sob medida para o seu ambiente",
+      "title": "Acesso à janela para limpeza",
+      "description": "O quadro removível permite liberar o vão quando necessário. Antes de escolher, verifique com a equipe de qual lado a retirada será feita.",
+      "highlight": "O acesso precisa ser seguro.",
       "image": {
         "src": "/images/telas/catalogo/mosquiteira-removivel.webp",
         "small": "/images/telas/catalogo/mosquiteira-removivel-480.webp",
@@ -121,77 +121,94 @@ export default {
       }
     },
     {
-      "title": "Instalação Perimetral",
-      "description": "Estrutura ajustada ao requadro da janela para utilização prática no dia a dia.",
-      "highlight": "Solução sob medida para o seu ambiente",
+      "title": "Encaixe ajustado à esquadria",
+      "description": "O quadro é dimensionado para a abertura existente. Removível descreve a possibilidade de retirar a tela, não uma instalação universal em qualquer janela.",
+      "highlight": "Medidas e profundidade precisam ser conferidas.",
       "image": {
         "src": "/images/telas/catalogo/telas-removiveis-especificacoes.webp",
         "small": "/images/telas/catalogo/telas-removiveis-especificacoes-480.webp",
         "width": 918,
         "height": 918,
         "smallWidth": 480,
-        "alt": "Quadros removíveis em janelas"
-      }
-    },
-    {
-      "title": "Encaixe no Vão",
-      "description": "Quadro dimensionado conforme o modelo da esquadria existente.",
-      "highlight": "Solução sob medida para o seu ambiente",
-      "image": {
-        "src": "/images/telas/catalogo/telas-para-basculante.webp",
-        "small": "/images/telas/catalogo/telas-para-basculante-480.webp",
-        "width": 633,
-        "height": 633,
-        "smallWidth": 480,
-        "alt": "Quadro de encaixe em basculante"
+        "alt": "Quadro de tela com pontos de fixação ao redor de janela"
       }
     }
   ],
   "benefits": [
     {
-      "title": "Higienização Prática",
-      "description": "Como o quadro pode ser desencaixado, a limpeza pode ser realizada com água e sabão neutro fora do vão."
+      "title": "Limpeza fora do vão",
+      "description": "Quando a retirada for indicada, a tela pode ser limpa em um local acessível. Peça orientação sobre os produtos e a forma de manusear o quadro."
     },
     {
-      "title": "Preservação da Estrutura",
-      "description": "Sistemas de fixação com mínimo impacto na esquadria existente."
+      "title": "Recolocação correta",
+      "description": "Depois da limpeza, confira o encaixe e o fechamento das bordas. Não force o quadro se ele não voltar à posição prevista."
     },
     {
-      "title": "Praticidade para Imóveis Residenciais",
-      "description": "Solução sob medida de fácil retirada quando necessário."
+      "title": "Manutenção do conjunto",
+      "description": "Folgas, malha solta ou dificuldade de encaixe precisam de avaliação. Evite improvisar fixações ou alterar o quadro."
     }
   ],
-  "technical": [],
+  "technical": [
+    {
+      "title": "Limites de uso",
+      "description": "Enquanto a tela estiver retirada, o vão fica aberto à entrada de insetos. Tela removível também não substitui proteção contra quedas."
+    }
+  ],
   "process": [
     {
-      "title": "Avaliação e medição",
-      "description": "Conferimos as medidas e as características do seu ambiente."
+      "title": "Mostre o acesso",
+      "description": "Envie foto da janela, dos pontos ao redor e do lado pelo qual pretende retirar a tela."
     },
     {
-      "title": "Fabricação sob medida",
-      "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      "title": "Confira o encaixe",
+      "description": "A equipe verifica medidas, abertura e espaço para manusear o quadro antes de definir a solução."
     },
     {
-      "title": "Instalação no local",
-      "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      "title": "Receba a orientação de uso",
+      "description": "Na instalação, confira como retirar e recolocar o modelo escolhido e quais cuidados adotar na limpeza."
     }
   ],
   "faq": [
     {
-      "pergunta": "Como é feito o processo de retirada da tela para higienização?",
-      "resposta": "O quadro é desencaixado de forma simples através dos pontos de encaixe, permitindo a retirada sem necessidade de ferramentas."
+      "pergunta": "Toda tela removível sai sem ferramentas?",
+      "resposta": "Não é uma característica que se possa garantir para todos os modelos. A forma de retirada depende do sistema de fixação definido para a janela."
     },
     {
-      "pergunta": "A tela removível permanece firme no vão?",
-      "resposta": "A tela é dimensionada para permanecer acomodada no vão durante o uso diário no ambiente residencial."
+      "pergunta": "Tela removível significa instalação sem furar?",
+      "resposta": "Não. Retirar o quadro e fixar a estrutura são etapas diferentes. A equipe precisa avaliar a esquadria e eventuais restrições antes de indicar a fixação."
     },
     {
-      "pergunta": "Posso usar tela removível em janelas basculantes?",
-      "resposta": "Sim. É uma aplicação frequente para basculantes, pois facilita o manuseio da alavanca da janela quando necessário."
+      "pergunta": "Posso retirar a tela de uma janela em andar alto?",
+      "resposta": "Somente conforme a orientação de manuseio seguro do modelo e do local. Não se incline para fora nem remova elementos de proteção para alcançar a tela."
     },
     {
-      "pergunta": "Como realizar a higienização da tela removível?",
-      "resposta": "A limpeza pode ser feita com água corrente e sabão neutro fora do vão, facilitando a secagem antes do reenquadramento."
+      "pergunta": "Como saber se o quadro ficou bem encaixado depois da limpeza?",
+      "resposta": "Confira os pontos de encaixe e se o quadro voltou à posição indicada pela equipe. Se houver folga ou dificuldade, não force; solicite orientação."
     }
-  ]
+  ],
+  "heroCta": "Consultar tela removível",
+  "modelsTitle": "Quando faz sentido retirar o quadro?",
+  "modelsIntro": "O benefício depende do acesso à janela e do sistema de encaixe escolhido.",
+  "benefitsTitle": "Retirada, limpeza e recolocação",
+  "sections": [
+    {
+      "title": "Qual a diferença para uma tela fixa?",
+      "paragraphs": [
+        "A tela fixa permanece instalada durante o uso. A removível permite retirar o quadro, mas essa operação depende do encaixe e das condições de acesso. Não significa necessariamente retirada sem ferramentas ou instalação sem furos.",
+        "Se a intenção é abrir e fechar a tela várias vezes por dia, vale avaliar um modelo de correr para janela ou uma solução própria para porta."
+      ],
+      "links": [
+        {
+          "text": "Compare as opções para janelas",
+          "to": "/servicos/telas/janelas"
+        },
+        {
+          "text": "Veja telas para passagens e portas",
+          "to": "/servicos/telas/portas"
+        }
+      ]
+    }
+  ],
+  "quoteTitle": "Consulte o encaixe para sua janela",
+  "quoteDescription": "Envie fotos, medidas aproximadas, quantidade de vãos e CEP. Informe se há grades ou redes que dificultam a retirada. Dimensões, fixação, acabamento e acesso influenciam o orçamento; confirme o prazo com a equipe."
 } satisfies TelasService

@@ -8,10 +8,10 @@ import ServiceModels from './ServiceModels.vue'
 import ServiceBenefits from './ServiceBenefits.vue'
 import ServiceProcess from './ServiceProcess.vue'
 import ServiceQuoteCTA from './ServiceQuoteCTA.vue'
-import ServiceTestimonials from './ServiceTestimonials.vue'
 import ServiceFAQ from './ServiceFAQ.vue'
 import RelatedServices from './RelatedServices.vue'
 import ServiceFooter from './ServiceFooter.vue'
+import { buildBreadcrumbSchema, buildServiceSchema } from '~/utils/serviceSchema'
 const props = defineProps<{ service: TelasService }>()
 const hideFloating = ref(false)
 let observer: IntersectionObserver | undefined
@@ -23,13 +23,10 @@ onMounted(() => {
 onUnmounted(() => observer?.disconnect())
 useHead(() => ({
   ...props.service.seo,
-  script: [{ type: 'application/ld+json', key: 'telas-service', innerHTML: JSON.stringify({
-    '@context': 'https://schema.org', '@type': 'Service', name: props.service.name,
-    description: props.service.description, serviceType: props.service.name,
-    url: `https://www.adtelasmosquiteiras.com.br/servicos/telas/${props.service.slug}`,
-    provider: { '@type': 'Organization', name: 'AD Telas e Redes', url: 'https://www.adtelasmosquiteiras.com.br' },
-    areaServed: { '@type': 'City', name: 'São Paulo' }
-  }) }]
+  script: [
+    { type: 'application/ld+json', key: 'telas-service', innerHTML: JSON.stringify(buildServiceSchema(props.service.name, props.service.description, `/servicos/telas/${props.service.slug}`)) },
+    { type: 'application/ld+json', key: 'telas-breadcrumbs', innerHTML: JSON.stringify(buildBreadcrumbSchema(props.service.breadcrumbs)) }
+  ]
 }))
 </script>
 <template>
@@ -41,9 +38,15 @@ useHead(() => ({
       <Suspense><ServiceProjectGallery :service="service" /></Suspense>
       <ServiceModels :service="service" />
       <ServiceBenefits :service="service" />
+      <section v-for="section in service.sections" :key="section.title" class="td-section td-wrap td-editorial">
+        <h2>{{ section.title }}</h2>
+        <p v-for="paragraph in section.paragraphs" :key="paragraph">{{ paragraph }}</p>
+        <ul v-if="section.links.length">
+          <li v-for="link in section.links" :key="link.to"><NuxtLink :to="link.to" class="td-text-link">{{ link.text }} →</NuxtLink></li>
+        </ul>
+      </section>
       <ServiceProcess :steps="service.process" />
       <ServiceQuoteCTA :service="service" />
-      <ServiceTestimonials />
       <ServiceFAQ :service="service" />
       <RelatedServices :current-slug="service.slug" />
     </main>

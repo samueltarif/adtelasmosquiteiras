@@ -224,7 +224,7 @@ const submitLead = async () => {
             v-model="formData.cidade"
             :id="fieldPrefix + '-cidade'" autocomplete="address-level2"
             type="text"
-            placeholder="Ex: São Paulo, Santo André, Campinas..."
+            placeholder="Ex: São Paulo, Santos, Campinas..."
             required
             class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#25D366] focus:border-transparent transition-all duration-300 text-base"
           />

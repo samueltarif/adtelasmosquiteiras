@@ -29,7 +29,7 @@ function toggleForm() {
 useHead({
   title: 'Telas Mosquiteiras com Esquadria de Alumínio | Orçamento Rápido | AD Telas',
   meta: [
-    { name: 'description', content: 'Telas mosquiteiras sob medida para janelas, portas e sacadas em alumínio. Instalação em São Paulo, Grande SP, Litoral, Campinas e Sorocaba. Orçamento rápido pelo WhatsApp.' },
+    { name: 'description', content: 'Telas mosquiteiras sob medida para janelas, portas e sacadas. Instalação em todo o estado de São Paulo. Orçamento rápido pelo WhatsApp.' },
     { name: 'robots', content: 'noindex, follow' },
     { property: 'og:title', content: 'Telas Mosquiteiras com Esquadria de Alumínio | AD Telas' },
     { property: 'og:description', content: 'Envie uma foto da sua janela ou porta e receba seu orçamento rápido pelo WhatsApp.' },
@@ -232,7 +232,7 @@ onUnmounted(() => {
             <p class="eyebrow">TELA MOSQUITEIRA SOB MEDIDA</p>
             <h1>Telas Mosquiteiras <span>com Esquadria de Alumínio</span></h1>
             <p class="hero-description">
-              Telas sob medida para janelas, portas e sacadas, com instalação em São Paulo, Grande SP, Litoral, Campinas e Sorocaba.
+              Telas sob medida para janelas, portas e sacadas, com instalação em todo o estado de São Paulo.
             </p>
             <p class="hero-subtext">
               Proteja sua casa contra mosquitos sem perder ventilação.
@@ -252,7 +252,7 @@ onUnmounted(() => {
             </div>
             <div class="hero-trust-item">
               <Icon name="lucide:shield-check" aria-hidden="true" />
-              <span><strong>2 anos de garantia</strong><small>contra defeitos de instalação</small></span>
+              <span><strong>Garantia informada</strong><small>conforme a proposta do serviço</small></span>
             </div>
             <div class="hero-trust-item">
               <Icon name="lucide:clock" aria-hidden="true" />
@@ -299,7 +299,7 @@ onUnmounted(() => {
           <div class="hero-benefits-row-bottom">
             <div class="hero-benefit-item">
               <Icon name="lucide:check-circle-2" class="check-icon" />
-              <span><strong>Atendimento em São Paulo e região</strong></span>
+              <span><strong>Atendimento em todo o estado de São Paulo</strong></span>
             </div>
           </div>
         </div>
@@ -458,7 +458,7 @@ onUnmounted(() => {
         </a>
       </div>
       <div class="installation-details">
-        <p><strong>Garantia de 2 anos</strong><span>Contra defeitos de instalação.</span></p>
+        <p><strong>Garantia do serviço</strong><span>Condições informadas na proposta.</span></p>
         <p><strong>Durabilidade estimada de 5 anos</strong><span>Consulte os cuidados de uso e manutenção com nossa equipe.</span></p>
         <p><strong>Instalação agendada</strong><span>O prazo depende do modelo, das medidas e da quantidade de telas. Confirmamos no orçamento.</span></p>
       </div>
@@ -555,7 +555,7 @@ onUnmounted(() => {
         <p class="eyebrow text-gold">ATENDIMENTO IMEDIATO</p>
         <h2>Pronto para proteger sua casa com telas sob medida?</h2>
         <p class="cta-subtitle">
-          Envie sua mensagem pelo WhatsApp ou tire uma foto do seu vão. Atendemos São Paulo, Grande SP, Litoral, Campinas e Sorocaba.
+          Envie sua mensagem pelo WhatsApp ou tire uma foto do seu vão. Atendemos todo o estado de São Paulo.
         </p>
 
         <div class="final-cta-actions">

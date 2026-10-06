@@ -33,7 +33,7 @@ const servicosCards = [
     beneficios: [
       { titulo: 'Visão 100% clara' },
       { titulo: 'Eficaz contra aedes' },
-      { titulo: 'Instalação 24h' }
+      { titulo: 'Instalação agendada' }
     ],
     url: '/servicos/telas'
   },

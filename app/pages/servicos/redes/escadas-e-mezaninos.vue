@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
+import { buildServiceSchema } from '~/utils/serviceSchema'
 
 const showFormModal = ref(false)
 
@@ -15,7 +16,12 @@ useHead({
     { property: 'og:description', content: 'Fechamento com redes de proteção para escadas caracol, corrimãos vazados e mezaninos residenciais.' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/redes_para_escadas.jpg' },
     { property: 'og:type', content: 'website' }
-  ]
+  ],
+  script: [{ type: 'application/ld+json', key: 'service-schema', innerHTML: JSON.stringify(buildServiceSchema(
+    'Rede de Proteção para Escadas e Mezaninos',
+    'Rede de proteção sob medida para escadas, mezaninos e vãos internos.',
+    '/servicos/redes/escadas-e-mezaninos'
+  )) }]
 })
 
 const breadcrumbItems = [
@@ -93,7 +99,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
               Rede de Proteção para Escadas e Mezaninos
             </h1>
             <p class="text-white/85 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-              Proteção para vãos internos em sobrados, lofts e mezaninos. Fechamento de corrimãos vazados e espaços entre degraus com instalação sob medida em São Paulo e região.
+              Proteção para vãos internos em sobrados, lofts e mezaninos. Fechamento de corrimãos vazados e espaços entre degraus em todo o estado de São Paulo.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3.5">

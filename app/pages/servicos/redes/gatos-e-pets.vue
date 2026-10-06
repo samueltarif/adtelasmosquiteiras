@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
+import { buildServiceSchema } from '~/utils/serviceSchema'
 
 const showFormModal = ref(false)
 
@@ -15,7 +16,12 @@ useHead({
     { property: 'og:description', content: 'Instalação de redes de proteção para segurança e prevenção de fugas de animais de estimação.' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/gato.png' },
     { property: 'og:type', content: 'website' }
-  ]
+  ],
+  script: [{ type: 'application/ld+json', key: 'service-schema', innerHTML: JSON.stringify(buildServiceSchema(
+    'Rede de Proteção para Gatos e Pets',
+    'Rede de proteção para prevenção de quedas e fugas de animais em janelas e sacadas.',
+    '/servicos/redes/gatos-e-pets'
+  )) }]
 })
 
 const breadcrumbItems = [
@@ -100,7 +106,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
               Rede de Proteção para Gatos e Pets
             </h1>
             <p class="text-white/85 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-              Rede de proteção para janelas e sacadas em residências com gatos e outros animais de estimação. Instalação profissional sob medida em São Paulo e região.
+              Rede de proteção para janelas e sacadas em residências com gatos e outros animais de estimação. Instalação sob medida em todo o estado de São Paulo.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3.5">

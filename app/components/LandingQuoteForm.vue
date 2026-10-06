@@ -80,11 +80,11 @@ async function submit() {
       <div v-if="showTrustBadges" class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 text-xs">
         <span class="inline-flex items-center gap-1.5 font-semibold text-[#22345F]">
           <Icon name="lucide:award" class="w-4 h-4 text-[#F49A1A] shrink-0" />
-          Certificado INMETRO
+          Instalação sob medida
         </span>
         <span class="inline-flex items-center gap-1 text-gray-600 font-medium">
           <span class="text-[#F49A1A] font-bold">★ 5.0</span>
-          <span class="text-[11px] text-gray-500">(487 avaliações Google)</span>
+          <span class="text-[11px] text-gray-500">(49 avaliações, consulta em 22/09/2026)</span>
         </span>
       </div>
 

@@ -1,5 +1,5 @@
 import { defineEventHandler, sendRedirect, getRequestURL } from 'h3'
-import { REDIRECT_MAP } from '../redirectsMap'
+import { ALL_REDIRECTS } from '../redirectsMap'
 
 export default defineEventHandler((event) => {
   const url = getRequestURL(event)
@@ -7,8 +7,8 @@ export default defineEventHandler((event) => {
     ? url.pathname.slice(0, -1) 
     : url.pathname
 
-  if (REDIRECT_MAP[pathname]) {
-    const target = REDIRECT_MAP[pathname]
+  if (ALL_REDIRECTS[pathname]) {
+    const target = ALL_REDIRECTS[pathname]
     const search = url.search || ''
     return sendRedirect(event, target + search, 301)
   }

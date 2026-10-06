@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useServicos } from '~/composables/useServicos'
+import { googleReviews, googleReviewsUrl, reviews } from '~/data/telas/reviews'
 
 const { WHATSAPP_NUMBER } = useServicos()
 definePageMeta({ layout: false })
@@ -20,80 +21,22 @@ function openQuoteForm() {
 }
 
 useHead({
-  title: 'Telas Mosquiteiras em São Paulo | Modelos Sob Medida | AD Telas',
+  title: 'Telas Mosquiteiras Sob Medida em SP | AD Telas',
   meta: [
-    { name: 'description', content: 'Telas mosquiteiras sob medida para janelas, portas, sacadas e ambientes comerciais em São Paulo. Instalação profissional. Solicite seu orçamento.' },
-    { property: 'og:title', content: 'Telas Mosquiteiras SP | AD Telas e Redes' },
-    { property: 'og:description', content: 'Modelos de telas mosquiteiras sob medida para sua residência ou comércio. Solicite um orçamento.' },
+    { name: 'description', content: 'Compare telas mosquiteiras para janelas, portas, varandas e cozinhas em SP. Veja qual modelo atende seu ambiente e solicite orçamento sob medida.' },
+    { property: 'og:title', content: 'Telas Mosquiteiras Sob Medida em SP | AD Telas' },
+    { property: 'og:description', content: 'Compare modelos para janelas, portas e outros vãos. Atendimento em todo o estado de São Paulo e orçamento conforme seu ambiente.' },
   ]
 })
 
 // Principais modelos com landing pages dedicadas
 const modelosPrincipais = [
-  { path: '/servicos/telas/janelas', titulo: 'Telas para Janelas', desc: 'Modelos sob medida para janelas de correr, basculantes e pivotantes', icon: 'lucide:layout-grid', img: '/images/tela_mosquiteira.png' },
-  { path: '/servicos/telas/portas', titulo: 'Telas para Portas', desc: 'Soluções para portas balcão e acessos frequentes com ajuste preciso', icon: 'lucide:door-open', img: '/images/telas_para_portas.jpeg' },
-  { path: '/servicos/telas/sacadas-e-varandas', titulo: 'Sacadas e Varandas', desc: 'Proteção contra insetos para áreas externas e terraços', icon: 'lucide:sun', img: '/images/telas_para_varandas.jpg' },
-  { path: '/servicos/telas/removivel', titulo: 'Telas Removíveis', desc: 'Praticidade para encaixar, retirar e higienizar quando desejar', icon: 'lucide:move', img: '/images/mosquiteira_removivel.png' },
-  { path: '/servicos/telas/pet-screen', titulo: 'Pet Screen', desc: 'Modelo voltado para ambientes residenciais com animais', icon: 'lucide:paw-print', img: '/images/telas_pet_screen_especificacoes.jpg' },
-  { path: '/servicos/telas/restaurantes', titulo: 'Restaurantes e Cozinhas', desc: 'Proteção contra insetos para ambientes comerciais e alimentícios', icon: 'lucide:utensils', img: '/images/telas_para_restaurantes.jpg' },
-]
-
-// Ordenados pelos mais buscados no Google (volume de busca)
-const categorias = [
-  {
-    slug: 'residencial',
-    titulo: 'Residencial',
-    emoji: '🏠',
-    iconName: 'lucide:home',
-    descricao: 'Para janelas, portas, varandas e mais',
-    servicos: [
-      { slug: 'janelas',     titulo: 'Telas Mosquiteiras para Janelas',     descricaoCurta: 'Proteção sob medida para janelas residenciais',        destaque: 'Sob Medida', imagem: '/images/tela_mosquiteira.png', imagens: ['/images/tela_mosquiteira.png', '/images/mosquiteira_janela.png'] },
-      { slug: 'portas',      titulo: 'Telas Mosquiteiras para Portas',      descricaoCurta: 'Passagem protegida para portas e acessos',             destaque: 'Sob Medida', imagem: '/images/telas_para_portas.jpeg', imagens: ['/images/telas_para_portas.jpeg', '/images/mosquiteira_para_porta.png'] },
-      { slug: 'varandas',    titulo: 'Telas Mosquiteiras para Varandas',    descricaoCurta: 'Aproveite a varanda com proteção contra insetos',       destaque: 'Área externa', imagem: '/images/telas_para_varandas.jpg', imagens: ['/images/telas_para_varandas.jpg', '/images/mosquiteira_area_externa.png'] },
-      { slug: 'sacadas',     titulo: 'Telas Mosquiteiras para Sacadas',     descricaoCurta: 'Proteção sob medida contra mosquitos na sacada',       destaque: 'Sob Medida', imagem: '/images/telas_para_sacadas.jpg', imagens: ['/images/telas_para_sacadas.jpg', '/images/telas_para_varandas.jpg'] },
-      { slug: 'apartamentos',titulo: 'Telas Mosquiteiras para Apartamentos',descricaoCurta: 'Solução sob medida anti-mosquito para apartamentos',   destaque: 'Sob Medida', imagem: '/images/telas_para_apartamento.jpg', imagens: ['/images/telas_para_apartamento.jpg', '/images/tela_mosquiteira.png'] },
-      { slug: 'banheiro',    titulo: 'Telas Mosquiteiras para Banheiro',    descricaoCurta: 'Proteção para janelas de banheiro e ventilação',       destaque: 'Sob Medida', imagem: '/images/telas_para_banheiro.jpg', imagens: ['/images/telas_para_banheiro.jpg', '/images/telas_para_basculante.jpg'] },
-    ]
-  },
-  {
-    slug: 'especiais',
-    titulo: 'Modelos Especiais',
-    emoji: '🔧',
-    iconName: 'lucide:wrench',
-    descricao: 'Sistemas diferenciados de abertura',
-    servicos: [
-      { slug: 'correr',    titulo: 'Telas Mosquiteiras de Correr',         descricaoCurta: 'Sistema deslizante prático para janelas',            destaque: 'Deslizante', imagem: '/images/telas_de_correr.jpg', imagens: ['/images/telas_de_correr.jpg', '/images/mosquiteira_porta_de_correr.png'] },
-      { slug: 'removivel', titulo: 'Telas Mosquiteiras Removíveis',        descricaoCurta: 'Fácil de remover, instalar e limpar',               destaque: 'Removível', imagem: '/images/mosquiteira_removivel.png', imagens: ['/images/mosquiteira_removivel.png', '/images/tela_mosquiteira.png'] },
-      { slug: 'aluminio',  titulo: 'Telas Mosquiteiras com Perfis',        descricaoCurta: 'Estrutura com perfis sob medida',                   destaque: 'Sob Medida', imagem: '/images/telas_com_aluminio.jpg', imagens: ['/images/telas_com_aluminio.jpg', '/images/telas_com_aco_inox.jpg'] },
-      { slug: 'basculante',titulo: 'Telas Mosquiteiras para Basculantes',  descricaoCurta: 'Específica para janelas basculantes',               destaque: 'Sob Medida', imagem: '/images/telas_para_basculante.jpg', imagens: ['/images/telas_para_basculante.jpg', '/images/telas_para_banheiro.jpg'] },
-      { slug: 'pivotante', titulo: 'Telas Mosquiteiras Pivotantes',        descricaoCurta: 'Abertura giratória funcional',                      destaque: 'Pivotante', imagem: '/images/telas_de_correr.jpg', imagens: ['/images/telas_de_correr.jpg', '/images/mosquiteira_removivel.png'] },
-      { slug: 'acoinox',   titulo: 'Telas Mosquiteiras Especiais',       descricaoCurta: 'Opção sob medida para projetos específicos',        destaque: 'Sob Medida', imagem: '/images/telas_com_aco_inox.jpg', imagens: ['/images/telas_com_aco_inox.jpg', '/images/telas_com_aluminio.jpg'] },
-    ]
-  },
-  {
-    slug: 'pet',
-    titulo: 'Pet Screen',
-    emoji: '🐾',
-    iconName: 'lucide:paw-print',
-    descricao: 'Telas para ambientes com animais',
-    servicos: [
-      { slug: 'pets',       titulo: 'Telas Mosquiteiras Pet Screen',         descricaoCurta: 'Modelo para casas com cães e gatos',                destaque: 'Pet Screen', imagem: '/images/telas_pet_screen_especificacoes.jpg', imagens: ['/images/telas_pet_screen_especificacoes.jpg', '/images/pets_pro.png'] },
-      { slug: 'pernilongos',titulo: 'Telas Mosquiteiras Anti-Pernilongos',   descricaoCurta: 'Malha fina para proteção contra insetos',           destaque: 'Malha Fina', imagem: '/images/telas_anti-pernilongos.jpg', imagens: ['/images/telas_anti-pernilongos.jpg', '/images/tela_mosquiteira.png'] },
-    ]
-  },
-  {
-    slug: 'comercial',
-    titulo: 'Fachadas e Ambientes Comerciais',
-    emoji: '🏢',
-    iconName: 'lucide:building-2',
-    descricao: 'Soluções para grandes áreas e comércios',
-    servicos: [
-      { slug: 'fachadas',    titulo: 'Telas Mosquiteiras para Fachadas',    descricaoCurta: 'Proteção para fachadas de edifícios',               destaque: 'Fachadas', imagem: '/images/telas_para_fachadas_especificacoes.png', imagens: ['/images/telas_para_fachadas_especificacoes.png', '/images/telas_para_coberturas.jpg'] },
-      { slug: 'coberturas',  titulo: 'Telas Mosquiteiras para Coberturas',  descricaoCurta: 'Proteção em áreas cobertas e vãos',                 destaque: 'Sob Medida', imagem: '/images/telas_para_coberturas.jpg', imagens: ['/images/telas_para_coberturas.jpg', '/images/telas_para_restaurantes.jpg'] },
-      { slug: 'restaurantes',titulo: 'Telas Mosquiteiras para Restaurantes',descricaoCurta: 'Ambiente protegido contra insetos para seu negócio',destaque: 'Comercial', imagem: '/images/telas_para_restaurantes.jpg', imagens: ['/images/telas_para_restaurantes.jpg', '/images/telas_para_fachadas_especificacoes.png'] },
-      { slug: 'industrias',  titulo: 'Telas Mosquiteiras para Indústrias',  descricaoCurta: 'Proteção para galpões e indústrias',                destaque: 'Industrial', imagem: '/images/telas_para_coberturas.jpg', imagens: ['/images/telas_para_coberturas.jpg', '/images/telas_para_restaurantes.jpg'] },
-    ]
-  }
+  { path: '/servicos/telas/janelas', titulo: 'Telas para Janelas', desc: 'Modelos sob medida para janelas de correr, basculantes e pivotantes', icon: 'lucide:layout-grid', img: '/images/telas/catalogo/mosquiteira-janela.webp', alt: 'Painéis de tela diante de janela com folhas de madeira', width: 663, height: 495 },
+  { path: '/servicos/telas/portas', titulo: 'Telas para Portas', desc: 'Soluções para portas balcão e acessos frequentes com ajuste preciso', icon: 'lucide:door-open', img: '/images/telas/catalogo/mosquiteira-porta-de-correr.webp', alt: 'Painel de tela em porta de correr entre quarto e varanda', width: 671, height: 499 },
+  { path: '/servicos/telas/sacadas-e-varandas', titulo: 'Sacadas e Varandas', desc: 'Proteção contra insetos para áreas externas e terraços', icon: 'lucide:sun', img: '/images/telas/catalogo/telas-para-varandas-especificacoes.webp', alt: 'Tela parcialmente baixada em abertura de varanda coberta', width: 780, height: 400 },
+  { path: '/servicos/telas/removivel', titulo: 'Telas Removíveis', desc: 'Quadro que pode ser retirado para limpeza, conforme o encaixe e o acesso', icon: 'lucide:move', img: '/images/telas/catalogo/telas-removiveis-especificacoes.webp', alt: 'Quadro de tela com pontos de fixação ao redor de janela', width: 918, height: 918 },
+  { path: '/servicos/telas/pet-screen', titulo: 'Pet Screen', desc: 'Barreira contra insetos para ambientes com pets; não substitui rede contra quedas', icon: 'lucide:paw-print', img: '/images/telas/catalogo/telas-pet-screen-especificacoes.webp', alt: 'Imagem de catálogo Pet Screen com pata de animal junto à malha', width: 800, height: 800 },
+  { path: '/servicos/telas/restaurantes', titulo: 'Restaurantes e Cozinhas', desc: 'Portas e janelas de cozinhas, considerando circulação e manutenção', icon: 'lucide:utensils', img: '/images/telas/catalogo/telas-para-restaurantes.webp', alt: 'Cozinha com janelas teladas próximas à bancada de preparo', width: 630, height: 292 },
 ]
 
 const getWhatsappUrl = (servicoTitulo) => {
@@ -103,6 +46,8 @@ const getWhatsappUrl = (servicoTitulo) => {
 
 const getTelasServiceKey = (slug) => {
   const map = {
+    'sacadas-e-varandas': 'telas_sacadas',
+    'pet-screen': 'pet_screen',
     removivel: 'telas_removiveis',
     aluminio: 'telas_perfis',
     basculante: 'telas_basculantes',
@@ -114,50 +59,37 @@ const getTelasServiceKey = (slug) => {
   return map[slug] || (slug.startsWith('telas') ? slug : 'telas_' + slug)
 }
 
-const getTelasDetailPath = (slug) => {
-  const map = {
-    janelas: '/servicos/telas/janelas',
-    portas: '/servicos/telas/portas',
-    varandas: '/servicos/telas/sacadas-e-varandas',
-    sacadas: '/servicos/telas/sacadas-e-varandas',
-    apartamentos: '/servicos/telas/janelas',
-    banheiro: '/servicos/telas/janelas',
-    correr: '/servicos/telas/janelas',
-    removivel: '/servicos/telas/removivel',
-    aluminio: '/servicos/telas/removivel',
-    basculante: '/servicos/telas/janelas',
-    pivotante: '/servicos/telas/janelas',
-    acoinox: '/servicos/telas/removivel',
-    pets: '/servicos/telas/pet-screen',
-    pernilongos: '/servicos/telas/janelas',
-    fachadas: '/servicos/telas/restaurantes',
-    coberturas: '/servicos/telas/sacadas-e-varandas',
-    restaurantes: '/servicos/telas/restaurantes',
-    industrias: '/servicos/telas/restaurantes'
-  }
-  return map[slug] || null
-}
-
-// Public Google profile checked on 2026-09-22; curated snapshot, not a live feed.
-const googleReviewsUrl = 'https://share.google/FZ810y9akHJ1iFS9q'
-const googleReviews = { rating: '5,0', count: 49, checkedAt: '22/09/2026' }
-const reviews = [
- {name:'Valter Jose', text:'Excelente serviço. Muito bem feito. Recomendo!!'},
- {name:'Giovana Naomi', text:'A instalação ficou perfeita, atendimento também. Recomendo o serviço, foram super pontuais e profissionais.'},
- {name:'Edna Oliveira', text:'Profissional pontual, orçamento certo, serviço limpo e de qualidade, recomendo 👍🏾'}
-]
 const benefits = [
  {icon:'lucide:ruler',title:'Produtos sob medida',text:'Telas feitas para as medidas do seu ambiente.'},
  {icon:'lucide:wrench',title:'Instalação profissional',text:'Cuidado na montagem e no acabamento.'},
  {icon:'lucide:wind',title:'Conforto no dia a dia',text:'Proteção contra insetos com ventilação.'},
- {icon:'lucide:map-pin',title:'São Paulo e região',text:'Atendimento no local da instalação.'}
+ {icon:'lucide:map-pin',title:'Estado de São Paulo',text:'Atendimento no local da instalação em todo o estado.'}
 ]
 const faqs = [
- {q:'Vocês atendem em quais regiões?',a:'Atendemos São Paulo e região. Informe o CEP da instalação para confirmar o atendimento no seu endereço.'},
- {q:'As telas são realmente sob medida?',a:'Sim. O modelo e as medidas são definidos de acordo com as janelas, portas ou vãos do seu ambiente.'},
- {q:'Quanto tempo leva para instalar?',a:'O prazo depende do modelo, das medidas e da quantidade de telas. Nossa equipe confirma o prazo no orçamento.'},
- {q:'Posso escolher a cor da tela?',a:'Fale com nossa equipe para consultar as opções de acabamento disponíveis para o modelo escolhido.'},
- {q:'Como faço a limpeza?',a:'Os cuidados variam conforme o modelo. As telas removíveis facilitam a retirada para limpeza; nossa equipe orienta sobre a manutenção.'}
+  {
+    "q": "Por onde começar a escolha da tela mosquiteira?",
+    "a": "Identifique a abertura: janela, porta ou vão de varanda. Depois considere como ela abre, se precisa retirar a tela para limpeza e se há animais no ambiente. Fotos ajudam a equipe a avaliar essas condições."
+  },
+  {
+    "q": "Tela mosquiteira e rede de proteção têm a mesma função?",
+    "a": "Não. A tela mosquiteira é uma barreira contra insetos. Para proteção contra quedas de crianças ou animais, consulte o serviço de redes de proteção. Pet Screen também não substitui rede."
+  },
+  {
+    "q": "Vocês atendem fora da capital paulista?",
+    "a": "Sim. Atendemos todo o estado de São Paulo, incluindo Grande São Paulo, interior e litoral. Informe o CEP para a equipe organizar o atendimento."
+  },
+  {
+    "q": "Existe um preço único por metro quadrado?",
+    "a": "O orçamento considera medidas, quantidade, abertura, acabamento e condições de instalação. A área sozinha não descreve todos os itens necessários para o projeto."
+  },
+  {
+    "q": "Posso consultar modelos e acabamentos antes de decidir?",
+    "a": "Sim. Envie fotos do ambiente e informe sua preferência de acabamento. A equipe apresenta as opções disponíveis para a aplicação avaliada."
+  },
+  {
+    "q": "Qual é o prazo para fabricar e instalar?",
+    "a": "O prazo depende do modelo, da quantidade e da agenda de atendimento. Confirme o cronograma na proposta antes de programar a instalação."
+  }
 ]
 onMounted(() => {
  quoteObserver = new IntersectionObserver(entries => {
@@ -193,8 +125,8 @@ onUnmounted(() => quoteObserver?.disconnect())
     <div class="wrap hero-inner"><div class="hero-copy">
      <div class="hero-text-block">
       <p class="eyebrow">Mais conforto para o seu dia a dia</p>
-      <h1>Telas Mosquiteiras <span>com Esquadria de Alumínio</span></h1>
-      <p class="hero-description">Telas sob medida para janelas, portas e sacadas, com instalação em São Paulo, Grande SP, Litoral, Campinas e Sorocaba.</p>
+      <h1>Telas Mosquiteiras <span>Sob Medida em São Paulo</span></h1>
+      <p class="hero-description">Quer ventilar a casa e reduzir a entrada de mosquitos? Compare soluções para janelas, portas e sacadas. Atendemos todo o estado de São Paulo.</p>
      </div>
      <div class="hero-bottom-block">
       <div class="hero-actions"><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green hero-cta-whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Chame no WhatsApp"><WhatsappIcon /> <span>Chame no WhatsApp <span aria-hidden="true">→</span></span></a></div>
@@ -203,27 +135,33 @@ onUnmounted(() => quoteObserver?.disconnect())
     </div></div>
    </section>
    <section id="solucoes" class="section wrap">
-    <div class="section-heading"><p class="eyebrow">Nossos serviços</p><h2>Proteção e Conforto para Sua Casa</h2><p>Telas mosquiteiras sob medida para sua casa ou empresa.</p></div>
+    <div class="section-heading"><p class="eyebrow">Escolha pelo ambiente</p><h2>Qual tela mosquiteira você procura?</h2><p>Comece pela abertura que deseja telar. Depois, confira como o modelo funciona na sua rotina.</p></div>
     <div class="services-grid">
-     <NuxtLink v-for="modelo in modelosPrincipais.slice(0,4)" :key="modelo.path" :to="modelo.path" class="service-card" data-cta-location="service_card" :data-service-key="getTelasServiceKey(modelo.path.split('/').pop())" :data-service-name="modelo.titulo" :aria-label="'Saiba mais: ' + modelo.titulo">
-      <img :src="modelo.img" :alt="modelo.titulo" width="480" height="360" loading="lazy" /><div class="card-body"><h3>{{ modelo.titulo }}</h3><p>{{ modelo.desc }}</p><span class="card-link">Saiba mais <span aria-hidden="true">→</span></span></div>
+     <NuxtLink v-for="modelo in modelosPrincipais" :key="modelo.path" :to="modelo.path" class="service-card" data-cta-location="service_card" :data-service-key="getTelasServiceKey(modelo.path.split('/').pop())" :data-service-name="modelo.titulo" :aria-label="'Saiba mais: ' + modelo.titulo">
+      <img :src="modelo.img" :alt="modelo.alt" :width="modelo.width" :height="modelo.height" loading="lazy" /><div class="card-body"><h3>{{ modelo.titulo }}</h3><p>{{ modelo.desc }}</p><span class="card-link">Saiba mais <span aria-hidden="true">→</span></span></div>
      </NuxtLink>
     </div>
-    <details class="more-services"><summary>Ver mais modelos e aplicações <span aria-hidden="true">＋</span></summary><div class="extra-services"><div v-for="categoria in categorias" :key="categoria.slug"><h3>{{ categoria.titulo }}</h3><div v-for="servico in categoria.servicos" :key="servico.slug" class="extra-row" data-cta-location="service_card" :data-service-key="getTelasServiceKey(servico.slug)" :data-service-name="servico.titulo"><NuxtLink :to="getTelasDetailPath(servico.slug)">{{ servico.titulo }} →</NuxtLink><a :href="getWhatsappUrl(servico.titulo)" target="_blank" rel="noopener noreferrer" :aria-label="'Orçamento pelo WhatsApp: ' + servico.titulo"><WhatsappIcon /></a></div></div></div></details>
+   </section>
+   <section class="section wrap choice-guide">
+    <h2>Como escolher entre os modelos?</h2>
+    <p>Em uma janela, observe o movimento das folhas e o acesso ao puxador. Em uma porta, pense também na circulação e no espaço para abrir. A equipe precisa dessas informações para avaliar a estrutura e a fixação.</p>
+    <p>Se a prioridade é retirar a tela para limpar, veja as <NuxtLink to="/servicos/telas/removivel">opções removíveis</NuxtLink>. Para uma cozinha profissional, consulte a página de <NuxtLink to="/servicos/telas/restaurantes">telas para restaurantes</NuxtLink>, que considera a rotina de trabalho e manutenção.</p>
+    <h3>Insetos e proteção contra quedas</h3>
+    <p>Tela mosquiteira, inclusive Pet Screen, não substitui rede de proteção. Se a preocupação é a segurança de crianças ou animais em janelas e sacadas, consulte nossas <NuxtLink to="/servicos/redes/gatos-e-pets">redes para gatos e pets</NuxtLink> ou <NuxtLink to="/servicos/redes/criancas">redes para crianças</NuxtLink>.</p>
    </section>
    <section id="galeria" class="gallery-section">
     <div class="wrap gallery-layout">
      <div>
       <p class="eyebrow">Modelos e aplicações</p>
       <h2>Veja as telas de perto</h2>
-      <p>Acabamentos discretos e soluções que se adaptam ao seu ambiente.</p>
+      <p>Imagens de referência do catálogo para comparar aplicações. Consulte a equipe sobre a compatibilidade com o seu vão.</p>
       <a href="#solucoes" class="text-link">Encontrar meu modelo →</a>
      </div>
      <div class="gallery-grid">
       <figure v-for="modelo in modelosPrincipais.slice(0,4)" :key="modelo.path" class="gallery-figure">
        <NuxtLink :to="modelo.path" class="gallery-link" :aria-label="'Ver detalhes de ' + modelo.titulo">
         <div class="gallery-img-wrap">
-         <img :src="modelo.img" :alt="modelo.titulo" width="360" height="420" loading="lazy" />
+         <img :src="modelo.img" :alt="modelo.alt" :width="modelo.width" :height="modelo.height" loading="lazy" />
         </div>
         <figcaption>
          <span>{{ modelo.titulo }}</span>
@@ -235,13 +173,13 @@ onUnmounted(() => quoteObserver?.disconnect())
     </div>
    </section>
    <section id="diferenciais" class="section wrap benefits-layout"><div><p class="eyebrow">Cuidado em cada detalhe</p><h2>Por que escolher a AD Telas?</h2></div><div class="benefits-grid"><article v-for="item in benefits" :key="item.title"><Icon :name="item.icon" /><h3>{{ item.title }}</h3><p>{{ item.text }}</p></article></div></section>
-   <section class="contact-band" data-cta-location="service_page"><div class="wrap"><p class="eyebrow">Vamos cuidar do seu projeto</p><h2>Solicite seu orçamento agora mesmo</h2><p>Conte o que você precisa. Nossa equipe ajuda a encontrar a tela para o seu ambiente.</p><div class="band-actions"><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Quero falar no WhatsApp →</a><a class="button secondary" href="#orcamento-telas" @click.prevent="openQuoteForm">Preencher formulário</a></div><p class="band-note">✓ Atendimento no local <span>✓ Orçamento gratuito</span></p></div></section>
+   <section class="contact-band" data-cta-location="service_page"><div class="wrap"><p class="eyebrow">Vamos cuidar do seu projeto</p><h2>O que define o preço da tela mosquiteira?</h2><p>Dimensões do vão, quantidade de telas, modelo de abertura, acabamento e condições de instalação influenciam o valor. Envie fotos, medidas aproximadas e CEP; a equipe confirma a medição e o prazo na proposta.</p><div class="band-actions"><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Quero falar no WhatsApp →</a><a class="button secondary" href="#orcamento-telas" @click.prevent="openQuoteForm">Preencher formulário</a></div><p class="band-note">✓ Projeto sob medida <span>✓ Atendimento em todo o estado de SP</span></p></div></section>
    <section id="avaliacoes" class="section wrap"><div class="section-heading"><p class="eyebrow">Quem já escolheu a AD Telas</p><h2>O que nossos clientes dizem</h2><p>Depoimentos de clientes no Google.</p></div><div class="google-review-summary"><a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer" class="google-rating"><span class="stars" aria-hidden="true">★★★★★</span><strong>{{ googleReviews.rating }} de 5 no Google</strong><span>{{ googleReviews.count }} avaliações ↗</span></a><p>Dados conferidos em {{ googleReviews.checkedAt }}.</p></div><div class="reviews-grid"><article v-for="review in reviews" :key="review.name" class="review"><span class="stars" aria-label="5 estrelas">★★★★★</span><blockquote>“{{ review.text }}”</blockquote><div class="review-person"><span class="avatar" aria-hidden="true">{{ review.name.charAt(0) }}</span><div><strong>{{ review.name }}</strong><a :href="googleReviewsUrl" target="_blank" rel="noopener noreferrer">Ver avaliações no Google ↗</a></div></div></article></div></section>
    <section class="process-section wrap"><div class="section-heading"><h2>Como funciona</h2><p>Do primeiro contato à instalação.</p></div><ol class="process-grid"><li v-for="(step,index) in [{title:'Faça seu contato',text:'Pelo WhatsApp ou formulário.',icon:'lucide:message-circle'},{title:'Conte sobre seu espaço',text:'Avaliamos o modelo e as medidas.',icon:'lucide:ruler'},{title:'Receba seu orçamento',text:'Uma proposta para o seu projeto.',icon:'lucide:clipboard-list'},{title:'Agende a instalação',text:'Com a nossa equipe profissional.',icon:'lucide:wrench'}]" :key="step.title"><span class="step-number">{{ index + 1 }}</span><Icon :name="step.icon" /><h3>{{ step.title }}</h3><p>{{ step.text }}</p></li></ol></section>
    <section id="duvidas" class="faq-section"><div class="wrap faq-layout"><div><p class="eyebrow">Pode perguntar</p><h2>Dúvidas frequentes</h2><p>Saiba mais sobre nossas telas mosquiteiras.</p></div><div><details v-for="faq in faqs" :key="faq.q" class="faq"><summary>{{ faq.q }}<span aria-hidden="true">＋</span></summary><p>{{ faq.a }}</p></details></div></div></section>
-   <section class="section wrap quote-layout" data-cta-location="quote_form"><div><p class="eyebrow">Seu projeto começa aqui</p><h2>Mais conforto para sua casa.</h2><p>Preencha seus dados para receber um orçamento. Se preferir, converse diretamente com nossa equipe.</p><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Chamar no WhatsApp</a><a href="tel:+5511983586611" class="phone-link"><Icon name="lucide:phone" /> (11) 98358-6611</a></div><LandingQuoteForm :show-trust-badges="false" /></section>
+   <section class="section wrap quote-layout" data-cta-location="quote_form"><div><p class="eyebrow">Seu projeto começa aqui</p><h2>Ajuda para escolher sua tela</h2><p>Informe o ambiente e o CEP no formulário. No contato com a equipe, fotos e medidas aproximadas ajudam a avaliar o modelo. Se ainda não mediu o vão, avise para combinar essa etapa.</p><a :href="getWhatsappUrl('Telas Mosquiteiras')" class="button green" target="_blank" rel="noopener noreferrer"><WhatsappIcon /> Chamar no WhatsApp</a><a href="tel:+5511983586611" class="phone-link"><Icon name="lucide:phone" /> (11) 98358-6611</a></div><LandingQuoteForm :show-trust-badges="false" /></section>
   </main>
-  <footer data-cta-location="footer"><div class="wrap footer-grid"><div><NuxtLink to="/" class="footer-brand">AD TELAS<span>MOSQUITEIRAS SOB MEDIDA</span></NuxtLink><p>Mais conforto para você e sua família.</p></div><div><h2>Navegue</h2><NuxtLink to="/">Início</NuxtLink><a href="#galeria">Galeria</a><a href="#duvidas">Dúvidas</a><a href="#orcamento-telas">Orçamento</a></div><div><h2>Serviços</h2><NuxtLink v-for="modelo in modelosPrincipais" :key="modelo.path" :to="modelo.path">{{ modelo.titulo }}</NuxtLink></div><div><h2>Atendimento</h2><a :href="getWhatsappUrl('Telas Mosquiteiras')" target="_blank" rel="noopener noreferrer">Fale no WhatsApp ↗</a><a href="tel:+5511983586611">(11) 98358-6611</a><p>São Paulo e região</p></div></div><div class="wrap footer-bottom"><span>© {{ new Date().getFullYear() }} AD Telas. Todos os direitos reservados.</span><NuxtLink to="/politica-de-privacidade">Política de Privacidade</NuxtLink></div></footer>
+  <footer data-cta-location="footer"><div class="wrap footer-grid"><div><NuxtLink to="/" class="footer-brand">AD TELAS<span>MOSQUITEIRAS SOB MEDIDA</span></NuxtLink><p>Mais conforto para você e sua família.</p></div><div><h2>Navegue</h2><NuxtLink to="/">Início</NuxtLink><a href="#galeria">Galeria</a><a href="#duvidas">Dúvidas</a><a href="#orcamento-telas">Orçamento</a></div><div><h2>Serviços</h2><NuxtLink v-for="modelo in modelosPrincipais" :key="modelo.path" :to="modelo.path">{{ modelo.titulo }}</NuxtLink></div><div><h2>Atendimento</h2><a :href="getWhatsappUrl('Telas Mosquiteiras')" target="_blank" rel="noopener noreferrer">Fale no WhatsApp ↗</a><a href="tel:+5511983586611">(11) 98358-6611</a><p>Todo o estado de São Paulo</p></div></div><div class="wrap footer-bottom"><span>© {{ new Date().getFullYear() }} AD Telas. Todos os direitos reservados.</span><NuxtLink to="/politica-de-privacidade">Política de Privacidade</NuxtLink></div></footer>
     <a
     :href="getWhatsappUrl('Telas Mosquiteiras')"
     class="floating-whatsapp"
@@ -257,6 +195,7 @@ onUnmounted(() => quoteObserver?.disconnect())
 </template>
 
 <style scoped>
+.choice-guide{max-width:850px}.choice-guide p{margin-top:16px;line-height:1.7}.choice-guide h3{margin-top:24px}.choice-guide a{text-decoration:underline;text-underline-offset:3px;color:var(--brand-blue)}
 .google-review-summary{text-align:center;margin:-8px 0 25px}.google-rating{display:inline-flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 14px;min-height:48px;padding:10px 18px;border:1px solid #dce5ef;border-radius:8px;background:#f2f5f9;font-size:14px}.google-rating strong{color:var(--brand-blue)}.google-rating>span:last-child{text-decoration:underline;text-underline-offset:3px}.google-review-summary p{font-size:12px;margin-top:8px}
 
 .floating-whatsapp{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;display:flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 18px;border-radius:999px;background:#087c38;color:#fff;box-shadow:0 4px 18px rgba(8,124,56,0.4);border:2px solid #fff;text-decoration:none;animation:pulse-whatsapp 2s infinite ease-in-out;transition:transform .2s ease,background-color .2s ease}

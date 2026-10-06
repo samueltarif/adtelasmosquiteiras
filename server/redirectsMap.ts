@@ -50,9 +50,18 @@ export const REDIRECT_MAP: Record<string, string> = {
   '/servicos/telas/comercial/industrias': '/servicos/telas'
 }
 
+export const CANONICALIZATION_REDIRECT_MAP: Record<string, string> = {
+  '/politica-de-privacidade.html': '/politica-de-privacidade'
+}
+
+export const ALL_REDIRECTS: Record<string, string> = {
+  ...REDIRECT_MAP,
+  ...CANONICALIZATION_REDIRECT_MAP
+}
+
 export const getNitroRedirectRules = () => {
   const rules: Record<string, { redirect: { to: string; statusCode: number } }> = {}
-  for (const [source, target] of Object.entries(REDIRECT_MAP)) {
+  for (const [source, target] of Object.entries(ALL_REDIRECTS)) {
     rules[source] = { redirect: { to: target, statusCode: 301 } }
   }
   return rules

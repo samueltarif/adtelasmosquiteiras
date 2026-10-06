@@ -123,14 +123,13 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Telas de segurança e redes protetoras instaladas em SP. Proteja sua família com garantia de qualidade e instalação rápida.' },
+        { name: 'description', content: 'Telas mosquiteiras e redes de proteção sob medida em todo o estado de São Paulo. Solicite seu orçamento.' },
         { property: 'og:title', content: 'AD Telas e Redes - Proteção Profissional para Sua Família em SP' },
-        { property: 'og:description', content: 'Instale telas de segurança com garantia. Proteja crianças, pets e sua casa contra insetos e quedas.' },
+        { property: 'og:description', content: 'Telas mosquiteiras e redes de proteção sob medida para residências e empresas em todo o estado de São Paulo.' },
         { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
         { property: 'og:image:width', content: '512' },
         { property: 'og:image:height', content: '512' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:url', content: 'https://www.adtelasmosquiteiras.com.br' }
       ],
       htmlAttrs: {
         lang: 'pt-BR'

@@ -105,20 +105,12 @@ const getRedesDetailPath = (slug) => {
     janelas: '/servicos/redes/janelas',
     sacadas: '/servicos/redes/sacadas-e-varandas',
     varandas: '/servicos/redes/sacadas-e-varandas',
-    apartamentos: '/servicos/redes/janelas',
-    portas: '/servicos/redes/janelas',
     escadas: '/servicos/redes/escadas-e-mezaninos',
     basculantes: '/servicos/redes/janelas',
     gatos: '/servicos/redes/gatos-e-pets',
     criancas: '/servicos/redes/criancas',
     cachorros: '/servicos/redes/gatos-e-pets',
-    animais: '/servicos/redes/gatos-e-pets',
-    idosos: '/servicos/redes/criancas',
-    piscinas: '/servicos/redes/sacadas-e-varandas',
-    telhados: '/servicos/redes/escadas-e-mezaninos',
-    portoes: '/servicos/redes/janelas',
-    muros: '/servicos/redes/escadas-e-mezaninos',
-    coberturas: '/servicos/redes/sacadas-e-varandas'
+    animais: '/servicos/redes/gatos-e-pets'
   }
   return map[slug] || null
 }
@@ -200,7 +192,7 @@ onUnmounted(() => {
         <span class="flex items-center gap-1.5"><Icon name="lucide:shield-check" class="w-4 h-4 text-[#F49A1A]" />Instalação sob medida</span>
         <span class="flex items-center gap-1.5"><Icon name="lucide:clock" class="w-4 h-4 text-[#F49A1A]" />Atendimento sob medida</span>
         <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-4 h-4 text-[#F49A1A]" />Orçamento sob medida</span>
-        <span class="flex items-center gap-1.5"><Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" />São Paulo e Região</span>
+        <span class="flex items-center gap-1.5"><Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" />Todo o estado de São Paulo</span>
       </div>
     </div>
 

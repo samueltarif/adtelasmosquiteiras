@@ -16,29 +16,29 @@ const servico = {
   slug: 'vidracaria',
   titulo: 'Vidraçaria',
   destaque: 'Instalação Profissional',
-  descricaoCurta: 'Janelas de vidro temperado, telhados de vidro e fachadas corporativas com instalação rápida e garantia de 2 anos.',
+  descricaoCurta: 'Janelas de vidro temperado, telhados de vidro e fachadas corporativas com instalação profissional sob medida.',
   imagem: '/images/vidro_janela_8mm.png',
   imagemEspecificacoes: '/images/vidro_fachada.jpg',
   metaTitle: 'Vidraçaria em São Paulo | Janelas, Telhados e Fachadas de Vidro | AD Telas',
-  metaDescription: 'Serviços de vidraçaria em SP: janelas de vidro temperado 8mm, telhados de vidro e fachadas corporativas. Instalação em 24h, garantia 2 anos, orçamento grátis.',
+  metaDescription: 'Serviços de vidraçaria em SP: janelas de vidro temperado, telhados de vidro e fachadas corporativas. Instalação agendada e orçamento sob medida.',
   beneficios: [
     { icone: 'shield', titulo: 'Vidro Temperado', descricao: 'Segurança certificada, alta resistência a impactos e variações térmicas' },
-    { icone: 'clock', titulo: 'Instalação em 24h', descricao: 'Agendamento rápido, equipe técnica especializada e pontual' },
+    { icone: 'clock', titulo: 'Instalação agendada', descricao: 'Prazo combinado na proposta conforme o projeto' },
     { icone: 'check', titulo: 'Sob Medida', descricao: 'Medição precisa e projeto personalizado para qualquer ambiente' },
-    { icone: 'award', titulo: 'Garantia 2 Anos', descricao: 'Cobertura total contra defeitos de material e instalação' }
+    { icone: 'award', titulo: 'Garantia do serviço', descricao: 'Condições informadas na proposta' }
   ],
   especificacoes: [
     { label: 'Material', valor: 'Vidro temperado 8mm, 10mm ou 12mm' },
     { label: 'Projetos', valor: 'Janelas de correr, telhados de vidro, fachadas, portas' },
     { label: 'Acabamento', valor: 'Perfis de alumínio, inox ou cromado' },
-    { label: 'Garantia', valor: '2 anos de garantia completa' },
+    { label: 'Garantia', valor: 'Condições informadas na proposta' },
     { label: 'Instalação', valor: 'Em até 24h após medição' },
     { label: 'Orçamento', valor: '100% Gratuito sem compromisso' }
   ],
   comparacao: [
     'Vidro temperado certificado',
     'Instalação rápida em 24h',
-    'Garantia de 2 anos',
+    'Garantia conforme proposta',
     'Medição presencial gratuita',
     'Acabamento premium'
   ],
@@ -140,11 +140,11 @@ const openFormModal = () => { showFormModal.value = true }
               <div class="flex flex-wrap gap-4 items-center justify-center md:justify-start">
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
-                  <span class="text-white font-semibold">Instalação em 24h</span>
+                  <span class="text-white font-semibold">Instalação agendada</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
-                  <span class="text-white font-semibold">Garantia 2 anos</span>
+                  <span class="text-white font-semibold">Garantia conforme proposta</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
@@ -189,7 +189,7 @@ const openFormModal = () => { showFormModal.value = true }
                   <Icon name="lucide:check-circle" class="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p class="text-2xl font-bold text-[#22345F]">5 Mil+</p>
+                  <p class="text-2xl font-bold text-[#22345F]">Sob medida</p>
                   <p class="text-sm text-[#4B5563]">Projetos Entregues</p>
                 </div>
               </div>
@@ -260,7 +260,7 @@ const openFormModal = () => { showFormModal.value = true }
                   </p>
 
                   <div class="flex items-center gap-1 text-xs text-gray-300">
-                    <Icon name="lucide:clock" class="w-3.5 h-3.5 text-[#F49A1A]" /> Instalação 24h
+                    <Icon name="lucide:clock" class="w-3.5 h-3.5 text-[#F49A1A]" /> Instalação agendada
                   </div>
                 </div>
               </div>
@@ -462,7 +462,7 @@ const openFormModal = () => { showFormModal.value = true }
       <div class="container mx-auto px-4 md:px-6 max-w-4xl relative z-10 text-center">
         <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">
           Modernize seu espaço HOJE!<br/>
-          Instalação em 24h
+          Instalação agendada
         </h2>
         <p class="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto">
           Janelas de vidro temperado, telhados de vidro e fachadas corporativas com acabamento premium e garantia.

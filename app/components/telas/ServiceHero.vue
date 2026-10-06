@@ -99,8 +99,9 @@ const formattedTitle = computed(() => {
         <p class="td-hero-description">{{ service.description }}</p>
         <div class="td-actions">
           <a :href="service.whatsappUrl" class="td-button td-whatsapp td-hero-cta" target="_blank" rel="noopener noreferrer">
-            <WhatsappIcon /> Chame no WhatsApp <span aria-hidden="true">→</span>
+            <WhatsappIcon /> {{ service.heroCta }} <span aria-hidden="true">→</span>
           </a>
+          <a href="#orcamento-servico" class="td-hero-form-link">Prefiro solicitar pelo formulário</a>
         </div>
       </div>
     </div>

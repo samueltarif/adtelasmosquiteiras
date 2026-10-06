@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
+import { buildServiceSchema } from '~/utils/serviceSchema'
 
 const showFormModal = ref(false)
 
@@ -15,7 +16,12 @@ useHead({
     { property: 'og:description', content: 'Instalação sob medida de redes de proteção em sacadas e varandas de apartamentos e casas.' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/redes_para_sacadas.jpg' },
     { property: 'og:type', content: 'website' }
-  ]
+  ],
+  script: [{ type: 'application/ld+json', key: 'service-schema', innerHTML: JSON.stringify(buildServiceSchema(
+    'Rede de Proteção para Sacadas e Varandas',
+    'Rede de proteção sob medida para sacadas e varandas.',
+    '/servicos/redes/sacadas-e-varandas'
+  )) }]
 })
 
 const breadcrumbItems = [
@@ -97,7 +103,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
               Rede de Proteção para Sacadas e Varandas
             </h1>
             <p class="text-white/85 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-              Fechamento sob medida para varandas e sacadas de apartamentos. Instalação profissional para ambientes residenciais em São Paulo e região.
+              Fechamento sob medida para varandas e sacadas de apartamentos. Instalação profissional em todo o estado de São Paulo.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3.5">

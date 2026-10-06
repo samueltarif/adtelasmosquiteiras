@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
+import { buildServiceSchema } from '~/utils/serviceSchema'
 
 const showFormModal = ref(false)
 
@@ -15,7 +16,12 @@ useHead({
     { property: 'og:description', content: 'Instalação profissional de redes de proteção em janelas residenciais para segurança de crianças e pets.' },
     { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/redes_para_janelas.png' },
     { property: 'og:type', content: 'website' }
-  ]
+  ],
+  script: [{ type: 'application/ld+json', key: 'service-schema', innerHTML: JSON.stringify(buildServiceSchema(
+    'Rede de Proteção para Janelas',
+    'Rede de proteção sob medida para janelas residenciais.',
+    '/servicos/redes/janelas'
+  )) }]
 })
 
 const breadcrumbItems = [
@@ -97,7 +103,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
               Rede de Proteção para Janelas
             </h1>
             <p class="text-white/85 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-              Segurança essencial para janelas de apartamentos e sobrados. Instalação profissional sob medida em São Paulo e região.
+              Segurança para janelas de apartamentos e sobrados. Instalação profissional sob medida em todo o estado de São Paulo.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3.5">

@@ -4,11 +4,11 @@ import { ref } from 'vue'
 const showFormModal = ref(false)
 
 useHead({
-  title: 'Áreas Atendidas em São Paulo e Região | AD Telas e Redes',
+  title: 'Áreas Atendidas no Estado de São Paulo | AD Telas e Redes',
   meta: [
     {
       name: 'description',
-      content: 'Consulte as regiões e cidades atendidas pela AD Telas e Redes em São Paulo e Grande SP. Utilize nosso verificador de CEP para consultar disponibilidade.'
+      content: 'A AD Telas e Redes atende todo o estado de São Paulo. Consulte o CEP da instalação e solicite seu orçamento.'
     },
     { property: 'og:title', content: 'Áreas Atendidas | AD Telas e Redes' },
     { property: 'og:description', content: 'Consulte a cobertura de atendimento para instalação de telas mosquiteiras e redes de proteção em São Paulo.' },
@@ -30,7 +30,7 @@ const regioesPrincipais = [
   },
   {
     regiao: 'Região Metropolitana',
-    descricao: 'Atendimento a municípios da Grande São Paulo mediante consulta prévia por CEP.',
+    descricao: 'Atendimento em todos os municípios do estado de São Paulo, mediante agendamento.',
     icon: 'lucide:building-2'
   },
   {
@@ -46,8 +46,8 @@ const faqs = [
     resposta: 'Consulte seu CEP no verificador acima para verificar a disponibilidade de atendimento no seu endereço.'
   },
   {
-    pergunta: 'A empresa atende cidades do litoral?',
-    resposta: 'Atualmente o atendimento da AD Telas e Redes é concentrado na cidade de São Paulo e municípios selecionados da Grande São Paulo, sem cobertura em cidades do litoral.'
+    pergunta: 'A empresa atende cidades do litoral e do interior?',
+    resposta: 'Sim. A AD Telas e Redes atende cidades da capital, região metropolitana, litoral e interior do estado de São Paulo.'
   },
   {
     pergunta: 'Como funciona o agendamento de visita para medição?',
@@ -78,7 +78,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
               Áreas Atendidas pela AD Telas e Redes
             </h1>
             <p class="text-white/85 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-              Instalação de telas mosquiteiras e redes de proteção sob medida em São Paulo e região metropolitana. Consulte seu CEP abaixo para verificar a disponibilidade de atendimento no seu endereço.
+              Instalação de telas mosquiteiras e redes de proteção sob medida em todo o estado de São Paulo. Consulte seu CEP abaixo para confirmar os dados do endereço.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-3.5">
@@ -110,7 +110,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
                 loading="eager"
               />
               <div class="p-4 bg-[#22345F]/90 backdrop-blur-sm border-t border-white/10 flex items-center justify-between text-xs text-white/80">
-                <span class="flex items-center gap-1.5"><Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" /> São Paulo e Região</span>
+                <span class="flex items-center gap-1.5"><Icon name="lucide:map-pin" class="w-4 h-4 text-[#F49A1A]" /> Todo o estado de São Paulo</span>
                 <span class="flex items-center gap-1.5"><Icon name="lucide:check-circle" class="w-4 h-4 text-[#F49A1A]" /> Atendimento sob medida</span>
               </div>
             </div>
@@ -143,7 +143,7 @@ const whatsappUrl = 'https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%
             Regiões de Atendimento
           </h2>
           <p class="text-gray-600 text-base">
-            Atendimento sob medida para residências, apartamentos e empresas na capital e municípios atendidos.
+            Atendimento sob medida para residências, apartamentos e empresas em todo o estado de São Paulo.
           </p>
         </div>
 

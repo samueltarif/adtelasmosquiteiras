@@ -10,7 +10,7 @@ const { toggleFaq, isOpen } = useFaq()
 const faqs = [
   {
     question: 'Quanto tempo a tela/rede dura?',
-    answer: 'Nossa rede de segurança tem durabilidade de 5 a 7 anos com manutenção básica. A tela mosquiteira dura 1 a 3 anos dependendo da exposição ao sol e chuva. Incluímos 2 anos de garantia completa contra defeitos.'
+    answer: 'A durabilidade depende do material, da exposição ao sol e à chuva, do uso e da manutenção. As condições de garantia são informadas na proposta.'
   },
   {
     question: 'As redes e telas de proteção são resistentes?',

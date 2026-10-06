@@ -1,0 +1,103 @@
+[
+  {
+    "path": "/servicos/telas/janelas",
+    "width": 375,
+    "scrollWidth": 375,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Esquadrias Residenciais e Comerciais"
+  },
+  {
+    "formVisible": true,
+    "top": 15.9375,
+    "bottom": 1108.125,
+    "scrollY": 5848,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas/janelas",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Esquadrias Residenciais e Comerciais"
+  },
+  {
+    "formVisible": true,
+    "top": 15.640625,
+    "bottom": 749.328125,
+    "scrollY": 3684,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas/removivel",
+    "width": 375,
+    "scrollWidth": 375,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Limpeza e Acesso à Janela"
+  },
+  {
+    "formVisible": true,
+    "top": 16.046875,
+    "bottom": 1087.234375,
+    "scrollY": 4822,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas/removivel",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Limpeza e Acesso à Janela"
+  },
+  {
+    "formVisible": true,
+    "top": 15.828125,
+    "bottom": 749.515625,
+    "scrollY": 3305,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas/restaurantes",
+    "width": 375,
+    "scrollWidth": 375,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Comércio e Setor Alimentício"
+  },
+  {
+    "formVisible": true,
+    "top": 16.296875,
+    "bottom": 1087.484375,
+    "scrollY": 5300,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas/restaurantes",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "missingAnchors": [],
+    "reviewsHref": "/servicos/telas#avaliacoes",
+    "formHref": "#orcamento-servico",
+    "eyebrow": "Comércio e Setor Alimentício"
+  },
+  {
+    "formVisible": true,
+    "top": 16.140625,
+    "bottom": 749.828125,
+    "scrollY": 3132,
+    "hash": "#orcamento-servico"
+  },
+  {
+    "path": "/servicos/telas",
+    "hash": "#avaliacoes",
+    "reviews": true
+  }
+]

@@ -6,14 +6,14 @@ export default {
   "name": "Telas Mosquiteiras para Portas",
   "title": "Tela Mosquiteira para Portas Sob Medida em São Paulo",
   "eyebrow": "Passagens e Acessos Externos",
-  "description": "Mantenha portas abertas para ventilação contínua com proteção contra mosquitos e pernilongos. Modelos sob medida para portas de giro e portas balcão em São Paulo e região.",
+  "description": "Telas sob medida para porta balcão, acesso ao quintal, cozinha e varanda. A escolha considera o espaço para abrir e a passagem de pessoas. Instalação em todo o estado de São Paulo.",
   "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Portas.+Vim+pelo+site.&type=phone_number&app_absent=0",
   "seo": {
     "title": "Tela Mosquiteira para Portas em SP | AD Telas e Redes",
     "meta": [
       {
         "name": "description",
-        "content": "Tela mosquiteira para portas e passagens em São Paulo. Modelos sob medida para residências e apartamentos. Solicite seu orçamento."
+        "content": "Tela mosquiteira para portas em SP. Conheça opções de giro e correr para porta balcão e acesso ao quintal. Solicite orçamento para sua passagem."
       },
       {
         "property": "og:title",
@@ -21,7 +21,7 @@ export default {
       },
       {
         "property": "og:description",
-        "content": "Instalação sob medida de telas mosquiteiras para portas de giro e portas balcão de correr."
+        "content": "Tela mosquiteira para portas em SP. Conheça opções de giro e correr para porta balcão e acesso ao quintal. Solicite orçamento para sua passagem."
       },
       {
         "property": "og:image",
@@ -62,7 +62,7 @@ export default {
     "width": 671,
     "height": 499,
     "smallWidth": 480,
-    "alt": "Tela em porta de correr"
+    "alt": "Painel de tela em porta de correr entre quarto e varanda"
   },
   "gallery": [
     {
@@ -71,7 +71,7 @@ export default {
       "width": 671,
       "height": 499,
       "smallWidth": 480,
-      "alt": "Tela em porta de correr"
+      "alt": "Painel de tela em porta de correr entre quarto e varanda"
     },
     {
       "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
@@ -108,9 +108,9 @@ export default {
   ],
   "models": [
     {
-      "title": "Porta de Giro com Fecho Prático",
-      "description": "Estrutura articulada com dobradiças e fecho funcional. Indicada para acessos frequentes a quintais, varandas e áreas de serviço.",
-      "highlight": "Passagem prática no dia a dia",
+      "title": "Porta de giro",
+      "description": "A folha com dobradiças precisa de espaço livre para abrir. É uma opção a avaliar em acessos a quintais e áreas de serviço, considerando móveis, degraus e o sentido da passagem.",
+      "highlight": "Confira o espaço de abertura.",
       "image": {
         "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
         "small": "/images/telas/catalogo/mosquiteira-para-porta-480.webp",
@@ -121,70 +121,91 @@ export default {
       }
     },
     {
-      "title": "Porta Balcão de Correr",
-      "description": "Painel deslizante montado paralelamente às folhas existentes, acompanhando o vão sem ocupar espaço útil do ambiente.",
-      "highlight": "Acompanha o vão da porta balcão",
+      "title": "Porta balcão de correr",
+      "description": "O painel desliza junto ao vão. A instalação depende do espaço para trilhos e do deslocamento das folhas existentes, especialmente em acessos à varanda.",
+      "highlight": "Mostre a porta inteira nas fotos.",
       "image": {
         "src": "/images/telas/catalogo/mosquiteira-porta-de-correr.webp",
         "small": "/images/telas/catalogo/mosquiteira-porta-de-correr-480.webp",
         "width": 671,
         "height": 499,
         "smallWidth": 480,
-        "alt": "Tela em porta de correr"
+        "alt": "Painel de tela em porta de correr entre quarto e varanda"
       }
     },
     {
-      "title": "Porta Dupla",
-      "description": "Configuração sob medida para vãos amplos com duas folhas centrais e fechamento centralizado.",
-      "highlight": "Ideal para passagens amplas",
+      "title": "Porta dupla",
+      "description": "A configuração com duas folhas é avaliada para passagens amplas. O encontro central e a abertura precisam ser definidos conforme as medidas e a circulação.",
+      "highlight": "O desenho abaixo é ilustrativo.",
       "diagram": "porta-dupla"
     }
   ],
   "benefits": [
     {
-      "title": "Ajuste à Altura da Porta",
-      "description": "A solução é dimensionada conforme as características da porta e do piso no local."
+      "title": "Circulação frequente",
+      "description": "Informe se passam crianças, animais ou pessoas carregando objetos. A rotina ajuda a escolher abertura e posição dos puxadores."
     },
     {
-      "title": "Estrutura para Passagens",
-      "description": "Estrutura projetada para a rotina de abertura e fechamento de acessos residenciais."
+      "title": "Piso e soleira",
+      "description": "Diferenças de nível e o espaço na base entram na avaliação. Confira como será a passagem antes de aprovar a proposta."
     },
     {
-      "title": "Puxadores Integrados",
-      "description": "Acessórios para manuseio confortável por dentro e por fora do ambiente."
+      "title": "Fechamento no dia a dia",
+      "description": "A barreira contra insetos depende de manter a tela fechada e ajustada. Enquanto a passagem estiver aberta, insetos podem entrar."
     }
   ],
   "technical": [],
   "process": [
     {
-      "title": "Avaliação e medição",
-      "description": "Conferimos as medidas e as características do seu ambiente."
+      "title": "Apresente a passagem",
+      "description": "Envie fotos dos dois lados, largura e altura aproximadas, quantidade de portas e CEP."
     },
     {
-      "title": "Fabricação sob medida",
-      "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      "title": "Escolha a abertura",
+      "description": "A equipe avalia o espaço para giro ou deslocamento, o piso e o fechamento antes de definir o modelo."
     },
     {
-      "title": "Instalação no local",
-      "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      "title": "Instale e confira o uso",
+      "description": "A montagem inclui a conferência do ajuste e da abertura. Peça orientação sobre limpeza dos perfis e partes móveis."
     }
   ],
   "faq": [
     {
-      "pergunta": "A tela para porta impede a entrada de animais de estimação?",
-      "resposta": "A tela convencional tem como finalidade principal o bloqueio de insetos voadores. Para lares com animais de estimação, o modelo Pet Screen é a opção com malha mais espessa."
+      "pergunta": "Qual tela usar em uma porta aberta várias vezes por dia?",
+      "resposta": "A escolha considera o espaço disponível e a circulação. Uma porta de giro precisa de área para abrir; a de correr precisa de espaço para o painel deslizar. A equipe avalia qual configuração cabe no local."
     },
     {
-      "pergunta": "Como é feito o fechamento na base da porta?",
-      "resposta": "A solução é dimensionada conforme as características da porta e as condições do vão."
+      "pergunta": "A tela serve para porta balcão?",
+      "resposta": "Há aplicação com painel de correr, conforme o catálogo existente. É necessário verificar os trilhos, as folhas da porta e o espaço de instalação."
     },
     {
-      "pergunta": "A porta de correr precisa de guia de apoio?",
-      "resposta": "É instalada uma guia de apoio superior e inferior para orientar o deslocamento alinhado do painel."
+      "pergunta": "A tela atrapalha a passagem ou cria um desnível no piso?",
+      "resposta": "Isso depende da estrutura e da guia previstas para o modelo. Mostre a soleira e informe necessidades de acesso antes de fechar o orçamento."
     },
     {
-      "pergunta": "Qual o procedimento para solicitar uma tela de porta?",
-      "resposta": "Basta entrar em contato para combinarmos a medição das dimensões da sua porta e elaboração da proposta sob medida."
+      "pergunta": "Como cuidar dos trilhos e do fechamento?",
+      "resposta": "Mantenha as partes móveis livres de sujeira e não force uma folha que esteja prendendo. Siga a orientação de limpeza do modelo instalado e peça avaliação se houver desalinhamento."
     }
-  ]
+  ],
+  "heroCta": "Consultar minha porta",
+  "modelsTitle": "A tela precisa acompanhar a passagem",
+  "modelsIntro": "Compare os modelos já apresentados no catálogo da AD Telas.",
+  "benefitsTitle": "Detalhes que mudam o uso diário",
+  "sections": [
+    {
+      "title": "Porta da cozinha, quintal ou varanda: o que muda?",
+      "paragraphs": [
+        "Em uma porta usada várias vezes por dia, a facilidade de abrir e fechar importa tanto quanto o ajuste ao vão. Informe se ela costuma ficar aberta por longos períodos e se há obstáculos dos dois lados.",
+        "Se cães e gatos têm contato com a tela, converse sobre a opção Pet Screen. Uma tela mosquiteira não deve ser usada para conter animais ou proteger contra quedas."
+      ],
+      "links": [
+        {
+          "text": "Consulte a tela para ambientes com pets",
+          "to": "/servicos/telas/pet-screen"
+        }
+      ]
+    }
+  ],
+  "quoteTitle": "Orçamento para a sua porta",
+  "quoteDescription": "Dimensões, número de folhas, modelo, acabamento e condições do piso e da esquadria influenciam o valor. Informe a frequência de uso da passagem. A equipe confirma medição e prazo na proposta."
 } satisfies TelasService

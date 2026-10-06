@@ -60,7 +60,7 @@ onUnmounted(() => {
 useHead({
   title: 'Solicitar Orçamento Grátis | AD Telas e Redes SP',
   meta: [
-    { name: 'description', content: 'Solicite seu orçamento grátis de telas mosquiteiras e redes de proteção. Atendimento rápido via WhatsApp, telefone ou formulário. Instalação em 24h.' },
+    { name: 'description', content: 'Solicite seu orçamento de telas mosquiteiras e redes de proteção. Atendimento via WhatsApp, telefone ou formulário. Instalação agendada.' },
     { property: 'og:title', content: 'Orçamento Grátis - AD Telas e Redes' },
     { property: 'og:description', content: 'Receba seu orçamento em minutos. WhatsApp, telefone ou formulário online.' }
   ]
@@ -360,19 +360,19 @@ const callPhone = () => {
               <div class="grid grid-cols-2 gap-3 text-xs text-gray-600">
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:shield-check" class="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>2 Anos de Garantia</span>
+                  <span>Garantia conforme proposta</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:clock" class="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span>Instalação em 24h</span>
+                  <span>Instalação agendada</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:award" class="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>Materiais Certificados</span>
+                  <span>Materiais selecionados</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:map-pin" class="w-4 h-4 text-rose-500 shrink-0" />
-                  <span>Toda Grande SP</span>
+                  <span>Todo o estado de SP</span>
                 </div>
               </div>
             </div>

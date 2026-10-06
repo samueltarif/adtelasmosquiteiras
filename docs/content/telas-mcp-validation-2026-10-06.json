@@ -1,0 +1,499 @@
+[
+  {
+    "route": "/servicos/telas",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Telas Mosquiteiras Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Chame no WhatsApp →",
+      "x": 28,
+      "y": 443,
+      "width": 320,
+      "height": 54,
+      "right": 348
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Telas Mosquiteiras Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Chame no WhatsApp →",
+      "x": 28,
+      "y": 620,
+      "width": 320,
+      "height": 54,
+      "right": 348
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Telas Mosquiteiras Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Chame no WhatsApp →",
+      "x": 40,
+      "y": 517.4375,
+      "width": 276.046875,
+      "height": 55,
+      "right": 316.046875
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas",
+    "href": "https://wa.me/5511983586611?text=Ol%C3%A1!%20Gostaria%20de%20um%20or%C3%A7amento%20para%3A%0A%0AServi%C3%A7o%3A%20Telas%20Mosquiteiras%0A%0AVim%20pelo%20site%3A%20https%3A%2F%2Fwww.adtelasmosquiteiras.com.br%2F%0A%0APode%20me%20ajudar%3F",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas",
+        "cta_location": "hero",
+        "service_key": "telas",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/janelas",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Mosquiteira para Janelas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha janela →",
+      "x": 24,
+      "y": 539,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/janelas",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Mosquiteira para Janelas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha janela →",
+      "x": 24,
+      "y": 716,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/janelas",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Mosquiteira para Janelas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha janela →",
+      "x": 72,
+      "y": 535.25,
+      "width": 263.78125,
+      "height": 54,
+      "right": 335.78125
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/janelas",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Janelas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/janelas",
+        "cta_location": "hero",
+        "service_key": "telas_janelas",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/portas",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Mosquiteira para Portas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha porta →",
+      "x": 24,
+      "y": 539,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/portas",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Mosquiteira para Portas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha porta →",
+      "x": 24,
+      "y": 716,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/portas",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Mosquiteira para Portas Sob Medida em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar minha porta →",
+      "x": 72,
+      "y": 512.859375,
+      "width": 260.5,
+      "height": 54,
+      "right": 332.5
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/portas",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Portas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/portas",
+        "cta_location": "hero",
+        "service_key": "telas_portas",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/sacadas-e-varandas",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Mosquiteira para Sacadas e Varandas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Avaliar minha varanda →",
+      "x": 24,
+      "y": 539,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/sacadas-e-varandas",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Mosquiteira para Sacadas e Varandas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Avaliar minha varanda →",
+      "x": 24,
+      "y": 716,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/sacadas-e-varandas",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Mosquiteira para Sacadas e Varandas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Avaliar minha varanda →",
+      "x": 72,
+      "y": 479.328125,
+      "width": 261.578125,
+      "height": 54,
+      "right": 333.578125
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/sacadas-e-varandas",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Sacadas+e+Varandas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/sacadas-e-varandas",
+        "cta_location": "hero",
+        "service_key": "telas_sacadas",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/removivel",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Mosquiteira Removível em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar tela removível →",
+      "x": 24,
+      "y": 527.21875,
+      "width": 250,
+      "height": 61.78125,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/removivel",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Mosquiteira Removível em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar tela removível →",
+      "x": 24,
+      "y": 704.21875,
+      "width": 250,
+      "height": 61.78125,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/removivel",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Mosquiteira Removível em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar tela removível →",
+      "x": 72,
+      "y": 479.328125,
+      "width": 274.859375,
+      "height": 54,
+      "right": 346.859375
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/removivel",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+Remov%C3%ADvel.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/removivel",
+        "cta_location": "hero",
+        "service_key": "telas_removiveis",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/pet-screen",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Pet Screen para Ambientes com Animais em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar Pet Screen →",
+      "x": 24,
+      "y": 539,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/pet-screen",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Pet Screen para Ambientes com Animais em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar Pet Screen →",
+      "x": 24,
+      "y": 716,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/pet-screen",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Pet Screen para Ambientes com Animais em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Consultar Pet Screen →",
+      "x": 72,
+      "y": 479.328125,
+      "width": 248.3125,
+      "height": 54,
+      "right": 320.3125
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/pet-screen",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Pet+Screen.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/pet-screen",
+        "cta_location": "hero",
+        "service_key": "pet_screen",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  },
+  {
+    "route": "/servicos/telas/restaurantes",
+    "width": 375,
+    "height": 667,
+    "scrollWidth": 375,
+    "h1": [
+      "Tela Mosquiteira para Restaurantes e Cozinhas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Orçar minha cozinha →",
+      "x": 24,
+      "y": 539,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/restaurantes",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "h1": [
+      "Tela Mosquiteira para Restaurantes e Cozinhas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Orçar minha cozinha →",
+      "x": 24,
+      "y": 716,
+      "width": 250,
+      "height": 50,
+      "right": 274
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/restaurantes",
+    "width": 1280,
+    "height": 800,
+    "scrollWidth": 1280,
+    "h1": [
+      "Tela Mosquiteira para Restaurantes e Cozinhas em São Paulo"
+    ],
+    "outOfBounds": [],
+    "heroCta": {
+      "text": "Orçar minha cozinha →",
+      "x": 72,
+      "y": 456.9375,
+      "width": 246.96875,
+      "height": 54,
+      "right": 318.96875
+    },
+    "formCount": 1
+  },
+  {
+    "route": "/servicos/telas/restaurantes",
+    "href": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Telas+Mosquiteiras+de+Restaurantes.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "modalOpen": true,
+    "events": [
+      {
+        "event": "whatsapp_modal_open",
+        "page_path": "/servicos/telas/restaurantes",
+        "cta_location": "hero",
+        "service_key": "telas_restaurantes",
+        "gtm.uniqueEventId": 18
+      }
+    ]
+  }
+]

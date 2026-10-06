@@ -154,7 +154,7 @@ const emailLink = `mailto:${EMAIL}`
                 <div class="flex-1 min-w-0">
                   <div class="text-xs text-gray-500 font-medium">Localização</div>
                   <div class="text-base font-bold text-gray-900">{{ ADDRESS }}</div>
-                  <div class="text-xs text-gray-600">Atendemos 19 cidades da Grande SP</div>
+                  <div class="text-xs text-gray-600">Atendemos todo o estado de São Paulo</div>
                 </div>
               </div>
             </div>

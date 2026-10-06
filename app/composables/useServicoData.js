@@ -54,13 +54,13 @@ export const useServicoData = () => {
       especificacoes: [
         { label: 'Material', valor: 'Rede de proteção sob medida' },
         { label: 'Fixação', valor: 'Pontos de ancoragem no vão' },
-        { label: 'Garantia', valor: '2 anos' },
+        { label: 'Garantia', valor: 'Conforme proposta' },
         { label: 'Instalação', valor: 'Agendamento rápido' }
       ],
       
       // Comparação com concorrentes
       comparacao: {
-        nos: ['Garantia 2 anos', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida', 'Instalação profissional'],
+        nos: ['Garantia conforme proposta', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida', 'Instalação profissional'],
         concorrentes: ['Sem garantia formal', 'Demora no atendimento', 'Material comum', 'Sem medição local', 'Sem instalação sob medida']
       },
       
@@ -83,7 +83,7 @@ export const useServicoData = () => {
         },
         {
           pergunta: 'Precisa de manutenção com sol e chuva?',
-          resposta: 'A manutenção básica requer apenas limpeza periódica. Garantimos 2 anos contra defeitos de instalação.'
+          resposta: 'A manutenção básica requer limpeza periódica. As condições de garantia são informadas na proposta.'
         },
         {
           pergunta: 'Quanto tempo demora a instalação?',
@@ -104,7 +104,7 @@ export const useServicoData = () => {
       
       // Meta tags
       metaTitle: 'Rede de Proteção em São Paulo | Instalação Sob Medida | AD Telas',
-      metaDescription: 'Rede de proteção para janelas e sacadas sob medida em SP. Garantia de 2 anos. Proteja sua família e pets. Orçamento grátis!'
+      metaDescription: 'Rede de proteção para janelas e sacadas sob medida em SP. Instalação profissional para ambientes com crianças e pets. Solicite um orçamento.'
     },
     
     {
@@ -146,7 +146,7 @@ export const useServicoData = () => {
       especificacoes: [
         { label: 'Material', valor: 'Fibra de vidro revestida' },
         { label: 'Transparência', valor: '85%' },
-        { label: 'Garantia', valor: '2 anos' },
+        { label: 'Garantia', valor: 'Conforme proposta' },
         { label: 'Malha', valor: '1x1mm (micro)' },
         { label: 'Cores', valor: 'Cinza escuro (invisível)' },
         { label: 'Instalação', valor: '24h após medição' }
@@ -154,7 +154,7 @@ export const useServicoData = () => {
       
       // Comparação com concorrentes
       comparacao: {
-        nos: ['Transparência 85%', 'Instalação 24h', 'Malha micro 1mm', 'Não oxida', 'Garantia 2 anos'],
+        nos: ['Instalação agendada', 'Modelo sob medida', 'Acabamento profissional', 'Proteção contra insetos', 'Garantia conforme proposta'],
         concorrentes: ['Transparência 60%', 'Instalação 7-15 dias', 'Malha 2mm', 'Oxida com tempo', 'Garantia 6 meses']
       },
       
@@ -196,7 +196,7 @@ export const useServicoData = () => {
         },
         {
           pergunta: 'A tela oxida ou estraga com o tempo?',
-          resposta: 'Não! O material é fibra de vidro revestida, não oxida. Garantimos 2 anos contra desgaste.'
+          resposta: 'O material e o acabamento são definidos conforme o modelo escolhido. As condições de garantia são informadas na proposta.'
         }
       ],
       
@@ -205,7 +205,7 @@ export const useServicoData = () => {
       
       // Meta tags
       metaTitle: 'Tela Mosquiteira Invisível em São Paulo | Anti-Dengue | AD Telas',
-      metaDescription: 'Tela mosquiteira com 85% transparência. Proteção contra dengue, zika e mosquitos. Instalação 24h. Garantia 2 anos. Orçamento grátis!'
+      metaDescription: 'Tela mosquiteira sob medida para proteção contra mosquitos e outros insetos. Instalação agendada. Solicite um orçamento.'
     }
   ]
   

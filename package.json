@@ -5,6 +5,7 @@
   "scripts": {
     "test:finance": "node scripts/test-finance.mjs",
     "test:finance:browser": "node scripts/test-finance-browser.mjs",
+    "test:seo": "node scripts/test-seo-routes.mjs",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

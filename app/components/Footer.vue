@@ -27,9 +27,9 @@
             Termos de Uso
           </a>
           <span>|</span>
-          <a href="/politica-de-privacidade.html" target="_blank" class="hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-3">
+          <NuxtLink to="/politica-de-privacidade" class="hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px] inline-flex items-center justify-center px-3">
             Política de Privacidade
-          </a>
+          </NuxtLink>
         </div>
         
         <p class="text-[11px] mt-5 opacity-60">Todos os direitos reservados | Desenvolvido com foco em conversão e segurança</p>

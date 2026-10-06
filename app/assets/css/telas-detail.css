@@ -1,4 +1,9 @@
 /* Page-scoped brand tokens from the approved /servicos/telas hub and existing logo. */
+.telas-detail .td-editorial { max-width:850px; }
+.telas-detail .td-editorial p { margin-top:16px; line-height:1.7; }
+.telas-detail .td-editorial ul { list-style:none; padding:0; margin:16px 0 0; }
+.telas-detail .td-editorial a { white-space:normal; overflow-wrap:anywhere; }
+.telas-detail .td-hero-form-link { color:white; text-decoration:underline; text-underline-offset:4px; display:inline-flex; align-items:center; min-height:44px; width:fit-content; font-size:14px; }
 .telas-detail { --td-blue:#234b73; --td-navy:#142b46; --td-gold:#f2bd16; --td-text:#182f49; --td-muted:#506176; --td-line:#dce5ef; --td-tint:#f3f6fa; color:var(--td-text); background:white; padding-bottom:0; line-height:1.5; }
 .telas-detail .td-wrap { width:min(1200px,calc(100% - 36px)); margin-inline:auto; }
 .telas-detail h1,.telas-detail h2,.telas-detail h3,.telas-detail p { margin:0; }

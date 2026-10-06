@@ -7,6 +7,11 @@ export interface ServiceImage {
   alt: string
 }
 export interface ServiceText { title: string; description: string }
+export interface ServiceContentSection {
+  title: string
+  paragraphs: string[]
+  links: Array<{ text: string; to: string }>
+}
 export interface ServiceModel extends ServiceText { highlight: string; image?: ServiceImage; diagram?: 'pivotante' | 'porta-dupla' }
 export interface TelasService {
   slug: string
@@ -15,6 +20,13 @@ export interface TelasService {
   title: string
   eyebrow: string
   description: string
+  heroCta: string
+  modelsTitle: string
+  modelsIntro: string
+  benefitsTitle: string
+  sections: ServiceContentSection[]
+  quoteTitle: string
+  quoteDescription: string
   whatsappUrl: string
   seo: { title: string; meta: Array<{ name?: string; property?: string; content: string }> }
   breadcrumbs: Array<{ label: string; path: string; current: boolean; icon?: string }>

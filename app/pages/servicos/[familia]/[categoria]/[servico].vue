@@ -13,9 +13,8 @@ const servico = getServicoBySlug(
   route.params.servico
 )
 
-// Se serviço não encontrado, redirecionar para página de serviços
 if (!servico) {
-  navigateTo('/servicos')
+  throw createError({ statusCode: 404, message: 'Serviço não encontrado' })
 }
 
 const canonicalServiceKey = computed(() => {
@@ -120,11 +119,11 @@ const openFormModal = () => { showFormModal.value = true }
               <div class="flex flex-wrap gap-4 items-center justify-center md:justify-start">
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
-                  <span class="text-white font-semibold">Instalação em 24h</span>
+                  <span class="text-white font-semibold">Instalação agendada</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
-                  <span class="text-white font-semibold">Garantia 2 anos</span>
+                  <span class="text-white font-semibold">Garantia conforme proposta</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:check-circle" class="w-5 h-5 text-[#25D366]" />
@@ -174,7 +173,7 @@ const openFormModal = () => { showFormModal.value = true }
                   <Icon name="lucide:check-circle" class="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p class="text-2xl font-bold text-[#22345F]">500+</p>
+                  <p class="text-2xl font-bold text-[#22345F]">Sob medida</p>
                   <p class="text-sm text-[#4B5563]">Instalações</p>
                 </div>
               </div>
@@ -441,7 +440,7 @@ const openFormModal = () => { showFormModal.value = true }
           <!-- Título -->
           <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">
             Proteja sua família HOJE!<br/>
-            Instalação em 24h
+            Instalação agendada
           </h2>
           
           <!-- Descrição -->
@@ -457,11 +456,11 @@ const openFormModal = () => { showFormModal.value = true }
             </div>
             <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
               <Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366]" />
-              <span class="font-semibold">Instalação 24h</span>
+              <span class="font-semibold">Instalação agendada</span>
             </div>
             <div class="flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
               <Icon name="lucide:check-circle" class="w-6 h-6 text-[#25D366]" />
-              <span class="font-semibold">Garantia 2 Anos</span>
+              <span class="font-semibold">Garantia conforme proposta</span>
             </div>
           </div>
           
@@ -482,7 +481,7 @@ const openFormModal = () => { showFormModal.value = true }
           <div class="flex items-center justify-center gap-6 text-sm text-white/80">
             <div class="flex items-center gap-2">
               <Icon name="lucide:star" class="w-5 h-5 text-[#F49A1A]" />
-              <span>500+ clientes satisfeitos</span>
+              <span>Atendimento sob medida</span>
             </div>
             <a
               :href="GOOGLE_REVIEWS_URL"

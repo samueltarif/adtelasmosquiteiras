@@ -5,9 +5,8 @@ const route = useRoute()
 const { getFamiliaBySlug } = useServicos()
 const familia = getFamiliaBySlug(route.params.familia)
 
-// Redirecionar se família não existir
 if (!familia) {
-  navigateTo('/servicos')
+  throw createError({ statusCode: 404, message: 'Família de serviços não encontrada' })
 }
 
 // Contar total de serviços
@@ -20,7 +19,7 @@ const totalServicos = Object.values(familia.categorias).reduce(
 useHead({
   title: `${familia.nome} | Todos os Serviços | AD Telas`,
   meta: [
-    { name: 'description', content: `${familia.descricao}. ${totalServicos} serviços disponíveis. Instalação em 24h. Garantia 2 anos.` },
+    { name: 'description', content: `${familia.descricao}. ${totalServicos} serviços disponíveis. Instalação agendada e garantia conforme proposta.` },
     { property: 'og:title', content: `${familia.nome} | AD Telas` },
     { property: 'og:description', content: familia.descricao }
   ]

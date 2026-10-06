@@ -7,9 +7,8 @@ const { getFamiliaBySlug, getCategoriaBySlug } = useServicos()
 const familia = getFamiliaBySlug(route.params.familia)
 const categoria = getCategoriaBySlug(route.params.familia, route.params.categoria)
 
-// Redirecionar se não existir
 if (!familia || !categoria) {
-  navigateTo('/servicos')
+  throw createError({ statusCode: 404, message: 'Categoria de serviços não encontrada' })
 }
 
 // Converter serviços object para array
@@ -19,7 +18,7 @@ const servicosArray = Object.values(categoria.servicos)
 useHead({
   title: `${categoria.titulo} | ${familia.nome} | AD Telas`,
   meta: [
-    { name: 'description', content: `${categoria.descricao}. ${servicosArray.length} serviços de ${familia.nome.toLowerCase()} disponíveis. Instalação em 24h.` },
+    { name: 'description', content: `${categoria.descricao}. ${servicosArray.length} serviços de ${familia.nome.toLowerCase()} disponíveis. Instalação agendada.` },
     { property: 'og:title', content: `${categoria.titulo} | ${familia.nome}` },
     { property: 'og:description', content: categoria.descricao }
   ]

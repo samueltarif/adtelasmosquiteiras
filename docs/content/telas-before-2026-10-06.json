@@ -1,0 +1,1114 @@
+[
+  {
+    "source": "janelas.ts",
+    "approxContentWords": 304,
+    "slug": "janelas",
+    "key": "telas_janelas",
+    "name": "Telas Mosquiteiras para Janelas",
+    "title": "Tela Mosquiteira para Janelas Sob Medida em São Paulo",
+    "eyebrow": "Esquadrias Residenciais e Comerciais",
+    "description": "Proteção contra pernilongos, mosquitos e insetos para janelas de quartos, salas, banheiros e cozinhas. Fabricação sob medida em todo o estado de São Paulo.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Janelas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Mosquiteira para Janelas em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Tela mosquiteira para janelas em São Paulo. Instalação sob medida para modelos de correr, basculantes e pivotantes. Solicite seu orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Mosquiteira para Janelas em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Instalação de telas mosquiteiras sob medida para todos os tipos de janelas residenciais e comerciais."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/tela_mosquiteira.png"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Janelas",
+        "path": "/servicos/telas/janelas",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/mosquiteira-janela.webp",
+      "small": "/images/telas/catalogo/mosquiteira-janela-480.webp",
+      "width": 663,
+      "height": 495,
+      "smallWidth": 480,
+      "alt": "Tela em janela residencial"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/mosquiteira-janela.webp",
+        "small": "/images/telas/catalogo/mosquiteira-janela-480.webp",
+        "width": 663,
+        "height": 495,
+        "smallWidth": 480,
+        "alt": "Tela em janela residencial"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-de-correr-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-de-correr-especificacoes-480.webp",
+        "width": 750,
+        "height": 1000,
+        "smallWidth": 360,
+        "alt": "Tela deslizante em janela"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-basculante.webp",
+        "small": "/images/telas/catalogo/telas-para-basculante-480.webp",
+        "width": 633,
+        "height": 633,
+        "smallWidth": 480,
+        "alt": "Janela basculante com tela"
+      },
+      {
+        "src": "/images/telas/catalogo/tela-paraJanela.webp",
+        "small": "/images/telas/catalogo/tela-paraJanela-480.webp",
+        "width": 313,
+        "height": 250,
+        "smallWidth": 313,
+        "alt": "Quadro de tela para janela"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-com-aluminio.webp",
+        "small": "/images/telas/catalogo/telas-com-aluminio-480.webp",
+        "width": 894,
+        "height": 894,
+        "smallWidth": 480,
+        "alt": "Detalhe do perfil e fecho"
+      }
+    ],
+    "models": [
+      {
+        "title": "Janelas de Correr (Deslizantes)",
+        "description": "Estrutura sobreposta que acompanha as folhas móveis da janela. Permite abertura e fechamento sem interferir no manuseio da esquadria.",
+        "highlight": "Salas, quartos e cozinhas com esquadrias padrão ou sob medida.",
+        "image": {
+          "src": "/images/telas/catalogo/telas-de-correr-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-de-correr-especificacoes-480.webp",
+          "width": 750,
+          "height": 1000,
+          "smallWidth": 360,
+          "alt": "Tela deslizante em janela"
+        }
+      },
+      {
+        "title": "Janelas Basculantes e Maxim-ar",
+        "description": "Painéis adaptados com fecho prático que permitem ventilação constante enquanto mantêm o vão protegido contra insetos.",
+        "highlight": "Banheiros, lavanderias, áreas de serviço e corredores.",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-basculante.webp",
+          "small": "/images/telas/catalogo/telas-para-basculante-480.webp",
+          "width": 633,
+          "height": 633,
+          "smallWidth": 480,
+          "alt": "Janela basculante com tela"
+        }
+      },
+      {
+        "title": "Janelas Pivotantes e Projetantes",
+        "description": "Quadros adaptados ao movimento da janela, garantindo abertura e fechamento adequados.",
+        "highlight": "Ambientes residenciais e projetos arquitetônicos.",
+        "diagram": "pivotante"
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Ajuste sob medida",
+        "description": "Dimensionamento conforme as características do vão."
+      },
+      {
+        "title": "Proteção contra insetos",
+        "description": "Ventilação natural com tela mosquiteira."
+      },
+      {
+        "title": "Instalação profissional",
+        "description": "Montagem e conferência no local."
+      }
+    ],
+    "technical": [],
+    "process": [
+      {
+        "title": "Levantamento e Medição",
+        "description": "Avaliação das dimensões exatas do vão e do tipo de esquadria existente no local."
+      },
+      {
+        "title": "Confecção da Estrutura",
+        "description": "Montagem da estrutura sob medida com encaixe preciso para o vão da janela."
+      },
+      {
+        "title": "Instalação no Local",
+        "description": "Fixação da tela na esquadria, conferência do ajuste e teste de abertura."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "A tela mosquiteira interfere na circulação de ar ou na claridade?",
+        "resposta": "A malha mosquiteira é desenvolvida com trama fina que permite a passagem natural de ar e luminosidade, retendo apenas insetos."
+      },
+      {
+        "pergunta": "Como é feita a limpeza de telas mosquiteiras em janelas?",
+        "resposta": "A higienização pode ser realizada com pano macio umedecido em água e sabão neutro ou aspirador com bocal de cerdas suaves."
+      },
+      {
+        "pergunta": "É possível instalar tela mosquiteira em janelas de apartamentos?",
+        "resposta": "Sim. As telas são instaladas de forma a respeitar as esquadrias e as características do condomínio."
+      },
+      {
+        "pergunta": "Qual a diferença entre tela de correr e tela fixa para janela?",
+        "resposta": "A tela de correr se movimenta para dar acesso ao lado externo, enquanto a tela fixa permanece montada no vão."
+      }
+    ]
+  },
+  {
+    "source": "pet-screen.ts",
+    "approxContentWords": 329,
+    "slug": "pet-screen",
+    "key": "pet_screen",
+    "name": "Telas Mosquiteiras Pet Screen",
+    "title": "Tela Pet Screen para Ambientes com Animais em São Paulo",
+    "eyebrow": "Ambientes Residenciais com Animais",
+    "description": "Tela mosquiteira indicada para ambientes com animais de estimação em portas e janelas residenciais. Ajuda a barrar insetos, mas não substitui a rede contra quedas. Instalação sob medida em todo o estado de São Paulo.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Pet+Screen.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Pet Screen em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Tela Pet Screen para ambientes com animais em São Paulo. Instalação sob medida para portas e janelas. Solicite seu orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Pet Screen em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Telas mosquiteiras com malha Pet Screen para residências com cães e gatos."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/telas_pet_screen_especificacoes.jpg"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Pet Screen",
+        "path": "/servicos/telas/pet-screen",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/telas-pet-screen-especificacoes.webp",
+      "small": "/images/telas/catalogo/telas-pet-screen-especificacoes-480.webp",
+      "width": 800,
+      "height": 800,
+      "smallWidth": 480,
+      "alt": "Referência de malha Pet Screen"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/telas-pet-screen-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-pet-screen-especificacoes-480.webp",
+        "width": 800,
+        "height": 800,
+        "smallWidth": 480,
+        "alt": "Referência de malha Pet Screen"
+      }
+    ],
+    "models": [
+      {
+        "title": "Modelo para Ambientes com Pets",
+        "description": "Tela desenvolvida para aplicação em portas e janelas de residências com cães e gatos.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/telas-pet-screen-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-pet-screen-especificacoes-480.webp",
+          "width": 800,
+          "height": 800,
+          "smallWidth": 480,
+          "alt": "Referência de malha Pet Screen"
+        }
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Modelo para Ambientes com Pets",
+        "description": "Tela desenvolvida para aplicação em portas e janelas de residências com cães e gatos."
+      },
+      {
+        "title": "Proteção Contra Insetos",
+        "description": "Trama milimétrica para impedir a entrada de pernilongos e mosquitos com ventilação contínua."
+      },
+      {
+        "title": "Estrutura Sob Medida",
+        "description": "Perfis ajustados ao vão para manter a tela instalada de forma contínua."
+      }
+    ],
+    "technical": [
+      {
+        "title": "Tela Mosquiteira Pet Screen",
+        "description": "Tela mosquiteira com malha mais espessa para ambientes com cães e gatos. Não substitui rede de proteção contra quedas em altura."
+      },
+      {
+        "title": "Rede de Proteção para Pets",
+        "description": "Estrutura para retenção mecânica e prevenção de acidentes em janelas e sacadas altas."
+      }
+    ],
+    "process": [
+      {
+        "title": "Avaliação e medição",
+        "description": "Conferimos as medidas e as características do seu ambiente."
+      },
+      {
+        "title": "Fabricação sob medida",
+        "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      },
+      {
+        "title": "Instalação no local",
+        "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "O que diferencia a tela Pet Screen da tela mosquiteira convencional?",
+        "resposta": "A tela Pet Screen é um modelo voltado para ambientes com animais de estimação, indicada para locais de passagem e circulação de cães e gatos."
+      },
+      {
+        "pergunta": "A tela Pet Screen substitui a rede de proteção em janelas e sacadas de prédios?",
+        "resposta": "Não. A tela Pet Screen tem foco em proteção contra insetos. Para segurança contra quedas em apartamentos e sobrados, a indicação é a Rede de Proteção."
+      },
+      {
+        "pergunta": "Onde a tela Pet Screen é mais indicada?",
+        "resposta": "Em portas de correr, acessos a quintais e janelas baixas onde cães e gatos costumam circular."
+      },
+      {
+        "pergunta": "Como deve ser feita a higienização da tela Pet Screen?",
+        "resposta": "A limpeza pode ser realizada com pano úmido e detergente neutro, removendo pelos e poeira acumulados."
+      }
+    ]
+  },
+  {
+    "source": "portas.ts",
+    "approxContentWords": 307,
+    "slug": "portas",
+    "key": "telas_portas",
+    "name": "Telas Mosquiteiras para Portas",
+    "title": "Tela Mosquiteira para Portas Sob Medida em São Paulo",
+    "eyebrow": "Passagens e Acessos Externos",
+    "description": "Mantenha portas abertas para ventilação contínua com proteção contra mosquitos e pernilongos. Modelos sob medida em todo o estado de São Paulo.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Portas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Mosquiteira para Portas em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Tela mosquiteira para portas e passagens em São Paulo. Modelos sob medida para residências e apartamentos. Solicite seu orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Mosquiteira para Portas em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Instalação sob medida de telas mosquiteiras para portas de giro e portas balcão de correr."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/telas_para_portas.jpeg"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Portas",
+        "path": "/servicos/telas/portas",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/mosquiteira-porta-de-correr.webp",
+      "small": "/images/telas/catalogo/mosquiteira-porta-de-correr-480.webp",
+      "width": 671,
+      "height": 499,
+      "smallWidth": 480,
+      "alt": "Tela em porta de correr"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/mosquiteira-porta-de-correr.webp",
+        "small": "/images/telas/catalogo/mosquiteira-porta-de-correr-480.webp",
+        "width": 671,
+        "height": 499,
+        "smallWidth": 480,
+        "alt": "Tela em porta de correr"
+      },
+      {
+        "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
+        "small": "/images/telas/catalogo/mosquiteira-para-porta-480.webp",
+        "width": 370,
+        "height": 494,
+        "smallWidth": 360,
+        "alt": "Tela em passagem externa"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-portas-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-para-portas-especificacoes-480.webp",
+        "width": 563,
+        "height": 1000,
+        "smallWidth": 270,
+        "alt": "Porta com tela instalada"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-portas.webp",
+        "small": "/images/telas/catalogo/telas-para-portas-480.webp",
+        "width": 481,
+        "height": 633,
+        "smallWidth": 365,
+        "alt": "Tela sob medida para porta"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-com-aluminio.webp",
+        "small": "/images/telas/catalogo/telas-com-aluminio-480.webp",
+        "width": 894,
+        "height": 894,
+        "smallWidth": 480,
+        "alt": "Detalhe do perfil e fecho"
+      }
+    ],
+    "models": [
+      {
+        "title": "Porta de Giro com Fecho Prático",
+        "description": "Estrutura articulada com dobradiças e fecho funcional. Indicada para acessos frequentes a quintais, varandas e áreas de serviço.",
+        "highlight": "Passagem prática no dia a dia",
+        "image": {
+          "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
+          "small": "/images/telas/catalogo/mosquiteira-para-porta-480.webp",
+          "width": 370,
+          "height": 494,
+          "smallWidth": 360,
+          "alt": "Tela em passagem externa"
+        }
+      },
+      {
+        "title": "Porta Balcão de Correr",
+        "description": "Painel deslizante montado paralelamente às folhas existentes, acompanhando o vão sem ocupar espaço útil do ambiente.",
+        "highlight": "Acompanha o vão da porta balcão",
+        "image": {
+          "src": "/images/telas/catalogo/mosquiteira-porta-de-correr.webp",
+          "small": "/images/telas/catalogo/mosquiteira-porta-de-correr-480.webp",
+          "width": 671,
+          "height": 499,
+          "smallWidth": 480,
+          "alt": "Tela em porta de correr"
+        }
+      },
+      {
+        "title": "Porta Dupla",
+        "description": "Configuração sob medida para vãos amplos com duas folhas centrais e fechamento centralizado.",
+        "highlight": "Ideal para passagens amplas",
+        "diagram": "porta-dupla"
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Ajuste à Altura da Porta",
+        "description": "A solução é dimensionada conforme as características da porta e do piso no local."
+      },
+      {
+        "title": "Estrutura para Passagens",
+        "description": "Estrutura projetada para a rotina de abertura e fechamento de acessos residenciais."
+      },
+      {
+        "title": "Puxadores Integrados",
+        "description": "Acessórios para manuseio confortável por dentro e por fora do ambiente."
+      }
+    ],
+    "technical": [],
+    "process": [
+      {
+        "title": "Avaliação e medição",
+        "description": "Conferimos as medidas e as características do seu ambiente."
+      },
+      {
+        "title": "Fabricação sob medida",
+        "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      },
+      {
+        "title": "Instalação no local",
+        "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "A tela para porta impede a entrada de animais de estimação?",
+        "resposta": "A tela convencional tem como finalidade principal o bloqueio de insetos voadores. Para lares com animais de estimação, o modelo Pet Screen é a opção com malha mais espessa."
+      },
+      {
+        "pergunta": "Como é feito o fechamento na base da porta?",
+        "resposta": "A solução é dimensionada conforme as características da porta e as condições do vão."
+      },
+      {
+        "pergunta": "A porta de correr precisa de guia de apoio?",
+        "resposta": "É instalada uma guia de apoio superior e inferior para orientar o deslocamento alinhado do painel."
+      },
+      {
+        "pergunta": "Qual o procedimento para solicitar uma tela de porta?",
+        "resposta": "Basta entrar em contato para combinarmos a medição das dimensões da sua porta e elaboração da proposta sob medida."
+      }
+    ]
+  },
+  {
+    "source": "removivel.ts",
+    "approxContentWords": 283,
+    "slug": "removivel",
+    "key": "telas_removiveis",
+    "name": "Telas Mosquiteiras Removíveis",
+    "title": "Tela Mosquiteira Removível em São Paulo",
+    "eyebrow": "Praticidade e Higienização Fácil",
+    "description": "Sistema prático que permite retirar o quadro a qualquer momento para limpeza ou para acessar o lado externo da janela. Fabricação sob medida em São Paulo.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+Remov%C3%ADvel.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Mosquiteira Removível em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Tela mosquiteira removível sob medida em São Paulo. Prática de retirar e higienizar quando necessário. Solicite seu orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Mosquiteira Removível em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Telas mosquiteiras de encaixe e remoção prática para limpeza em janelas residenciais."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/mosquiteira_removivel.png"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Removível",
+        "path": "/servicos/telas/removivel",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/telas-removiveis-especificacoes.webp",
+      "small": "/images/telas/catalogo/telas-removiveis-especificacoes-480.webp",
+      "width": 918,
+      "height": 918,
+      "smallWidth": 480,
+      "alt": "Quadros removíveis em janelas"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/telas-removiveis-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-removiveis-especificacoes-480.webp",
+        "width": 918,
+        "height": 918,
+        "smallWidth": 480,
+        "alt": "Quadros removíveis em janelas"
+      },
+      {
+        "src": "/images/telas/catalogo/mosquiteira-removivel.webp",
+        "small": "/images/telas/catalogo/mosquiteira-removivel-480.webp",
+        "width": 373,
+        "height": 497,
+        "smallWidth": 360,
+        "alt": "Tela instalada no requadro"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-basculante.webp",
+        "small": "/images/telas/catalogo/telas-para-basculante-480.webp",
+        "width": 633,
+        "height": 633,
+        "smallWidth": 480,
+        "alt": "Quadro de encaixe em basculante"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-banheiro.webp",
+        "small": "/images/telas/catalogo/telas-para-banheiro-480.webp",
+        "width": 750,
+        "height": 1000,
+        "smallWidth": 360,
+        "alt": "Tela em janela de banheiro"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-com-aluminio.webp",
+        "small": "/images/telas/catalogo/telas-com-aluminio-480.webp",
+        "width": 894,
+        "height": 894,
+        "smallWidth": 480,
+        "alt": "Detalhe do encaixe"
+      }
+    ],
+    "models": [
+      {
+        "title": "Sistema de Fácil Encaixe",
+        "description": "O modelo removível permite retirada quando necessário para limpeza ou acesso ao vão.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/mosquiteira-removivel.webp",
+          "small": "/images/telas/catalogo/mosquiteira-removivel-480.webp",
+          "width": 373,
+          "height": 497,
+          "smallWidth": 360,
+          "alt": "Tela instalada no requadro"
+        }
+      },
+      {
+        "title": "Instalação Perimetral",
+        "description": "Estrutura ajustada ao requadro da janela para utilização prática no dia a dia.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/telas-removiveis-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-removiveis-especificacoes-480.webp",
+          "width": 918,
+          "height": 918,
+          "smallWidth": 480,
+          "alt": "Quadros removíveis em janelas"
+        }
+      },
+      {
+        "title": "Encaixe no Vão",
+        "description": "Quadro dimensionado conforme o modelo da esquadria existente.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-basculante.webp",
+          "small": "/images/telas/catalogo/telas-para-basculante-480.webp",
+          "width": 633,
+          "height": 633,
+          "smallWidth": 480,
+          "alt": "Quadro de encaixe em basculante"
+        }
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Higienização Prática",
+        "description": "Como o quadro pode ser desencaixado, a limpeza pode ser realizada com água e sabão neutro fora do vão."
+      },
+      {
+        "title": "Preservação da Estrutura",
+        "description": "Sistemas de fixação com mínimo impacto na esquadria existente."
+      },
+      {
+        "title": "Praticidade para Imóveis Residenciais",
+        "description": "Solução sob medida de fácil retirada quando necessário."
+      }
+    ],
+    "technical": [],
+    "process": [
+      {
+        "title": "Avaliação e medição",
+        "description": "Conferimos as medidas e as características do seu ambiente."
+      },
+      {
+        "title": "Fabricação sob medida",
+        "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      },
+      {
+        "title": "Instalação no local",
+        "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "Como é feito o processo de retirada da tela para higienização?",
+        "resposta": "O quadro é desencaixado de forma simples através dos pontos de encaixe, permitindo a retirada sem necessidade de ferramentas."
+      },
+      {
+        "pergunta": "A tela removível permanece firme no vão?",
+        "resposta": "A tela é dimensionada para permanecer acomodada no vão durante o uso diário no ambiente residencial."
+      },
+      {
+        "pergunta": "Posso usar tela removível em janelas basculantes?",
+        "resposta": "Sim. É uma aplicação frequente para basculantes, pois facilita o manuseio da alavanca da janela quando necessário."
+      },
+      {
+        "pergunta": "Como realizar a higienização da tela removível?",
+        "resposta": "A limpeza pode ser feita com água corrente e sabão neutro fora do vão, facilitando a secagem antes do reenquadramento."
+      }
+    ]
+  },
+  {
+    "source": "restaurantes.ts",
+    "approxContentWords": 275,
+    "slug": "restaurantes",
+    "key": "telas_restaurantes",
+    "name": "Telas Mosquiteiras para Restaurantes",
+    "title": "Tela Mosquiteira para Restaurantes e Cozinhas em São Paulo",
+    "eyebrow": "Comércio e Setor Alimentício",
+    "description": "Proteção contra moscas e insetos para cozinhas profissionais, bares, restaurantes, lanchonetes e padarias em todo o estado de São Paulo. Instalação sob medida.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Telas+Mosquiteiras+de+Restaurantes.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Mosquiteira para Restaurantes e Cozinhas em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Telas mosquiteiras sob medida para cozinhas, bares e restaurantes em São Paulo. Proteção contra insetos para seu estabelecimento. Solicite um orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Mosquiteira para Restaurantes e Cozinhas em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Telas mosquiteiras comerciais para cozinhas profissionais, lanchonetes e áreas de manipulação de alimentos."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/telas_para_restaurantes.jpg"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Restaurantes",
+        "path": "/servicos/telas/restaurantes",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/telas-para-restaurantes.webp",
+      "small": "/images/telas/catalogo/telas-para-restaurantes-480.webp",
+      "width": 630,
+      "height": 292,
+      "smallWidth": 480,
+      "alt": "Tela em janela de cozinha"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/telas-para-restaurantes.webp",
+        "small": "/images/telas/catalogo/telas-para-restaurantes-480.webp",
+        "width": 630,
+        "height": 292,
+        "smallWidth": 480,
+        "alt": "Tela em janela de cozinha"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-restaurantes-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-para-restaurantes-especificacoes-480.webp",
+        "width": 1024,
+        "height": 576,
+        "smallWidth": 480,
+        "alt": "Aplicação em cozinha profissional"
+      },
+      {
+        "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
+        "small": "/images/telas/catalogo/mosquiteira-para-porta-480.webp",
+        "width": 370,
+        "height": 494,
+        "smallWidth": 360,
+        "alt": "Referência de tela para passagem"
+      }
+    ],
+    "models": [
+      {
+        "title": "Cozinhas e Áreas de Preparo",
+        "description": "Telas sob medida em janelas e aberturas para manter o ambiente arejado e protegido contra insetos voadores.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-restaurantes.webp",
+          "small": "/images/telas/catalogo/telas-para-restaurantes-480.webp",
+          "width": 630,
+          "height": 292,
+          "smallWidth": 480,
+          "alt": "Tela em janela de cozinha"
+        }
+      },
+      {
+        "title": "Despensas e Armazenamento",
+        "description": "Fechamento de vãos de ventilação para conservar alimentos com circulação de ar.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-restaurantes-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-para-restaurantes-especificacoes-480.webp",
+          "width": 1024,
+          "height": 576,
+          "smallWidth": 480,
+          "alt": "Aplicação em cozinha profissional"
+        }
+      },
+      {
+        "title": "Portas de Acesso e Passagens",
+        "description": "Portas mosquiteiras sob medida para áreas com circulação operacional.",
+        "highlight": "Solução sob medida para o seu ambiente",
+        "image": {
+          "src": "/images/telas/catalogo/mosquiteira-para-porta.webp",
+          "small": "/images/telas/catalogo/mosquiteira-para-porta-480.webp",
+          "width": 370,
+          "height": 494,
+          "smallWidth": 360,
+          "alt": "Referência de tela para passagem"
+        }
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Estrutura Sob Medida para Estabelecimentos",
+        "description": "Perfis e telas dimensionados para a rotina de cozinhas profissionais."
+      },
+      {
+        "title": "Instalação Sob Medida",
+        "description": "Adaptação técnica a diferentes dimensões de esquadrias comerciais."
+      },
+      {
+        "title": "Atendimento para Empresas",
+        "description": "Planejamento de atendimento conforme a necessidade do comércio ou estabelecimento."
+      }
+    ],
+    "technical": [],
+    "process": [
+      {
+        "title": "Avaliação e medição",
+        "description": "Conferimos as medidas e as características do seu ambiente."
+      },
+      {
+        "title": "Fabricação sob medida",
+        "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      },
+      {
+        "title": "Instalação no local",
+        "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "Quais áreas de um restaurante necessitam de telas mosquiteiras?",
+        "resposta": "Geralmente as aberturas em áreas de manipulação de alimentos, cozinhas, despensas e acessos operacionais."
+      },
+      {
+        "pergunta": "Como realizar a limpeza de telas em ambientes comerciais?",
+        "resposta": "Recomenda-se a limpeza periódica com água e detergente neutro, com auxílio de pano macio ou esponja suave."
+      },
+      {
+        "pergunta": "Vocês atendem em horários combinados com o estabelecimento?",
+        "resposta": "O cronograma de instalação é combinado previamente para melhor conveniência do cliente."
+      },
+      {
+        "pergunta": "Como solicitar orçamento para estabelecimentos comerciais?",
+        "resposta": "Basta entrar em contato pelo WhatsApp ou formulário informando a quantidade aproximada de vãos para agendarmos a avaliação técnica."
+      }
+    ]
+  },
+  {
+    "source": "sacadas-e-varandas.ts",
+    "approxContentWords": 341,
+    "slug": "sacadas-e-varandas",
+    "key": "telas_sacadas",
+    "name": "Telas Mosquiteiras para Sacadas",
+    "title": "Tela Mosquiteira para Sacadas e Varandas em São Paulo",
+    "eyebrow": "Áreas Externas e Varandas Gourmet",
+    "description": "Aproveite sua varanda gourmet e sacada com ar fresco e proteção contra pernilongos e mosquitos. Projetos sob medida em todo o estado de São Paulo.",
+    "whatsappUrl": "https://api.whatsapp.com/send/?phone=5511983586611&text=Ol%C3%A1%21+Gostaria+de+um+or%C3%A7amento+para+Tela+Mosquiteira+de+Sacadas+e+Varandas.+Vim+pelo+site.&type=phone_number&app_absent=0",
+    "seo": {
+      "title": "Tela Mosquiteira para Sacada e Varanda em SP | AD Telas e Redes",
+      "meta": [
+        {
+          "name": "description",
+          "content": "Tela mosquiteira sob medida para sacadas e varandas em São Paulo. Proteção contra insetos para sua área externa. Solicite um orçamento."
+        },
+        {
+          "property": "og:title",
+          "content": "Tela Mosquiteira para Sacada e Varanda em SP | AD Telas e Redes"
+        },
+        {
+          "property": "og:description",
+          "content": "Fechamento com tela mosquiteira sob medida para sacadas, terraços e varandas gourmet."
+        },
+        {
+          "property": "og:image",
+          "content": "https://www.adtelasmosquiteiras.com.br/images/telas_para_varandas.jpg"
+        },
+        {
+          "property": "og:type",
+          "content": "website"
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "label": "Home",
+        "path": "/",
+        "current": false,
+        "icon": "lucide:home"
+      },
+      {
+        "label": "Serviços",
+        "path": "/servicos",
+        "current": false
+      },
+      {
+        "label": "Telas Mosquiteiras",
+        "path": "/servicos/telas",
+        "current": false
+      },
+      {
+        "label": "Sacadas e Varandas",
+        "path": "/servicos/telas/sacadas-e-varandas",
+        "current": true
+      }
+    ],
+    "hero": {
+      "src": "/images/telas/catalogo/telas-para-varandas-especificacoes.webp",
+      "small": "/images/telas/catalogo/telas-para-varandas-especificacoes-480.webp",
+      "width": 780,
+      "height": 400,
+      "smallWidth": 480,
+      "alt": "Fechamento telado de varanda"
+    },
+    "gallery": [
+      {
+        "src": "/images/telas/catalogo/telas-para-varandas-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-para-varandas-especificacoes-480.webp",
+        "width": 780,
+        "height": 400,
+        "smallWidth": 480,
+        "alt": "Fechamento telado de varanda"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-sacadas-especificacoes.webp",
+        "small": "/images/telas/catalogo/telas-para-sacadas-especificacoes-480.webp",
+        "width": 563,
+        "height": 1000,
+        "smallWidth": 270,
+        "alt": "Tela em vão de sacada"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-sacadas.webp",
+        "small": "/images/telas/catalogo/telas-para-sacadas-480.webp",
+        "width": 1200,
+        "height": 900,
+        "smallWidth": 480,
+        "alt": "Tela em varanda residencial"
+      },
+      {
+        "src": "/images/telas/catalogo/telas-para-varandas.webp",
+        "small": "/images/telas/catalogo/telas-para-varandas-480.webp",
+        "width": 690,
+        "height": 460,
+        "smallWidth": 480,
+        "alt": "Painéis com tela mosquiteira"
+      },
+      {
+        "src": "/images/telas/catalogo/mosquiteira-area-externa.webp",
+        "small": "/images/telas/catalogo/mosquiteira-area-externa-480.webp",
+        "width": 365,
+        "height": 496,
+        "smallWidth": 353,
+        "alt": "Tela em área externa"
+      }
+    ],
+    "models": [
+      {
+        "title": "Integração com Envidraçamento",
+        "description": "Telas deslizantes ou fixas projetadas para operar em conjunto com o fechamento de vidro existente.",
+        "highlight": "Varandas gourmet e sacadas com fechamento de vidro",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-sacadas-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-para-sacadas-especificacoes-480.webp",
+          "width": 563,
+          "height": 1000,
+          "smallWidth": 270,
+          "alt": "Tela em vão de sacada"
+        }
+      },
+      {
+        "title": "Fechamento de Grandes Vãos",
+        "description": "Módulos sob medida que cobrem extensões de varanda garantindo ventilação com proteção contra insetos.",
+        "highlight": "Apartamentos e casas com áreas externas",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-varandas-especificacoes.webp",
+          "small": "/images/telas/catalogo/telas-para-varandas-especificacoes-480.webp",
+          "width": 780,
+          "height": 400,
+          "smallWidth": 480,
+          "alt": "Fechamento telado de varanda"
+        }
+      },
+      {
+        "title": "Painéis de Fácil Manuseio",
+        "description": "Telas com encaixe prático para áreas onde é necessária a retirada periódica para limpeza dos vidros.",
+        "highlight": "Sacadas com acesso restrito",
+        "image": {
+          "src": "/images/telas/catalogo/telas-para-varandas.webp",
+          "small": "/images/telas/catalogo/telas-para-varandas-480.webp",
+          "width": 690,
+          "height": 460,
+          "smallWidth": 480,
+          "alt": "Painéis com tela mosquiteira"
+        }
+      }
+    ],
+    "benefits": [
+      {
+        "title": "Ajuste sob medida",
+        "description": "Dimensionamento conforme as características do vão."
+      },
+      {
+        "title": "Proteção contra insetos",
+        "description": "Ventilação natural com tela mosquiteira."
+      },
+      {
+        "title": "Instalação profissional",
+        "description": "Montagem e conferência no local."
+      }
+    ],
+    "technical": [
+      {
+        "title": "Finalidade da Tela Mosquiteira",
+        "description": "Desenvolvida especificamente para proteção contra insetos voadores, preservando a circulação de ar."
+      },
+      {
+        "title": "Diferença para Rede de Proteção",
+        "description": "A tela mosquiteira não possui função de retenção de peso. Para segurança contra quedas em locais altos, deve-se utilizar a rede de proteção."
+      }
+    ],
+    "process": [
+      {
+        "title": "Avaliação e medição",
+        "description": "Conferimos as medidas e as características do seu ambiente."
+      },
+      {
+        "title": "Fabricação sob medida",
+        "description": "Preparamos a solução conforme o modelo e as medidas definidos."
+      },
+      {
+        "title": "Instalação no local",
+        "description": "Instalamos a tela e conferimos o ajuste e o funcionamento."
+      }
+    ],
+    "faq": [
+      {
+        "pergunta": "É possível instalar tela mosquiteira em sacada que já possui fechamento de vidro?",
+        "resposta": "Sim. A tela mosquiteira é dimensionada para operar no espaço disponível no vão da varanda em harmonia com os vidros."
+      },
+      {
+        "pergunta": "A tela mosquiteira na sacada substitui a rede de proteção?",
+        "resposta": "Não. A tela mosquiteira tem a função de proteção contra insetos. Para retenção física e segurança contra quedas em altura, deve ser utilizada a rede de proteção."
+      },
+      {
+        "pergunta": "Como fica a visibilidade da paisagem com a tela na varanda?",
+        "resposta": "A malha fina é desenvolvida para manter boa transparência visual, preservando a visão externa."
+      },
+      {
+        "pergunta": "Posso combinar tela mosquiteira e rede de proteção na mesma sacada?",
+        "resposta": "Sim. É comum a instalação combinada: a rede de proteção atua na segurança e a tela mosquiteira no bloqueio de insetos."
+      }
+    ]
+  }
+]

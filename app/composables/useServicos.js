@@ -69,7 +69,7 @@ export const useServicos = () => {
               slug: 'varandas',
               titulo: 'Redes de Proteção para Varandas',
               descricaoCurta: 'Proteção total para varandas',
-              destaque: 'Instalação 24h',
+              destaque: 'Instalação agendada',
               imagem: '/images/bebe.png',
               imagemEspecificacoes: '/images/redes_para_varandas_especificacoes.jpg',
               keywords: ['varanda', 'sacada', 'área externa']
@@ -461,16 +461,16 @@ export const useServicos = () => {
     especificacoes: [
       { label: 'Material', valor: 'Sob medida para o vão' },
       { label: 'Fácil Limpeza', valor: 'Passa pano úmido' },
-      { label: 'Garantia', valor: '2 anos' },
+      { label: 'Garantia', valor: 'Conforme proposta' },
       { label: 'Instalação', valor: 'Agendamento rápido' }
     ],
     comparacao: {
-      nos: ['Garantia 2 anos', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida'],
+      nos: ['Garantia conforme proposta', 'Instalação agendada', 'Material de qualidade', 'Atendimento sob medida'],
       concorrentes: ['Sem garantia formal', 'Demora no atendimento', 'Material comum', 'Sem sob medida']
     },
     faq: [
       { pergunta: 'Quanto tempo demora a instalação?', resposta: 'Após medição, combinamos a data para instalação rápida.' },
-      { pergunta: 'Tem garantia?', resposta: 'Sim! 2 anos de garantia contra defeitos de instalação.' },
+      { pergunta: 'Tem garantia?', resposta: 'As condições de garantia são informadas na proposta de cada serviço.' },
       { pergunta: 'Fazem orçamento grátis?', resposta: 'Sim! Orçamento 100% gratuito sem compromisso via WhatsApp.' }
     ]
   }
@@ -506,7 +506,7 @@ export const useServicos = () => {
       categoriaTitulo: categoria.titulo,
       categoriaEmoji: categoria.emoji,
       metaTitle: `${servico.titulo} em São Paulo | ${familia.nome} | AD Telas`,
-      metaDescription: `${servico.titulo}: ${servico.descricaoCurta}. Instalação 24h. Garantia 2 anos. Orçamento grátis!`
+      metaDescription: `${servico.titulo}: ${servico.descricaoCurta}. Instalação agendada e orçamento sob medida.`
     }
   }
   
