@@ -1,0 +1,3 @@
+Remover da campanha "AD Telas | Pesquisa | Leads | SP" (nível campanha):
+"metro"   -> bloqueia quem pesquisa preço do serviço ("tela mosquiteira preço por metro instalada")
+Manter todas as outras 153 (nylon, retrátil, sanfonada, magnética, ímã, velcro, manutenção etc. continuam negativadas — você não faz esses serviços).

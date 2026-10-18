@@ -31,7 +31,7 @@ useHead({
             <ul class="list-disc pl-5 space-y-1 mb-4">
               <li><strong>Nome:</strong> Para personalizar o atendimento</li>
               <li><strong>Cidade:</strong> Para verificar nossa área de atendimento</li>
-              <li><strong>Região/Endereço:</strong> Para calcular deslocamento e agendar visitas</li>
+              <li><strong>Região/Endereço:</strong> Para planejar o atendimento e agendar visitas</li>
               <li><strong>Tipo de serviço:</strong> Para preparar orçamento adequado</li>
               <li><strong>Número de WhatsApp:</strong> Para contato direto (quando fornecido)</li>
             </ul>

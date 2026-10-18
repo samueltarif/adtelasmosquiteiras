@@ -25,7 +25,7 @@ const config = {
   
   // Prova Social
   rating: 5.0, // ⚠️ ALTERAR: Nota de avaliação
-  reviewCount: 487, // ⚠️ ALTERAR: Número de avaliações
+  reviewCount: 49, // ⚠️ ALTERAR: Número de avaliações
   googleReviewUrl: 'https://www.google.com/search?q=AD+TELAS+MOSQUITEIRAS', // ⚠️ ALTERAR: Link das avaliações
   
   // CTAs

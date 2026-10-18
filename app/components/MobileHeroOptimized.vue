@@ -27,7 +27,7 @@ const props = defineProps({
   },
   reviewCount: {
     type: Number,
-    default: 487
+    default: 49
   },
   primaryCtaText: {
     type: String,

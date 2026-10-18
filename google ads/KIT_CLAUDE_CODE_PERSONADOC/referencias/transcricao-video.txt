@@ -1,0 +1,85 @@
+(Transcrito por TurboScribe. Atualize para Ilimitado para remover esta mensagem.)
+
+Quando o assunto é inteligência artificial, nada se comenta mais no mercado do que o Cloud AI. Até pouco tempo a gente falava muito sobre chatpt, sobre Manos, sobre Gemini, parece que todo mundo virou a chave e agora só usa o tal do Cloud AI, e sim, ele é poderosíssimo. E sim, se você está com aquela sensação de que parece que está todo mundo usando, menos você, parece que todo mundo entendeu o poder dele e sabe usar, menos você, você não está errado.
+
+Mas olha, definitivamente eu estou aqui nesse vídeo para te explicar, como se você fosse uma criança de 5 anos, o básico do básico do básico, para que você saia desse vídeo conseguindo fazer coisas verdadeiramente úteis e impressionantes com o Cloud AI. Chega de papo, vamos direto para o vídeo. Olá, me chamo Adriano Genino, sou especialista em tráfego pago e sou criador da comunidade Invictus, uma comunidade feita para ajudar você, gestor de tráfego, gestora de tráfego, a sair do mais absoluto zero e faturar R$15 mil por mês com gestão de tráfego.
+
+Algumas vezes por ano eu abro inscrições para a minha comunidade, e se você quiser conhecer mais tanto a comunidade, quanto depoimentos de pessoas reais, que estão conseguindo faturar valores que você nunca imaginou faturar com gestor de tráfego, o link está aqui nesse card e também na descrição. E antes de começar a aula sobre Cloud AI, cara, dá uma olhada nesse dashboard aqui. Quanto você acha que eu preciso saber de programação? Quanto você acha que eu tenho que saber das práticas de UX e de tantas outras coisas para construir um dashboard desse nível? Olha que coisa linda, não é só o relatório que é bonito, as métricas, os filtros, tem até um botão de ajuda aqui explicando o que é cada coisa.
+
+Cara, eu venho de uma época que a gente cobraria uma verdadeira fortuna para fazer isso aqui. Eu venho de uma época, até pouco tempo, em que tem tutorial meu no canal ensinando a usar o Google Data Studio, que hoje é o Locker Studio. Cara, era um trabalho desgraçado construir uma parada dessa.
+
+Isso aqui foi feito em menos de três minutos com o Cloud AI. Aí você fala, tá bom, Andreano, então como que eu consigo usar o Cloud AI para criar coisas verdadeiramente incríveis? Você precisa aprender o método CTR. A partir dele, você vai conseguir criar coisas verdadeiramente úteis no Cloud AI e é para isso que eu estou aqui, vem cá.
+
+Existem dois grandes pilares que a gente precisa aprender, básicos, para qualquer iniciante do zero, para você sair de não sei nada, não faço nada de útil, para consigo fazer coisas verdadeiramente úteis ou até mesmo incríveis. Primeiro é o método CTR, que é o método ensinado pela própria Antropic nos treinamentos oficiais dela. O que é o CTR? Eles chamam de outro nome, mas particularmente para mim fica muito fácil explicar como CTR.
+
+Não, não tem nada a ver com taxa de cliques. O C é de contexto, o T é de tarefa e o R é de regras, detalhes, especificações. Então, para que a gente consiga verdadeiramente extrair um bom resultado, o primeiro grande pilar é que a sua conversa, o seu chat, ou seja, o seu prompt use o método CTR.
+
+Então, aqui no contexto, você vai dar o contexto do que você precisa dar de contexto para uma tarefa. Imagine que você precisa chegar para uma pessoa e falar assim, crie uma planilha. Isso aqui seria tarefa.
+
+Então, a tarefa seria, crie uma planilha, crie um dashboard para mim, um dashboard. Aqui seria tarefa. Mas sem contexto, que planilha eu crio? Para qual objetivo? Com qual contexto? Para resolver qual problema? A tarefa de maneira clara, crie uma planilha ou crie um painel de controle, crie um dashboard, ela fica sem sentido.
+
+Entretanto, a partir do momento que eu dou o contexto certo, olha, eu sou um profissional de tráfego pago, eu gerencio campanhas Google Ads e Meta Ads para clientes. E eu tenho a seguinte necessidade, eu preciso mensalmente, semanalmente, apresentar relatórios de forma visual, bonita e sofisticada para que os meus clientes entendam o resultado que eu estou gerando e mais do que isso, para que eles me percebam como uma grande autoridade, como um grande especialista, tal que eu apresento os dados de forma bonita e incrivelmente sofisticada. Aqui está um contexto, entende? É diferente de criar um dashboard para... Aqui está o contexto.
+
+Só em dar esse contexto, esse mesmo comando, crie um dashboard, crie uma planilha, crie um documento de persona, crie um anúncio para mim, já vai ter uma saída, um resultado muito diferente. Então, a primeira coisa, eu preciso dar um contexto. A segunda é, eu preciso dizer qual é a tarefa.
+
+Crie um documento de persona. E a terceira, então aqui, todo o contexto que eu falei, eu teria digitado ele aqui. E a terceira, mas não menos importante é, quais são as regras.
+
+Então, por exemplo, nessa tarefa aqui de dashboard, eu falei, olha, eu quero um documento de ajuda. As cores precisam ser preto e amarelo. Eu quero ter filtros por data, eu quero ter filtros por KPIs, eu quero ter... E assim eu fui escrevendo.
+
+Então, o primeiro grande pilar para você usar maravilhosamente bem o Cloud AI, ainda aqui na versão mais simples, que é a versão chat, é você dar o contexto, a tarefa, e todas as especificações sobre essa tarefa. Mas Adriano, você falou então que eram dois grandes pilares. O primeiro pilar era CTR, contexto, tarefa e resultado.
+
+Qual é o segundo grande pilar? Referência. Então, olha só, para que eu consiga extrair um resultado do jeito que eu quero, ao invés de eu explicar um montão de coisas para o Cloud AI, eu tenho uma referência? Então, vamos pensar em uma coisa útil. Imagine que o contexto é, eu sou um profissional, eu vou até... Tem um software bem interessante chamado WhisperFlow, que você aperta aqui e ele começa a escrever aquilo que você está digitando, aquilo que você está falando, é muito melhor do que você digitar.
+
+Então, eu soltei aqui, está vendo? Ele colocou basicamente tudo o que eu falei. Então, agora eu vou falar, vou apagar isso aqui. Eu sou um profissional de tráfego pago, e todas as vezes em que eu fecho um contrato com um cliente, eu preciso criar um documento de persona, tal que a partir dele eu consiga ter todas as informações que eu preciso para criar um site profissional para o meu cliente, e também para criar anúncios para a rede de pesquisa do Google Ads.
+
+Pronto, ele colocou tudo para mim. Então, eu já não precisei aqui ficar digitando, fora que quando você dá o contexto falado fica bem mais legal. Tarefa, cria um documento de persona.
+
+Cara, isso aqui é um comando. Com esse contexto, já vai sair um documento de persona bem legal. Agora, se eu colocar, cria um documento de persona de acordo com o arquivo modelo-de-persona.doc, o resultado vai sair rigorosamente do jeito que você quer.
+
+Aí aqui você vai anexar, você vai vir aqui, adicionar arquivos, e aí você pega um documento de modelo de persona que você já usa com seus clientes, por exemplo. Então, se você é aluno meu, se você já baixou algum modelo de documento de persona, você vai anexar o documento de persona aqui, e voilá, você já deu o modelo para ele. Então, tá bom.
+
+Dentro desse contexto, a tarefa é criar um documento de persona, mas não do jeito que eu acho que deve ser, do jeito que você me falou que deve ser. Cara, sensacional. E aí eu posso ainda fazer o seguinte, crie um documento de persona de acordo com o arquivo modelo-de-persona.tal, mas apenas use este modelo para entender quais informações eu quero.
+
+O resultado final da tarefa deve ser uma página web navegável. Percebe? Aqui eu já estou dizendo que o final eu não quero um documento, eu quero uma página web. Mas eu também poderia falar, o resultado final é um documento.
+
+Então, você entende que eu estou brincando aqui, mas no final, quanto mais específico você for na tarefa, melhor vai ser o resultado. E aqui, nas regras, você vai colocar tudo o que você quer. Então, eu poderia até colocar isso aqui.
+
+Eu até acho melhor. Regras. Um, o resultado final da tarefa deve ser uma página web navegável.
+
+As cores devem seguir... Aí você pode digitar as cores ou o modelo de resultado final, modelo-resultado.pdf. Então, você pode ter um PDF onde nele tem todo o brand, por exemplo. E aqui você vai colocando todas as regras. Crie um menu de ajuda.
+
+E aí você vai especificar. Crie um menu de ajuda para isso, isso e aquilo. Crie uma pesquisa por todas as perguntas e assim por diante.
+
+Então, olha só, eu não coloquei nenhum modelo aqui. Dito isso, ele não vai gerar nenhum resultado. Mas, crie um documento de persona de acordo... Eu vou tirar esse de acordo só para a gente gerar um resultado aqui.
+
+Crie um documento de persona para ser usado nas campanhas. E eu vou deixar as regras aqui. Você vai entender o que vai acontecer aqui, mas a grande mágica é que eu dei um contexto, eu dei a tarefa e eu dei todos os detalhes da tarefa.
+
+Se eu coloco modelos, por exemplo, nessa tarefa do dashboard aqui, eu dei o modelo. Eu dei modelos de planilhas e eu dei modelos de design. Então, saiu exatamente do jeito que eu queria.
+
+Então, vamos dar uma olhada aqui. Só para registrar, eu estou usando o aplicativo do Cloud, mas esse resultado vai ser tão inteligente e tão fidedigno quanto se você usar a versão web, desde que você tenha basicamente o mesmo prompt, versão paga. Eu estou usando aqui a versão intermediária, que não gasta tanto token, mas também não gasta o mínimo.
+
+E para essa tarefa vai funcionar muito bem. Então, vou clicar aqui e vamos ver o que vai sair. Só fazendo uma adenda, eu esqueci de tirar a questão do PDF.
+
+Eu falei no prompt aqui alguma coisa do PDF. As cores devem seguir o modelo resultado. E ele fala, o modelo resultado não foi.
+
+Parece que ele não foi enviado. Então, eu vou criar como identidade visual profissional. Esquema é escuro com destaque de âmba dourado, que é comum em materiais de tráfego pago de alto nível.
+
+Então, eu falei que eu ia mandar o modelo, mas não mandei. Ele falou, cara, beleza, de boa. Eu vou seguir aqui outro caminho.
+
+Ele não travou. Bom, ele terminou aqui o modelo. E eu quero mostrar para vocês o seguinte.
+
+Eu vou abrir aqui no Firefox. Então, aqui ele criou o modelo PersonaDoc, dados do cliente, perfil. E aqui ele trouxe dados demográficos, dores e desejos, comportamento digital, janela de compra, comunicação e tom, Google Ads Search.
+
+Então, ele já trouxe aqui uma estrutura para a gente pensar em rede de pesquisa, site, landing page, identidade visual. Ele trouxe um grande modelo. Perceba que ele também está me dando aqui já uma opção de exportar em PDF.
+
+Eu nem pedi isso para ele, mas a ideia é que eu possa preencher aqui e eu gere um PDF exportando, porque no final do dia eu pedi para ele um modelo. Se eu tivesse falado para ele, olha, se a minha tarefa fosse, eu quero que você crie um documento de persona para o nicho X, ele já teria criado o documento de persona daquele nicho. Eu trabalhei na ideia de um modelo.
+
+Agora, com esse modelo em mãos, se ele estiver do jeito que eu quero, o que eu posso fazer daqui em diante é, olha, a partir do modelo, aí eu vou ter o documento aqui, a partir do modelo de persona tal, pesquise sobre higienização de sofás e crie um documento de persona completo com todas as informações para mim. Bingo! Você criou um criador de persona em pouquíssimo tempo. Eu posso fazer a mesma lógica para ter um criador de anúncios, onde eu dou a estrutura e eu só mudo o nicho.
+
+Olha, para advogado, olha, para dentistas, para infoproduto e assim por diante. Inclusive, eu posso ir melhorando e falando assim, toda vez que o nicho for advogado, consulte as normas XPTO da OAB, interprete e faça de acordo com elas. Cara, é muito simples fazer isso.
+
+Então, eu espero que, um, esse vídeo tenha te trazido uma clareza de um iniciante que nunca teve nenhum contato com o Cloud, que você consiga entender uma estrutura simples chamada CTR e que a partir dela você consiga fazer o primeiro prompt. A partir disso, eu espero que você, dois, coloque em prática, que você crie um documento de persona, uma persona de um nicho específico que você está atendendo, anúncios ou até mesmo um copy de uma landing page ou tantas outras coisas. Literalmente, o limite aqui é o limite da nossa capacidade de pensar.
+
+Me fala se você curtiu essa aula ou se você quer mais aulas de Cloud AI para gestores de tráfego, para gestores de tráfego. Comenta aqui o que você gostaria que eu trouxesse sobre isso. Grande abraço e até o próximo vídeo.
+
+(Transcrito por TurboScribe. Atualize para Ilimitado para remover esta mensagem.)

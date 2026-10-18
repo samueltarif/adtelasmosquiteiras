@@ -29,7 +29,7 @@ function toggleForm() {
 useHead({
   title: 'Telas Mosquiteiras com Esquadria de Alumínio | Orçamento Rápido | AD Telas',
   meta: [
-    { name: 'description', content: 'Telas mosquiteiras sob medida para janelas, portas e sacadas. Instalação em todo o estado de São Paulo. Orçamento rápido pelo WhatsApp.' },
+    { name: 'description', content: 'Instalação de telas mosquiteiras sob medida para janelas, portas e sacadas na Grande São Paulo e interior. Janela instalada a partir de R$ 299. Visita e orçamento grátis.' },
     { name: 'robots', content: 'noindex, follow' },
     { property: 'og:title', content: 'Telas Mosquiteiras com Esquadria de Alumínio | AD Telas' },
     { property: 'og:description', content: 'Envie uma foto da sua janela ou porta e receba seu orçamento rápido pelo WhatsApp.' },
@@ -232,8 +232,9 @@ onUnmounted(() => {
             <p class="eyebrow">TELA MOSQUITEIRA SOB MEDIDA</p>
             <h1>Telas Mosquiteiras <span>com Esquadria de Alumínio</span></h1>
             <p class="hero-description">
-              Telas sob medida para janelas, portas e sacadas, com instalação em todo o estado de São Paulo.
+              Vamos até você, medimos e instalamos telas sob medida em janelas, portas e sacadas na Grande São Paulo e interior.
             </p>
+            <p class="hero-subtext"><strong>Janela comum instalada a partir de R$ 299.</strong> Não vendemos tela avulsa: o serviço inclui a instalação.</p>
             <p class="hero-subtext">
               Proteja sua casa contra mosquitos sem perder ventilação.
             </p>
@@ -299,7 +300,7 @@ onUnmounted(() => {
           <div class="hero-benefits-row-bottom">
             <div class="hero-benefit-item">
               <Icon name="lucide:check-circle-2" class="check-icon" />
-              <span><strong>Atendimento em todo o estado de São Paulo</strong></span>
+              <span><strong>Atendimento na Grande São Paulo e interior</strong></span>
             </div>
           </div>
         </div>
@@ -520,7 +521,7 @@ onUnmounted(() => {
           <div class="step-card">
             <span class="step-num">2</span>
             <strong>Informe seu CEP</strong>
-            <p>Para calcularmos a taxa de visita ou instalação na sua região.</p>
+            <p>Para confirmarmos o atendimento e a instalação na sua região.</p>
           </div>
           <div class="step-card">
             <span class="step-num">3</span>
@@ -555,7 +556,7 @@ onUnmounted(() => {
         <p class="eyebrow text-gold">ATENDIMENTO IMEDIATO</p>
         <h2>Pronto para proteger sua casa com telas sob medida?</h2>
         <p class="cta-subtitle">
-          Envie sua mensagem pelo WhatsApp ou tire uma foto do seu vão. Atendemos todo o estado de São Paulo.
+          Envie sua mensagem pelo WhatsApp ou tire uma foto do seu vão. Visita e orçamento grátis na Grande São Paulo e interior.
         </p>
 
         <div class="final-cta-actions">
