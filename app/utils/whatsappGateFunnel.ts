@@ -13,6 +13,22 @@ import type { WhatsappGateContext } from '~/utils/whatsappGateHelpers'
 
 export type GateFunnelStep = 'form_start' | 'whatsapp_gate_typing'
 
+const CLARITY_EVENT: Record<string, string> = {
+  form_start: 'popup_aberto',
+  whatsapp_gate_typing: 'popup_digitou',
+  submit: 'popup_enviou'
+}
+
+/** Marca a etapa do pop-up na gravação do Microsoft Clarity (filtro "Eventos inteligentes"/"Tags"). */
+export function markClarityGateStep(step: GateFunnelStep | 'submit'): void {
+  try {
+    const clarity = (window as any).clarity
+    if (typeof clarity !== 'function') return
+    clarity('event', CLARITY_EVENT[step])
+    clarity('set', 'popup', CLARITY_EVENT[step])
+  } catch {}
+}
+
 function alreadyTracked(step: GateFunnelStep, sessionId: string): boolean {
   const key = `adt_gate_${step}_${sessionId}`
   try {
@@ -24,6 +40,7 @@ function alreadyTracked(step: GateFunnelStep, sessionId: string): boolean {
 
 export function trackGateFunnelStep(step: GateFunnelStep, context: WhatsappGateContext | null): void {
   if (typeof window === 'undefined' || !context) return
+  markClarityGateStep(step)
   if (alreadyTracked(step, context.sessionId)) return
 
   const eventId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${step}`

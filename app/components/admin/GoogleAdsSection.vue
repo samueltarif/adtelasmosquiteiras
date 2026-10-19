@@ -88,10 +88,17 @@ const emit = defineEmits<{
         :loading="loading"
       />
       <AdminKpiCard
-        title="Início Formulário" :value="data?.kpis.form_starts ?? '-'"
+        title="Abriu Pop-up" :value="data?.kpis.form_starts ?? '-'"
         :sublabel="`${data?.kpis.form_starts_unique_visitors ?? 0} pessoas únicas`"
         icon="lucide:edit-3" theme="amber"
-        formula-tooltip="Visitantes que focaram/interagiram com os campos do formulário da landing"
+        formula-tooltip="Visitantes do Google Ads que tocaram no botão de WhatsApp e viram o pop-up de nome e telefone"
+        :loading="loading"
+      />
+      <AdminKpiCard
+        title="Digitou no Pop-up" :value="data?.kpis.gate_typing ?? 0"
+        :sublabel="`${data?.kpis.gate_typing_rate ?? '0.0%'} das visitas`"
+        icon="lucide:keyboard" theme="amber"
+        formula-tooltip="Visitantes do Google Ads que começaram a digitar nome ou telefone no pop-up (enviando ou não)"
         :loading="loading"
       />
       <AdminKpiCard

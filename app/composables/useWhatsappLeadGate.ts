@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { generateShortCode, appendShortCodeToWhatsappUrl } from '~/utils/whatsappShortCode'
 import { dispatchWhatsappLeadTracking } from '~/utils/whatsappLeadQueue'
 import { reportFormConversion } from '~/utils/formConversion'
-import { trackGateFunnelStep } from '~/utils/whatsappGateFunnel'
+import { trackGateFunnelStep, markClarityGateStep } from '~/utils/whatsappGateFunnel'
 import {
   formatPhoneMask,
   openWhatsappWindow,
@@ -95,6 +95,7 @@ export function useWhatsappLeadGate() {
       // Lead identificado (nome + WhatsApp válidos): conversão principal no Google Ads via GTM
       // (evento lead_form_success, deduplicado por submission_id). Disparado antes de abrir o WhatsApp.
       reportFormConversion(submissionId.value)
+      markClarityGateStep('submit')
       openWhatsappWindow(targetHref)
       pushGateSubmitEvents(ctaContext.value, shortCode)
       try {
