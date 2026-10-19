@@ -10,7 +10,8 @@ const {
   phone,
   errorMessage,
   closeGate,
-  submitGate
+  submitGate,
+  trackTyping
 } = useWhatsappLeadGate()
 
 const dialogRef = ref<HTMLElement | null>(null)
@@ -89,7 +90,7 @@ async function onSubmit() {
           </div>
 
           <!-- Formulário -->
-          <form @submit.prevent="onSubmit" class="p-5 sm:p-6 space-y-4">
+          <form @submit.prevent="onSubmit" @input="trackTyping" class="p-5 sm:p-6 space-y-4">
             <!-- Alerta de Erro -->
             <div
               v-if="errorMessage"

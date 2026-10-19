@@ -75,6 +75,9 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
   const gAdsWhatsappVisitors = new Set()
   let gAdsFormStartsCount = 0
   const gAdsFormStartVisitors = new Set()
+  // Pop-up do WhatsApp: visitante começou a digitar nome/telefone (tipo whatsapp_gate_typing)
+  let gAdsGateTypingCount = 0
+  const gAdsGateTypingVisitors = new Set()
   const gAdsContactIntentVisitors = new Set()
 
   for (const c of gAdsClicks) {
@@ -91,6 +94,9 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
         gAdsFormStartVisitors.add(c.visitor_id)
         gAdsContactIntentVisitors.add(c.visitor_id)
       }
+    } else if (c.tipo === 'whatsapp_gate_typing') {
+      gAdsGateTypingCount++
+      if (c.visitor_id && cTime >= activePeriodStartMs) gAdsGateTypingVisitors.add(c.visitor_id)
     } else if (c.tipo === 'quote_cta' || c.tipo === 'telefone' || c.tipo === 'internal_cta') {
       if (c.visitor_id && cTime >= activePeriodStartMs) {
         gAdsContactIntentVisitors.add(c.visitor_id)
@@ -258,6 +264,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
         pageviews: 0,
         whatsapp_clicks: 0,
         form_starts: 0,
+        gate_typing: 0,
         leads_count: 0,
         intent_visitors: new Set(),
         lead_visitors: new Set()
@@ -275,6 +282,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
     if (campaignMap[key]) {
       if (c.tipo === 'whatsapp') campaignMap[key].whatsapp_clicks++
       if (c.tipo === 'form_start') campaignMap[key].form_starts++
+      if (c.tipo === 'whatsapp_gate_typing') campaignMap[key].gate_typing++
       if (c.visitor_id) campaignMap[key].intent_visitors.add(c.visitor_id)
     }
   }
@@ -299,6 +307,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
       pageviews: cmp.pageviews,
       whatsapp_clicks: cmp.whatsapp_clicks,
       form_starts: cmp.form_starts,
+      gate_typing: cmp.gate_typing,
       leads_count: cmp.leads_count,
       contact_intent_rate: safeRate(cmp.intent_visitors.size, vCount),
       lead_conversion_rate: safeRate(cmp.lead_visitors.size, vCount)
@@ -318,6 +327,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
         pageviews: 0,
         whatsapp_clicks: 0,
         form_starts: 0,
+        gate_typing: 0,
         leads_count: 0,
         intent_visitors: new Set(),
         lead_visitors: new Set()
@@ -333,6 +343,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
     if (keywordMap[kw]) {
       if (c.tipo === 'whatsapp') keywordMap[kw].whatsapp_clicks++
       if (c.tipo === 'form_start') keywordMap[kw].form_starts++
+      if (c.tipo === 'whatsapp_gate_typing') keywordMap[kw].gate_typing++
       if (c.visitor_id) keywordMap[kw].intent_visitors.add(c.visitor_id)
     }
   }
@@ -355,6 +366,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
       pageviews: kw.pageviews,
       whatsapp_clicks: kw.whatsapp_clicks,
       form_starts: kw.form_starts,
+      gate_typing: kw.gate_typing,
       leads_count: kw.leads_count,
       contact_intent_rate: safeRate(kw.intent_visitors.size, vCount),
       lead_conversion_rate: safeRate(kw.lead_visitors.size, vCount)
@@ -404,6 +416,7 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
       whatsapp_clicks: gAdsWhatsappClicksCount,
       whatsapp_unique_visitors: gAdsWhatsappVisitors.size,
       form_starts: gAdsFormStartsCount,
+      gate_typing: gAdsGateTypingCount,
       form_starts_unique_visitors: gAdsFormStartVisitors.size,
       real_leads: gAdsLeads.length,
       real_lead_unique_visitors: gAdsLeadVisitors.size,
@@ -412,7 +425,8 @@ export function computeGoogleAdsData(rawViews, rawClicks, rawLeads, dateRange) {
       contact_intent_rate: safeRate(gAdsContactIntentVisitors.size, totalGAdsVisitors),
       lead_conversion_rate: safeRate(gAdsLeadVisitors.size, totalGAdsVisitors),
       whatsapp_rate: safeRate(gAdsWhatsappVisitors.size, totalGAdsVisitors),
-      form_start_rate: safeRate(gAdsFormStartVisitors.size, totalGAdsVisitors)
+      form_start_rate: safeRate(gAdsFormStartVisitors.size, totalGAdsVisitors),
+      gate_typing_rate: safeRate(gAdsGateTypingVisitors.size, totalGAdsVisitors)
     },
     funnel,
     data_quality: dataQuality,

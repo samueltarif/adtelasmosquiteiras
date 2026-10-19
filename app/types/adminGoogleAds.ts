@@ -10,6 +10,7 @@ export interface GoogleAdsKpis {
   whatsapp_clicks: number
   whatsapp_unique_visitors: number
   form_starts: number
+  gate_typing?: number
   form_starts_unique_visitors: number
   real_leads: number
   real_lead_unique_visitors: number
@@ -19,6 +20,7 @@ export interface GoogleAdsKpis {
   lead_conversion_rate: string
   whatsapp_rate: string
   form_start_rate: string
+  gate_typing_rate?: string
 }
 
 export interface GoogleAdsFunnel {
@@ -60,6 +62,7 @@ export interface GoogleAdsCampaignMetric {
   pageviews: number
   whatsapp_clicks: number
   form_starts: number
+  gate_typing?: number
   leads_count: number
   contact_intent_rate: string
   lead_conversion_rate: string
@@ -73,6 +76,7 @@ export interface GoogleAdsKeywordMetric {
   pageviews: number
   whatsapp_clicks: number
   form_starts: number
+  gate_typing?: number
   leads_count: number
   contact_intent_rate: string
   lead_conversion_rate: string
@@ -113,6 +117,7 @@ export interface CohortMetrics {
   whatsapp_clicks: number
   form_start_unique_visitors: number
   form_starts: number
+  gate_typing?: number
   quote_cta_unique_visitors: number
   quote_cta_clicks: number
   real_lead_unique_visitors: number

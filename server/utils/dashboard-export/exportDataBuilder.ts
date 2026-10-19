@@ -90,7 +90,8 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
       ['Visitantes Únicos', gAdsMetrics.kpis.unique_visitors, '-', 'Visitantes humanos'],
       ['Pageviews', gAdsMetrics.kpis.pageviews, '-', 'Visualizações de página'],
       ['Cliques no WhatsApp', gAdsMetrics.kpis.whatsapp_clicks, gAdsMetrics.kpis.whatsapp_rate, 'Taxa Sessão -> WhatsApp'],
-      ['Inícios de Formulário', gAdsMetrics.kpis.form_starts, gAdsMetrics.kpis.form_start_rate, 'Taxa Sessão -> Formulário'],
+      ['Inícios de Formulário', gAdsMetrics.kpis.form_starts, gAdsMetrics.kpis.form_start_rate, 'Abriu o pop-up do WhatsApp (Taxa Sessão -> Pop-up)'],
+      ['Começou a Digitar no Pop-up', gAdsMetrics.kpis.gate_typing ?? 0, gAdsMetrics.kpis.gate_typing_rate ?? '0.0%', 'Digitou nome/telefone no pop-up (Taxa Sessão -> Digitou)'],
       ['Leads Convertidos', gAdsMetrics.kpis.real_leads, gAdsMetrics.kpis.lead_conversion_rate, 'Taxa Sessão -> Lead']
     ]
   }
@@ -98,7 +99,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
   tables.google_ads_campaigns = {
     key: 'google_ads_campaigns',
     title: 'Google Ads — Campanhas',
-    headers: ['Campanha UTM', 'ID Campanha Google', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Leads'],
+    headers: ['Campanha UTM', 'ID Campanha Google', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Digitou Pop-up', 'Leads'],
     rows: (gAdsMetrics.campaigns || []).map((c: any) => [
       c.utm_campaign || '(não definido)',
       c.google_campaign_id || '-',
@@ -107,6 +108,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
       c.pageviews,
       c.whatsapp_clicks,
       c.form_starts,
+      c.gate_typing ?? 0,
       c.leads_count
     ])
   }
@@ -114,7 +116,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
   tables.google_ads_keywords = {
     key: 'google_ads_keywords',
     title: 'Google Ads — Termos e Palavras-chave',
-    headers: ['Palavra-chave / Termo', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Leads', 'Taxa Intenção'],
+    headers: ['Palavra-chave / Termo', 'Sessões', 'Visitantes', 'Pageviews', 'WhatsApp', 'Form Starts', 'Digitou Pop-up', 'Leads', 'Taxa Intenção'],
     rows: (gAdsMetrics.keywords || []).map((k: any) => [
       k.keyword,
       k.sessions,
@@ -122,6 +124,7 @@ export function buildExportTables(raw: CollectedExportRaw, payload: ExportReques
       k.pageviews,
       k.whatsapp_clicks,
       k.form_starts,
+      k.gate_typing ?? 0,
       k.leads_count,
       k.contact_intent_rate
     ])

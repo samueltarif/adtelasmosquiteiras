@@ -10,7 +10,7 @@ const { toggleFaq, isOpen } = useFaq()
 const faqs = [
   {
     question: 'Quanto tempo a tela/rede dura?',
-    answer: 'A durabilidade depende do material, da exposição ao sol e à chuva, do uso e da manutenção. As condições de garantia são informadas na proposta.'
+    answer: 'A durabilidade depende do material, da exposição ao sol e à chuva, do uso e da manutenção. Nossas instalações têm garantia de 2 anos; as condições são detalhadas na proposta.'
   },
   {
     question: 'As redes e telas de proteção são resistentes?',

@@ -314,7 +314,7 @@ onUnmounted(() => {
             </div>
             <div class="hero-trust-item">
               <Icon name="lucide:shield-check" aria-hidden="true" />
-              <span><strong>Garantia informada</strong><small>conforme a proposta do serviço</small></span>
+              <span><strong>Garantia de 2 anos</strong><small>na instalação e na vedação</small></span>
             </div>
             <div class="hero-trust-item">
               <Icon name="lucide:clock" aria-hidden="true" />
@@ -536,7 +536,8 @@ onUnmounted(() => {
         </a>
       </div>
       <div class="installation-details">
-        <p><strong>Garantia do serviço</strong><span>Condições informadas na proposta.</span></p>
+        <p><strong>Garantia de 2 anos</strong><span>Cobre a instalação e a vedação. Condições detalhadas na proposta.</span></p>
+        <p><strong>Cantos em alumínio, não em plástico</strong><span>Os cantos da esquadria são de alumínio, mais firmes que os cantos de plástico usados em muitas telas.</span></p>
         <p><strong>Durabilidade estimada de 5 anos</strong><span>Consulte os cuidados de uso e manutenção com nossa equipe.</span></p>
         <p><strong>Instalação agendada</strong><span>O prazo depende do modelo, das medidas e da quantidade de telas. Confirmamos no orçamento.</span></p>
       </div>
@@ -672,8 +673,9 @@ onUnmounted(() => {
         <div class="trust-footer-pills">
           <span>✓ Orçamento Gratuito</span>
           <span>✓ Sem Compromisso</span>
-          <span>✓ Pagamento Facilitado</span>
-          <span>✓ Garantia de Vedação</span>
+          <span>✓ Até 5x Sem Juros</span>
+          <span>✓ Garantia de 2 Anos</span>
+          <span>✓ Cantos em Alumínio</span>
         </div>
       </div>
     </section>

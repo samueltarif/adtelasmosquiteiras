@@ -21,7 +21,7 @@ const config = {
   // Textos
   logo: '/images/logo_adt_telas_nova.png', // ⚠️ ALTERAR: Caminho da logo
   headline: 'Telas mosquiteiras em São Paulo', // ⚠️ ALTERAR: Título principal
-  subheadline: 'Instalação agendada • Garantia conforme proposta • Atendimento sob medida',
+  subheadline: 'Instalação agendada • Garantia de 2 anos • Atendimento sob medida',
   
   // Prova Social
   rating: 5.0, // ⚠️ ALTERAR: Nota de avaliação

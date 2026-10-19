@@ -188,3 +188,63 @@ Backup dos originais: google ads/estrategia-340/backup-codigo-2026-10-18/
 - GTM GTM-KZTR2DHT (lido do contêiner público): conversões vão para AW-473885322 — tag clique WhatsApp (rótulo AzrWCM3Ln_scEIrV--EB, gatilho clique em wa.me) e tag lead (rótulo Zb8PCJbfv_scEIrV--EB, gatilho lead_form_success). Nenhuma tag de conversão para AW-17981093809 (só recebe form_submit automático do Google tag).
 - Pendente: confirmar que a conta da campanha usa 473885322/Zb8P… em "AD Telas | Formulário | Lead"; então Formulário|Lead = Principal, WhatsApp|Clique = Secundária. Cidade/bairro no pop-up exige mudança de API/banco (Supabase) — próximo lote, com aprovação.
 - 18/10 17:23 — TESTE LOCAL OK: envio do WhatsApp Gate dispara conversão 473885322 com label Zb8PCJbfv_scEIrV--EB ("AD Telas | Formulário | Lead"). Falta: publicar site; tornar essa conversão Principal e "WhatsApp | Clique" Secundária.
+
+## 16. Lances por palavra (Planejador 18/10/2026, local = Brasil — confiança MÉDIA) — CPC manual
+| Palavra | Busca/mês (BR) | Topo baixo–alto | Lance máx. | Papel (método Sabri) |
+|---|---|---|---|---|
+| [instalação de tela mosquiteira] | 50 | 5,55–15,41 | R$ 6,00 | Campeã de intenção → buscar topo |
+| "instalação de tela mosquiteira" | — | — | R$ 5,00 | idem |
+| "instalador de tela mosquiteira" | 10 | — | R$ 4,00 | idem |
+| "empresa de tela mosquiteira" | 10 | — | R$ 4,00 | idem |
+| [orçamento tela mosquiteira] | — | — | R$ 3,00 | intenção alta |
+| "tela mosquiteira sob medida" | 110 | 2,29–10,24 | R$ 3,00 | intenção média-alta |
+| "tela mosquiteira para porta" / [..] | 390 | 1,24–5,75 | R$ 2,00 | melhor custo/conv. histórico (R$17) |
+| [tela mosquiteira para janela] | 2.400 | 1,53–7,25 | R$ 1,50 | volume; muito produto (Mercado Livre) → só exata, lance baixo |
+| [tela mosquiteira] | — | — | R$ 1,30 | exploração |
+Revisão em 3 dias: IS e "IS perdida (classificação)" do grupo Instalação; subir 10–20% só com lead real e aprovação.
+
+## 17. Estrutura em 3 grupos de anúncios (18/10/2026)
+G1 "Instalação" (renomear Grupo de anúncios 1): instalação/instalador/colocação/empresa/orçamento/sob medida/perto de mim/sp/são paulo — anúncio da seção 12.
+G2 "Porta": "tela mosquiteira para porta" (2,00), [tela mosquiteira para porta] (2,00), "tela mosquiteira para porta de correr" (2,00). Pausar a versão frase em G1.
+  Títulos: Tela Mosquiteira para Porta [pos1] · Instalamos Tela na Sua Porta [pos1] · Porta de Correr ou de Abrir · Tela Sob Medida para Porta · Cozinha, Quintal e Varanda · Visita e Orçamento Grátis · Medimos e Instalamos no Local · Nota 5,0 no Google · Esquadria de Alumínio · Chame no WhatsApp Agora · Não Vendemos Tela Avulsa · Atendemos Toda a Grande SP · Envie Foto e Receba Orçamento · Visita em Até 24h · +1.000 Clientes Atendidos
+  Descrições: (1, pos1) Tela sob medida para porta de correr ou de abrir. Vamos até sua casa medir e instalar. (2) Para cozinha, quintal e varanda: entra ar e o mosquito fica de fora. Peça seu orçamento. (3) Envie uma foto da porta pelo WhatsApp e receba o orçamento com a instalação inclusa. (4) Nota 5,0 no Google. Equipe leva o material, instala e deixa tudo limpo. Grande SP.
+G3 "Janela e Sacada": [tela mosquiteira para janela] (1,50), [tela mosquiteira para sacada] (2,00), "tela mosquiteira para sacada de apartamento" (2,00). Pausar [tela mosquiteira para janela] em G1.
+  Títulos: Tela Mosquiteira para Janela [pos1] · Tela Mosquiteira para Sacada [pos1] · Instalada a Partir de R$ 299 · Instalamos na Sua Casa · Correr, Basculante e Maxim-ar · Visita e Orçamento Grátis · Medimos e Instalamos no Local · Nota 5,0 no Google · Não Vendemos Tela Avulsa · Chame no WhatsApp Agora · Atendemos Toda a Grande SP · Envie Foto e Receba Orçamento · Sacada e Área Gourmet · Visita em Até 24h · Esquadria de Alumínio
+  Descrições: (1, pos1) Janela comum instalada a partir de R$ 299. Vamos até sua casa, medimos e instalamos. (2) Telas para janela de correr, basculante, maxim-ar e sacadas. Não vendemos tela avulsa. (3) Envie uma foto da janela pelo WhatsApp e receba o orçamento com a instalação inclusa. (4) Nota 5,0 no Google. Equipe leva o material, instala e deixa tudo limpo. Grande SP.
+URL final de todos: https://www.adtelasmosquiteiras.com.br/lp/telas-mosquiteiras (mesmo sufixo UTM do anúncio atual). Lance padrão de cada grupo novo: R$ 1,50.
+
+## 18. Executado pelo Claude via Chrome (18/10/2026 ~19:40) — campanha segue PAUSADA
+- Grupo "Grupo de anúncios 1" renomeado para "Instalação"; adicionadas "tela mosquiteira sob medida" (3,00), "instalador de tela mosquiteira" (4,00), "colocação de tela mosquiteira" (4,00), "tela mosquiteira perto de mim" (2,50). Pausadas nele: "tela mosquiteira para porta" e [tela mosquiteira para janela].
+- Criado grupo "Porta" (lance padrão 2,00): "tela mosquiteira para porta", [tela mosquiteira para porta], "tela mosquiteira para porta de correr" + RSA (2 títulos fixados pos.1, descrição 1 fixada), sufixo UTM. Aprovado na checagem de políticas.
+- Criado grupo "Janela e Sacada" (lance padrão 2,00): [tela mosquiteira para janela], [tela mosquiteira para sacada], "tela mosquiteira para sacada de apartamento" + RSA (Janela/Sacada fixados pos.1, descrição do preço fixada), sufixo UTM. Aprovado.
+- Pendente (aguardando OK do dono): adicionar 36 negativas e remover "metro" (lista ainda tem 154); reativar campanha.
+
+---
+
+## 19. Análise do 1º dia completo — 19/10/2026 (somente leitura)
+
+**Dados (fontes: relatórios Google Ads de 19/10 + dashboard do site exportado 19/10 18:59):**
+- 41 impressões, 6 cliques, CTR 14,6%, CPC médio R$ 3,59, custo R$ 21,56, 0 leads. Em 18/10: 4 cliques, R$ 13,97.
+- Gasto acumulado estimado: ~R$ 333 de R$ 600 → restam ~R$ 267 para 20/10–02/11 (~R$ 19/dia, ~74 cliques no CPC atual).
+- Site: 6 sessões Google Ads (todas mobile), 1 página vista cada, 0 cliques WhatsApp registrados, 0 inícios de formulário.
+- "empresa de tela mosquiteira" (frase, R$ 4,00) = 4 cliques, R$ 17,24 (80% do gasto), acionada por buscas SEM "empresa" (ex.: "tela mosquiteira em mogi das cruzes", "tela mosquiteira para janela perto de mim").
+- Termos visíveis: bons (intenção local/instalação). Lixo: "artens tela mosquiteiro". A confirmar: "tela mosquiteira em aço inox".
+- Leilão 19/10: nossa parcela <10%, topo 41,7%, 1ª posição 8,3%. Concorrentes instaladores: mttelas (46%), sossegotelas (31%), alumintelas, casadatelamosquiteiro (26%), morumbitelas (24%), mestredastelas, telasbelavista (22%), mercadolivre (20%).
+
+**Ponto cego confirmado no código:** o 1º clique no botão WhatsApp (abre o pop-up) NÃO é gravado no Supabase (track-clicks.client.ts só faz preventDefault + openGate; o evento whatsapp_modal_open vai só para o dataLayer/GTM). O pop-up também não registra form_start. Logo, "0 cliques WhatsApp" no dashboard não distingue "ninguém clicou" de "abriu o pop-up e desistiu".
+
+**Estatística:** com taxa histórica ~3,3% (8 leads/245 cliques), a chance de 0 lead em 10 cliques é ~72%. Um dia não prova nada.
+
+**Recomendações (aguardando aprovação):**
+1. Baixar "empresa de tela mosquiteira" (frase) de R$ 4,00 para R$ 2,50.
+2. Negativar "artens" (+ "inox" se não fazem inox); confirmar se as 36 negativas foram coladas.
+3. Não pausar manualmente: usar programação de anúncios no horário em que a Denise responde.
+4. Registrar abertura do pop-up e digitação no dashboard (mudança de código) e/ou instalar Microsoft Clarity.
+5. Adicionar públicos "Reforma de casas" e "Serviços de casa e jardim" em modo Observação.
+6. Regra de decisão: avaliar após ~30 cliques, não antes.
+
+**Executado pelo dono em 19/10 (~19h20):** lance "empresa de tela mosquiteira" (frase) R$ 4,00 → R$ 2,50; negativa "artens"; programação seg–sex 7h–19h30 (não atendem sábado); públicos "Reforma de casas" e "Serviços de casa e jardim" em Observação. Fazem tela de aço inox (não negativar "inox"). Microsoft Clarity (z0ddp6avz0) adicionado via app/plugins/clarity.client.js + CSP no nuxt.config.ts — aguardando deploy.
+
+**Funil do pop-up (19/10, aguardando deploy):** app/utils/whatsappGateFunnel.ts (novo) + useWhatsappLeadGate.ts + WhatsappLeadModal.vue. Abrir o pop-up grava tipo form_start/cta modal (dashboard: "Inícios de Formulário"); começar a digitar grava tipo whatsapp_gate_typing em lead_clicks. 1x por sessão. Backups em backup-codigo-2026-10-19/.
+
+**Exportação (19/10):** "Começou a Digitar no Pop-up" (KPI) + coluna "Digitou Pop-up" nas abas Campanhas e Termos; adminGoogleAdsMetrics.mjs, exportDataBuilder.ts, types/adminGoogleAds.ts.

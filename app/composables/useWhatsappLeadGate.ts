@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { generateShortCode, appendShortCodeToWhatsappUrl } from '~/utils/whatsappShortCode'
 import { dispatchWhatsappLeadTracking } from '~/utils/whatsappLeadQueue'
 import { reportFormConversion } from '~/utils/formConversion'
+import { trackGateFunnelStep } from '~/utils/whatsappGateFunnel'
 import {
   formatPhoneMask,
   openWhatsappWindow,
@@ -53,6 +54,13 @@ export function useWhatsappLeadGate() {
         service_key: context.serviceKey
       })
     }
+
+    // Funil próprio: pop-up aberto (dashboard → "Inícios de Formulário")
+    trackGateFunnelStep('form_start', context)
+  }
+
+  function trackTyping() {
+    trackGateFunnelStep('whatsapp_gate_typing', ctaContext.value)
   }
 
   function closeGate() {
@@ -144,6 +152,7 @@ export function useWhatsappLeadGate() {
 
   return {
     isOpen,
+    trackTyping,
     isSubmitting,
     name,
     phone,

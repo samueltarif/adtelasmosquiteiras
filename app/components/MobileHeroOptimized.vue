@@ -19,7 +19,7 @@ const props = defineProps({
   },
   subheadline: {
     type: String,
-    default: 'Instalação agendada • Garantia conforme proposta • Atendimento sob medida'
+    default: 'Instalação agendada • Garantia de 2 anos • Atendimento sob medida'
   },
   rating: {
     type: Number,
