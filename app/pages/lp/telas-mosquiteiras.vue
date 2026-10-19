@@ -42,61 +42,61 @@ const realInstallations = [
   {
     title: 'Telas Mosquiteiras para janelas',
     desc: 'Acabamento discreto integrado à esquadria existente.',
-    img: '/images/telas_para_banheiro.jpg',
+    img: '/images/telas_para_banheiro.webp',
     images: [
-      '/images/telas_para_banheiro.jpg',
-      '/images/tela_paraJanela.png',
-      '/images/telas_para_banheiro_especificacoes.jpg'
+      '/images/telas_para_banheiro.webp',
+      '/images/tela_paraJanela.webp',
+      '/images/telas_para_banheiro_especificacoes.webp'
     ],
     tag: 'Janela'
   },
   {
     title: 'Janela de Correr em Alumínio',
     desc: 'Vedação impecável sem alterar a fachada.',
-    img: '/images/janela_correr_aluminio_1.png',
+    img: '/images/janela_correr_aluminio_1.webp',
     images: [
-      '/images/janela_correr_aluminio_1.png',
-      '/images/janela_correr_aluminio_2.png',
-      '/images/janela_correr_aluminio_3.png'
+      '/images/janela_correr_aluminio_1.webp',
+      '/images/janela_correr_aluminio_2.webp',
+      '/images/janela_correr_aluminio_3.webp'
     ],
     tag: 'Janela'
   },
   {
     title: 'Porta Balcão de Correr',
     desc: 'Deslizamento suave para acesso à sacada.',
-    img: '/images/porta_balcao_correr_1.png',
+    img: '/images/porta_balcao_correr_1.webp',
     images: [
-      '/images/porta_balcao_correr_1.png',
-      '/images/porta_balcao_correr_2.png',
-      '/images/porta_balcao_correr_3.png'
+      '/images/porta_balcao_correr_1.webp',
+      '/images/porta_balcao_correr_2.webp',
+      '/images/porta_balcao_correr_3.webp'
     ],
     tag: 'Porta'
   },
   {
     title: 'Sacada Envidraçada',
     desc: 'Proteção total mantendo a ventilação e a vista.',
-    img: '/images/sacada_envidracada_1.png',
+    img: '/images/sacada_envidracada_1.webp',
     images: [
-      '/images/sacada_envidracada_1.png',
-      '/images/sacada_envidracada_2.png'
+      '/images/sacada_envidracada_1.webp',
+      '/images/sacada_envidracada_2.webp'
     ],
     tag: 'Sacada'
   },
   {
     title: 'Tela Pet Screen Reforçada',
     desc: 'Malha de alta resistência contra arranhões de pets.',
-    img: '/images/telas_pet_screen_especificacoes.jpg',
+    img: '/images/telas_pet_screen_especificacoes.webp',
     images: [
-      '/images/telas_pet_screen_especificacoes.jpg',
-      '/images/telas_pet_screen_cores.jpg',
-      '/images/telas_pet_screen_rolo.jpg'
+      '/images/telas_pet_screen_especificacoes.webp',
+      '/images/telas_pet_screen_cores.webp',
+      '/images/telas_pet_screen_rolo.webp'
     ],
     tag: 'Pet Screen'
   },
   {
     title: 'Tela Removível com Fecho',
     desc: 'Fácil manuseio para retirar, higienizar e recolocar.',
-    img: '/images/tela-mosquiteira-removivel.jpeg',
+    img: '/images/tela-mosquiteira-removivel.webp',
     tag: 'Removível'
   }
 ]
@@ -135,6 +135,9 @@ const quickModels = [
 
 const activeSlides = ref({})
 let carouselInterval = null
+const isGalleryPaused = ref(false)
+const isGalleryVisible = ref(false)
+let galleryObserver = null
 const showFloatingWhatsapp = ref(false)
 let heroCtaObserver = null
 let inlineCtaObserver = null
@@ -145,8 +148,58 @@ function updateFloatingWhatsapp() {
   showFloatingWhatsapp.value = heroCtaPassed && visibleInlineCtas.size === 0
 }
 
+function handleImgError(event, fallbackSrc) {
+  const target = event?.target
+  if (!target) return
+  if (target.src && target.src.endsWith('.webp')) {
+    target.src = target.src.replace(/\.webp$/, '.png')
+    return
+  }
+  if (fallbackSrc && target.src !== fallbackSrc) {
+    target.src = fallbackSrc
+  }
+}
+
+function preloadCarouselImages() {
+  if (typeof window === 'undefined') return
+  realInstallations.forEach((item) => {
+    const list = item.images || (item.img ? [item.img] : [])
+    list.forEach((src) => {
+      const img = new Image()
+      img.src = src
+    })
+  })
+}
+
+function startCarousel() {
+  if (carouselInterval) return
+  carouselInterval = setInterval(() => {
+    if (isGalleryPaused.value) return
+    realInstallations.forEach((item, index) => {
+      if (item.images?.length) {
+        activeSlides.value[index] = ((activeSlides.value[index] || 0) + 1) % item.images.length
+      }
+    })
+  }, 4000)
+}
+
+function stopCarousel() {
+  if (carouselInterval) {
+    clearInterval(carouselInterval)
+    carouselInterval = null
+  }
+}
+
 onMounted(() => {
   track('landing_view')
+
+  if (typeof window !== 'undefined') {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => preloadCarouselImages())
+    } else {
+      setTimeout(preloadCarouselImages, 600)
+    }
+  }
 
   if (typeof IntersectionObserver !== 'undefined') {
     const heroCta = document.querySelector('.hero-cta-btn')
@@ -177,24 +230,32 @@ onMounted(() => {
     }
   })
 
-  // Alterna as fotos a cada 3 segundos como carrossel para os cards com múltiplas fotos
-  carouselInterval = setInterval(() => {
-    realInstallations.forEach((item, index) => {
-      if (item.images?.length) {
-        activeSlides.value[index] = ((activeSlides.value[index] || 0) + 1) % item.images.length
-      }
-    })
-  }, 3000)
+  if (typeof IntersectionObserver !== 'undefined') {
+    const galleryEl = document.getElementById('gallery-section')
+    if (galleryEl) {
+      galleryObserver = new IntersectionObserver(([entry]) => {
+        isGalleryVisible.value = entry.isIntersecting
+        if (entry.isIntersecting) {
+          startCarousel()
+        } else {
+          stopCarousel()
+        }
+      }, { rootMargin: '250px 0px' })
+      galleryObserver.observe(galleryEl)
+    } else {
+      startCarousel()
+    }
+  } else {
+    startCarousel()
+  }
 })
 
 onUnmounted(() => {
   heroCtaObserver?.disconnect()
   inlineCtaObserver?.disconnect()
+  galleryObserver?.disconnect()
   visibleInlineCtas.clear()
-  if (carouselInterval) {
-    clearInterval(carouselInterval)
-    carouselInterval = null
-  }
+  stopCarousel()
 })
 </script>
 
@@ -349,14 +410,20 @@ onUnmounted(() => {
     </section>
 
     <!-- 1. Galeria de Fotos REAIS de Instalações Feitas pela AD Telas -->
-    <section class="section wrap" aria-labelledby="gallery-title">
+    <section id="gallery-section" class="section wrap" aria-labelledby="gallery-title">
       <div class="section-heading">
         <p class="eyebrow">INSTALAÇÕES REAIS AD TELAS</p>
         <h2 id="gallery-title">Fotos de Serviços Realizados</h2>
         <p>Veja como as telas ficam discretas, elegantes e perfeitamente integradas às esquadrias de alumínio.</p>
       </div>
 
-      <div class="gallery-grid">
+      <div
+        class="gallery-grid"
+        @mouseenter="isGalleryPaused = true"
+        @mouseleave="isGalleryPaused = false"
+        @touchstart="isGalleryPaused = true"
+        @touchend="isGalleryPaused = false"
+      >
         <article v-for="(item, cIndex) in realInstallations" :key="item.title" class="gallery-card">
           <div class="card-img-wrap" :class="{ 'has-carousel': item.images?.length }">
             <template v-if="item.images && item.images.length">
@@ -372,6 +439,8 @@ onUnmounted(() => {
                   width="480"
                   height="600"
                   :loading="sIndex === 0 ? 'eager' : 'lazy'"
+                  decoding="async"
+                  @error="handleImgError($event, item.img)"
                 />
               </div>
               <div class="carousel-dots" :aria-label="`Fotos de ${item.title}`">
@@ -387,7 +456,15 @@ onUnmounted(() => {
               </div>
             </template>
             <template v-else>
-              <img :src="item.img" :alt="item.title" width="480" height="600" loading="lazy" />
+              <img
+                :src="item.img"
+                :alt="item.title"
+                width="480"
+                height="600"
+                loading="lazy"
+                decoding="async"
+                @error="handleImgError($event)"
+              />
             </template>
             <span class="card-badge">{{ item.tag }}</span>
           </div>
