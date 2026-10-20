@@ -248,3 +248,5 @@ URL final de todos: https://www.adtelasmosquiteiras.com.br/lp/telas-mosquiteiras
 **Funil do pop-up (19/10, aguardando deploy):** app/utils/whatsappGateFunnel.ts (novo) + useWhatsappLeadGate.ts + WhatsappLeadModal.vue. Abrir o pop-up grava tipo form_start/cta modal (dashboard: "Inícios de Formulário"); começar a digitar grava tipo whatsapp_gate_typing em lead_clicks. 1x por sessão. Backups em backup-codigo-2026-10-19/.
 
 **Exportação (19/10):** "Começou a Digitar no Pop-up" (KPI) + coluna "Digitou Pop-up" nas abas Campanhas e Termos; adminGoogleAdsMetrics.mjs, exportDataBuilder.ts, types/adminGoogleAds.ts.
+
+**Dashboard (19/10 noite):** tabela "Visitas do Google Ads" (GoogleAdsSessionsTable.vue + server/shared/adminGoogleAdsSessions.mjs + campo sessions em google-ads/overview) com jornada por sessão (reusa SessionJourneyDrawer; títulos amigáveis para form_start/whatsapp_gate_typing). Clarity: só grava hostname oficial; tags de origem/palavra-chave; eventos popup_aberto/popup_digitou/popup_enviou; identify = visitor_id.

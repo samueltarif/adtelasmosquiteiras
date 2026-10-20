@@ -12,6 +12,7 @@ import AdminKpiCard from './AdminKpiCard.vue'
 import LandingComparisonCard from './LandingComparisonCard.vue'
 import MarketingChangeTimeline from './MarketingChangeTimeline.vue'
 import GoogleAdsKeywordsTable from './GoogleAdsKeywordsTable.vue'
+import GoogleAdsSessionsTable from './GoogleAdsSessionsTable.vue'
 
 const props = defineProps<{
   data: GoogleAdsOverviewResponse | null
@@ -403,6 +404,9 @@ const emit = defineEmits<{
 
     <!-- TABELA DE PALAVRAS-CHAVE GOOGLE ADS -->
     <GoogleAdsKeywordsTable :keywords="data?.keywords" :loading="loading" />
+
+    <!-- VISITAS DO GOOGLE ADS: NAVEGAÇÃO DE CADA SESSÃO -->
+    <GoogleAdsSessionsTable :sessions="data?.sessions || []" />
 
     <!-- TABELA DE DESEMPENHO DOS CTAs DA LANDING PAGE -->
     <Card class="p-5">

@@ -55,10 +55,14 @@ export default defineEventHandler(async (event) => {
     // 2. Cliques de Intenção
     clicksRes.forEach((c) => {
       const isWhatsapp = c.tipo === 'whatsapp'
+      const friendly: Record<string, string> = {
+        form_start: 'Abriu o pop-up do WhatsApp',
+        whatsapp_gate_typing: 'Começou a digitar no pop-up'
+      }
       timeline.push({
         id: c.id,
         type: isWhatsapp ? 'whatsapp_click' : 'intent_click',
-        title: isWhatsapp ? 'Clique no Botão WhatsApp' : `Clique: ${c.tipo || 'Interação'}`,
+        title: isWhatsapp ? 'Enviou nome/telefone e foi para o WhatsApp' : (friendly[c.tipo] || `Clique: ${c.tipo || 'Interação'}`),
         timestamp: c.created_at,
         path: c.origem || '/',
         channel: c.channel || null,

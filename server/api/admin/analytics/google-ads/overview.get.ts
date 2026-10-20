@@ -4,6 +4,7 @@ import {
 } from '../../../../utils/adminAnalytics'
 import { requireActiveAdmin } from '../../../../utils/adminAuth'
 import { computeGoogleAdsData } from '../../../../shared/adminGoogleAdsMetrics.mjs'
+import { buildGoogleAdsSessions } from '../../../../shared/adminGoogleAdsSessions.mjs'
 
 export default defineEventHandler(async (event) => {
   // 1. Exige Administrador Ativo
@@ -54,7 +55,8 @@ export default defineEventHandler(async (event) => {
         identity_start_utc: identityStartUtc,
         is_legacy_overlap: isLegacyOverlap
       },
-      ...metrics
+      ...metrics,
+      sessions: buildGoogleAdsSessions(rawViews, rawClicks, rawLeads)
     }
   } catch (error: any) {
     console.error('[analytics/google-ads/overview] Erro:', error?.message)

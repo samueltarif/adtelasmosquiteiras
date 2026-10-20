@@ -106,6 +106,24 @@ export interface GoogleAdsOverviewResponse {
   campaigns: GoogleAdsCampaignMetric[]
   keywords: GoogleAdsKeywordMetric[]
   ctas: GoogleAdsCtaMetric[]
+  sessions?: GoogleAdsSessionRow[]
+}
+
+export interface GoogleAdsSessionRow {
+  session_id: string
+  started_at: string
+  last_event_at: string
+  keyword: string | null
+  match_type: string | null
+  device: string | null
+  entry_path: string
+  pageviews: number
+  pages: string[]
+  opened_popup: boolean
+  typed: boolean
+  sent_whatsapp: boolean
+  lead: boolean
+  duration_seconds: number
 }
 
 export interface CohortMetrics {
