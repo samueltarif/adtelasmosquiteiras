@@ -6,7 +6,6 @@ import { useModalA11y } from '~/composables/useModalA11y'
 const {
   isOpen,
   isSubmitting,
-  name,
   phone,
   errorMessage,
   closeGate,
@@ -15,17 +14,17 @@ const {
 } = useWhatsappLeadGate()
 
 const dialogRef = ref<HTMLElement | null>(null)
-const nameInputRef = ref<HTMLInputElement | null>(null)
+const phoneInputRef = ref<HTMLInputElement | null>(null)
 
 useModalA11y(isOpen, closeGate, {
   dialogRef,
-  initialFocusSelector: '#wa-lead-name'
+  initialFocusSelector: '#wa-lead-phone'
 })
 
 watch(isOpen, async (val) => {
   if (val) {
     await nextTick()
-    nameInputRef.value?.focus()
+    phoneInputRef.value?.focus()
   }
 })
 
@@ -103,24 +102,6 @@ async function onSubmit() {
               <span>{{ errorMessage }}</span>
             </div>
 
-            <!-- Campo Nome -->
-            <div>
-              <label for="wa-lead-name" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                Seu nome <span class="text-red-500">*</span>
-              </label>
-              <input
-                id="wa-lead-name"
-                ref="nameInputRef"
-                v-model="name"
-                type="text"
-                required
-                autocomplete="name"
-                placeholder="Como podemos te chamar?"
-                :disabled="isSubmitting"
-                class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-[#22345F] focus:ring-2 focus:ring-[#22345F]/20 text-slate-900 text-sm outline-none transition-all placeholder:text-slate-400 disabled:bg-slate-100 disabled:opacity-60"
-              />
-            </div>
-
             <!-- Campo WhatsApp -->
             <div>
               <label for="wa-lead-phone" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -128,6 +109,7 @@ async function onSubmit() {
               </label>
               <input
                 id="wa-lead-phone"
+                ref="phoneInputRef"
                 :value="phone"
                 @input="onPhoneInput"
                 type="tel"

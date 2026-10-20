@@ -71,14 +71,10 @@ export function useWhatsappLeadGate() {
 
   async function submitGate(retryCount = 0): Promise<boolean> {
     if (isSubmitting.value && retryCount === 0) return false
-    const cleanNome = (name.value || '').trim()
+    const cleanNome = (name.value || '').trim() || 'Cliente'
     let digits = (phone.value || '').replace(/\D/g, '')
     if (digits.startsWith('55') && digits.length >= 12) digits = digits.slice(2)
 
-    if (cleanNome.length < 2) {
-      errorMessage.value = 'Por favor, informe seu nome (mínimo 2 caracteres).'
-      return false
-    }
     if (digits.length < 10 || digits.length > 11) {
       errorMessage.value = 'Por favor, informe um WhatsApp válido com DDD (10 ou 11 dígitos).'
       return false

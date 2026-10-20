@@ -18,7 +18,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: 'Configuração de banco indisponível' })
   }
 
-  const cleanNome = validateLeadName(body.nome)
+  const cleanNome = (body.nome && typeof body.nome === 'string' && body.nome.trim().length >= 2)
+    ? validateLeadName(body.nome)
+    : 'Cliente'
   const cleanPhone = validateLeadPhone(body.telefone)
   const cleanShortCode = String(body.short_code || '').trim().toUpperCase()
 
