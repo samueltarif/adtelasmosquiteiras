@@ -4,6 +4,8 @@
 // do visitante (o mesmo do dashboard), para cruzar gravação ↔ sessão ↔ lead.
 export default defineNuxtPlugin(() => {
   if (window.location.pathname.startsWith('/admin')) return
+  // Só grava o site oficial: ignora previews da Vercel (*.vercel.app) e localhost
+  if (!/^(www\.)?adtelasmosquiteiras\.com\.br$/.test(window.location.hostname)) return
   if (window.clarity) return
 
   ;(function (c, l, a, r, i, t, y) {
