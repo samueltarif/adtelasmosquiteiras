@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY,
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4anFoeHBlandrdWFiZWFveWF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3NzcwMTksImV4cCI6MjA4OTM1MzAxOX0.5EcFOHojkLOxI3cqspJTaKfZEBj-CLXlRqwKT6W6oEw',
     newsApiKey: process.env.NEWS_API_KEY,
     mediastackApiKey: process.env.MEDIASTACK_API_KEY,
     newsdataApiKey: process.env.NEWSDATA_API_KEY,
@@ -108,7 +108,10 @@ export default defineNuxtConfig({
         }
       },
       // Fase 03C / 03D-PRE: SINGLE_REDIRECT_MAP_SOURCE (45 Redirects 301)
-      ...getNitroRedirectRules()
+      ...getNitroRedirectRules(),
+      // Redirecionamentos de mídia para CDN Cloudflare R2
+      '/images/**': { redirect: { to: 'https://media.adtelasmosquiteiras.com.br/images/**', statusCode: 301 } },
+      '/videos/**': { redirect: { to: 'https://media.adtelasmosquiteiras.com.br/videos/**', statusCode: 301 } }
     }
   },
   
@@ -126,7 +129,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Telas mosquiteiras e redes de proteção sob medida em todo o estado de São Paulo. Solicite seu orçamento.' },
         { property: 'og:title', content: 'AD Telas e Redes - Proteção Profissional para Sua Família em SP' },
         { property: 'og:description', content: 'Telas mosquiteiras e redes de proteção sob medida para residências e empresas em todo o estado de São Paulo.' },
-        { property: 'og:image', content: 'https://www.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
+        { property: 'og:image', content: 'https://media.adtelasmosquiteiras.com.br/images/logo_adt_telas_nova.png' },
         { property: 'og:image:width', content: '512' },
         { property: 'og:image:height', content: '512' },
         { property: 'og:type', content: 'website' },

@@ -103,13 +103,22 @@ export function buildLeadInsertPayload(params: BuildLeadParams): Record<string, 
     nome: cleanNome,
     cidade: (cidade && String(cidade).trim()) ? String(cidade).trim() : null,
     bairro: bairro || null,
-    servico: servico || 'Não especificado',
+    servico: servico || (body.need_type ? `Telas Mosquiteiras — ${body.need_type}` : 'Não especificado'),
     telefone: cleanPhone,
     email: cleanEmail,
     mensagem: mensagem ? String(mensagem).slice(0, 2000) : null,
     origem: origem || 'formulario_geral',
     status: 'Novo',
     valor_orcamento: 0,
+
+    // Campos do Funil Multi-Etapas & Pipeline
+    need_type: body.need_type || null,
+    quantity_range: body.quantity_range || null,
+    property_type: body.property_type || null,
+    installation_timeline: body.installation_timeline || null,
+    has_photos: body.has_photos === true || body.has_photos === 'true' || false,
+    postal_code: body.postal_code || body.cep || null,
+    pipeline_stage: body.pipeline_stage || 'NOVO',
 
     // Estado durável de notificação por e-mail
     notification_email_status: 'pending',

@@ -11,6 +11,7 @@ import Badge from '../../components/ui/badge/Badge.vue'
 import WhatsappLeadKpiCards from '../../components/admin/whatsapp/WhatsappLeadKpiCards.vue'
 import WhatsappLeadDetailModal from '../../components/admin/whatsapp/WhatsappLeadDetailModal.vue'
 import WhatsappUnidentifiedClicks from '../../components/admin/whatsapp/WhatsappUnidentifiedClicks.vue'
+import LeadKanbanBoard from '../../components/admin/leads/LeadKanbanBoard.vue'
 import { formatWhatsAppLink } from '~/utils/phone'
 
 definePageMeta({ layout: 'admin' })
@@ -21,6 +22,7 @@ useHead({
 })
 
 const activeTab = ref<'whatsapp' | 'technical_history'>('whatsapp')
+const viewMode = ref<'table' | 'kanban'>('table')
 const isLoading = ref(false)
 const searchQuery = ref('')
 const selectedStatusFilter = ref('')
@@ -127,6 +129,46 @@ async function handleInlineStatusUpdate(lead: any, newStatus: string) {
     }
   } catch (err) {
     console.warn('[handleInlineStatusUpdate] Falha:', err)
+  }
+}
+
+async function handleKanbanStageUpdate(lead: any, newStage: string) {
+  try {
+    const canonicalStatus = newStage === 'FECHADO' ? 'Fechado' : (newStage === 'PERDIDO' ? 'Perdido' : 'Em contato')
+    const res = await $fetch<any>(`/api/admin/leads/${encodeURIComponent(lead.id)}/status`, {
+      method: 'PATCH',
+      body: { 
+        status: canonicalStatus,
+        pipeline_stage: newStage 
+      }
+    })
+    if (res?.success) {
+      lead.pipeline_stage = newStage
+      lead.status = canonicalStatus
+      fetchLeads()
+    }
+  } catch (err) {
+    console.warn('[handleKanbanStageUpdate] Falha:', err)
+  }
+}
+
+async function handleIncrementAttempt(lead: any) {
+  const nextAttempts = (lead.contact_attempts || 0) + 1
+  try {
+    const res = await $fetch<any>(`/api/admin/leads/${encodeURIComponent(lead.id)}/status`, {
+      method: 'PATCH',
+      body: { 
+        status: 'Em contato',
+        pipeline_stage: 'CONTATO',
+        contact_attempts: nextAttempts
+      }
+    })
+    if (res?.success) {
+      lead.contact_attempts = nextAttempts
+      fetchLeads()
+    }
+  } catch (err) {
+    console.warn('[handleIncrementAttempt] Falha:', err)
   }
 }
 
@@ -291,8 +333,43 @@ onMounted(() => {
               <option :value="100">100</option>
             </select>
           </div>
+
+          <!-- Alternador Tabela / Funil (Kanban) -->
+          <div class="flex items-center gap-1 bg-slate-900 border border-slate-700/60 p-1 rounded-xl">
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              :class="viewMode === 'table' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'"
+              @click="viewMode = 'table'"
+            >
+              <Icon name="lucide:table" class="w-3.5 h-3.5" />
+              Tabela
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              :class="viewMode === 'kanban' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'"
+              @click="viewMode = 'kanban'"
+            >
+              <Icon name="lucide:columns" class="w-3.5 h-3.5" />
+              Funil (Kanban)
+            </button>
+          </div>
         </div>
       </div>
+
+      <!-- Visualização em Kanban -->
+      <LeadKanbanBoard
+        v-if="viewMode === 'kanban'"
+        :leads="leads"
+        :is-loading="isLoading"
+        @open-detail="openLeadDetails"
+        @update-stage="handleKanbanStageUpdate"
+        @increment-attempt="handleIncrementAttempt"
+      />
+
+      <!-- Visualização em Tabela / Cards Mobile (Existente) -->
+      <template v-else>
 
       <!-- ====================================================================== -->
       <!-- MOBILE CARDS VIEW (< 768px)                                             -->
@@ -424,7 +501,10 @@ onMounted(() => {
             >
               <!-- Nome & Telefone -->
               <TableCell class="py-3.5 px-4">
-                <p class="font-bold text-white text-sm">{{ lead.nome || 'Sem nome' }}</p>
+                <div class="flex items-center gap-1.5">
+                  <p class="font-bold text-white text-sm">{{ lead.nome || 'Sem nome' }}</p>
+                  <span v-if="lead.need_type || lead.pipeline_stage" class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 font-bold">Funil</span>
+                </div>
                 <div class="flex items-center gap-1.5 mt-0.5">
                   <span class="text-slate-400 text-[11px] font-mono">{{ lead.telefone || lead.email || '-' }}</span>
                   <a
@@ -539,6 +619,7 @@ onMounted(() => {
           </button>
         </div>
       </div>
+      </template>
 
       <!-- SEÇÃO FINAL: Cliques do WhatsApp sem Identificação -->
       <WhatsappUnidentifiedClicks />

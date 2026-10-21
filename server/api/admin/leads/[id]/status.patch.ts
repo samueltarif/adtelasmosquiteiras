@@ -45,11 +45,21 @@ export default defineEventHandler(async (event) => {
     const currentLead = leads[0]
     const previousStatus = currentLead.status || 'Novo'
 
-    // 2. Atualizar status do lead
+    // 2. Atualizar status e pipeline do lead
+    const updatePayload: Record<string, any> = { status: canonicalStatus }
+    if (body.pipeline_stage) {
+      updatePayload.pipeline_stage = String(body.pipeline_stage).toUpperCase()
+      updatePayload.pipeline_updated_at = new Date().toISOString()
+    }
+    if (typeof body.contact_attempts === 'number') {
+      updatePayload.contact_attempts = body.contact_attempts
+      updatePayload.last_contact_at = new Date().toISOString()
+    }
+
     const updateRes = await fetch(`${config.supabaseUrl}/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers,
-      body: JSON.stringify({ status: canonicalStatus })
+      body: JSON.stringify(updatePayload)
     })
 
     const updatedLeads = await updateRes.json()

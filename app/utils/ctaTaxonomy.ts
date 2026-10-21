@@ -4,6 +4,8 @@ export const CTA_LOCATIONS = [
   'lp_sticky',
   'lp_bottom',
   'lp_form',
+  'lp_funnel',
+  'lp_multistep',
   'header',
   'hero',
   'footer',

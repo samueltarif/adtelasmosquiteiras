@@ -193,6 +193,48 @@ function statusVariant(status: string) {
           </div>
         </div>
 
+        <!-- Respostas do Funil de Leads Multi-Etapas (se existirem) -->
+        <div v-if="lead.need_type || lead.quantity_range || lead.property_type || lead.installation_timeline || lead.postal_code || lead.has_photos" class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3">
+          <div class="flex items-center gap-2">
+            <Icon name="lucide:check-square" class="w-4 h-4 text-amber-400" />
+            <span class="font-bold text-amber-300 text-xs uppercase tracking-wider">Qualificação do Funil (Multi-Step)</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Necessidade</span>
+              <span class="text-white font-bold">{{ lead.need_type || '-' }}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Quantidade</span>
+              <span class="text-white font-bold">{{ lead.quantity_range || '-' }}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Tipo de Imóvel</span>
+              <span class="text-white font-bold capitalize">{{ lead.property_type || '-' }}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Prazo Desejado</span>
+              <span class="text-white font-bold">{{ lead.installation_timeline || '-' }}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">CEP</span>
+              <span class="text-white font-bold font-mono">{{ lead.postal_code || '-' }}</span>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase font-semibold block">Possui Fotos</span>
+              <span :class="lead.has_photos ? 'text-emerald-400 font-bold' : 'text-slate-400 font-medium'">
+                {{ lead.has_photos ? 'Sim 📷' : 'Não informado' }}
+              </span>
+            </div>
+          </div>
+
+          <div v-if="lead.mensagem" class="pt-1 text-xs text-slate-300 whitespace-pre-line border-t border-white/5">
+            <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Resumo das Respostas:</span>
+            {{ lead.mensagem }}
+          </div>
+        </div>
+
         <!-- Origem & Atribuição (Sessão Atual vs First Touch) -->
         <div class="space-y-3">
           <h3 class="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-2">

@@ -31,41 +31,48 @@ export default defineEventHandler(async (event) => {
 
   const t1_validationComplete = performance.now()
 
-  if (!config.supabaseUrl || !config.supabaseServiceRoleKey) {
+  const supabaseApiKey = config.supabaseServiceRoleKey || config.supabaseAnonKey
+  if (!config.supabaseUrl || !supabaseApiKey) {
     console.error('[send-lead] CRITICAL: Supabase não configurado — lead NÃO será salvo')
     throw createError({ statusCode: 500, message: 'Configuração de banco indisponível' })
   }
 
   const effectiveSubmissionId = body.submission_id || crypto.randomUUID()
-  let leadId: string | null = null
+  const preGeneratedLeadId = crypto.randomUUID()
+  let leadId: string | null = preGeneratedLeadId
   let isNewLead = false
 
   // ======================================================================
   // 2. GRAVAR LEAD NO SUPABASE (LEAD_CREATION_ORDER = FIRST)
   // ======================================================================
   const t2_dbInsertStart = performance.now()
-  const insertPayload = buildLeadInsertPayload({
-    body,
-    effectiveSubmissionId,
-    cleanNome,
-    cleanPhone,
-    cleanEmail,
-    userAgent: headers['user-agent'] || ''
-  })
+  const insertPayload = {
+    id: preGeneratedLeadId,
+    ...buildLeadInsertPayload({
+      body,
+      effectiveSubmissionId,
+      cleanNome,
+      cleanPhone,
+      cleanEmail,
+      userAgent: headers['user-agent'] || ''
+    })
+  }
+
+  const isServiceRole = Boolean(config.supabaseServiceRoleKey)
 
   try {
     const insertResponse = await $fetch(`${config.supabaseUrl}/rest/v1/leads`, {
       method: 'POST',
       headers: {
-        'apikey': config.supabaseServiceRoleKey,
-        'Authorization': `Bearer ${config.supabaseServiceRoleKey}`,
+        'apikey': supabaseApiKey,
+        'Authorization': `Bearer ${supabaseApiKey}`,
         'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
+        'Prefer': isServiceRole ? 'return=representation' : 'return=minimal'
       },
       body: insertPayload
     }) as any
 
-    if (Array.isArray(insertResponse) && insertResponse.length > 0) {
+    if (Array.isArray(insertResponse) && insertResponse.length > 0 && insertResponse[0]?.id) {
       leadId = insertResponse[0].id
     } else if (insertResponse?.id) {
       leadId = insertResponse.id
@@ -80,8 +87,8 @@ export default defineEventHandler(async (event) => {
           `${config.supabaseUrl}/rest/v1/leads?submission_id=eq.${encodeURIComponent(effectiveSubmissionId)}&select=id,submission_id,status`,
           {
             headers: {
-              'apikey': config.supabaseServiceRoleKey,
-              'Authorization': `Bearer ${config.supabaseServiceRoleKey}`
+              'apikey': supabaseApiKey,
+              'Authorization': `Bearer ${supabaseApiKey}`
             }
           }
         )

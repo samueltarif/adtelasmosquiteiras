@@ -21,6 +21,8 @@ export const ALLOWED_CTA_LOCATIONS = new Set([
   'lp_sticky',
   'lp_bottom',
   'lp_form',
+  'lp_funnel',
+  'lp_multistep',
   'header',
   'hero',
   'footer',
