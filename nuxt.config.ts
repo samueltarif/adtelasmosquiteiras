@@ -108,10 +108,7 @@ export default defineNuxtConfig({
         }
       },
       // Fase 03C / 03D-PRE: SINGLE_REDIRECT_MAP_SOURCE (45 Redirects 301)
-      ...getNitroRedirectRules(),
-      // Redirecionamentos de mídia para CDN Cloudflare R2
-      '/images/**': { redirect: { to: 'https://media.adtelasmosquiteiras.com.br/images/**', statusCode: 301 } },
-      '/videos/**': { redirect: { to: 'https://media.adtelasmosquiteiras.com.br/videos/**', statusCode: 301 } }
+      ...getNitroRedirectRules()
     }
   },
   

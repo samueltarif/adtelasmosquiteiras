@@ -1,16 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [{ "path": "/api/cron/finance-reminders", "schedule": "0 12 * * *" }],
-  "redirects": [
-    {
-      "source": "/images/:path*",
-      "destination": "https://media.adtelasmosquiteiras.com.br/images/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/videos/:path*",
-      "destination": "https://media.adtelasmosquiteiras.com.br/videos/:path*",
-      "permanent": true
-    }
-  ]
+  "crons": [{ "path": "/api/cron/finance-reminders", "schedule": "0 12 * * *" }]
 }

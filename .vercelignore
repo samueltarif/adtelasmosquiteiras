@@ -1,4 +1,0 @@
-# Omit heavy static media from Vercel deployment bundle
-# All media is served directly by Cloudflare R2 CDN (https://media.adtelasmosquiteiras.com.br)
-public/images/
-public/videos/
