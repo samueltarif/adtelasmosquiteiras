@@ -86,5 +86,6 @@ useHead(() => ({
       <NuxtPage />
     </NuxtLayout>
     <WhatsappLeadModal />
+    <SiteLightboxModal />
   </div>
 </template>

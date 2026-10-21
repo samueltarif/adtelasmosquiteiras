@@ -130,3 +130,12 @@ html {
 .animate-in > *:nth-child(4) {
   animation-delay: 0.4s;
 }
+
+/* Cursor pointer para fotos ampliáveis no site */
+[data-custom-lightbox],
+.gallery-figure img,
+.service-card > img,
+article img,
+section:not(header) img:not([data-no-lightbox]):not(.no-lightbox):not([src*="logo"]):not([src*="icon"]) {
+  cursor: pointer;
+}

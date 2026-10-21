@@ -1,5 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
+
+const siteLightbox = useSiteLightbox()
+
+function openHeroPhoto() {
+  siteLightbox.open(
+    carouselImages.map(img => ({ src: img.src, alt: img.alt, title: img.alt })),
+    currentIndex.value
+  )
+}
 
 const carouselImages = [
   { src: '/images/redes_para_sacadas.jpg', alt: 'Rede de proteção para sacada' },
@@ -63,10 +73,23 @@ onUnmounted(() => { clearInterval(timer) })
     <!-- Conteúdo do Hero colado embaixo exatamente como na referência IM Esquadrias -->
     <div class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex-1 flex flex-col justify-end pb-7 sm:pb-10 lg:pb-12 pt-20">
       
-      <!-- Pill Badge: visível no desktop onde existe na referência -->
-      <div class="hidden sm:inline-flex items-center gap-2 self-start px-4 py-1.5 bg-black/40 text-white rounded-full text-xs sm:text-sm font-semibold mb-5 border border-white/20 backdrop-blur-md uppercase tracking-wider">
-        <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
-        Especialistas em Telas e Redes
+      <!-- Pill Badge + Botão Ampliar Foto -->
+      <div class="flex items-center gap-3 self-start mb-5 flex-wrap">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-black/40 text-white rounded-full text-xs sm:text-sm font-semibold border border-white/20 backdrop-blur-md uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-[#00D2FF] animate-pulse"></span>
+          Especialistas em Telas e Redes
+        </div>
+
+        <button
+          type="button"
+          @click.stop="openHeroPhoto"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/50 hover:bg-black/75 text-white rounded-full text-xs font-semibold border border-white/30 backdrop-blur-md transition-all active:scale-95 cursor-pointer shadow-md"
+          title="Ver foto do banner em tamanho ampliado"
+          aria-label="Ver foto do banner em tamanho ampliado"
+        >
+          <Icon name="lucide:zoom-in" class="w-3.5 h-3.5 text-[#00D2FF]" />
+          <span>Ampliar foto</span>
+        </button>
       </div>
 
       <!-- Headline -->

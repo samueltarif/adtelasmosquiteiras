@@ -6,6 +6,17 @@
 // Cinza escuro: #4B5563 (texto secundário)
 
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
+
+const siteLightbox = useSiteLightbox()
+
+function openReviewPhoto(review) {
+  siteLightbox.open({
+    src: review.image,
+    alt: `Avaliação Google - ${review.name}`,
+    title: `Avaliação de ${review.name}`
+  })
+}
 
 // Array com as avaliações do Google
 const reviews = [
@@ -130,12 +141,23 @@ onUnmounted(() => { stopAutoplay() })
               <div class="grid md:grid-cols-12 gap-6 items-center">
                 
                 <!-- Print/Foto da Avaliação -->
-                <div class="md:col-span-5 relative overflow-hidden rounded-xl bg-gray-100 border border-gray-200">
+                <div
+                  class="md:col-span-5 relative overflow-hidden rounded-xl bg-gray-100 border border-gray-200 cursor-pointer group/rev"
+                  data-custom-lightbox
+                  role="button"
+                  tabindex="0"
+                  :aria-label="`Ver avaliação de ${review.name} em tamanho ampliado`"
+                  @click="openReviewPhoto(review)"
+                >
                   <img 
                     :src="review.image" 
                     :alt="`Avaliação Google - ${review.name}`"
-                    class="w-full h-auto max-h-[320px] object-contain mx-auto"
+                    class="w-full h-auto max-h-[320px] object-contain mx-auto transition-transform duration-300 group-hover/rev:scale-105"
                   />
+                  <div class="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 text-white text-[11px] font-semibold px-2 py-1 rounded-md shadow flex items-center gap-1 backdrop-blur-sm">
+                    <Icon name="lucide:zoom-in" class="w-3.5 h-3.5" />
+                    <span>Ampliar</span>
+                  </div>
                 </div>
 
                 <!-- Depoimento em texto estilo Google Review -->

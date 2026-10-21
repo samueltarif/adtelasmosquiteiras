@@ -1,6 +1,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import ServicePublicGallery from '~/components/services/ServicePublicGallery.vue'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
+
+const siteLightbox = useSiteLightbox()
+
+function openProductPhoto(produto) {
+  siteLightbox.open({
+    src: produto.imagem,
+    alt: produto.titulo,
+    title: produto.titulo,
+    caption: produto.descricao
+  })
+}
 
 const WHATSAPP_NUMBER = '5511983586611'
 const GOOGLE_REVIEWS_URL = 'https://www.google.com/search?sca_esv=59de4d94fc229621&sxsrf=ADLYWIIjEuoUVhAIFwXy5vUQP17RrHg2ig:1729605268236&kgmid=/g/11rnbd2wmb&q=AD+TELAS+MOSQUITEIRAS&shndl=30&source=sh/x/loc/uni/m1/1&kgs=5e4e7713d87c37c6&zx=1768571227913&no_sw_cr=1#lrd=0x94ce595a4d5fb92b:0xe81c9935ae058bde,1,,,,'
@@ -227,14 +239,18 @@ const openFormModal = () => { showFormModal.value = true }
             class="group relative rounded-2xl overflow-hidden border-2 border-white/10 hover:border-[#38BDF8] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 flex flex-col bg-white/5 backdrop-blur-sm justify-between"
           >
             <!-- Área clicável do Card (Foto + Título + Descrição -> Abre Modal de Contato) -->
-            <button
-              type="button"
-              @click="openFormModal"
-              :aria-label="`Pedir orçamento para ${produto.titulo}`"
+            <div
               class="text-left w-full flex flex-col flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38BDF8] rounded-t-2xl"
             >
               <!-- Imagem do Card com Overlay Gradient -->
-              <div class="relative h-64 md:h-72 overflow-hidden bg-gray-900 w-full">
+              <div
+                class="relative h-64 md:h-72 overflow-hidden bg-gray-900 w-full cursor-pointer"
+                data-custom-lightbox
+                role="button"
+                tabindex="0"
+                :aria-label="`Abrir foto de ${produto.titulo} em tela grande`"
+                @click.stop.prevent="openProductPhoto(produto)"
+              >
                 <img
                   :src="produto.imagem"
                   :alt="produto.titulo"
@@ -250,8 +266,17 @@ const openFormModal = () => { showFormModal.value = true }
                   {{ produto.destaque }}
                 </div>
 
+                <!-- Badge Ampliar -->
+                <div class="absolute top-3 right-3 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1 backdrop-blur-md transition-all active:scale-95 z-20">
+                  <Icon name="lucide:zoom-in" class="w-3.5 h-3.5" />
+                  <span>Ampliar</span>
+                </div>
+
                 <!-- Conteúdo sobreposto na imagem (Estilo Card Dark Premium) -->
-                <div class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end">
+                <div
+                  class="absolute inset-x-0 bottom-0 p-5 flex flex-col justify-end cursor-pointer"
+                  @click="openFormModal"
+                >
                   <h3 class="text-lg md:text-xl font-bold text-white mb-2 leading-tight group-hover:text-[#38BDF8] transition-colors">
                     {{ produto.titulo }}
                   </h3>
@@ -264,7 +289,7 @@ const openFormModal = () => { showFormModal.value = true }
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
 
             <!-- Barra de Ações (WhatsApp CTA Isolado) -->
             <div class="p-4 bg-white/5 border-t border-white/10 flex items-center justify-between gap-2 mt-auto">

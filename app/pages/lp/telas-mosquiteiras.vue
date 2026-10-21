@@ -2,12 +2,28 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useServicos } from '~/composables/useServicos'
 import { useLandingTracking } from '~/composables/useLandingTracking'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
 import { reviews, googleReviews, googleReviewsUrl } from '~/data/telas/reviews'
 
 definePageMeta({ layout: false })
 
 const { WHATSAPP_NUMBER } = useServicos()
 const { track, startForm } = useLandingTracking()
+const siteLightbox = useSiteLightbox()
+
+function openGalleryLightbox(item, cIndex) {
+  const images = (item.images && item.images.length) ? item.images : [item.img]
+  const currentIdx = (item.images && item.images.length) ? (activeSlides.value[cIndex] || 0) : 0
+  siteLightbox.open(
+    images.map((src, i) => ({
+      src,
+      alt: `${item.title} - Foto ${i + 1}`,
+      title: item.title,
+      caption: item.desc
+    })),
+    currentIdx
+  )
+}
 
 const baseWhatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}`
 function getWhatsappUrl(text) {
@@ -425,7 +441,15 @@ onUnmounted(() => {
         @touchend="isGalleryPaused = false"
       >
         <article v-for="(item, cIndex) in realInstallations" :key="item.title" class="gallery-card">
-          <div class="card-img-wrap" :class="{ 'has-carousel': item.images?.length }">
+          <div
+            class="card-img-wrap"
+            :class="{ 'has-carousel': item.images?.length }"
+            role="button"
+            tabindex="0"
+            :aria-label="`Abrir fotos de ${item.title} em tela grande`"
+            data-custom-lightbox
+            @click.stop.prevent="openGalleryLightbox(item, cIndex)"
+          >
             <template v-if="item.images && item.images.length">
               <div
                 v-for="(imgSrc, sIndex) in item.images"
@@ -467,6 +491,10 @@ onUnmounted(() => {
               />
             </template>
             <span class="card-badge">{{ item.tag }}</span>
+            <span class="card-zoom-badge" aria-hidden="true">
+              <Icon name="lucide:zoom-in" class="w-3.5 h-3.5" />
+              <span>Ampliar</span>
+            </span>
           </div>
           <div class="card-body">
             <h3>{{ item.title }}</h3>
@@ -1310,6 +1338,31 @@ p {
   padding: 3px 8px;
   border-radius: 4px;
   backdrop-filter: blur(4px);
+}
+
+.card-zoom-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(13, 29, 48, 0.85);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.gallery-card:hover .card-zoom-badge {
+  background: rgba(35, 75, 115, 0.95);
+  transform: scale(1.05);
 }
 
 .card-body {

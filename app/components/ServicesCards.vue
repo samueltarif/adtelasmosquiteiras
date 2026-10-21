@@ -1,10 +1,21 @@
 <script setup>
 import { useServicos } from '~/composables/useServicos'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
 
 // ============================================
 // COMPOSABLES
 // ============================================
 const { getAllFamilias } = useServicos()
+const siteLightbox = useSiteLightbox()
+
+function openServicePhoto(servico) {
+  siteLightbox.open({
+    src: servico.imagem,
+    alt: servico.titulo,
+    title: servico.titulo,
+    caption: servico.descricaoCurta
+  })
+}
 const familias = getAllFamilias()
 
 // Mapear famílias para cards
@@ -103,8 +114,15 @@ const trackEvent = (eventName, params = {}) => {
           class="group bg-white rounded-3xl overflow-hidden border-2 border-[#E5EDF8] hover:border-[#F49A1A] transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 cursor-pointer"
           :data-gtm="`servico-card-${servico.slug}`"
         >
-          <!-- Imagem do Serviço -->
-          <div class="relative h-64 md:h-80 overflow-hidden bg-gradient-to-br from-[#E5EDF8] to-[#F9FAFB]">
+          <!-- Imagem do Serviço com Zoom -->
+          <div
+            class="relative h-64 md:h-80 overflow-hidden bg-gradient-to-br from-[#E5EDF8] to-[#F9FAFB] cursor-pointer"
+            data-custom-lightbox
+            role="button"
+            tabindex="0"
+            :aria-label="`Abrir foto de ${servico.titulo} em tela grande`"
+            @click.stop.prevent="openServicePhoto(servico)"
+          >
             <img
               :src="servico.imagem"
               :alt="servico.titulo"
@@ -116,6 +134,12 @@ const trackEvent = (eventName, params = {}) => {
             <div class="absolute top-4 left-4 bg-[#F49A1A] text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
               <Icon name="lucide:check-circle" class="w-4 h-4" />
               {{ servico.destaque }}
+            </div>
+
+            <!-- Botão/Badge Ampliar -->
+            <div class="absolute top-4 right-4 bg-black/60 hover:bg-black/80 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 backdrop-blur-md transition-all active:scale-95 z-10">
+              <Icon name="lucide:zoom-in" class="w-4 h-4" />
+              <span>Ampliar</span>
             </div>
             
             <!-- Overlay Gradient -->

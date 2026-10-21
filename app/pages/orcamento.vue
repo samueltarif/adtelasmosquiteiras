@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
 
 // Carrosseis do hero
 const heroCarousels = [
@@ -40,6 +41,19 @@ const heroCarousels = [
 
 const carouselIndexes = ref([0, 0, 0])
 let carouselTimers = []
+const siteLightbox = useSiteLightbox()
+
+function openCardPhotos(carousel, i) {
+  const currentIdx = carouselIndexes.value[i] || 0
+  siteLightbox.open(
+    carousel.images.map((src, idx) => ({
+      src,
+      alt: `${carousel.label} - Foto ${idx + 1}`,
+      title: carousel.label
+    })),
+    currentIdx
+  )
+}
 
 onMounted(() => {
   heroCarousels.forEach((_, i) => {
@@ -160,11 +174,15 @@ const callPhone = () => {
 
           <!-- 3 carrosseis lado a lado -->
           <div class="grid grid-cols-3 gap-2 sm:gap-3 flex-1">
-            <NuxtLink
+            <div
               v-for="(carousel, i) in heroCarousels"
               :key="i"
-              :to="carousel.link"
               class="card-glow relative rounded-xl overflow-hidden shadow-lg cursor-pointer group h-32 sm:h-44 md:h-56"
+              data-custom-lightbox
+              role="button"
+              tabindex="0"
+              :aria-label="`Abrir fotos de ${carousel.label} em tela grande`"
+              @click="openCardPhotos(carousel, i)"
             >
               <transition-group name="fade">
                 <img
@@ -176,13 +194,25 @@ const callPhone = () => {
                   class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </transition-group>
-              <!-- Label -->
-              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-1.5 sm:p-3">
-                <p class="text-white text-[10px] sm:text-xs font-bold text-center leading-tight truncate">{{ carousel.label }}</p>
+              <!-- Zoom badge -->
+              <div class="absolute top-2 right-2 bg-black/60 text-white text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow flex items-center gap-1 backdrop-blur-sm z-10 transition-transform active:scale-95">
+                <Icon name="lucide:zoom-in" class="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <span>Ampliar</span>
               </div>
+              <!-- Label -->
+              <NuxtLink
+                :to="carousel.link"
+                @click.stop
+                class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-1.5 sm:p-3 hover:bg-black/90 transition-colors z-10"
+              >
+                <p class="text-white text-[10px] sm:text-xs font-bold text-center leading-tight truncate flex items-center justify-center gap-1">
+                  <span>{{ carousel.label }}</span>
+                  <span class="text-[#F49A1A]">→</span>
+                </p>
+              </NuxtLink>
               <!-- Hover overlay -->
-              <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60"></div>
-            </NuxtLink>
+              <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl ring-2 ring-white/60 pointer-events-none"></div>
+            </div>
           </div>
 
         </div><!-- fim flex row -->

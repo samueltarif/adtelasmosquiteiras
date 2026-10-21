@@ -1,10 +1,26 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useServicos } from '~/composables/useServicos'
+import { useSiteLightbox } from '~/composables/useSiteLightbox'
 
 const { WHATSAPP_NUMBER } = useServicos()
 const route = useRoute()
 const showFormModal = ref(false)
+const siteLightbox = useSiteLightbox()
+
+function openCardPhotos(servico) {
+  const images = servico.imagens || [servico.imagem]
+  const currentIdx = cardImageIndex.value % (servico.imagens?.length || 1)
+  siteLightbox.open(
+    images.map((src, i) => ({
+      src,
+      alt: `${servico.titulo} - Foto ${i + 1}`,
+      title: servico.titulo,
+      caption: servico.descricaoCurta
+    })),
+    currentIdx
+  )
+}
 
 useHead({
   title: 'Redes de Proteção em São Paulo | Modelos Sob Medida | AD Telas',
@@ -292,7 +308,14 @@ onUnmounted(() => {
                 class="flex flex-col flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F49A1A] rounded-t-2xl"
               >
                 <!-- Imagem com hover interativo -->
-                <div class="relative h-44 overflow-hidden bg-[#E5EDF8]">
+                <div
+                  class="relative h-44 overflow-hidden bg-[#E5EDF8] cursor-pointer group/img"
+                  data-custom-lightbox
+                  role="button"
+                  tabindex="0"
+                  :aria-label="`Abrir fotos de ${servico.titulo} em tela cheia`"
+                  @click.stop.prevent="openCardPhotos(servico)"
+                >
                   <img
                     v-for="(imgSrc, imgIdx) in (servico.imagens || [servico.imagem])"
                     :key="imgSrc"
@@ -305,6 +328,11 @@ onUnmounted(() => {
                   <!-- Badge destaque -->
                   <div class="absolute top-3 left-3 bg-[#F49A1A] text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
                     {{ servico.destaque }}
+                  </div>
+                  <!-- Badge Zoom -->
+                  <div class="absolute top-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow flex items-center gap-1 backdrop-blur-sm z-10 transition-transform active:scale-95">
+                    <Icon name="lucide:zoom-in" class="w-3 h-3" />
+                    <span>Ampliar</span>
                   </div>
                   <!-- Overlay hover "Ver Detalhes" -->
                   <div class="absolute inset-0 bg-[#22345F]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
