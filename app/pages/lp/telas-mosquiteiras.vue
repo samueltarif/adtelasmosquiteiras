@@ -12,7 +12,9 @@ const { track, startForm } = useLandingTracking()
 const siteLightbox = useSiteLightbox()
 
 function openGalleryLightbox(item, cIndex) {
-  const images = (item.images && item.images.length) ? item.images : [item.img]
+  const images = (item.fullImages && item.fullImages.length)
+    ? item.fullImages
+    : (item.fullImg ? [item.fullImg] : (item.images && item.images.length ? item.images : [item.img]))
   const currentIdx = (item.images && item.images.length) ? (activeSlides.value[cIndex] || 0) : 0
   siteLightbox.open(
     images.map((src, i) => ({
@@ -58,8 +60,13 @@ const realInstallations = [
   {
     title: 'Telas Mosquiteiras para janelas',
     desc: 'Acabamento discreto integrado à esquadria existente.',
-    img: '/images/telas_para_banheiro.webp',
+    img: '/images/telas_para_banheiro-640.webp',
     images: [
+      '/images/telas_para_banheiro-640.webp',
+      '/images/tela_paraJanela-640.webp',
+      '/images/telas_para_banheiro_especificacoes-640.webp'
+    ],
+    fullImages: [
       '/images/telas_para_banheiro.webp',
       '/images/tela_paraJanela.webp',
       '/images/telas_para_banheiro_especificacoes.webp'
@@ -69,8 +76,13 @@ const realInstallations = [
   {
     title: 'Janela de Correr em Alumínio',
     desc: 'Vedação impecável sem alterar a fachada.',
-    img: '/images/janela_correr_aluminio_1.webp',
+    img: '/images/janela_correr_aluminio_1-640.webp',
     images: [
+      '/images/janela_correr_aluminio_1-640.webp',
+      '/images/janela_correr_aluminio_2-640.webp',
+      '/images/janela_correr_aluminio_3-640.webp'
+    ],
+    fullImages: [
       '/images/janela_correr_aluminio_1.webp',
       '/images/janela_correr_aluminio_2.webp',
       '/images/janela_correr_aluminio_3.webp'
@@ -80,8 +92,13 @@ const realInstallations = [
   {
     title: 'Porta Balcão de Correr',
     desc: 'Deslizamento suave para acesso à sacada.',
-    img: '/images/porta_balcao_correr_1.webp',
+    img: '/images/porta_balcao_correr_1-640.webp',
     images: [
+      '/images/porta_balcao_correr_1-640.webp',
+      '/images/porta_balcao_correr_2-640.webp',
+      '/images/porta_balcao_correr_3-640.webp'
+    ],
+    fullImages: [
       '/images/porta_balcao_correr_1.webp',
       '/images/porta_balcao_correr_2.webp',
       '/images/porta_balcao_correr_3.webp'
@@ -91,8 +108,12 @@ const realInstallations = [
   {
     title: 'Sacada Envidraçada',
     desc: 'Proteção total mantendo a ventilação e a vista.',
-    img: '/images/sacada_envidracada_1.webp',
+    img: '/images/sacada_envidracada_1-640.webp',
     images: [
+      '/images/sacada_envidracada_1-640.webp',
+      '/images/sacada_envidracada_2-640.webp'
+    ],
+    fullImages: [
       '/images/sacada_envidracada_1.webp',
       '/images/sacada_envidracada_2.webp'
     ],
@@ -101,8 +122,13 @@ const realInstallations = [
   {
     title: 'Tela Pet Screen Reforçada',
     desc: 'Malha de alta resistência contra arranhões de pets.',
-    img: '/images/telas_pet_screen_especificacoes.webp',
+    img: '/images/telas_pet_screen_especificacoes-640.webp',
     images: [
+      '/images/telas_pet_screen_especificacoes-640.webp',
+      '/images/telas_pet_screen_cores-640.webp',
+      '/images/telas_pet_screen_rolo-640.webp'
+    ],
+    fullImages: [
       '/images/telas_pet_screen_especificacoes.webp',
       '/images/telas_pet_screen_cores.webp',
       '/images/telas_pet_screen_rolo.webp'
@@ -112,7 +138,8 @@ const realInstallations = [
   {
     title: 'Tela Removível com Fecho',
     desc: 'Fácil manuseio para retirar, higienizar e recolocar.',
-    img: '/images/tela-mosquiteira-removivel.webp',
+    img: '/images/tela-mosquiteira-removivel-640.webp',
+    fullImg: '/images/tela-mosquiteira-removivel.webp',
     tag: 'Removível'
   }
 ]
@@ -167,6 +194,10 @@ function updateFloatingWhatsapp() {
 function handleImgError(event, fallbackSrc) {
   const target = event?.target
   if (!target) return
+  if (target.src && target.src.endsWith('-640.webp')) {
+    target.src = target.src.replace(/-640\.webp$/, '.webp')
+    return
+  }
   if (target.src && target.src.endsWith('.webp')) {
     target.src = target.src.replace(/\.webp$/, '.png')
     return
@@ -176,15 +207,34 @@ function handleImgError(event, fallbackSrc) {
   }
 }
 
+let carouselPreloadTriggered = false
 function preloadCarouselImages() {
-  if (typeof window === 'undefined') return
-  realInstallations.forEach((item) => {
-    const list = item.images || (item.img ? [item.img] : [])
-    list.forEach((src) => {
-      const img = new Image()
-      img.src = src
+  if (carouselPreloadTriggered || typeof window === 'undefined') return
+  carouselPreloadTriggered = true
+  cleanupPreloadListeners()
+
+  const runPreload = () => {
+    realInstallations.forEach((item) => {
+      const list = item.images || (item.img ? [item.img] : [])
+      list.forEach((src) => {
+        const img = new Image()
+        img.src = src
+      })
     })
-  })
+  }
+
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(runPreload)
+  } else {
+    setTimeout(runPreload, 300)
+  }
+}
+
+function cleanupPreloadListeners() {
+  if (typeof window === 'undefined') return
+  window.removeEventListener('scroll', preloadCarouselImages)
+  window.removeEventListener('touchstart', preloadCarouselImages)
+  window.removeEventListener('pointerdown', preloadCarouselImages)
 }
 
 function startCarousel() {
@@ -210,11 +260,9 @@ onMounted(() => {
   track('landing_view')
 
   if (typeof window !== 'undefined') {
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => preloadCarouselImages())
-    } else {
-      setTimeout(preloadCarouselImages, 600)
-    }
+    window.addEventListener('scroll', preloadCarouselImages, { once: true, passive: true })
+    window.addEventListener('touchstart', preloadCarouselImages, { once: true, passive: true })
+    window.addEventListener('pointerdown', preloadCarouselImages, { once: true, passive: true })
   }
 
   if (typeof IntersectionObserver !== 'undefined') {
@@ -271,6 +319,7 @@ onUnmounted(() => {
   inlineCtaObserver?.disconnect()
   galleryObserver?.disconnect()
   visibleInlineCtas.clear()
+  cleanupPreloadListeners()
   stopCarousel()
 })
 </script>
@@ -294,13 +343,18 @@ onUnmounted(() => {
     <!-- Hero com Foto Ocupando o Topo e Gradiente Escuro Suave -->
     <section class="lp-hero" aria-label="Apresentação das Telas Mosquiteiras">
       <div class="lp-hero-photo">
-        <img
-          src="/images/telas-hero-casal.jpg"
-          width="1440"
-          height="960"
-          alt="Instalação de tela mosquiteira sob medida em sala de estar"
-          fetchpriority="high"
-        />
+        <picture>
+          <source media="(max-width: 640px)" srcset="/images/telas-hero-casal-640.webp" type="image/webp" />
+          <source srcset="/images/telas-hero-casal.webp" type="image/webp" />
+          <img
+            src="/images/telas-hero-casal.jpg"
+            width="1024"
+            height="682"
+            alt="Instalação de tela mosquiteira sob medida em sala de estar"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
       </div>
 
       <div class="wrap lp-hero-inner">
@@ -462,7 +516,7 @@ onUnmounted(() => {
                   :alt="`${item.title} - Foto ${sIndex + 1}`"
                   width="480"
                   height="600"
-                  :loading="sIndex === 0 ? 'eager' : 'lazy'"
+                  :loading="(cIndex === 0 && sIndex === 0) ? 'eager' : 'lazy'"
                   decoding="async"
                   @error="handleImgError($event, item.img)"
                 />
@@ -803,9 +857,14 @@ p {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--brand-gold);
+  color: #8a6500;
   margin-bottom: 6px;
   display: block;
+}
+
+.lp-hero .eyebrow,
+.cta-banner .eyebrow {
+  color: var(--brand-gold);
 }
 
 .text-gold {
@@ -939,6 +998,12 @@ p {
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+}
+
+.lp-hero-photo picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .lp-hero-photo img {
@@ -1310,6 +1375,7 @@ p {
 }
 
 .carousel-dot {
+  position: relative;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -1318,6 +1384,16 @@ p {
   padding: 0;
   cursor: pointer;
   transition: background-color 0.25s ease, width 0.25s ease, border-radius 0.25s ease;
+}
+
+.carousel-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 28px;
 }
 
 .carousel-dot.active {
@@ -1511,7 +1587,7 @@ p {
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--brand-gold);
+  color: #8a6500;
   letter-spacing: 0.08em;
   display: block;
 }
@@ -1581,7 +1657,7 @@ p {
 }
 
 .review-stars {
-  color: var(--brand-gold);
+  color: #8a6500;
   letter-spacing: 2px;
   font-size: 16px;
   margin-bottom: 10px;
