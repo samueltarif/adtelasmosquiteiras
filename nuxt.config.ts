@@ -66,6 +66,7 @@ export default defineNuxtConfig({
     
     // Público (cliente e servidor)
     public: {
+      waGateEnabled: process.env.NUXT_PUBLIC_WA_GATE_ENABLED === 'true',
       gaMeasurementId: process.env.GA_MEASUREMENT_ID || 'G-S0038L1Q6R',
       r2SiteMediaPublicBaseUrl: process.env.R2_SITE_MEDIA_PUBLIC_BASE_URL || 'https://media.adtelasmosquiteiras.com.br'
     }

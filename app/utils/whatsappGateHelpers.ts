@@ -68,6 +68,44 @@ export function pushGateSubmitEvents(context: WhatsappGateContext | null, shortC
   }
 }
 
+export function pushWhatsappDirectEvents(
+  context: {
+    path: string
+    ctaLocation: string
+    serviceKey: string | null
+    gclid?: string | null
+  },
+  shortCode: string
+): void {
+  if (typeof window === 'undefined') return
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push({
+    event: 'whatsapp_direct_click',
+    page_path: context.path,
+    cta_location: context.ctaLocation,
+    service_key: context.serviceKey,
+    short_code: shortCode
+  })
+  window.dataLayer.push({
+    event: 'generate_lead',
+    value: 1.0,
+    currency: 'BRL',
+    lead_type: 'whatsapp_direct',
+    source: 'site_whatsapp_direct',
+    page_path: context.path,
+    short_code: shortCode,
+    gclid: context.gclid || undefined
+  })
+  if ((window as any).gtag) {
+    (window as any).gtag('event', 'generate_lead', {
+      event_category: 'engagement',
+      event_label: context.ctaLocation || 'whatsapp_direct',
+      value: 1.0,
+      currency: 'BRL'
+    })
+  }
+}
+
 export function buildGatePayload(
   submissionId: string,
   eventId: string,

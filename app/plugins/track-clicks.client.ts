@@ -3,9 +3,13 @@ import { useAttribution } from '~/composables/useAttribution'
 import { useWhatsappLeadGate } from '~/composables/useWhatsappLeadGate'
 import { flushPendingWhatsappClicks } from '~/utils/whatsappTrackingQueue'
 import { flushPendingWhatsappLeads } from '~/utils/whatsappLeadQueue'
+import { generateShortCode, appendShortCodeToWhatsappUrl } from '~/utils/whatsappShortCode'
+import { reportFormConversion } from '~/utils/formConversion'
+import { pushWhatsappDirectEvents, openWhatsappWindow } from '~/utils/whatsappGateHelpers'
 import {
   getCtaLocation,
   getServiceContext,
+  prepareWhatsappAnchorForNavigation,
   buildClickPayload,
   dispatchClickTracking
 } from '~/utils/clickTrackerDispatcher'
@@ -67,33 +71,99 @@ export default defineNuxtPlugin(() => {
     }
 
     if (tipo === 'whatsapp') {
-      // REGRA CRÍTICA: Primeiro clique no CTA NÃO cria lead, NÃO gera REF, NÃO grava no Supabase
-      e.preventDefault()
-      e.stopPropagation()
+      const config = useRuntimeConfig()
+      const waGateEnabled = config.public?.waGateEnabled === true
+
+      if (waGateEnabled) {
+        // Fluxo com Gate / Pop-up (ativo apenas quando NUXT_PUBLIC_WA_GATE_ENABLED=true)
+        e.preventDefault()
+        e.stopPropagation()
+
+        const visitorId = identity.getOrCreateVisitorId()
+        const { sessionId } = identity.getOrCreateSessionId(path)
+        const landingPath = identity.getSessionLandingPath(path)
+        const attrSnapshot = { ...attribution.getOrInitAttribution() }
+        const firstTouchSnapshot = identity.getFirstTouchContext()
+        const { serviceKey, serviceName } = getServiceContext(target, e.target as HTMLElement)
+        const ctaLocation = getCtaLocation(target)
+        const rawHref = anchorEl?.getAttribute('href') || target.getAttribute('href') || ''
+
+        const gate = useWhatsappLeadGate()
+        gate.openGate({
+          originalHref: rawHref,
+          ctaLocation,
+          serviceKey,
+          serviceName,
+          path,
+          landingPath,
+          visitorId,
+          sessionId,
+          attrSnapshot,
+          firstTouchSnapshot,
+          text
+        })
+        return
+      }
+
+      // Fluxo Direto (sem pop-up) — waGateEnabled === false
+      const now = Date.now()
+      const ctaLocation = getCtaLocation(target)
+      const dedupeKey = `whatsapp:${ctaLocation}:${path}`
+
+      // Deduplicação de cliques repetidos acidentais no mesmo CTA em menos de 700ms
+      if (dedupeKey === lastClickKey && (now - lastClickTime) < 700) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      lastClickKey = dedupeKey
+      lastClickTime = now
+
+      const shortCode = generateShortCode()
+      const eventId = identity.generateUUID()
+
+      if (anchorEl) {
+        // Aplica o REF no href do próprio link e deixa o navegador abrir normalmente (target _blank)
+        prepareWhatsappAnchorForNavigation(anchorEl, target, shortCode)
+      } else {
+        // Elemento não é link âncora (ex: botão com data-track-type="whatsapp"): abre via janela
+        e.preventDefault()
+        e.stopPropagation()
+        const rawHref = target.getAttribute('data-whatsapp-url') || target.getAttribute('href') || 'https://wa.me/5511983586611'
+        const targetHref = appendShortCodeToWhatsappUrl(rawHref, shortCode, { replaceExisting: true })
+        openWhatsappWindow(targetHref)
+      }
 
       const visitorId = identity.getOrCreateVisitorId()
       const { sessionId } = identity.getOrCreateSessionId(path)
       const landingPath = identity.getSessionLandingPath(path)
-      const attrSnapshot = { ...attribution.getOrInitAttribution() }
-      const firstTouchSnapshot = identity.getFirstTouchContext()
+      const attr = attribution.getOrInitAttribution()
       const { serviceKey, serviceName } = getServiceContext(target, e.target as HTMLElement)
-      const ctaLocation = getCtaLocation(target)
-      const rawHref = anchorEl?.getAttribute('href') || target.getAttribute('href') || ''
 
-      const gate = useWhatsappLeadGate()
-      gate.openGate({
-        originalHref: rawHref,
-        ctaLocation,
+      const payload = buildClickPayload(
+        { target, anchorEl, tipo: 'whatsapp', path, visitorId, sessionId, landingPath, attr, text },
+        eventId,
         serviceKey,
         serviceName,
+        ctaLocation,
+        shortCode
+      )
+
+      // Registra telemetria e atribuição no Supabase via /api/track-click com fila resiliente
+      dispatchClickTracking('whatsapp', payload, shortCode)
+
+      // Dispara conversão principal do Google Ads no dataLayer (lead_form_success via GTM, deduplicado por eventId)
+      reportFormConversion(eventId)
+
+      // Dispara eventos complementares de dataLayer (generate_lead com lead_type: 'whatsapp_direct' e short_code)
+      pushWhatsappDirectEvents({
         path,
-        landingPath,
-        visitorId,
-        sessionId,
-        attrSnapshot,
-        firstTouchSnapshot,
-        text
-      })
+        ctaLocation,
+        serviceKey,
+        gclid: attr.gclid
+      }, shortCode)
+
       return
     }
 

@@ -31,6 +31,7 @@ supabase/.temp
 
 # Local Backups
 backups/
+backup-*/
 
 # Local Scratch
 scratch/

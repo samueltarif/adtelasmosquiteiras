@@ -463,7 +463,7 @@ onUnmounted(() => {
               :href="getWhatsappUrl(model.msg)"
               target="_blank"
               rel="noopener noreferrer"
-              class="button outline-btn pulse-subtle"
+              class="button outline-btn"
               data-cta-location="quick_models"
               data-gtm="lp-whatsapp-models"
               data-track-type="whatsapp"
@@ -557,7 +557,7 @@ onUnmounted(() => {
               :href="getWhatsappUrl(`Olá! Gostei da foto de ${item.title} e gostaria de falar com um consultor para um orçamento.`)"
               target="_blank"
               rel="noopener noreferrer"
-              class="card-cta-link pulse-subtle"
+              class="card-cta-link"
               data-cta-location="gallery_card"
               data-gtm="lp-whatsapp-gallery"
               data-track-type="whatsapp"
@@ -695,7 +695,7 @@ onUnmounted(() => {
             :href="getWhatsappUrl('Olá! Quero enviar a foto do meu vão para orçamento de tela mosquiteira. Meu CEP é: ')"
             target="_blank"
             rel="noopener noreferrer"
-            class="button green pulse-btn"
+            class="button green"
             data-cta-location="quick_photo_band"
             data-gtm="lp-whatsapp-quick-band"
             data-track-type="whatsapp"
@@ -724,7 +724,7 @@ onUnmounted(() => {
             :href="getWhatsappUrl('Olá! Quero enviar uma foto e pedir um orçamento para telas mosquiteiras sob medida.')"
             target="_blank"
             rel="noopener noreferrer"
-            class="button green final-btn pulse-btn"
+            class="button green final-btn"
             data-cta-location="final_cta"
             data-gtm="lp-whatsapp-final"
             data-track-type="whatsapp"
@@ -1145,13 +1145,7 @@ p {
 }
 
 .pulse-btn {
-  animation: pulse-green 2s infinite ease-in-out;
-}
-
-@keyframes pulse-green {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-  50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+  animation: none !important;
 }
 
 /* Rodapé Compacto do Hero: 2 frases lado a lado e 1 centralizada embaixo */
@@ -1310,11 +1304,11 @@ p {
   box-shadow: 0 12px 24px rgba(18, 35, 47, 0.12);
 }
 
-/* Altura verticalmente aumentada conforme solicitação */
+/* Altura vertical dos cards da galeria */
 .card-img-wrap {
   position: relative;
   background: #e8eef5;
-  height: 280px;
+  height: 260px;
   overflow: hidden;
 }
 
@@ -1472,6 +1466,15 @@ p {
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  border: 1.5px solid #087c38;
+  background: #f0faf3;
+  color: #087c38;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.card-cta-link:hover {
+  background: #087c38;
+  color: #fff;
 }
 
 .card-cta-link .cta-wa-icon {
@@ -1502,38 +1505,8 @@ p {
   }
 }
 
-/* Animação que Pisca Levemente nos Botões de Ação dos Cards */
 .pulse-subtle {
-  animation: pulse-subtle-glow 2.2s infinite ease-in-out;
-  border: 1.5px solid #087c38 !important;
-  background: #f0faf3 !important;
-  color: #087c38 !important;
-  font-weight: 750 !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-.pulse-subtle:hover {
-  background: #087c38 !important;
-  color: #fff !important;
-  transform: scale(1.03);
-}
-
-@keyframes pulse-subtle-glow {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6), 0 2px 8px rgba(8, 124, 56, 0.15);
-    filter: brightness(1);
-  }
-  50% {
-    transform: scale(1.025);
-    box-shadow: 0 0 0 8px rgba(37, 211, 102, 0), 0 4px 16px rgba(8, 124, 56, 0.35);
-    filter: brightness(1.08);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 2px 8px rgba(8, 124, 56, 0.15);
-    filter: brightness(1);
-  }
+  animation: none !important;
 }
 
 /* Modelos Objetivos: Janela | Porta | Sacada | Removível */
@@ -1614,6 +1587,15 @@ p {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  border: 1.5px solid #087c38;
+  background: #f0faf3;
+  color: #087c38;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.outline-btn:hover {
+  background: #087c38;
+  color: #fff;
 }
 
 .outline-btn :deep(svg) {
@@ -2038,11 +2020,7 @@ p {
   }
 }
 
-@keyframes pulse-whatsapp {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.8), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
-  50% { transform: scale(1.05); box-shadow: 0 0 0 14px rgba(37, 211, 102, 0), 0 8px 24px rgba(8, 124, 56, 0.55); filter: brightness(1.12); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 4px 18px rgba(8, 124, 56, 0.4); filter: brightness(1); }
-}
+
 
 /* Prova de confiança próxima à decisão, sem acrescentar altura fixa. */
 .hero-trust {
@@ -2115,7 +2093,7 @@ p {
   .comparison-action .button { width: 100%; padding-inline: 10px; }
   .installation-details { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 18px; }
   .gallery-grid { gap: 8px; }
-  .card-img-wrap { height: auto; aspect-ratio: 4 / 3; }
+  .card-img-wrap { height: 260px; aspect-ratio: auto; }
   .card-body { padding: 12px 10px; }
   .card-body p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-bottom: 10px; }
   .card-cta-link { min-height: 44px; white-space: normal; text-align: center; }
